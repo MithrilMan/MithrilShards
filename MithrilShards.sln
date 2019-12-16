@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.P2P", "src\MithrilShards.P2P\MithrilShards.P2P.csproj", "{CA14A138-B31B-4DD5-B227-A78740DE932B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeStyle", "CodeStyle", "{4745214D-E97C-41B1-A1A3-5C8237C59B72}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectionTest", "src\ConnectionTest\ConnectionTest.csproj", "{D93C5DFE-431A-4A18-8260-7E989C5B54E9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmark", "Benchmark", "{AEDA167A-43CB-40E7-935B-BF12DCBE339A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.P2P.Benchmark", "MithrilShards.P2P.Benchmark\MithrilShards.P2P.Benchmark.csproj", "{60A45997-FDF2-4D8E-A00A-2203FDEC2102}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{59B8229B-8557-4987-B758-5E41D996DCD2}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\todo.md = Documentation\todo.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Core", "src\MithrilShards.Core\MithrilShards.Core.csproj", "{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA14A138-B31B-4DD5-B227-A78740DE932B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA14A138-B31B-4DD5-B227-A78740DE932B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA14A138-B31B-4DD5-B227-A78740DE932B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA14A138-B31B-4DD5-B227-A78740DE932B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60A45997-FDF2-4D8E-A00A-2203FDEC2102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60A45997-FDF2-4D8E-A00A-2203FDEC2102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60A45997-FDF2-4D8E-A00A-2203FDEC2102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60A45997-FDF2-4D8E-A00A-2203FDEC2102}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{60A45997-FDF2-4D8E-A00A-2203FDEC2102} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}
+	EndGlobalSection
+EndGlobal
