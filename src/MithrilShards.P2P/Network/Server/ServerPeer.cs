@@ -6,8 +6,6 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using MithrilShards.Core;
 using MithrilShards.Core.Extensions;
 using MithrilShards.P2P.Helpers;
 
@@ -22,7 +20,6 @@ namespace MithrilShards.P2P.Network.Server {
       private readonly CancellationTokenSource listenerCancellation;
 
       readonly ILogger logger;
-      readonly ICoreServices coreServices;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
 
       /// <summary>
@@ -35,7 +32,6 @@ namespace MithrilShards.P2P.Network.Server {
 
       /// <summary>IP address and port of the external network interface that is accessible from the Internet.</summary>
       public IPEndPoint RemoteEndPoint { get; }
-
 
       public ServerPeer(ILogger<ServerPeer> logger,
                         IPEndPoint localEndPoint,
@@ -59,19 +55,23 @@ namespace MithrilShards.P2P.Network.Server {
       /// Starts listening on the server's initialized endpoint.
       /// </summary>
       public async Task ListenAsync(CancellationToken cancellation) {
-         try {
-            this.tcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            this.tcpListener.Start();
-            await this.AcceptClientsAsync(cancellation).ConfigureAwait(false);
-         }
-         catch (Exception e) {
-            this.logger.LogCritical(e, "Listen exception occurred.");
-            throw;
+         using (this.logger.BeginScope("Listening to {LocalEndpoint}", this.tcpListener.LocalEndpoint)) {
+            try {
+               this.tcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+               this.logger.LogInformation("Start Listening to {LocalEndpoint}", this.tcpListener.LocalEndpoint);
+               this.tcpListener.Start();
+               await this.AcceptClientsAsync(cancellation).ConfigureAwait(false);
+            }
+            catch (Exception e) {
+               this.logger.LogCritical(e, "Listen exception occurred.");
+               throw;
+            }
          }
       }
 
       /// <inheritdoc />
       public void StopListening() {
+         this.logger.LogInformation("Stopping listening to {EndPoint}", this.LocalEndPoint);
          this.tcpListener.Stop();
       }
 

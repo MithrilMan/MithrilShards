@@ -1,4 +1,10 @@
 ﻿{
+   "Logging": {
+      "LogLevel": {
+         "Default": "Warning"
+      }
+   },
+
    "ForgeServerSettings": {
       "MaxInboundConnections": 25,
       "Bindings": [

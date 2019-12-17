@@ -4,23 +4,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core.Forge.MithrilShards;
+using MithrilShards.Core.MithrilShards;
 
 namespace MithrilShards.Core.Forge {
    public class Forge : BackgroundService, IForge {
       private readonly IForgeDataFolderLock forgeDataFolderLock;
       readonly IForgeServer forgeServer;
       readonly IEnumerable<IMithrilShard> mithrilShards;
+      readonly DefaultConfigurationWriter defaultConfigurationManager;
       private readonly ILogger logger;
 
-      public Forge(ILogger<Forge> logger, IForgeDataFolderLock forgeDataFolderLock, IForgeServer forgeServer, IEnumerable<IMithrilShard> mithrilShards) {
+      public IServiceProvider Services => throw new NotImplementedException();
+
+      public Forge(ILogger<Forge> logger, IForgeDataFolderLock forgeDataFolderLock, IForgeServer forgeServer, IEnumerable<IMithrilShard> mithrilShards, DefaultConfigurationWriter defaultConfigurationManager = null) {
          this.forgeDataFolderLock = forgeDataFolderLock;
          this.forgeServer = forgeServer;
          this.mithrilShards = mithrilShards;
+         this.defaultConfigurationManager = defaultConfigurationManager;
          this.logger = logger;
       }
 
       private async Task InitializeShardsAsync(CancellationToken stoppingToken) {
+         //if no default configuration file is present, create one
+         this.defaultConfigurationManager?.GenerateDefaultFile();
+
          using (this.logger.BeginScope("Initializing Shards")) {
             foreach (IMithrilShard shard in this.mithrilShards) {
                await shard.InitializeAsync(stoppingToken).ConfigureAwait(false);

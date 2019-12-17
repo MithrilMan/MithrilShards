@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -10,38 +12,47 @@ namespace MithrilShards.P2P.Network.Server {
       readonly ILogger<ServerPeerFactory> logger;
       readonly ILoggerFactory loggerFactory;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
-      readonly IOptions<ForgeServerSettings> options;
+      readonly ForgeServerSettings settings;
 
       public ServerPeerFactory(ILogger<ServerPeerFactory> logger,
                                ILoggerFactory loggerFactory,
                                IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
-                               IOptions<ForgeServerSettings> options) {
+                               IOptions<ForgeServerSettings> settings
+                               ) {
          this.logger = logger;
          this.loggerFactory = loggerFactory;
          this.serverPeerConnectionGuards = serverPeerConnectionGuards;
-         this.options = options;
+         this.settings = settings.Value;
       }
 
       public List<IServerPeer> CreateServerInstances() {
-         var servers = new List<IServerPeer>();
+         using (this.logger.BeginScope("CreateServerInstances")) {
+            this.logger.LogInformation("Loading Forge Server listeners configuration.");
+            var servers = new List<IServerPeer>();
 
-         if (this.options.Value?.Bindings != null) {
-            foreach (ServerPeerBinding binding in this.options.Value?.Bindings) {
-               var serverPeer = new ServerPeer(
-                  this.loggerFactory.CreateLogger<ServerPeer>(),
-                  IPEndPoint.Parse(binding.Endpoint),
-                  IPEndPoint.Parse(binding.Endpoint),
-                  this.serverPeerConnectionGuards
-                  );
+            if (this.settings.Bindings != null) {
 
-               servers.Add(serverPeer);
+               foreach (ServerPeerBinding binding in this.settings.Bindings) {
+                  var serverPeer = new ServerPeer(
+                     this.loggerFactory.CreateLogger<ServerPeer>(),
+                     IPEndPoint.Parse(binding.Endpoint),
+                     IPEndPoint.Parse(binding.Endpoint),
+                     this.serverPeerConnectionGuards
+                     );
+
+                  servers.Add(serverPeer);
+               }
             }
-         }
-         else {
-            this.logger.LogWarning("No binding information found in configuration file, no Forge Servers available.");
-         }
 
-         return servers;
+            if (servers.Count == 0) {
+               this.logger.LogWarning("No binding information found in configuration file, no Forge Servers available.");
+            }
+            else {
+               this.logger.LogInformation("Found {ConfiguredListeners} listeners in configuration.", servers.Count);
+            }
+
+            return servers;
+         }
       }
    }
 }

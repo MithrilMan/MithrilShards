@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using MithrilShards.Core.Forge.MithrilShards;
+﻿using MithrilShards.Core.MithrilShards;
 
 namespace MithrilShards.Core.Forge {
    /// <summary>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MithrilShards.Core.Forge.MithrilShards {
+namespace MithrilShards.Core.MithrilShards {
    public interface IMithrilShardDefinition {
       string Name { get; }
 

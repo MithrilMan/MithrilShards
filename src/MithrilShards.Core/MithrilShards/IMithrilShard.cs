@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace MithrilShards.Core.Forge.MithrilShards {
+namespace MithrilShards.Core.MithrilShards {
    public interface IMithrilShard {
       public Task InitializeAsync(CancellationToken cancellationToken);
 

@@ -13,7 +13,7 @@ namespace MithrilShards.P2P.Network.Server {
       readonly IServerPeerSettings serverPeerSettings;
       readonly IInitialBlockDownloadState initialBlockDownloadState;
 
-      public InitialBlockDownloadStateGuard(ICoreServices coreServices, IServerPeerSettings serverPeerSettings, IInitialBlockDownloadState initialBlockDownloadState) : base(coreServices) {
+      public InitialBlockDownloadStateGuard(ILogger<InitialBlockDownloadStateGuard> logger, IServerPeerSettings serverPeerSettings, IInitialBlockDownloadState initialBlockDownloadState) : base(logger) {
          this.serverPeerSettings = serverPeerSettings;
          this.initialBlockDownloadState = initialBlockDownloadState;
       }

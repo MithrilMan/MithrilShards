@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,11 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
+    <Compile Remove="coreKey.cs" />
+    <Compile Remove="Key2.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\MithrilShards.P2P\MithrilShards.P2P.csproj" />
+    <None Include="coreKey.cs" />
+    <None Include="Key2.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
+    <PackageReference Include="NBitcoin" Version="5.0.12" />
   </ItemGroup>
 
 </Project>
