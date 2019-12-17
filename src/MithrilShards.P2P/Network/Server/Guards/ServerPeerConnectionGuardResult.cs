@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
-namespace MithrilShards.P2P.Network.Server {
+namespace MithrilShards.P2P.Network.Server.Guards {
    public struct ServerPeerConnectionGuardResult {
       /// <summary>
       /// Returns a successful guard check.

@@ -24,4 +24,12 @@
       /// <summary>An error occurred.</summary>
       Failure
    }
+
+   public static class PeerConnectionStateExtensions {
+
+      /// <inheritdoc/>
+      public static bool IsConnected(this PeerConnectionState state) {
+         return state == PeerConnectionState.Connected || state == PeerConnectionState.HandShaked;
+      }
+   }
 }

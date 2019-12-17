@@ -1,18 +1,19 @@
 ﻿using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-namespace MithrilShards.P2P.Network.Server {
+namespace MithrilShards.P2P.Network.Server.Guards {
    public class MaxConnectionThresholdGuard : ServerPeerConnectionGuardBase {
-      readonly IServerPeerSettings serverPeerSettings;
       readonly IServerPeerStats serverPeerStats;
 
-      public MaxConnectionThresholdGuard(ILogger<InitialBlockDownloadStateGuard> logger, IServerPeerSettings serverPeerSettings, IServerPeerStats serverPeerStats) : base(logger) {
-         this.serverPeerSettings = serverPeerSettings;
+      public MaxConnectionThresholdGuard(ILogger<InitialBlockDownloadStateGuard> logger,
+                                         IOptions<ForgeServerSettings> settings,
+                                         IServerPeerStats serverPeerStats) : base(logger, settings) {
          this.serverPeerStats = serverPeerStats;
       }
 
       internal override string TryGetDenyReason(TcpClient tcpClient) {
-         if (this.serverPeerStats.ConnectedInboundPeersCount >= this.serverPeerSettings.MaxInboundConnections) {
+         if (this.serverPeerStats.ConnectedInboundPeersCount >= this.settings.MaxInboundConnections) {
             return "Inbound connection refused: max connection threshold reached.";
          }
 

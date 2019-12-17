@@ -84,6 +84,8 @@ namespace MithrilShards.Core.Forge {
                .AddSingleton<IEventBus, InMemoryEventBus>()
                .AddSingleton<ISubscriptionErrorHandler, DefaultSubscriptionErrorHandler>()
                .AddSingleton<IForgeServer, FakeForgeServer>()
+               .AddSingleton<IInitialBlockDownloadState, InitialBlockDownloadState>()
+               .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                ;
          });
 
@@ -158,6 +160,7 @@ namespace MithrilShards.Core.Forge {
       public Task RunConsoleAsync(CancellationToken cancellationToken = default) {
          //TODO: add configuration parameter to set if console logging is enabled or not and use it
          this.ConfigureLogging((context, logging) => {
+            logging.AddConfiguration(context.Configuration.GetSection("Logging"));
             logging.AddConsole();
          });
 

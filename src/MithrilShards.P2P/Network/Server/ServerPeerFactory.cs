@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MithrilShards.P2P.Network.Server.Guards;
 
 namespace MithrilShards.P2P.Network.Server {
    public class ServerPeerFactory : IServerPeerFactory {

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Extensions;
 using MithrilShards.P2P.Helpers;
+using MithrilShards.P2P.Network.Server.Guards;
 
 namespace MithrilShards.P2P.Network.Server {
    public class ServerPeer : IServerPeer {
@@ -52,9 +53,8 @@ namespace MithrilShards.P2P.Network.Server {
       /// Starts listening on the server's initialized endpoint.
       /// </summary>
       public async Task ListenAsync(CancellationToken cancellation) {
-         using (this.logger.BeginScope("Listening to {LocalEndpoint}", this.tcpListener.LocalEndpoint)) {
+         using (this.logger.BeginScope("Listener {LocalEndpoint}", this.tcpListener.LocalEndpoint)) {
             try {
-               this.logger.LogInformation("Start Listening to {LocalEndpoint}.", this.tcpListener.LocalEndpoint);
                this.tcpListener.Start();
                await this.AcceptClientsAsync(cancellation).ConfigureAwait(false);
             }
@@ -112,6 +112,8 @@ namespace MithrilShards.P2P.Network.Server {
 
       private void ConnectToPeer() {
          this.logger.LogDebug("Connecting to peer");
+
+
       }
 
       /// <summary>

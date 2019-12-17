@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Core.Forge;
 using MithrilShards.P2P.Network.Server;
+using Guards = MithrilShards.P2P.Network.Server.Guards;
 
 namespace MithrilShards.P2P {
    public static class ForgeBuilderExtensions {
@@ -11,10 +12,21 @@ namespace MithrilShards.P2P {
                services
                   .Replace(ServiceDescriptor.Transient<IForgeServer, P2PForgeServer>()) //replace fake forgeServer with real one
                   .AddSingleton<IServerPeerFactory, ServerPeerFactory>()
+                  .AddSingleton<IServerPeerStats, ServerPeerStats>()
                   ;
+
+               AddPeerGuards(services);
             });
 
          return forgeBuilder;
+      }
+
+
+      private static void AddPeerGuards(IServiceCollection services) {
+         services
+            .AddSingleton<Guards.IServerPeerConnectionGuard, Guards.InitialBlockDownloadStateGuard>()
+            .AddSingleton<Guards.IServerPeerConnectionGuard, Guards.MaxConnectionThresholdGuard>()
+            ;
       }
    }
 }
