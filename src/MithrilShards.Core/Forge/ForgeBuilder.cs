@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +10,7 @@ using MithrilShards.Core.MithrilShards;
 
 namespace MithrilShards.Core.Forge {
    public class ForgeBuilder : IForgeBuilder {
-      const string CONFIGURATION_FILE = "forge.config2.json";
+      const string CONFIGURATION_FILE = "forge-settings.json";
 
       private readonly HostBuilder hostBuilder;
       private bool isForgeSet = false;

@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="forge.config.json" />
+    <None Remove="forge-settings.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="forge.config.json">
+    <Content Include="forge-settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

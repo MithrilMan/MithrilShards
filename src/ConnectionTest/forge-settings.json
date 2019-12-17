@@ -11,6 +11,10 @@
          {
             "IsWhitelistingEndpoint": false,
             "Endpoint": "127.0.0.1:45010"
+         },
+         {
+            "IsWhitelistingEndpoint": true,
+            "Endpoint": "127.0.0.1:45011"
          }
       ]
    }
