@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MithrilShards.Core.Forge;
 
 namespace MithrilShards.P2P.Network.Server {

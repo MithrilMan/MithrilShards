@@ -12,7 +12,7 @@ using MithrilShards.P2P.Helpers;
 namespace MithrilShards.P2P.Network.Server {
    public class ServerPeer : IServerPeer {
       /// <summary>TCP server listener accepting inbound connections.</summary>
-      private readonly TcpListener tcpListener;
+      private readonly ForgeTcpListener tcpListener;
 
       /// <summary>
       /// Cancellation source that is triggered on dispose.
@@ -45,10 +45,7 @@ namespace MithrilShards.P2P.Network.Server {
 
          this.listenerCancellation = new CancellationTokenSource();
 
-         this.tcpListener = new TcpListener(this.LocalEndPoint);
-         this.tcpListener.Server.LingerState = new LingerOption(true, 0);
-         this.tcpListener.Server.NoDelay = true;
-         this.tcpListener.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
+         this.tcpListener = new ForgeTcpListener(this.LocalEndPoint);
       }
 
       /// <summary>
@@ -57,8 +54,7 @@ namespace MithrilShards.P2P.Network.Server {
       public async Task ListenAsync(CancellationToken cancellation) {
          using (this.logger.BeginScope("Listening to {LocalEndpoint}", this.tcpListener.LocalEndpoint)) {
             try {
-               this.tcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-               this.logger.LogInformation("Start Listening to {LocalEndpoint}", this.tcpListener.LocalEndpoint);
+               this.logger.LogInformation("Start Listening to {LocalEndpoint}.", this.tcpListener.LocalEndpoint);
                this.tcpListener.Start();
                await this.AcceptClientsAsync(cancellation).ConfigureAwait(false);
             }
@@ -71,8 +67,10 @@ namespace MithrilShards.P2P.Network.Server {
 
       /// <inheritdoc />
       public void StopListening() {
-         this.logger.LogInformation("Stopping listening to {EndPoint}", this.LocalEndPoint);
-         this.tcpListener.Stop();
+         if (this.tcpListener.IsActive) {
+            this.logger.LogInformation("Stopping listening to {EndPoint}", this.LocalEndPoint);
+            this.tcpListener.Stop();
+         }
       }
 
       /// <summary>

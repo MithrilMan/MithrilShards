@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using MithrilShards.P2P.Helpers;
 
 namespace MithrilShards.P2P.Network.Server {
@@ -8,6 +9,10 @@ namespace MithrilShards.P2P.Network.Server {
    public class ServerPeerBinding {
       /// <summary>IP address and port number on which the node server listens.</summary>
       public string Endpoint { get; set; }
+
+      /// <summary>External IP address and port number used to access the node from external network.</summary>
+      /// <remarks>Used to announce to external peers the address they connect to in order to reach our Forge server.</remarks>
+      public string PublicEndpoint { get; set; }
 
       /// <summary>
       /// If <c>true</c>, peers that connect to this interface are white-listed.
@@ -28,6 +33,15 @@ namespace MithrilShards.P2P.Network.Server {
          else {
             return otherEndpoint.Equals(this.Endpoint);
          }
+      }
+
+      public bool IsValidEndpoint(out IPEndPoint parsedEndpoint) {
+         parsedEndpoint = null;
+         return this.Endpoint != null && IPEndPoint.TryParse(this.Endpoint, out parsedEndpoint);
+      }
+
+      internal bool IsValidPublicEndpoint() {
+         return this.PublicEndpoint != null && IPEndPoint.TryParse(this.PublicEndpoint, out _);
       }
    }
 }

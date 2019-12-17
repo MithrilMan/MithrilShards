@@ -14,7 +14,8 @@
          },
          {
             "IsWhitelistingEndpoint": true,
-            "Endpoint": "127.0.0.1:45011"
+            "Endpoint": "127.0.0.1:45011",
+            "PublicEndpoint": "98.0.0.1:45011"
          }
       ]
    }

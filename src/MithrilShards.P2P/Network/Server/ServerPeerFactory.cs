@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
-using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -30,13 +28,37 @@ namespace MithrilShards.P2P.Network.Server {
             this.logger.LogInformation("Loading Forge Server listeners configuration.");
             var servers = new List<IServerPeer>();
 
+            if (this.serverPeerConnectionGuards.Any()) {
+               this.logger.LogInformation(
+                  "Using {PeerConnectionGuardsCount} peer connection guards: {PeerConnectionGuards}.",
+                  this.serverPeerConnectionGuards.Count(),
+                  string.Join(',', this.serverPeerConnectionGuards.Select(guard => guard.GetType().Name))
+                  );
+            }
+            else {
+               this.logger.LogWarning("No peer connection guards detected.");
+            }
+
             if (this.settings.Bindings != null) {
 
                foreach (ServerPeerBinding binding in this.settings.Bindings) {
+                  if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
+                     throw new ArgumentException($"Configuration error: binding Endpoint must be a valid address:port value. Current value: {binding.Endpoint ?? "NULL"}", nameof(binding.Endpoint));
+                  }
+
+                  if (binding.PublicEndpoint == null) {
+                     binding.PublicEndpoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
+                  }
+
+                  if (!binding.IsValidPublicEndpoint()) {
+                     throw new ArgumentException($"Configuration error: binding PublicEndpoint must be a valid address:port value. Current value: {binding.PublicEndpoint ?? "NULL"}", nameof(binding.PublicEndpoint));
+                  }
+
+
                   var serverPeer = new ServerPeer(
                      this.loggerFactory.CreateLogger<ServerPeer>(),
                      IPEndPoint.Parse(binding.Endpoint),
-                     IPEndPoint.Parse(binding.Endpoint),
+                     IPEndPoint.Parse(binding.PublicEndpoint),
                      this.serverPeerConnectionGuards
                      );
 
