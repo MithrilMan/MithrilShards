@@ -1,120 +1,113 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Forge.MithrilShards;
 
 namespace MithrilShards.Core.Forge {
    public class ForgeBuilder : IForgeBuilder {
-      /// <summary>
-      /// The forge is built
-      /// </summary>
-      public bool forgeIsBuilt;
-      private IForge forge;
+      const string CONFIGURATION_FILE = "forge.config.json";
 
-      public ForgeSettings HostSettings => throw new NotImplementedException();
-
-      private IServiceCollection services;
-
-      private ServiceProvider forgeServiceProvider;
-
-      /// <summary>List of service configuration actions that has to be called in order to add custom services to DI container.</summary>
-      private readonly List<Action<IServiceCollection>> registerServicesActions;
+      private readonly HostBuilder hostBuilder;
+      private bool isForgeSet = false;
 
       public ForgeBuilder() {
-         this.registerServicesActions = new List<Action<IServiceCollection>>();
+         this.hostBuilder = new HostBuilder();
       }
 
-      public IForgeBuilder RegisterServices(Action<IServiceCollection> registerServices) {
-         if (registerServices is null) {
-            throw new ArgumentNullException(nameof(registerServices));
-         }
 
-         this.registerServicesActions.Add(registerServices);
+      public ForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE) {
+         _ = this.hostBuilder.ConfigureAppConfiguration((hostingContext, config) => {
+
+            configurationFile ??= CONFIGURATION_FILE;
+
+            config.AddJsonFile(configurationFile, optional: false);
+            config.AddEnvironmentVariables();
+
+            if (commandLineArgs != null) {
+               config.AddCommandLine(commandLineArgs);
+            }
+         });
+
          return this;
       }
 
-      public IForge Build() {
-         if (this.forgeIsBuilt) {
-            throw new ForgeBuilderException("The forge has been already built.");
+      public ForgeBuilder UseForge<TForgeImplementation>() where TForgeImplementation : class, IForge {
+         if (this.isForgeSet) {
+            throw new Exception($"Forge already set. Only one call to {nameof(UseForge)} is allowed");
          }
 
-         this.services = this.BuildServices();
-         this.forgeServiceProvider = this.services.BuildServiceProvider();
-         this.forge = this.forgeServiceProvider.GetService<IForge>();
+         _ = this.hostBuilder.ConfigureServices(services => {
 
-         this.forgeIsBuilt = true;
-         return this.forge;
+            services
+               .AddOptions()
+               .AddHostedService<TForgeImplementation>()
+               .AddSingleton<IDataFolders, DataFolders>(serviceProvider => new DataFolders("."))
+               .AddSingleton<IForgeLifetime, ForgeLifetime>()
+               .AddSingleton<IForgeDataFolderLock, ForgeDataFolderLock>()
+               .AddSingleton<IEventBus, InMemoryEventBus>()
+               .AddSingleton<ISubscriptionErrorHandler, DefaultSubscriptionErrorHandler>()
+               .AddSingleton<IForgeServer, FakeForgeServer>()
+
+               .AddSingleton<ICoreServices, CoreServices>()
+               ;
+         });
+
+         this.isForgeSet = true;
+
+         return this;
       }
 
-      public void Run() {
-         if (!this.forgeIsBuilt) {
-            throw new ForgeBuilderException("The forge has not been built yet, call Build() first.");
-         }
-
-         IForgeLifetime forgeLifetime = this.forgeServiceProvider.GetRequiredService<IForgeLifetime>();
-
-         Console.CancelKeyPress += (sender, eventArgs) => {
-            Console.WriteLine("Application is shutting down...");
-            try {
-               this.forge.ShutDown();
-            }
-            catch (ObjectDisposedException exception) {
-               Console.WriteLine(exception.Message);
-            }
-            // Don't terminate the process immediately, wait for the Main thread to exit gracefully.
-            eventArgs.Cancel = true;
-         };
-
-
-         IEventBus eventbus = this.forgeServiceProvider.GetService<IEventBus>();
-
-         using (SubscriptionToken sub = eventbus.Subscribe<Events.ForgeShuttedDown>(action => {
-            Console.WriteLine();
-            Console.WriteLine("Application stopped.");
-            Console.WriteLine();
-         })) {
-
-            Console.WriteLine();
-            Console.WriteLine("Application starting, press Ctrl+C to cancel.");
-            Console.WriteLine();
-
-            this.forge.Start();
-
-            Console.WriteLine();
-            Console.WriteLine("Application started, press Ctrl+C to stop.");
-            Console.WriteLine();
-
-            forgeLifetime.ForgeShuttingDown.WaitHandle.WaitOne();
-         };
+      //
+      // Summary:
+      //     Adds a delegate for configuring the provided Microsoft.Extensions.Logging.ILoggingBuilder.
+      //     This may be called multiple times.
+      //
+      // Parameters:
+      //   hostBuilder:
+      //     The Microsoft.Extensions.Hosting.IHostBuilder to configure.
+      //
+      //   configureLogging:
+      //     The delegate that configures the Microsoft.Extensions.Logging.ILoggingBuilder.
+      //
+      // Returns:
+      //     The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.
+      public ForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging) {
+         this.hostBuilder.ConfigureLogging(configureLogging);
+         return this;
       }
 
-      /// <summary>
-      /// Starts a forge instance, sets up cancellation tokens for its shutdown, and waits until it terminates.
-      /// </summary>
-      /// <param name="cancellationToken">Cancellation token that triggers when the node should be shut down.</param>
-      public void BuildAndRun() {
-         this.Build();
-         this.Run();
+      public ForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate) where TMithrilShard : class, IMithrilShard {
+         this.hostBuilder.ConfigureServices(configureDelegate);
+         return this;
       }
 
-      /// <summary>
-      /// Constructs and configures services ands features to be used by the node.
-      /// </summary>
-      /// <returns>Collection of registered services.</returns>
-      private IServiceCollection BuildServices() {
-         this.services = new ServiceCollection();
+      //
+      // Summary:
+      //     Enables console support, builds and starts the host, and waits for Ctrl+C or
+      //     SIGTERM to shut down.
+      //
+      // Parameters:
+      //   hostBuilder:
+      //     The Microsoft.Extensions.Hosting.IHostBuilder to configure.
+      //
+      //   cancellationToken:
+      //     A System.Threading.CancellationToken that can be used to cancel the console.
+      //
+      // Returns:
+      //     A System.Threading.Tasks.Task that only completes when the token is triggered or
+      //     shutdown is triggered.
+      public Task RunConsoleAsync(CancellationToken cancellationToken = default) {
+         //TODO: add configuration parameter to set if console logging is enabled or not and use it
+         this.ConfigureLogging((context, logging) => {
+            logging.AddConsole();
+         });
 
-         // register services before features
-         // as some of the features may depend on independent services
-         foreach (Action<IServiceCollection> configureServices in this.registerServicesActions) {
-            configureServices(this.services);
-         }
-
-         return this.services;
+         return this.hostBuilder.RunConsoleAsync(cancellationToken);
       }
    }
 }

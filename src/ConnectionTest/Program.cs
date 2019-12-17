@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Forge;
+using MithrilShards.P2P;
 
 namespace ConnectionTest {
    class Program {
-      static void Main(string[] args) {
+      static async Task Main(string[] args) {
          bool isServer = args.Contains("-server");
 
          try {
             if (isServer) {
-               StartServer();
+               await StartServer(args);
             }
             else {
-               StartClient();
+               await StartClient(args);
             }
          }
          catch (Exception ex) {
@@ -22,16 +24,20 @@ namespace ConnectionTest {
 
       }
 
-      private static void StartClient() {
-         new ForgeBuilder()
-            .UseForge()
-            .BuildAndRun();
+      private static async Task StartClient(string[] args) {
+         await new ForgeBuilder()
+            .UseForge<Forge>()
+            .Configure(args)
+            .UseP2PForgeServer()
+            .RunConsoleAsync();
       }
 
-      private static void StartServer() {
-         new ForgeBuilder()
-            .UseForge()
-            .BuildAndRun();
+      private static async Task StartServer(string[] args) {
+         await new ForgeBuilder()
+           .UseForge<Forge>()
+           .Configure(args)
+           .UseP2PForgeServer()
+           .RunConsoleAsync();
       }
    }
 }

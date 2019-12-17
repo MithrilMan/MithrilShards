@@ -1,0 +1,11 @@
+﻿{
+   "ForgeServerSettings": {
+      "MaxInboundConnections": 25,
+      "Bindings": [
+         {
+            "IsWhitelistingEndpoint": false,
+            "Endpoint": "127.0.0.1:45010"
+         }
+      ]
+   }
+}

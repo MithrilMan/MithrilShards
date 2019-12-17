@@ -12,7 +12,7 @@ using MithrilShards.Core.Extensions;
 using MithrilShards.P2P.Helpers;
 
 namespace MithrilShards.P2P.Network.Server {
-   public class ServerPeer : IDisposable {
+   public class ServerPeer : IServerPeer {
       /// <summary>TCP server listener accepting inbound connections.</summary>
       private readonly TcpListener tcpListener;
 
@@ -24,7 +24,6 @@ namespace MithrilShards.P2P.Network.Server {
       readonly ILogger logger;
       readonly ICoreServices coreServices;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
-      readonly CancellationToken cancellationToken;
 
       /// <summary>
       /// IP address and port, on which the server listens to incoming connections.
@@ -38,20 +37,13 @@ namespace MithrilShards.P2P.Network.Server {
       public IPEndPoint RemoteEndPoint { get; }
 
 
-      public ServerPeer(ICoreServices coreServices,
+      public ServerPeer(ILogger<ServerPeer> logger,
                         IPEndPoint localEndPoint,
                         IPEndPoint remoteEndPoint,
-                        IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
-                        CancellationToken cancellationToken) {
+                        IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards) {
 
-         if (cancellationToken == default) {
-            throw new Exception($"{nameof(cancellationToken)} cannot be None.");
-         }
-
-         this.coreServices = coreServices;
-         this.logger = coreServices.CreateLoggerFor(this);
+         this.logger = logger;
          this.serverPeerConnectionGuards = serverPeerConnectionGuards;
-         this.cancellationToken = cancellationToken;
          this.LocalEndPoint = localEndPoint.EnsureIPv6();
          this.RemoteEndPoint = remoteEndPoint.EnsureIPv6();
 
@@ -63,24 +55,24 @@ namespace MithrilShards.P2P.Network.Server {
          this.tcpListener.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
       }
 
-      /// <inheritdoc />
-      public void Dispose() {
-         this.tcpListener.Stop();
-      }
-
       /// <summary>
       /// Starts listening on the server's initialized endpoint.
       /// </summary>
-      public async void Listen() {
+      public async Task ListenAsync(CancellationToken cancellation) {
          try {
             this.tcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             this.tcpListener.Start();
-            await this.AcceptClientsAsync(this.cancellationToken).ConfigureAwait(false);
+            await this.AcceptClientsAsync(cancellation).ConfigureAwait(false);
          }
          catch (Exception e) {
             this.logger.LogCritical(e, "Listen exception occurred.");
             throw;
          }
+      }
+
+      /// <inheritdoc />
+      public void StopListening() {
+         this.tcpListener.Stop();
       }
 
       /// <summary>
@@ -116,20 +108,13 @@ namespace MithrilShards.P2P.Network.Server {
             this.logger.LogDebug("Exception occurred: {0}", e.ToString());
          }
          finally {
-            this.CloseListener();
+            this.StopListening();
          }
-      }
-
-      private void CloseListener() {
-         throw new NotImplementedException();
       }
 
       private void ConnectToPeer() {
          this.logger.LogDebug("Connecting to peer");
       }
-
-
-
 
       /// <summary>
       /// Check if the client is allowed to connect based on certain criteria.

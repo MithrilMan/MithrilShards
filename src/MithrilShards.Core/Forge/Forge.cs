@@ -1,84 +1,66 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Core.Forge.MithrilShards;
 
 namespace MithrilShards.Core.Forge {
-   public class Forge : IForge {
-      private readonly ICoreServices coreServices;
+   public class Forge : BackgroundService, IForge {
       private readonly IForgeDataFolderLock forgeDataFolderLock;
+      readonly IForgeServer forgeServer;
+      readonly IEnumerable<IMithrilShard> mithrilShards;
       private readonly ILogger logger;
-      private readonly IForgeLifetime forgeLifetime;
 
-      public Forge(ICoreServices coreServices, IForgeDataFolderLock forgeDataFolderLock) {
-         this.coreServices = coreServices;
+      public Forge(ILogger<Forge> logger, IForgeDataFolderLock forgeDataFolderLock, IForgeServer forgeServer, IEnumerable<IMithrilShard> mithrilShards) {
          this.forgeDataFolderLock = forgeDataFolderLock;
-         this.logger = coreServices.CreateLogger<Forge>();
-         this.forgeLifetime = coreServices.ForgeLifetime;
+         this.forgeServer = forgeServer;
+         this.mithrilShards = mithrilShards;
+         this.logger = logger;
       }
 
-      public CancellationToken ForgeShuttingDown => throw new System.NotImplementedException();
-
-
-      public void Start() {
-         this.forgeLifetime.SetState(ForgeState.Starting);
-
-         if (!this.forgeDataFolderLock.TryLockNodeFolder()) {
-            this.logger.LogCritical("Node folder is being used by another instance of the application!");
-            throw new Exception("Node folder is being used!");
-         }
-
-         //// Initialize all registered features.
-         //this.fullNodeFeatureExecutor.Initialize();
-
-         //// Initialize peer connection.
-         //var consensusManager = this.Services.ServiceProvider.GetRequiredService<IConsensusManager>();
-         //this.ConnectionManager.Initialize(consensusManager);
-
-         // Fire INodeLifetime.Started.
-         this.forgeLifetime.SetState(ForgeState.Started);
-
-         //this.StartPeriodicLog();
-
-         //this.State = FullNodeState.Started;
-      }
-
-      public void ShutDown() {
-         if (this.forgeLifetime.State == ForgeState.ShuttingDown || this.forgeLifetime.State == ForgeState.ShuttedDown) {
-            return;
-         }
-
-         this.forgeLifetime.SetState(ForgeState.ShuttingDown);
-
-         this.forgeLifetime.ShutDown();
-
-         // TODO: complete the shutdown sequence disposing components that aren't forgeLifetime aware
-         // or not subscribed to shutting down events on event bus
-
-         this.forgeDataFolderLock.UnlockNodeFolder();
-
-         this.forgeLifetime.SetState(ForgeState.ShuttedDown);
-      }
-
-      #region IDisposable Support
-      private bool disposedValue = false; // To detect redundant calls
-
-      protected virtual void Dispose(bool disposing) {
-         if (!this.disposedValue) {
-            if (disposing) {
-               this.ShutDown();
+      private async Task InitializeShardsAsync(CancellationToken stoppingToken) {
+         using (this.logger.BeginScope("Initializing Shards")) {
+            foreach (IMithrilShard shard in this.mithrilShards) {
+               await shard.InitializeAsync(stoppingToken).ConfigureAwait(false);
             }
+         }
 
-            this.disposedValue = true;
+         using (this.logger.BeginScope("Starting Shards")) {
+            foreach (IMithrilShard shard in this.mithrilShards) {
+               _ = shard.StartAsync(stoppingToken);
+            }
          }
       }
 
-      // This code added to correctly implement the disposable pattern.
-      public void Dispose() {
-         this.Dispose(true);
+      protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
+         using (this.logger.BeginScope("Locking Data Folder")) {
+            if (!this.forgeDataFolderLock.TryLockNodeFolder()) {
+               this.logger.LogCritical("Node folder is being used by another instance of the application!");
+               throw new Exception("Node folder is being used!");
+            }
+         }
+
+         await this.InitializeShardsAsync(stoppingToken).ConfigureAwait(false);
+
+         await this.forgeServer.InitializeAsync(stoppingToken).ConfigureAwait(false);
+
+         await this.forgeServer.StartAsync(stoppingToken).ConfigureAwait(false);
+
+         using (this.logger.BeginScope("Unlocking Data Folder")) {
+            this.forgeDataFolderLock.UnlockNodeFolder();
+         }
       }
-      #endregion
 
+      public override async Task StopAsync(CancellationToken cancellationToken) {
+         using (this.logger.BeginScope("Stopping forge server.")) {
+            await this.forgeServer.StopAsync(cancellationToken);
+         }
 
+         using (this.logger.BeginScope("Stopping Forge instance.")) {
+            await base.StopAsync(cancellationToken);
+         }
+      }
    }
 }

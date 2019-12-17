@@ -1,9 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
 
 namespace MithrilShards.Core.Forge {
-   public interface IForge : IDisposable {
-      void Start();
-
-      void ShutDown();
+   public interface IForge : IHostedService {
    }
 }

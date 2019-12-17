@@ -1,29 +1,21 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using MithrilShards.Core.Forge.MithrilShards;
 
 namespace MithrilShards.Core.Forge {
-   /// <summary>
-   /// Host builder allows constructing a host using specific components.
-   /// </summary>
    public interface IForgeBuilder {
-      /// <summary>User defined host settings.</summary>
-      ForgeSettings HostSettings { get; }
+      ForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate) where TMithrilShard : class, IMithrilShard;
 
-      /// <summary>
-      /// Adds services to the forge builder.
-      /// </summary>
-      /// <param name="registerServices">A method that allow to register and configure custom services to the builder.</param>
-      /// <returns>The same <see cref="IForgeBuilder"/> instance to allow fluent code.</returns>
-      IForgeBuilder RegisterServices(Action<IServiceCollection> registerServices);
+      ForgeBuilder Configure(string[] commandLineArgs, string configurationFile = "forge.config");
 
-      /// <summary>
-      /// Constructs the <see cref="Forge"/> with the required features, services, and settings.
-      /// </summary>
-      /// <returns>Initialized <see cref="Forge"/>.</returns>
-      IForge Build();
+      ForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging);
 
-      void Run();
+      Task RunConsoleAsync(CancellationToken cancellationToken = default);
 
-      void BuildAndRun();
+      ForgeBuilder UseForge<TForgeImplementation>() where TForgeImplementation : class, IForge;
    }
 }

@@ -6,6 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="forge.config.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="forge.config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MithrilShards.P2P\MithrilShards.P2P.csproj" />
   </ItemGroup>
 
