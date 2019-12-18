@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
 using MithrilShards.P2P.Helpers;
 using MithrilShards.P2P.Network.Server.Guards;
@@ -21,6 +22,7 @@ namespace MithrilShards.P2P.Network.Server {
       private readonly CancellationTokenSource listenerCancellation;
 
       readonly ILogger logger;
+      readonly IEventBus eventBus;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
 
       /// <summary>
@@ -35,11 +37,13 @@ namespace MithrilShards.P2P.Network.Server {
       public IPEndPoint RemoteEndPoint { get; }
 
       public ServerPeer(ILogger<ServerPeer> logger,
+                        IEventBus eventBus,
                         IPEndPoint localEndPoint,
                         IPEndPoint remoteEndPoint,
                         IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards) {
 
          this.logger = logger;
+         this.eventBus = eventBus;
          this.serverPeerConnectionGuards = serverPeerConnectionGuards;
          this.LocalEndPoint = localEndPoint.EnsureIPv6();
          this.RemoteEndPoint = remoteEndPoint.EnsureIPv6();
@@ -94,9 +98,7 @@ namespace MithrilShards.P2P.Network.Server {
                   continue;
                }
 
-               this.logger.LogDebug("Connection accepted from client '{ConnectingPeerEndPoint}'.", connectingPeer.Client.RemoteEndPoint);
-
-               this.ConnectToPeer();
+               this.EstablishConnection(connectingPeer);
             }
          }
          catch (OperationCanceledException) {
@@ -110,10 +112,13 @@ namespace MithrilShards.P2P.Network.Server {
          }
       }
 
-      private void ConnectToPeer() {
-         this.logger.LogDebug("Connecting to peer");
+      private void EstablishConnection(TcpClient connectingPeer) {
+         this.logger.LogDebug("Connection accepted from client '{ConnectingPeerEndPoint}'.", connectingPeer.Client.RemoteEndPoint);
 
+         this.fact
+         var peer = new NetworkPeer((IPEndPoint)client.Client.RemoteEndPoint, this.network, parameters, client, this.dateTimeProvider, this, this.loggerFactory, this.selfEndpointTracker, this.asyncProvider, onDisconnected, this.onSendingMessage);
 
+         this.eventBus.Publish(new Events.PeerConnected(true, (IPEndPoint)connectingPeer.Client.RemoteEndPoint));
       }
 
       /// <summary>

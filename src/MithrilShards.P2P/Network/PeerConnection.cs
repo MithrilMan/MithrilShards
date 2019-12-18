@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core;
+using MithrilShards.P2P.Network.StateMachine;
 
 namespace MithrilShards.P2P.Network {
 
@@ -13,260 +17,34 @@ namespace MithrilShards.P2P.Network {
 
       /// <summary>Provider of time functions.</summary>
       private readonly IDateTimeProvider dateTimeProvider;
-      private readonly IPEndPoint peerEndPoint;
+      readonly TcpClient connectedClient;
       private readonly PeerConnectionDirection peerConnectionDirection;
-
+      readonly CancellationToken cancellationToken;
+      readonly PeerConnectionStateMachine connectionStateMachine;
       private PeerConnectionState State;
+
+      public TimeSpan? TimeOffset { get; private set; }
+
+      public PeerDisconnectionReason DisconnectReason { get; private set; }
 
       public PeerConnection(ILogger<PeerConnection> logger,
                             IDateTimeProvider dateTimeProvider,
-                            IPEndPoint peerEndPoint,
-                            PeerConnectionDirection peerConnectionDirection) {
+                            TcpClient connectedClient,
+                            PeerConnectionDirection peerConnectionDirection,
+                            CancellationToken cancellationToken) {
          this.logger = logger;
          this.dateTimeProvider = dateTimeProvider;
-         this.peerEndPoint = peerEndPoint;
+         this.connectedClient = connectedClient;
          this.peerConnectionDirection = peerConnectionDirection;
-      }
+         this.cancellationToken = cancellationToken;
 
-      /// <inheritdoc/>
-      public TimeSpan? TimeOffset { get; private set; }
-
-
-      /// <inheritdoc />
-      public bool MatchRemoteIPAddress(IPAddress ip, int? port = null) {
-         bool isConnectedOrHandShaked = (this.State == NetworkPeerState.Connected || this.State == NetworkPeerState.HandShaked);
-
-         bool isAddressMatching = this.RemoteSocketAddress.Equals(ip)
-                                  && (!port.HasValue || port == this.RemoteSocketPort);
-
-         bool isPeerVersionAddressMatching = this.PeerVersion?.AddressFrom != null
-                                             && this.PeerVersion.AddressFrom.Address.Equals(ip)
-                                             && (!port.HasValue || port == this.PeerVersion.AddressFrom.Port);
-
-         return (isConnectedOrHandShaked && isAddressMatching) || isPeerVersionAddressMatching;
-      }
-
-      /// <inheritdoc />
-      public bool MatchRemoteEndPoint(IPEndPoint ep, bool matchPort = true) {
-         return this.MatchRemoteIPAddress(ep.Address, matchPort ? ep.Port : (int?)null);
-      }
-
-      /// <summary><c>true</c> to advertise "addr" message with our external endpoint to the peer when passing to <see cref="NetworkPeerState.HandShaked"/> state.</summary>
-      private bool advertize;
-
-      /// <inheritdoc/>
-      public VersionPayload MyVersion { get; private set; }
-
-      /// <inheritdoc/>
-      public VersionPayload PeerVersion { get; private set; }
-
-      /// <summary>Set to <c>1</c> if the peer disconnection has been initiated, <c>0</c> otherwise.</summary>
-      private int disconnected;
-
-      /// <summary>Set to <c>1</c> if the peer disposal has been initiated, <c>0</c> otherwise.</summary>
-      private int disposed;
-
-      /// <summary>
-      /// Async context to allow to recognize whether <see cref="onDisconnected"/> callback execution is scheduled in this async context.
-      /// <para>
-      /// It is not <c>null</c> if one of the following callbacks is in progress: <see cref="StateChanged"/>, <see cref="MessageReceived"/>,
-      /// set to <c>null</c> otherwise.
-      /// </para>
-      /// </summary>
-      private readonly AsyncLocal<DisconnectedExecutionAsyncContext> onDisconnectedAsyncContext;
-
-      /// <summary>Transaction options we would like.</summary>
-      private TransactionOptions preferredTransactionOptions;
-
-      /// <inheritdoc/>
-      public TransactionOptions SupportedTransactionOptions { get; private set; }
-
-      /// <inheritdoc/>
-      public NetworkPeerDisconnectReason DisconnectReason { get; private set; }
-
-      /// <inheritdoc/>
-      public Network Network { get; set; }
-
-      /// <inheritdoc/>
-      public AsyncExecutionEvent<INetworkPeer, NetworkPeerState> StateChanged { get; private set; }
-
-      /// <inheritdoc/>
-      public AsyncExecutionEvent<INetworkPeer, IncomingMessage> MessageReceived { get; private set; }
-
-      /// <inheritdoc/>
-      public NetworkPeerConnectionParameters ConnectionParameters { get; private set; }
-
-      /// <inheritdoc/>
-      public MessageProducer<IncomingMessage> MessageProducer { get { return this.Connection.MessageProducer; } }
-
-      /// <summary>Callback that is invoked when peer has finished disconnecting, or <c>null</c> when no notification after the disconnection is required.</summary>
-      private readonly Action<INetworkPeer> onDisconnected;
-
-      /// <summary>Callback that is invoked just before a message is to be sent to a peer, or <c>null</c> when nothing needs to be called.</summary>
-      private readonly Action<IPEndPoint, Payload> onSendingMessage;
-
-      /// <summary>A queue for sending payload messages to peers.</summary>
-      private readonly IAsyncDelegateDequeuer<Payload> asyncPayloadsQueue;
-
-      /// <summary>
-      /// Initializes parts of the object that are common for both inbound and outbound peers.
-      /// </summary>
-      /// <param name="inbound"><c>true</c> for inbound peers, <c>false</c> for outbound peers.</param>
-      /// <param name="peerEndPoint">IP address and port on the side of the peer.</param>
-      /// <param name="network">Specification of the network the node runs on - regtest/testnet/mainnet.</param>
-      /// <param name="parameters">Various settings and requirements related to how the connections with peers are going to be established, or <c>null</c> to use default parameters.</param>
-      /// <param name="dateTimeProvider">Provider of time functions.</param>
-      /// <param name="loggerFactory">Factory for creating loggers.</param>
-      /// <param name="selfEndpointTracker">Tracker for endpoints known to be self.</param>
-      /// <param name="onDisconnected">Callback that is invoked when peer has finished disconnecting, or <c>null</c> when no notification after the disconnection is required.</param>
-      private NetworkPeer(bool inbound,
-          IPEndPoint peerEndPoint,
-          Network network,
-          NetworkPeerConnectionParameters parameters,
-          IDateTimeProvider dateTimeProvider,
-          ILoggerFactory loggerFactory,
-          ISelfEndpointTracker selfEndpointTracker,
-          IAsyncProvider asyncProvider,
-          Action<INetworkPeer> onDisconnected = null,
-          Action<IPEndPoint, Payload> onSendingMessage = null) {
-         this.dateTimeProvider = dateTimeProvider;
-
-         this.preferredTransactionOptions = parameters.PreferredTransactionOptions;
-         this.SupportedTransactionOptions = parameters.PreferredTransactionOptions & ~TransactionOptions.All;
-
-         this.State = inbound ? NetworkPeerState.Connected : NetworkPeerState.Created;
-         this.Inbound = inbound;
-         this.peerEndPoint = peerEndPoint;
-         this.RemoteSocketEndpoint = this.peerEndPoint;
-         this.RemoteSocketAddress = this.RemoteSocketEndpoint.Address;
-         this.RemoteSocketPort = this.RemoteSocketEndpoint.Port;
-
-         this.Network = network;
-         this.Behaviors = new List<INetworkPeerBehavior>();
-         this.selfEndpointTracker = selfEndpointTracker;
-         this.asyncProvider = asyncProvider;
-         this.onDisconnectedAsyncContext = new AsyncLocal<DisconnectedExecutionAsyncContext>();
-
-         this.ConnectionParameters = parameters ?? new NetworkPeerConnectionParameters();
-         this.MyVersion = this.ConnectionParameters.CreateVersion(this.selfEndpointTracker.MyExternalAddress, this.peerEndPoint, network, this.dateTimeProvider.GetTimeOffset());
-
-         this.MessageReceived = new AsyncExecutionEvent<INetworkPeer, IncomingMessage>();
-         this.StateChanged = new AsyncExecutionEvent<INetworkPeer, NetworkPeerState>();
-         this.onDisconnected = onDisconnected;
-         this.onSendingMessage = onSendingMessage;
-
-         string dequeuerName = $"{nameof(NetworkPeer)}-{nameof(this.asyncPayloadsQueue)}-{this.peerEndPoint.ToString()}";
-         this.asyncPayloadsQueue = asyncProvider.CreateAndRunAsyncDelegateDequeuer<Payload>(dequeuerName, this.SendMessageHandledAsync);
-      }
-
-      /// <summary>
-      /// Initializes an instance of the object for outbound network peers.
-      /// </summary>
-      /// <param name="peerEndPoint">IP address and port on the side of the peer.</param>
-      /// <param name="network">Specification of the network the node runs on - regtest/testnet/mainnet.</param>
-      /// <param name="parameters">Various settings and requirements related to how the connections with peers are going to be established, or <c>null</c> to use default parameters.</param>
-      /// <param name="networkPeerFactory">Factory for creating P2P network peers.</param>
-      /// <param name="dateTimeProvider">Provider of time functions.</param>
-      /// <param name="loggerFactory">Factory for creating loggers.</param>
-      /// <param name="selfEndpointTracker">Tracker for endpoints known to be self.</param>
-      /// <param name="onDisconnected">Callback that is invoked when peer has finished disconnecting, or <c>null</c> when no notification after the disconnection is required.</param>
-      public NetworkPeer(IPEndPoint peerEndPoint,
-          Network network,
-          NetworkPeerConnectionParameters parameters,
-          INetworkPeerFactory networkPeerFactory,
-          IDateTimeProvider dateTimeProvider,
-          ILoggerFactory loggerFactory,
-          ISelfEndpointTracker selfEndpointTracker,
-          IAsyncProvider asyncProvider,
-          Action<INetworkPeer> onDisconnected = null,
-          Action<IPEndPoint, Payload> onSendingMessage = null
-          )
-          : this(false, peerEndPoint, network, parameters, dateTimeProvider, loggerFactory, selfEndpointTracker, asyncProvider, onDisconnected, onSendingMessage) {
-         var client = new TcpClient(AddressFamily.InterNetworkV6);
-         client.Client.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
-         client.Client.ReceiveBufferSize = parameters.ReceiveBufferSize;
-         client.Client.SendBufferSize = parameters.SendBufferSize;
-
-         this.Connection = networkPeerFactory.CreateNetworkPeerConnection(this, client, this.ProcessMessageAsync);
-
-         this.logger = loggerFactory.CreateLogger(this.GetType().FullName, $"[{this.Connection.Id}-{peerEndPoint}] ");
-      }
-
-      /// <summary>
-      /// Initializes an instance of the object for inbound network peers with already established connection.
-      /// </summary>
-      /// <param name="peerEndPoint">IP address and port on the side of the peer.</param>
-      /// <param name="network">Specification of the network the node runs on - regtest/testnet/mainnet.</param>
-      /// <param name="parameters">Various settings and requirements related to how the connections with peers are going to be established, or <c>null</c> to use default parameters.</param>
-      /// <param name="client">Already connected network client.</param>
-      /// <param name="dateTimeProvider">Provider of time functions.</param>
-      /// <param name="networkPeerFactory">Factory for creating P2P network peers.</param>
-      /// <param name="loggerFactory">Factory for creating loggers.</param>
-      /// <param name="selfEndpointTracker">Tracker for endpoints known to be self.</param>
-      /// <param name="onDisconnected">Callback that is invoked when peer has finished disconnecting, or <c>null</c> when no notification after the disconnection is required.</param>
-      public NetworkPeer(IPEndPoint peerEndPoint,
-          Network network,
-          NetworkPeerConnectionParameters parameters,
-          TcpClient client,
-          IDateTimeProvider dateTimeProvider,
-          INetworkPeerFactory networkPeerFactory,
-          ILoggerFactory loggerFactory,
-          ISelfEndpointTracker selfEndpointTracker,
-          IAsyncProvider asyncProvider,
-          Action<INetworkPeer> onDisconnected = null,
-          Action<IPEndPoint, Payload> onSendingMessage = null)
-          : this(true, peerEndPoint, network, parameters, dateTimeProvider, loggerFactory, selfEndpointTracker, asyncProvider, onDisconnected, onSendingMessage) {
-         this.Connection = networkPeerFactory.CreateNetworkPeerConnection(this, client, this.ProcessMessageAsync);
-
-         this.logger = loggerFactory.CreateLogger(this.GetType().FullName, $"[{this.Connection.Id}-{peerEndPoint}] ");
-
-         this.logger.LogDebug("Connected to peer '{0}'.", this.peerEndPoint);
-
-         this.InitDefaultBehaviors(this.ConnectionParameters);
-         this.Connection.StartReceiveMessages();
-      }
-
-      /// <summary>
-      /// Sets a new network state of the peer.
-      /// </summary>
-      /// <param name="newState">New network state to be set.</param>
-      /// <remarks>This method is not thread safe.</remarks>
-      private async Task SetStateAsync(NetworkPeerState newState) {
-         NetworkPeerState previous = this.State;
-
-         if (StateTransitionTable[previous].Contains(newState)) {
-            this.State = newState;
-
-            await this.OnStateChangedAsync(previous).ConfigureAwait(false);
-
-            if ((newState == NetworkPeerState.Failed) || (newState == NetworkPeerState.Offline)) {
-               this.logger.LogDebug("Communication with the peer has been closed.");
-
-               this.ExecuteDisconnectedCallbackWhenSafe();
-            }
-         }
-         else if (previous != newState) {
-            this.logger.LogDebug("Illegal transition from {0} to {1} occurred.", previous, newState);
-         }
+         this.connectionStateMachine = new PeerConnectionStateMachine(logger, peerConnectionDirection, connectedClient, cancellationToken);
       }
 
       /// <inheritdoc/>
       public async Task ConnectAsync(CancellationToken cancellation = default(CancellationToken)) {
          try {
-            this.logger.LogDebug("Connecting to '{0}'.", this.peerEndPoint);
-
-            await this.Connection.ConnectAsync(this.peerEndPoint, cancellation).ConfigureAwait(false);
-
-            this.RemoteSocketEndpoint = this.Connection.RemoteEndPoint;
-            this.RemoteSocketAddress = this.RemoteSocketEndpoint.Address;
-            this.RemoteSocketPort = this.RemoteSocketEndpoint.Port;
-
-            this.State = NetworkPeerState.Connected;
-
-            this.InitDefaultBehaviors(this.ConnectionParameters);
-            this.Connection.StartReceiveMessages();
-
-            this.logger.LogDebug("Outbound connection to '{0}' established.", this.peerEndPoint);
+            this.connectionStateMachine.AcceptOutgoingConnection();
          }
          catch (OperationCanceledException) {
             this.logger.LogDebug("Connection to '{0}' cancelled.", this.peerEndPoint);
