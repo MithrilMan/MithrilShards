@@ -1,13 +1,4 @@
 ﻿{
-   "Logging": {
-      "LogLevel": {
-         "Default": "Debug"
-      },
-      "Console": {
-         "IncludeScopes": true
-      }
-   },
-
    "ForgeServerSettings": {
       "MaxInboundConnections": 25,
       "Bindings": [

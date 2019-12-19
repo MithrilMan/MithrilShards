@@ -12,16 +12,20 @@ using MithrilShards.P2P.Network.StateMachine;
 
 namespace MithrilShards.P2P.Network {
 
-   public class PeerConnection {
+   public class PeerConnection : IPeerConnection {
       /// <summary>Instance logger.</summary>
       private readonly ILogger logger;
       readonly IEventBus eventBus;
 
       /// <summary>Provider of time functions.</summary>
       private readonly IDateTimeProvider dateTimeProvider;
-      readonly TcpClient connectedClient;
-      private readonly PeerConnectionDirection peerConnectionDirection;
+      internal TcpClient ConnectedClient { get; }
+      public PeerConnectionDirection Direction { get; }
+
       readonly CancellationToken cancellationToken;
+
+      public Guid PeerConnectionId { get; }
+
       readonly PeerConnectionStateMachine connectionStateMachine;
 
       public TimeSpan? TimeOffset { get; private set; }
@@ -37,16 +41,37 @@ namespace MithrilShards.P2P.Network {
          this.logger = logger;
          this.eventBus = eventBus;
          this.dateTimeProvider = dateTimeProvider;
-         this.connectedClient = connectedClient;
-         this.peerConnectionDirection = peerConnectionDirection;
+         this.ConnectedClient = connectedClient;
+         this.Direction = peerConnectionDirection;
          this.cancellationToken = cancellationToken;
 
-         this.connectionStateMachine = new PeerConnectionStateMachine(logger, eventBus, peerConnectionDirection, connectedClient, cancellationToken);
+         this.PeerConnectionId = Guid.NewGuid();
+
+         this.connectionStateMachine = new PeerConnectionStateMachine(logger, eventBus, this, cancellationToken);
       }
 
       /// <inheritdoc/>
-      public async Task ConnectAsync(CancellationToken cancellation = default(CancellationToken)) {
-            await this.connectionStateMachine.AcceptOutgoingConnection();
+      public async Task IncomingConnectionAccepted(CancellationToken cancellation = default(CancellationToken)) {
+         try {
+            await this.connectionStateMachine.AcceptIncomingConnection().ConfigureAwait(false);
+
+            //at the end, the peer is expected to be disconnected
+            this.Disconnect();
+         }
+         catch (Exception ex) {
+            this.logger.LogCritical(ex, "Unexpected error, ensure peer is disconnected");
+            //ensure peer is disconnected
+            this.Disconnect();
+         }
+      }
+
+
+      /// <summary>
+      /// Closes TCP connection and disposes it's stream.
+      /// </summary>
+      private void Disconnect() {
+         this.logger.LogDebug("Disconnect {PeerConnectionId}.", this.PeerConnectionId);
+         this.ConnectedClient.Dispose();
       }
    }
 }

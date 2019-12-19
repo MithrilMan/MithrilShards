@@ -1,0 +1,20 @@
+﻿{
+   "Serilog": {
+      "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.Seq" ],
+      "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+      "WriteTo": [
+         { "Name": "Console" },
+         {
+            "Name": "Seq",
+            "Args": { "serverUrl": "http://localhost:5341" }
+         }
+      ],
+      "MinimumLevel": {
+         "Default": "Debug",
+         "Override": {
+            "Microsoft": "Information",
+            "System": "Warning"
+         }
+      }
+   }
+}

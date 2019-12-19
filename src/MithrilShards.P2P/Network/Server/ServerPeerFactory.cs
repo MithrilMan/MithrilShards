@@ -4,24 +4,31 @@ using System.Linq;
 using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MithrilShards.Core.EventBus;
 using MithrilShards.P2P.Network.Server.Guards;
 
 namespace MithrilShards.P2P.Network.Server {
    public class ServerPeerFactory : IServerPeerFactory {
       readonly ILogger<ServerPeerFactory> logger;
       readonly ILoggerFactory loggerFactory;
+      readonly IEventBus eventBus;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
+      readonly IPeerConnectionFactory peerConnectionFactory;
       readonly ForgeServerSettings settings;
 
       public ServerPeerFactory(ILogger<ServerPeerFactory> logger,
                                ILoggerFactory loggerFactory,
+                               IEventBus eventBus,
                                IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
-                               IOptions<ForgeServerSettings> settings
+                               IOptions<ForgeServerSettings> settings,
+                               IPeerConnectionFactory peerConnectionFactory
                                ) {
          this.logger = logger;
          this.loggerFactory = loggerFactory;
+         this.eventBus = eventBus;
          this.serverPeerConnectionGuards = serverPeerConnectionGuards;
-         this.settings = settings.Value;
+         this.peerConnectionFactory = peerConnectionFactory;
+         this.settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
       }
 
       public List<IServerPeer> CreateServerInstances() {
@@ -44,7 +51,7 @@ namespace MithrilShards.P2P.Network.Server {
 
                foreach (ServerPeerBinding binding in this.settings.Bindings) {
                   if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
-                     throw new ArgumentException($"Configuration error: binding Endpoint must be a valid address:port value. Current value: {binding.Endpoint ?? "NULL"}", nameof(binding.Endpoint));
+                     throw new Exception($"Configuration error: binding {binding.Endpoint} must be a valid address:port value. Current value: {binding.Endpoint ?? "NULL"}");
                   }
 
                   if (binding.PublicEndpoint == null) {
@@ -52,15 +59,17 @@ namespace MithrilShards.P2P.Network.Server {
                   }
 
                   if (!binding.IsValidPublicEndpoint()) {
-                     throw new ArgumentException($"Configuration error: binding PublicEndpoint must be a valid address:port value. Current value: {binding.PublicEndpoint ?? "NULL"}", nameof(binding.PublicEndpoint));
+                     throw new Exception($"Configuration error: binding {nameof(binding.PublicEndpoint)} must be a valid address:port value. Current value: {binding.PublicEndpoint ?? "NULL"}");
                   }
 
 
                   var serverPeer = new ServerPeer(
                      this.loggerFactory.CreateLogger<ServerPeer>(),
+                     this.eventBus,
                      IPEndPoint.Parse(binding.Endpoint),
                      IPEndPoint.Parse(binding.PublicEndpoint),
-                     this.serverPeerConnectionGuards
+                     this.serverPeerConnectionGuards,
+                     this.peerConnectionFactory
                      );
 
                   servers.Add(serverPeer);

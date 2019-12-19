@@ -12,10 +12,10 @@ namespace MithrilShards.Core.Forge {
    public class ForgeBuilder : IForgeBuilder {
       const string CONFIGURATION_FILE = "forge-settings.json";
 
-      private readonly HostBuilder hostBuilder;
+      public readonly HostBuilder hostBuilder;
       private bool isForgeSet = false;
       private bool createDefaultConfigurationFileNeeded = false;
-      private string configurationFilePath;
+      public string ConfigurationFIleName { get; private set; }
 
       public ForgeBuilder() {
          this.hostBuilder = new HostBuilder();
@@ -27,39 +27,19 @@ namespace MithrilShards.Core.Forge {
          });
       }
 
-
-      public ForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE) {
-         _ = this.hostBuilder.ConfigureAppConfiguration((hostingContext, config) => {
-
-            this.configurationFilePath = configurationFile ?? CONFIGURATION_FILE;
-
-            config.AddJsonFile(this.configurationFilePath, optional: false, reloadOnChange: true);
-
-            config.AddEnvironmentVariables("FORGE_");
-
-            if (commandLineArgs != null) {
-               config.AddCommandLine(commandLineArgs);
-            }
-
-            config.SetFileLoadExceptionHandler(context => this.CreateDefaultConfigurationFile(hostingContext, context));
-         });
-
-         return this;
-      }
-
       /// <summary>
       /// Creates the default configuration file if it's missing.
       /// </summary>
       /// <returns></returns>
       private void CreateDefaultConfigurationFile(HostBuilderContext hostingContext, FileLoadExceptionContext context) {
          this.createDefaultConfigurationFileNeeded = true;
-         this.configurationFilePath = context.Provider.Source.Path;
+         this.ConfigurationFIleName = context.Provider.Source.Path;
 
          //default file created, no need to throw error
          context.Ignore = true;
       }
 
-      public ForgeBuilder UseForge<TForgeImplementation>() where TForgeImplementation : class, IForge {
+      public IForgeBuilder UseForge<TForgeImplementation>(string[] commandLineArgs, string configurationFile = "forge-settings.json") where TForgeImplementation : class, IForge {
          if (this.isForgeSet) {
             throw new Exception($"Forge already set. Only one call to {nameof(UseForge)} is allowed");
          }
@@ -71,7 +51,7 @@ namespace MithrilShards.Core.Forge {
                   return new DefaultConfigurationWriter(
                      services.GetService<ILoggerFactory>().CreateLogger<DefaultConfigurationWriter>(),
                      services.GetServices<IMithrilShardSettings>(),
-                     this.configurationFilePath
+                     this.ConfigurationFIleName
                      );
                });
             }
@@ -91,6 +71,8 @@ namespace MithrilShards.Core.Forge {
 
          this.isForgeSet = true;
 
+         this.Configure(commandLineArgs, configurationFile);
+
          return this;
       }
 
@@ -108,12 +90,12 @@ namespace MithrilShards.Core.Forge {
       //
       // Returns:
       //     The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.
-      public ForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging) {
+      public IForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging) {
          this.hostBuilder.ConfigureLogging(configureLogging);
          return this;
       }
 
-      public ForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+      public IForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
          where TMithrilShard : class, IMithrilShard
          where TMithrilShardSettings : class, IMithrilShardSettings {
 
@@ -130,7 +112,7 @@ namespace MithrilShards.Core.Forge {
          return this;
       }
 
-      public ForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+      public IForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
          where TMithrilShard : class, IMithrilShard {
 
          if (configureDelegate is null) {
@@ -138,6 +120,24 @@ namespace MithrilShards.Core.Forge {
          }
 
          this.hostBuilder.ConfigureServices(configureDelegate);
+
+         return this;
+      }
+
+      public IForgeBuilder ExtendInnerHostBuilder(Action<IHostBuilder> extendHostBuilderAction) {
+         extendHostBuilderAction(this.hostBuilder);
+         return this;
+      }
+
+      /// <summary>
+      /// Adds the console log reading settings from Logging section if configuration file and displaying on standard console
+      /// </summary>
+      /// <returns></returns>
+      public IForgeBuilder AddConsoleLog() {
+         this.ConfigureLogging((context, logging) => {
+            logging.AddConfiguration(context.Configuration.GetSection("Logging"));
+            logging.AddConsole();
+         });
 
          return this;
       }
@@ -158,13 +158,34 @@ namespace MithrilShards.Core.Forge {
       //     A System.Threading.Tasks.Task that only completes when the token is triggered or
       //     shutdown is triggered.
       public Task RunConsoleAsync(CancellationToken cancellationToken = default) {
-         //TODO: add configuration parameter to set if console logging is enabled or not and use it
-         this.ConfigureLogging((context, logging) => {
-            logging.AddConfiguration(context.Configuration.GetSection("Logging"));
-            logging.AddConsole();
-         });
+         this.EnsureForgeIsSet();
 
          return this.hostBuilder.RunConsoleAsync(cancellationToken);
+      }
+
+      private void EnsureForgeIsSet() {
+         if (!this.isForgeSet) {
+            throw new ForgeBuilderException("Forge must be set. A call to UseForge is required");
+         }
+      }
+
+      private IForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE) {
+         this.ConfigurationFIleName = configurationFile ?? CONFIGURATION_FILE;
+
+         _ = this.hostBuilder.ConfigureAppConfiguration((hostingContext, config) => {
+
+            config.AddJsonFile(this.ConfigurationFIleName, optional: false, reloadOnChange: true);
+
+            config.AddEnvironmentVariables("FORGE_");
+
+            if (commandLineArgs != null) {
+               config.AddCommandLine(commandLineArgs);
+            }
+
+            config.SetFileLoadExceptionHandler(context => this.CreateDefaultConfigurationFile(hostingContext, context));
+         });
+
+         return this;
       }
    }
 }

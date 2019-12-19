@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
+﻿using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core;
-using MithrilShards.P2P.Network.StateMachine;
+using MithrilShards.Core.EventBus;
 
 namespace MithrilShards.P2P.Network {
 
@@ -15,27 +10,30 @@ namespace MithrilShards.P2P.Network {
       /// <summary>Instance logger.</summary>
       private readonly ILogger logger;
       readonly ILoggerFactory loggerFactory;
+      readonly IEventBus eventBus;
 
       /// <summary>Provider of time functions.</summary>
       private readonly IDateTimeProvider dateTimeProvider;
 
-      public PeerConnectionFactory(ILoggerFactory loggerFactory, IDateTimeProvider dateTimeProvider) {
+      public PeerConnectionFactory(ILoggerFactory loggerFactory, IEventBus eventBus, IDateTimeProvider dateTimeProvider) {
          this.loggerFactory = loggerFactory;
+         this.eventBus = eventBus;
          this.dateTimeProvider = dateTimeProvider;
 
          this.logger = loggerFactory.CreateLogger<PeerConnectionFactory>();
       }
 
-      public async Task AcceptConnectionAsync(TcpClient connectingPeer, CancellationToken cancellationToken) {
+      public IPeerConnection CreatePeerConnection(TcpClient connectingPeer, CancellationToken cancellationToken) {
          var peer = new PeerConnection(
             this.loggerFactory.CreateLogger<PeerConnection>(),
+            this.eventBus,
             this.dateTimeProvider,
             connectingPeer,
             PeerConnectionDirection.Inbound,
             cancellationToken
             );
 
-         await peer.ConnectAsync(cancellationToken);
+         return peer;
       }
    }
 }

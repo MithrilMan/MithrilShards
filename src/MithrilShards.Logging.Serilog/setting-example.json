@@ -1,0 +1,46 @@
+﻿{
+
+   "Serilog": {
+      "MinimumLevel": {
+         "Default": "Debug",
+         "Override": {
+            "Microsoft": "Information",
+            "System": "Warning"
+         }
+      },
+      "WriteTo": [
+         {
+            "Name": "Seq",
+            "Args": { "serverUrl": "http://localhost:5341" }
+         },
+
+         {
+            "Name": "Console"
+         }
+      ]
+   },
+
+   "Logging": {
+      "LogLevel": {
+         "Default": "Debug"
+      },
+      "Console": {
+         "IncludeScopes": true
+      }
+   },
+
+   "ForgeServerSettings": {
+      "MaxInboundConnections": 25,
+      "Bindings": [
+         {
+            "IsWhitelistingEndpoint": false,
+            "Endpoint": "127.0.0.1:45010"
+         },
+         {
+            "IsWhitelistingEndpoint": true,
+            "Endpoint": "127.0.0.1:45011",
+            "PublicEndpoint": "98.0.0.1:45011"
+         }
+      ]
+   }
+}

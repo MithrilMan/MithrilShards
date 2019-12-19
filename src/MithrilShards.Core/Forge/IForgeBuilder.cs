@@ -9,6 +9,8 @@ using MithrilShards.Core.MithrilShards;
 namespace MithrilShards.Core.Forge {
    public interface IForgeBuilder {
 
+      string ConfigurationFIleName { get; }
+
       /// <summary>
       /// Adds a shard into the forge.
       /// </summary>
@@ -16,7 +18,7 @@ namespace MithrilShards.Core.Forge {
       /// <typeparam name="TMithrilShardSettings">The type of the mithril shard settings to register to allow application configuration.</typeparam>
       /// <param name="configureDelegate">The configure delegate.</param>
       /// <returns></returns>
-      ForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+      IForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
          where TMithrilShard : class, IMithrilShard
          where TMithrilShardSettings : class, IMithrilShardSettings;
 
@@ -26,14 +28,14 @@ namespace MithrilShards.Core.Forge {
       /// <typeparam name="TMithrilShard">The type of the mithril shard.</typeparam>
       /// <param name="configureDelegate">The configure delegate.</param>
       /// <returns></returns>
-      ForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate) where TMithrilShard : class, IMithrilShard;
-    
-      ForgeBuilder Configure(string[] commandLineArgs, string configurationFile = "forge.config");
+      IForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate) where TMithrilShard : class, IMithrilShard;
 
-      ForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging);
+      IForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging);
+
+      IForgeBuilder ExtendInnerHostBuilder(Action<IHostBuilder> extendHostBuilderAction);
 
       Task RunConsoleAsync(CancellationToken cancellationToken = default);
 
-      ForgeBuilder UseForge<TForgeImplementation>() where TForgeImplementation : class, IForge;
+      IForgeBuilder UseForge<TForgeImplementation>(string[] commandLineArgs, string configurationFile) where TForgeImplementation : class, IForge;
    }
 }

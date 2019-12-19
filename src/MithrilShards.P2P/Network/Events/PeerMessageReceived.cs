@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using NBitcoin.Protocol;
 
 namespace MithrilShards.P2P.Network.Events {
     /// <summary>

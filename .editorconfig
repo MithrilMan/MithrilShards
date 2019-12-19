@@ -59,7 +59,7 @@ csharp_style_conditional_delegate_call                            = true : sugge
 csharp_style_expression_bodied_accessors                          = true : silent
 csharp_style_expression_bodied_constructors                       = true : silent
 csharp_style_expression_bodied_indexers                           = true : silent
-csharp_style_expression_bodied_methods                            = true : silent
+csharp_style_expression_bodied_methods = true:silent
 csharp_style_expression_bodied_operators                          = true : silent
 csharp_style_expression_bodied_properties                         = true : silent
 csharp_style_inlined_variable_declaration                         = true : error
@@ -72,3 +72,15 @@ csharp_style_var_for_built_in_types                               = false : erro
 csharp_style_var_when_type_is_apparent                            = true : suggestion
 
 
+
+# CA1303: Do not pass literals as localized parameters
+dotnet_diagnostic.CA1303.severity = silent
+
+# CA1816: Dispose methods should call SuppressFinalize
+dotnet_diagnostic.CA1816.severity = none
+
+# CA1063: Implement IDisposable Correctly
+dotnet_diagnostic.CA1063.severity = none
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = error

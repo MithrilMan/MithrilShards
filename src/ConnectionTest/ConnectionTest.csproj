@@ -7,15 +7,20 @@
 
   <ItemGroup>
     <None Remove="forge-settings.json" />
+    <None Remove="log-settings.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="log-settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="forge-settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MithrilShards.Logging.Serilog\MithrilShards.Logging.Serilog.csproj" />
     <ProjectReference Include="..\MithrilShards.P2P\MithrilShards.P2P.csproj" />
   </ItemGroup>
 

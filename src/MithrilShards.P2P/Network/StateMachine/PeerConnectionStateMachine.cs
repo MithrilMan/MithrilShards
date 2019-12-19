@@ -17,11 +17,10 @@ using Stateless;
 namespace MithrilShards.P2P.Network.StateMachine {
    public class PeerConnectionStateMachine {
       readonly StateMachine<PeerConnectionState, PeerConnectionTrigger> stateMachine;
-      private readonly Guid machineId;
       readonly ILogger logger;
       readonly IEventBus eventBus;
-      readonly PeerConnectionDirection peerConnectionDirection;
-      readonly TcpClient connectedClient;
+      readonly PeerConnection peerConnection;
+      readonly PeerConnectionDirection peerDirection;
 
       readonly IPEndPoint remoteEndPoint;
 
@@ -46,23 +45,20 @@ namespace MithrilShards.P2P.Network.StateMachine {
       public PeerConnectionState Status { get => this.stateMachine.State; }
 
 
-      public PeerConnectionStateMachine(ILogger logger, IEventBus eventBus, PeerConnectionDirection peerConnectionDirection, TcpClient connectedClient, CancellationToken cancellationToken) {
-         this.logger = logger;
-         this.eventBus = eventBus;
-         this.peerConnectionDirection = peerConnectionDirection;
-         this.connectedClient = connectedClient;
+      public PeerConnectionStateMachine(ILogger logger, IEventBus eventBus, PeerConnection peerConnection, CancellationToken cancellationToken) {
+         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+         this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+         this.peerConnection = peerConnection ?? throw new ArgumentNullException(nameof(peerConnection));
          this.stateMachine = new StateMachine<PeerConnectionState, PeerConnectionTrigger>(PeerConnectionState.Initializing);
 
-         this.machineId = Guid.NewGuid();
-
-         this.remoteEndPoint = this.connectedClient.Client.RemoteEndPoint as IPEndPoint;
+         this.remoteEndPoint = this.peerConnection.ConnectedClient.Client.RemoteEndPoint as IPEndPoint;
 
          this.processMessageTrigger = this.stateMachine.SetTriggerParameters<Message>(PeerConnectionTrigger.ProcessMessage);
          this.disconnectFromPeerTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.DisconnectFromPeer);
          this.peerDisconnectedTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.PeerDisconnected);
 
 
-         if (peerConnectionDirection == PeerConnectionDirection.Inbound) {
+         if (this.peerConnection.Direction == PeerConnectionDirection.Inbound) {
             this.ConfigureInboundStateMachine(cancellationToken);
          }
          else {
@@ -118,8 +114,8 @@ namespace MithrilShards.P2P.Network.StateMachine {
          });
       }
 
-      public async Task AcceptOutgoingConnection() {
-         await this.stateMachine.FireAsync(PeerConnectionTrigger.Connect).ConfigureAwait(false);
+      public async Task AcceptIncomingConnection() {
+         await this.stateMachine.FireAsync(PeerConnectionTrigger.AcceptConnection).ConfigureAwait(false);
       }
 
       /// <summary>
@@ -131,27 +127,33 @@ namespace MithrilShards.P2P.Network.StateMachine {
          this.pipeReader = pipe.Reader;
 
          try {
-            while (!cancellationToken.IsCancellationRequested) {
-               //TODO usare System.IO.Pipelines
-               // reading data from a pipe instance
-               //ReadResult result = await this.pipeReader.ReadAsync(this.cancellationToken);
-               //ReadOnlySequence<byte> buffer = result.Buffer;
-               //SequencePosition? position = null;
-               //this.connectedClient.GetStream();
-               //// We perform calculations with the data obtained.
-               //await _bytesProcessor.ProcessBytesAsync(buffer, token);
+            using (NetworkStream stream = this.peerConnection.ConnectedClient.GetStream()) {
+               while (!cancellationToken.IsCancellationRequested) {
+                  //TODO usare System.IO.Pipelines
+                  // reading data from a pipe instance
+                  //ReadResult result = await this.pipeReader.ReadAsync(this.cancellationToken);
+                  //ReadOnlySequence<byte> buffer = result.Buffer;
+                  //SequencePosition? position = null;
+                  //this.connectedClient.GetStream();
+                  //// We perform calculations with the data obtained.
+                  //await _bytesProcessor.ProcessBytesAsync(buffer, token);
 
-
-
+                  Message readMessage = null;
+                  await Task.Run(() => {
+                     readMessage = Message.ReadNext(this.peerConnection.ConnectedClient.GetStream(), NBitcoin.Network.Main, 7002, cancellationToken, out _);
+                  }).ConfigureAwait(false);
+               }
             }
          }
          catch (Exception ex) when (ex is IOException || ex is OperationCanceledException || ex is ObjectDisposedException) {
             await this.stateMachine.FireAsync(this.peerDisconnectedTrigger,
                                               (reason: "The node stopped receiving messages.", ex)).ConfigureAwait(false);
+            return;
          }
          catch (Exception ex) {
             await this.stateMachine.FireAsync(this.peerDisconnectedTrigger,
                                               (reason: "Unexpected failure whilst receiving messages.", ex)).ConfigureAwait(false);
+            return;
          }
       }
 
@@ -165,7 +167,9 @@ namespace MithrilShards.P2P.Network.StateMachine {
       }
 
       private Task DisconnectAsync(string reason, Exception ex, CancellationToken cancellationToken) {
-         throw new NotImplementedException();
+         this.logger.LogDebug(ex, "Peer {PeerConnectionId} Disconnected: {Reason}", this.peerConnection.PeerConnectionId, reason);
+         this.eventBus.Publish(new Events.PeerDisconnected(this.peerConnection.Direction, this.peerConnection.PeerConnectionId, this.remoteEndPoint, reason, ex));
+         return Task.CompletedTask;
       }
    }
 }

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Forge;
 using MithrilShards.P2P;
+using MithrilShards.Logging.Serilog;
+using Serilog;
 
 namespace ConnectionTest {
    class Program {
@@ -26,18 +28,18 @@ namespace ConnectionTest {
 
       private static async Task StartClient(string[] args) {
          await new ForgeBuilder()
-            .UseForge<Forge>()
-            .Configure(args)
+            .UseForge<Forge>(args)
+            .UseSerilog("log-settings.json")
             .UseP2PForgeServer()
             .RunConsoleAsync();
       }
 
       private static async Task StartServer(string[] args) {
          await new ForgeBuilder()
-           .UseForge<Forge>()
-           .Configure(args)
-           .UseP2PForgeServer()
-           .RunConsoleAsync();
+            .UseForge<Forge>(args)
+            .UseSerilog("log-settings.json")
+            .UseP2PForgeServer()
+            .RunConsoleAsync();
       }
    }
 }

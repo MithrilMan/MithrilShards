@@ -9,12 +9,14 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
 using MithrilShards.P2P.Helpers;
+using MithrilShards.P2P.Network.Events;
 using MithrilShards.P2P.Network.Server.Guards;
 
 namespace MithrilShards.P2P.Network.Server {
-   public class ServerPeer : IServerPeer {
+   public class ServerPeer : IServerPeer, IDisposable {
       /// <summary>TCP server listener accepting inbound connections.</summary>
       private readonly ForgeTcpListener tcpListener;
+      private readonly SubscriptionToken onPeerDisconnectedSubscription;
 
       /// <summary>
       /// Cancellation source that is triggered on dispose.
@@ -24,6 +26,8 @@ namespace MithrilShards.P2P.Network.Server {
       readonly ILogger logger;
       readonly IEventBus eventBus;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
+      readonly IPeerConnectionFactory peerConnectionFactory;
+      private readonly Dictionary<Guid, IPeerConnection> connectedPeers;
 
       /// <summary>
       /// IP address and port, on which the server listens to incoming connections.
@@ -36,22 +40,36 @@ namespace MithrilShards.P2P.Network.Server {
       /// <summary>IP address and port of the external network interface that is accessible from the Internet.</summary>
       public IPEndPoint RemoteEndPoint { get; }
 
+
+
       public ServerPeer(ILogger<ServerPeer> logger,
                         IEventBus eventBus,
                         IPEndPoint localEndPoint,
                         IPEndPoint remoteEndPoint,
-                        IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards) {
+                        IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
+                        IPeerConnectionFactory peerConnectionFactory) {
 
          this.logger = logger;
          this.eventBus = eventBus;
          this.serverPeerConnectionGuards = serverPeerConnectionGuards;
+         this.peerConnectionFactory = peerConnectionFactory;
          this.LocalEndPoint = localEndPoint.EnsureIPv6();
          this.RemoteEndPoint = remoteEndPoint.EnsureIPv6();
+
+         this.connectedPeers = new Dictionary<Guid, IPeerConnection>();
 
          this.listenerCancellation = new CancellationTokenSource();
 
          this.tcpListener = new ForgeTcpListener(this.LocalEndPoint);
+
+         this.onPeerDisconnectedSubscription = this.eventBus.Subscribe<Events.PeerDisconnected>(this.OnPeerDisconnected);
       }
+
+      private void OnPeerDisconnected(PeerDisconnected @event) {
+         this.connectedPeers.Remove(@event.PeerId);
+         this.logger.LogDebug("Peer {PeerId} disconnected, removed from connectedPeers", @event.PeerId);
+      }
+
 
       /// <summary>
       /// Starts listening on the server's initialized endpoint.
@@ -74,6 +92,7 @@ namespace MithrilShards.P2P.Network.Server {
          if (this.tcpListener.IsActive) {
             this.logger.LogInformation("Stopping listening to {EndPoint}", this.LocalEndPoint);
             this.tcpListener.Stop();
+            this.listenerCancellation.Cancel();
          }
       }
 
@@ -87,7 +106,7 @@ namespace MithrilShards.P2P.Network.Server {
             while (!this.listenerCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested) {
 
                TcpClient connectingPeer = await this.tcpListener.AcceptTcpClientAsync()
-                  .WithCancellationAsync(cancellationToken)
+                  .WithCancellationAsync(this.listenerCancellation.Token)
                   .ConfigureAwait(false);
 
                ServerPeerConnectionGuardResult connectionGuardResult = this.EnsurePeerCanConnect(connectingPeer);
@@ -98,7 +117,10 @@ namespace MithrilShards.P2P.Network.Server {
                   continue;
                }
 
-               this.EstablishConnection(connectingPeer);
+               //spawn a new task to manage the peer connection
+               Task.Run(async () => {
+                  await this.EstablishConnection(connectingPeer, cancellationToken).ConfigureAwait(false);
+               });
             }
          }
          catch (OperationCanceledException) {
@@ -112,13 +134,18 @@ namespace MithrilShards.P2P.Network.Server {
          }
       }
 
-      private void EstablishConnection(TcpClient connectingPeer) {
-         this.logger.LogDebug("Connection accepted from client '{ConnectingPeerEndPoint}'.", connectingPeer.Client.RemoteEndPoint);
+      private async Task EstablishConnection(TcpClient connectingPeer, CancellationToken cancellationToken) {
+         LoggerExtensions.LogDebug(this.logger, (string)"Connection accepted from client '{ConnectingPeerEndPoint}'.", connectingPeer.Client.RemoteEndPoint);
 
-         this.fact
-         var peer = new NetworkPeer((IPEndPoint)client.Client.RemoteEndPoint, this.network, parameters, client, this.dateTimeProvider, this, this.loggerFactory, this.selfEndpointTracker, this.asyncProvider, onDisconnected, this.onSendingMessage);
+         IPeerConnection acceptedPeer = this.peerConnectionFactory.CreatePeerConnection((TcpClient)connectingPeer, cancellationToken);
+         this.connectedPeers[acceptedPeer.PeerConnectionId] = acceptedPeer;
 
-         this.eventBus.Publish(new Events.PeerConnected(true, (IPEndPoint)connectingPeer.Client.RemoteEndPoint));
+         try {
+            await acceptedPeer.IncomingConnectionAccepted(cancellationToken).ConfigureAwait(false);
+         }
+         catch (Exception ex) {
+            this.logger.LogCritical(ex, "Should never happen, need to be fixed!");
+         }
       }
 
       /// <summary>
@@ -138,6 +165,10 @@ namespace MithrilShards.P2P.Network.Server {
             )
             .DefaultIfEmpty(ServerPeerConnectionGuardResult.Success)
             .FirstOrDefault();
+      }
+
+      public void Dispose() {
+         this.onPeerDisconnectedSubscription.Dispose();
       }
    }
 }
