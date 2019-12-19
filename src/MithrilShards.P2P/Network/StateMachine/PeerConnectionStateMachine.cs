@@ -50,7 +50,7 @@ namespace MithrilShards.P2P.Network.StateMachine {
          this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
          this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
          this.peerConnection = peerConnection ?? throw new ArgumentNullException(nameof(peerConnection));
-         this.stateMachine = new StateMachine<PeerConnectionState, PeerConnectionTrigger>(PeerConnectionState.Initializing);
+         this.stateMachine = new StateMachine<PeerConnectionState, PeerConnectionTrigger>(PeerConnectionState.Initializing, FiringMode.Immediate);
 
          this.remoteEndPoint = this.peerConnection.ConnectedClient.Client.RemoteEndPoint as IPEndPoint;
 
@@ -112,6 +112,8 @@ namespace MithrilShards.P2P.Network.StateMachine {
 
             this.stateMachine.Configure(PeerConnectionState.Disconnected)
                .OnEntry(this.Disconnected);
+
+            string graph = Stateless.Graph.UmlDotGraph.Format(this.stateMachine.GetInfo());
          }
       }
 
@@ -133,7 +135,7 @@ namespace MithrilShards.P2P.Network.StateMachine {
 
          try {
             using (NetworkStream stream = this.peerConnection.ConnectedClient.GetStream()) {
-               this.stateMachine.Fire(PeerConnectionTrigger.WaitMessage);
+               await this.stateMachine.FireAsync(PeerConnectionTrigger.WaitMessage).ConfigureAwait(false);
 
                while (!cancellationToken.IsCancellationRequested) {
                   //TODO usare System.IO.Pipelines
@@ -147,7 +149,7 @@ namespace MithrilShards.P2P.Network.StateMachine {
 
                   Message readMessage = null;
                   await Task.Run(() => {
-                     readMessage = Message.ReadNext(this.peerConnection.ConnectedClient.GetStream(), NBitcoin.Network.Main, 7002, cancellationToken, out _);
+                     readMessage = Message.ReadNext(this.peerConnection.ConnectedClient.GetStream(), NBitcoin.Network.Main, 70015, cancellationToken, out _);
                   }).ConfigureAwait(false);
                }
             }

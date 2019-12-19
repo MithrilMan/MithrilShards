@@ -9,7 +9,7 @@ using MithrilShards.Core.MithrilShards;
 namespace MithrilShards.Core.Forge {
    public interface IForgeBuilder {
 
-      string ConfigurationFIleName { get; }
+      string ConfigurationFileName { get; }
 
       /// <summary>
       /// Adds a shard into the forge.

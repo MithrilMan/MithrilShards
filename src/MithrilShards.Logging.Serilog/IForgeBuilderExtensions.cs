@@ -10,7 +10,7 @@ namespace MithrilShards.Logging.Serilog {
 
                builder.UseSerilog((hostingContext, loggerConfiguration) => {
                   IConfigurationRoot logConfiguration = new ConfigurationBuilder()
-                  .AddJsonFile(configurationFile ?? forgeBuilder.ConfigurationFIleName)
+                  .AddJsonFile(configurationFile ?? forgeBuilder.ConfigurationFileName)
                   .Build();
 
                   loggerConfiguration.ReadFrom.Configuration(logConfiguration);

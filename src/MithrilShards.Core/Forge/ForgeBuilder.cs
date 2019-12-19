@@ -15,7 +15,7 @@ namespace MithrilShards.Core.Forge {
       public readonly HostBuilder hostBuilder;
       private bool isForgeSet = false;
       private bool createDefaultConfigurationFileNeeded = false;
-      public string ConfigurationFIleName { get; private set; }
+      public string ConfigurationFileName { get; private set; }
 
       public ForgeBuilder() {
          this.hostBuilder = new HostBuilder();
@@ -33,7 +33,7 @@ namespace MithrilShards.Core.Forge {
       /// <returns></returns>
       private void CreateDefaultConfigurationFile(HostBuilderContext hostingContext, FileLoadExceptionContext context) {
          this.createDefaultConfigurationFileNeeded = true;
-         this.ConfigurationFIleName = context.Provider.Source.Path;
+         this.ConfigurationFileName = context.Provider.Source.Path;
 
          //default file created, no need to throw error
          context.Ignore = true;
@@ -51,7 +51,7 @@ namespace MithrilShards.Core.Forge {
                   return new DefaultConfigurationWriter(
                      services.GetService<ILoggerFactory>().CreateLogger<DefaultConfigurationWriter>(),
                      services.GetServices<IMithrilShardSettings>(),
-                     this.ConfigurationFIleName
+                     this.ConfigurationFileName
                      );
                });
             }
@@ -170,11 +170,11 @@ namespace MithrilShards.Core.Forge {
       }
 
       private IForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE) {
-         this.ConfigurationFIleName = configurationFile ?? CONFIGURATION_FILE;
+         this.ConfigurationFileName = configurationFile ?? CONFIGURATION_FILE;
 
          _ = this.hostBuilder.ConfigureAppConfiguration((hostingContext, config) => {
 
-            config.AddJsonFile(this.ConfigurationFIleName, optional: false, reloadOnChange: true);
+            config.AddJsonFile(this.ConfigurationFileName, optional: false, reloadOnChange: true);
 
             config.AddEnvironmentVariables("FORGE_");
 
