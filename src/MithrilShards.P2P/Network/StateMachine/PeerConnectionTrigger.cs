@@ -16,6 +16,7 @@
       PeerStartedHandshake,
       ProcessMessage,
       WaitMessage,
-      MessageProcessed
+      MessageProcessed,
+      PeerDropped
    }
 }

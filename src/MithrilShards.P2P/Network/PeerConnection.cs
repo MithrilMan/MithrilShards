@@ -54,24 +54,11 @@ namespace MithrilShards.P2P.Network {
       public async Task IncomingConnectionAccepted(CancellationToken cancellation = default(CancellationToken)) {
          try {
             await this.connectionStateMachine.AcceptIncomingConnection().ConfigureAwait(false);
-
-            //at the end, the peer is expected to be disconnected
-            this.Disconnect();
          }
          catch (Exception ex) {
-            this.logger.LogCritical(ex, "Unexpected error, ensure peer is disconnected");
-            //ensure peer is disconnected
-            this.Disconnect();
+            this.logger.LogCritical(ex, "Unexpected error.");
+            this.connectionStateMachine.ForceDisconnection();
          }
-      }
-
-
-      /// <summary>
-      /// Closes TCP connection and disposes it's stream.
-      /// </summary>
-      private void Disconnect() {
-         this.logger.LogDebug("Disconnect {PeerConnectionId}.", this.PeerConnectionId);
-         this.ConnectedClient.Dispose();
       }
    }
 }

@@ -66,8 +66,11 @@ namespace MithrilShards.P2P.Network.Server {
       }
 
       private void OnPeerDisconnected(PeerDisconnected @event) {
-         this.connectedPeers.Remove(@event.PeerId);
-         this.logger.LogDebug("Peer {PeerId} disconnected, removed from connectedPeers", @event.PeerId);
+         // This event is catched by every ServerPeer instance, so if we have multiple endpoints listening, all of them will
+         // try to remove the item from the dictionary.
+         if (this.connectedPeers.Remove(@event.PeerId)) {
+            this.logger.LogDebug("Peer {PeerId} disconnected, removed from connectedPeers", @event.PeerId);
+         }
       }
 
 

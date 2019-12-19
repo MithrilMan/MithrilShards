@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipelines;
 using System.Net;
@@ -40,7 +41,7 @@ namespace MithrilShards.P2P.Network.StateMachine {
       /// <summary>
       /// Triggers a disconnection caused by the other peer, specifying the reason.
       /// </summary>
-      private readonly StateMachine<PeerConnectionState, PeerConnectionTrigger>.TriggerWithParameters<(string reason, Exception ex)> peerDisconnectedTrigger;
+      private readonly StateMachine<PeerConnectionState, PeerConnectionTrigger>.TriggerWithParameters<(string reason, Exception ex)> peerDroppedTrigger;
 
       public PeerConnectionState Status { get => this.stateMachine.State; }
 
@@ -55,7 +56,7 @@ namespace MithrilShards.P2P.Network.StateMachine {
 
          this.processMessageTrigger = this.stateMachine.SetTriggerParameters<Message>(PeerConnectionTrigger.ProcessMessage);
          this.disconnectFromPeerTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.DisconnectFromPeer);
-         this.peerDisconnectedTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.PeerDisconnected);
+         this.peerDroppedTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.PeerDropped);
 
 
          if (this.peerConnection.Direction == PeerConnectionDirection.Inbound) {
@@ -63,6 +64,18 @@ namespace MithrilShards.P2P.Network.StateMachine {
          }
          else {
             this.ConfigureOutboundStateMachine(cancellationToken);
+         }
+
+         //this.stateMachine.OnUnhandledTrigger((state, trigger) => {
+         //   this.logger.LogError("Unhandled Trigger: '{State}' state, '{trigger}' trigger!", state, trigger);
+         //});
+
+         this.EnableStateTransitionLogs();
+      }
+
+      internal void ForceDisconnection() {
+         if (this.stateMachine.IsInState(PeerConnectionState.Connected)) {
+            this.stateMachine.FireAsync(this.disconnectFromPeerTrigger, (reason: "Unexpected state transition.", ex: (Exception)null));
          }
       }
 
@@ -73,7 +86,7 @@ namespace MithrilShards.P2P.Network.StateMachine {
 
             this.stateMachine.Configure(PeerConnectionState.Disconnectable)
                .Permit(PeerConnectionTrigger.DisconnectFromPeer, PeerConnectionState.Disconnecting)
-               .Permit(PeerConnectionTrigger.PeerDisconnected, PeerConnectionState.Disconnecting);
+               .Permit(PeerConnectionTrigger.PeerDropped, PeerConnectionState.Disconnecting);
 
             this.stateMachine.Configure(PeerConnectionState.Connected)
                .SubstateOf(PeerConnectionState.Disconnectable)
@@ -91,27 +104,19 @@ namespace MithrilShards.P2P.Network.StateMachine {
                .Permit(PeerConnectionTrigger.MessageProcessed, PeerConnectionState.WaitingMessage);
 
             this.stateMachine.Configure(PeerConnectionState.Disconnecting)
-               .OnEntryFromAsync(this.peerDisconnectedTrigger,
-                                 async (why) => await this.DisconnectAsync(why.reason, why.ex, cancellationToken).ConfigureAwait(false))
+               .OnEntryFromAsync(this.peerDroppedTrigger,
+                                 async (why) => await this.DisconnectingAsync(why.reason, why.ex, cancellationToken).ConfigureAwait(false))
                .OnEntryFromAsync(this.disconnectFromPeerTrigger,
-                                 async (why) => await this.DisconnectAsync(why.reason, why.ex, cancellationToken).ConfigureAwait(false))
+                                 async (why) => await this.DisconnectingAsync(why.reason, why.ex, cancellationToken).ConfigureAwait(false))
                .Permit(PeerConnectionTrigger.PeerDisconnected, PeerConnectionState.Disconnected);
 
             this.stateMachine.Configure(PeerConnectionState.Disconnected)
-               .OnEntry(this.CleanUp);
-
-            this.stateMachine.OnUnhandledTrigger((state, trigger) => {
-               this.logger.LogError("Unhandled Trigger: '{State}' state, '{trigger}' trigger!", state, trigger);
-            });
+               .OnEntry(this.Disconnected);
          }
       }
 
       private void ConfigureOutboundStateMachine(CancellationToken cancellationToken) {
 
-
-         this.stateMachine.OnUnhandledTrigger((state, trigger) => {
-            this.logger.LogError("Unhandled Trigger: '{State}' state, '{trigger}' trigger!", state, trigger);
-         });
       }
 
       public async Task AcceptIncomingConnection() {
@@ -128,6 +133,8 @@ namespace MithrilShards.P2P.Network.StateMachine {
 
          try {
             using (NetworkStream stream = this.peerConnection.ConnectedClient.GetStream()) {
+               this.stateMachine.Fire(PeerConnectionTrigger.WaitMessage);
+
                while (!cancellationToken.IsCancellationRequested) {
                   //TODO usare System.IO.Pipelines
                   // reading data from a pipe instance
@@ -146,12 +153,12 @@ namespace MithrilShards.P2P.Network.StateMachine {
             }
          }
          catch (Exception ex) when (ex is IOException || ex is OperationCanceledException || ex is ObjectDisposedException) {
-            await this.stateMachine.FireAsync(this.peerDisconnectedTrigger,
+            await this.stateMachine.FireAsync(this.peerDroppedTrigger,
                                               (reason: "The node stopped receiving messages.", ex)).ConfigureAwait(false);
             return;
          }
          catch (Exception ex) {
-            await this.stateMachine.FireAsync(this.peerDisconnectedTrigger,
+            await this.stateMachine.FireAsync(this.peerDroppedTrigger,
                                               (reason: "Unexpected failure whilst receiving messages.", ex)).ConfigureAwait(false);
             return;
          }
@@ -162,14 +169,28 @@ namespace MithrilShards.P2P.Network.StateMachine {
          throw new NotImplementedException();
       }
 
-      private void CleanUp() {
-         throw new NotImplementedException();
+      private void Disconnected() {
+         this.logger.LogDebug("Peer {PeerConnectionId} Disconnected", this.peerConnection.PeerConnectionId);
       }
 
-      private Task DisconnectAsync(string reason, Exception ex, CancellationToken cancellationToken) {
-         this.logger.LogDebug(ex, "Peer {PeerConnectionId} Disconnected: {Reason}", this.peerConnection.PeerConnectionId, reason);
+      private Task DisconnectingAsync(string reason, Exception ex, CancellationToken cancellationToken) {
+         this.logger.LogDebug(ex, "Disconnecting {PeerConnectionId}: {Reason}", this.peerConnection.PeerConnectionId, reason);
+         this.peerConnection.ConnectedClient.Close();
          this.eventBus.Publish(new Events.PeerDisconnected(this.peerConnection.Direction, this.peerConnection.PeerConnectionId, this.remoteEndPoint, reason, ex));
+         this.stateMachine.Fire(PeerConnectionTrigger.PeerDisconnected);
          return Task.CompletedTask;
+      }
+
+
+      /// <summary>
+      /// Enables the state transition logs.
+      /// </summary>
+      /// <remarks>Transition logs are enabled only if the code is compiled with DEBUG symbol</remarks>
+      [Conditional("DEBUG")]
+      private void EnableStateTransitionLogs() {
+         this.stateMachine.OnTransitioned(transition => {
+            this.logger.LogDebug("From {FromState} to {ToState}", transition.Source, transition.Destination);
+         });
       }
    }
 }
