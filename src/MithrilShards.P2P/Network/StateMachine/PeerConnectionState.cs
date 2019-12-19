@@ -28,6 +28,14 @@
       Initializing,
       Connecting,
       Cancelled,
-      ConnectionFailed
+      ConnectionFailed,
+      Disconnecting,
+      Disconnected,
+      Disconnectable,
+      WaitingPeerInitiateHandShake,
+      PeerStartedHandshake,
+      HandlingMessage,
+      ProcessMessage,
+      WaitingMessage
    }
 }

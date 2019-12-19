@@ -12,7 +12,7 @@ namespace MithrilShards.P2P.Network.Server {
       /// <summary>Address of the end point the client is connected to, or <c>null</c> if the client has not connected yet.</summary>
       public IPEndPoint RemoteEndPoints {
          get {
-            return (IPEndPoint)this.RemoteEndPoint;
+            return (IPEndPoint)this.RemoteEndPoints;
          }
       }
 

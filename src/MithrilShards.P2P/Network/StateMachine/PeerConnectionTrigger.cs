@@ -3,11 +3,19 @@
    /// State of the peer connection.
    /// </summary>
    public enum PeerConnectionTrigger : int {
+      AcceptConnection,
       Connect,
       Cancel,
       ConnectionFail,
       Connected,
-      AcceptConnection,
-      Disconnect
+      Disconnect,
+      PeerDisconnected,
+      DisconnectFromPeer,
+      WaitPeerStartsHandShake,
+      VersionMessageReceived,
+      PeerStartedHandshake,
+      ProcessMessage,
+      WaitMessage,
+      MessageProcessed
    }
 }
