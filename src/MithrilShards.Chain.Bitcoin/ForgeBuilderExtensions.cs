@@ -12,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin {
             (hostBuildContext, services) => {
                services
                   .AddSingleton<INetworkMessageSerializator, BitcoinMessageSerializator>()
-                  .AddSingleton<IChainDefinition, BitcoinMain>()
+                  .AddSingleton<IChainDefinition, BitcoinMainDefinition>()
                   .AddPeerGuards();
             });
 

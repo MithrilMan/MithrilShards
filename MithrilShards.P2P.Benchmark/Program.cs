@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Security.Cryptography;
 using BenchmarkDotNet.Running;
+using MithrilShards.P2P.Benchmark.Benchmarks;
 
 namespace MithrilShards.P2P.Benchmark {
    class Program {
@@ -16,7 +17,8 @@ namespace MithrilShards.P2P.Benchmark {
 
          Console.WriteLine(N);
 
-         BenchmarkRunner.Run<BigInt_vs_uint256_parse>();
+         //BenchmarkRunner.Run<BigInt_vs_uint256_parse>();
+         BenchmarkRunner.Run<MagicNumberFinder>();
       }
    }
 }

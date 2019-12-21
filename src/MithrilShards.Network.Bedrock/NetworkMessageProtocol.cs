@@ -13,10 +13,15 @@ namespace MithrilShards.P2P.Bedrock {
       private byte messageLengthExpected;
       readonly ILogger<NetworkMessageProtocol> logger;
       private readonly IChainDefinition chainDefinition;
+      private readonly byte[] magicNumberBytes;
+      private readonly int magicNumber;
 
       public NetworkMessageProtocol(ILogger<NetworkMessageProtocol> logger, IChainDefinition chainDefinition) {
          this.logger = logger;
          this.chainDefinition = chainDefinition;
+
+         this.magicNumberBytes = this.chainDefinition.MagicBytes;
+         this.magicNumber = BitConverter.ToInt32(this.chainDefinition.MagicBytes);
       }
 
 
@@ -24,8 +29,10 @@ namespace MithrilShards.P2P.Bedrock {
          var reader = new SequenceReader<byte>(input);
 
          if (!this.magicNumberRead) {
-            this.magicNumberRead = this.TryReadMagicNumber(ref reader, out consumed, out examined);
+            this.magicNumberRead = this.TryReadMagicNumber(ref reader);
             if (!this.magicNumberRead) {
+               consumed = reader.Position;
+               examined = input.End;
                message = default;
                return false;
             }
@@ -33,7 +40,13 @@ namespace MithrilShards.P2P.Bedrock {
 
          // try to read the command name
          if (reader.Remaining >= COMMAND_LENGTH) {
+
             //reader.TryRead()
+         }
+         else {
+            consumed = examined = reader.Position;
+            message = default;
+            return false;
          }
 
          // try to read the message length
@@ -64,12 +77,32 @@ namespace MithrilShards.P2P.Bedrock {
 
       }
 
-      private bool TryReadMagicNumber(ref SequenceReader<byte> reader, out SequencePosition consumed, out SequencePosition examined) {
-         byte[] magicBytes = this.chainDefinition.MagicBytes;
+      private bool TryReadMagicNumber(ref SequenceReader<byte> reader) {
+         // advance to the first byte of the magic number.
+         while (reader.TryAdvanceTo(this.magicNumberBytes[0], advancePastDelimiter: false)) {
+            if (reader.TryReadLittleEndian(out int magicRead)) {
+               if (magicRead == this.magicNumber) {
+                  //this.logger.LogDebug("Magic Number found, after skipping {SkippedBytes} bytes.", reader.Position.GetInteger() - 4);
 
-         consumed = examined = reader.Position;
-         for (int i = 0; i < magicBytes.Length; i++) {
-            byte expectedByte = magicBytes[i];
+                  return true;
+               }
+               else {
+                  reader.Rewind(3);
+               }
+            }
+            else {
+               return false;
+            }
+         }
+
+         // didn't found the first magic byte so can advance up to the end
+         reader.Advance(reader.Remaining);
+         return false;
+      }
+
+      private bool TryReadMagicNumberOld(ref SequenceReader<byte> reader) {
+         for (int i = 0; i < this.magicNumberBytes.Length; i++) {
+            byte expectedByte = this.magicNumberBytes[i];
 
             if (reader.TryRead(out byte receivedByte)) {
                if (expectedByte != receivedByte) {
@@ -80,25 +113,18 @@ namespace MithrilShards.P2P.Bedrock {
                   // with the second byte. Otherwise, we set index to -1
                   // here, which means that after the loop incrementation,
                   // we will start from first byte of magic.
-                  i = receivedByte == magicBytes[0] ? 0 : -1;
-
-                  //set consumed up to this point
-                  consumed = reader.Position;
+                  i = receivedByte == this.magicNumberBytes[0] ? 0 : -1;
                }
             }
             else {
                //nothing left to read
                // in case there are partial matches for the magic packet, don't consider them as consumed
                // so they will be examined again next iteration when hopefully the full magic number will be present
-               examined = reader.Position;
-
-               this.logger.LogDebug("Skipped {SkippedBytes} bytes while looking for magic packet.", consumed.GetInteger());
+               reader.Rewind(i);
 
                return false;
             }
          }
-
-         consumed = examined = reader.Position;
          return true;
       }
 
