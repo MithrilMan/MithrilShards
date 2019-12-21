@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Network;
 using MithrilShards.P2P.Network.StateMachine;
 
 namespace MithrilShards.P2P.Network {

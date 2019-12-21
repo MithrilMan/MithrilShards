@@ -14,10 +14,10 @@ namespace ConnectionTest {
 
          try {
             if (isServer) {
-               await StartServer(args);
+               await StartServer(args).ConfigureAwait(false);
             }
             else {
-               await StartClient(args);
+               await StartClient(args).ConfigureAwait(false);
             }
          }
          catch (Exception ex) {
@@ -31,7 +31,8 @@ namespace ConnectionTest {
             .UseForge<Forge>(args)
             .UseSerilog("log-settings.json")
             .UseP2PForgeServer()
-            .RunConsoleAsync();
+            .RunConsoleAsync()
+            .ConfigureAwait(false);
       }
 
       private static async Task StartServer(string[] args) {
@@ -39,7 +40,8 @@ namespace ConnectionTest {
             .UseForge<Forge>(args)
             .UseSerilog("log-settings.json")
             .UseP2PForgeServer()
-            .RunConsoleAsync();
+            .RunConsoleAsync()
+            .ConfigureAwait(false);
       }
    }
 }

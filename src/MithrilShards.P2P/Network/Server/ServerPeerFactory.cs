@@ -5,7 +5,8 @@ using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
-using MithrilShards.P2P.Network.Server.Guards;
+using MithrilShards.Core.Network.Server;
+using MithrilShards.Core.Network.Server.Guards;
 
 namespace MithrilShards.P2P.Network.Server {
    public class ServerPeerFactory : IServerPeerFactory {
@@ -40,7 +41,7 @@ namespace MithrilShards.P2P.Network.Server {
                this.logger.LogInformation(
                   "Using {PeerConnectionGuardsCount} peer connection guards: {PeerConnectionGuards}.",
                   this.serverPeerConnectionGuards.Count(),
-                  string.Join(',', this.serverPeerConnectionGuards.Select(guard => guard.GetType().Name))
+                  this.serverPeerConnectionGuards.Select(guard => guard.GetType().Name)
                   );
             }
             else {

@@ -14,7 +14,7 @@ namespace MithrilShards.Core.EventBus {
       private readonly ILogger logger;
 
       public DefaultSubscriptionErrorHandler(ILogger<DefaultSubscriptionErrorHandler> logger) {
-         this.logger = logger.NullCheck();
+         this.logger = logger;
       }
 
       /// <inheritdoc />

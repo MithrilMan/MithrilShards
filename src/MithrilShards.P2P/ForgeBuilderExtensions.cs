@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Core.Forge;
+using MithrilShards.Core.Network.Server;
 using MithrilShards.P2P.Network;
 using MithrilShards.P2P.Network.Server;
-using Guards = MithrilShards.P2P.Network.Server.Guards;
 
 namespace MithrilShards.P2P {
    public static class ForgeBuilderExtensions {
@@ -16,19 +16,9 @@ namespace MithrilShards.P2P {
                   .AddSingleton<IServerPeerStats, ServerPeerStats>()
                   .AddSingleton<IPeerConnectionFactory, PeerConnectionFactory>()
                   ;
-
-               AddPeerGuards(services);
             });
 
          return forgeBuilder;
-      }
-
-
-      private static void AddPeerGuards(IServiceCollection services) {
-         services
-            .AddSingleton<Guards.IServerPeerConnectionGuard, Guards.InitialBlockDownloadStateGuard>()
-            .AddSingleton<Guards.IServerPeerConnectionGuard, Guards.MaxConnectionThresholdGuard>()
-            ;
       }
    }
 }

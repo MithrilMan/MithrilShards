@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
-using MithrilShards.P2P.Helpers;
-using MithrilShards.P2P.Network.Events;
-using MithrilShards.P2P.Network.Server.Guards;
+using MithrilShards.Core.Network.Events;
+using MithrilShards.Core.Network.Server.Guards;
 
 namespace MithrilShards.P2P.Network.Server {
    public class ServerPeer : IServerPeer, IDisposable {
@@ -62,7 +61,7 @@ namespace MithrilShards.P2P.Network.Server {
 
          this.tcpListener = new ForgeTcpListener(this.LocalEndPoint);
 
-         this.onPeerDisconnectedSubscription = this.eventBus.Subscribe<Events.PeerDisconnected>(this.OnPeerDisconnected);
+         this.onPeerDisconnectedSubscription = this.eventBus.Subscribe<PeerDisconnected>(this.OnPeerDisconnected);
       }
 
       private void OnPeerDisconnected(PeerDisconnected @event) {
@@ -160,9 +159,11 @@ namespace MithrilShards.P2P.Network.Server {
             return ServerPeerConnectionGuardResult.Success;
          }
 
+         IPeerContext peerContext = new PeerContext((IPEndPoint)tcpClient.Client.LocalEndPoint, (IPEndPoint)tcpClient.Client.RemoteEndPoint);
+
          return (
             from guard in this.serverPeerConnectionGuards
-            let guardResult = guard.Check(tcpClient)
+            let guardResult = guard.Check(peerContext)
             where guardResult.IsDenied
             select guardResult
             )

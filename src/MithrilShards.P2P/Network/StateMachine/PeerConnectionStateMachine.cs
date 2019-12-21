@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
-using MithrilShards.P2P.Network.Events;
+using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Events;
 using NBitcoin.Protocol;
 using Stateless;
 
@@ -24,9 +23,6 @@ namespace MithrilShards.P2P.Network.StateMachine {
       readonly PeerConnectionDirection peerDirection;
 
       readonly IPEndPoint remoteEndPoint;
-
-      private PipeWriter pipeWriter;
-      private PipeReader pipeReader;
 
       /// <summary>
       /// Triggers the message processing passing the message that has to be processed.
@@ -65,10 +61,6 @@ namespace MithrilShards.P2P.Network.StateMachine {
          else {
             this.ConfigureOutboundStateMachine(cancellationToken);
          }
-
-         //this.stateMachine.OnUnhandledTrigger((state, trigger) => {
-         //   this.logger.LogError("Unhandled Trigger: '{State}' state, '{trigger}' trigger!", state, trigger);
-         //});
 
          this.EnableStateTransitionLogs();
       }
@@ -129,30 +121,13 @@ namespace MithrilShards.P2P.Network.StateMachine {
       /// Reads messages from the connection stream.
       /// </summary>
       private async Task StartReceivingMessages(CancellationToken cancellationToken) {
-         var pipe = new Pipe();
-         this.pipeWriter = pipe.Writer;
-         this.pipeReader = pipe.Reader;
-
          try {
-            using (NetworkStream stream = this.peerConnection.ConnectedClient.GetStream()) {
-               await this.stateMachine.FireAsync(PeerConnectionTrigger.WaitMessage).ConfigureAwait(false);
+            //using (NetworkStream stream = this.peerConnection.ConnectedClient.GetStream()) {
+            await this.stateMachine.FireAsync(PeerConnectionTrigger.WaitMessage).ConfigureAwait(false);
 
-               while (!cancellationToken.IsCancellationRequested) {
-                  //TODO usare System.IO.Pipelines
-                  // reading data from a pipe instance
-                  //ReadResult result = await this.pipeReader.ReadAsync(this.cancellationToken);
-                  //ReadOnlySequence<byte> buffer = result.Buffer;
-                  //SequencePosition? position = null;
-                  //this.connectedClient.GetStream();
-                  //// We perform calculations with the data obtained.
-                  //await _bytesProcessor.ProcessBytesAsync(buffer, token);
-
-                  Message readMessage = null;
-                  await Task.Run(() => {
-                     readMessage = Message.ReadNext(this.peerConnection.ConnectedClient.GetStream(), NBitcoin.Network.Main, 70015, cancellationToken, out _);
-                  }).ConfigureAwait(false);
-               }
-            }
+            await this.ProcessNetworkMessages(this.peerConnection.ConnectedClient.Client, cancellationToken).ConfigureAwait(false);
+            //await this.ReadOldStyle(stream, cancellationToken).ConfigureAwait(false);
+            //}
          }
          catch (Exception ex) when (ex is IOException || ex is OperationCanceledException || ex is ObjectDisposedException) {
             await this.stateMachine.FireAsync(this.peerDroppedTrigger,
@@ -164,11 +139,142 @@ namespace MithrilShards.P2P.Network.StateMachine {
                                               (reason: "Unexpected failure whilst receiving messages.", ex)).ConfigureAwait(false);
             return;
          }
+         finally {
+            //TODO: close pipes
+         }
+      }
+
+      private async Task ProcessNetworkMessages(Socket socket, CancellationToken cancellationToken) {
+         var pipe = new Pipe();
+
+         Task writer = this.FillPipeAsync(socket, pipe.Writer, cancellationToken);
+         Task reader = this.ProcessMessagesAsync(pipe.Reader, cancellationToken);
+
+         await Task.WhenAll(writer, reader).ConfigureAwait(false);
+
+         await this.stateMachine.FireAsync(this.disconnectFromPeerTrigger, (reason: "Peer Disconnected", ex: (Exception)null)).ConfigureAwait(false);
       }
 
 
+      private async Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken cancellationToken) {
+         const int minimumBufferSize = 512;
+
+         while (!cancellationToken.IsCancellationRequested) {
+            // Allocate at least 512 bytes from the PipeWriter.
+            Memory<byte> memory = writer.GetMemory(minimumBufferSize);
+            int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None);
+            if (bytesRead == 0) {
+               break;
+            }
+            // Tell the PipeWriter how much was read from the Socket.
+            writer.Advance(bytesRead);
+
+            // Make the data available to the PipeReader.
+            FlushResult result = await writer.FlushAsync();
+
+            if (result.IsCompleted) {
+               break;
+            }
+         }
+
+         // By completing PipeWriter, tell the PipeReader that there's no more data coming.
+         await writer.CompleteAsync();
+      }
+
+      async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellationToken = default) {
+         try {
+            while (true) {
+               ReadResult result = await reader.ReadAsync(cancellationToken);
+               ReadOnlySequence<byte> buffer = result.Buffer;
+
+               try {
+                  // Process all messages from the buffer, modifying the input buffer on each
+                  // iteration.
+                  while (NetworkMessageDecoder.TryParseMessage(ref buffer, out Message message)) {
+                     await this.stateMachine.FireAsync(this.processMessageTrigger,
+                                           message).ConfigureAwait(false);
+                  }
+
+                  // There's no more data to be processed.
+                  if (result.IsCompleted) {
+                     if (buffer.Length > 0) {
+                        // The message is incomplete and there's no more data to process.
+                        throw new InvalidDataException("Incomplete message.");
+                     }
+                     break;
+                  }
+               }
+               catch (InvalidNetworkMessageException ex) {
+                  throw;
+               }
+               finally {
+                  // Since all messages in the buffer are being processed, you can use the
+                  // remaining buffer's Start and End position to determine consumed and examined.
+                  reader.AdvanceTo(buffer.Start, buffer.End);
+               }
+            }
+         }
+         finally {
+            await reader.CompleteAsync();
+         }
+      }
+
+      private async Task ReadPipeAsync(PipeReader reader, CancellationToken cancellationToken) {
+         while (!cancellationToken.IsCancellationRequested) {
+            ReadResult result = await reader.ReadAsync();
+            ReadOnlySequence<byte> buffer = result.Buffer;
+
+            while (this.TryReadNetworkMessage(ref buffer, out ReadOnlySequence<byte> line)) {
+               // Process the line.
+               // this.ProcessNetworkMessage(line);
+            }
+
+            // Tell the PipeReader how much of the buffer has been consumed.
+            reader.AdvanceTo(buffer.Start, buffer.End);
+
+            // Stop reading if there's no more data coming.
+            if (result.IsCompleted) {
+               break;
+            }
+         }
+
+         // Mark the PipeReader as complete.
+         await reader.CompleteAsync();
+      }
+
+      private bool TryReadNetworkMessage(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> rawMessage) {
+         // Look for a EOL in the buffer.
+         SequencePosition? position = buffer.PositionOf((byte)'\n');
+
+         if (position == null) {
+            rawMessage = default;
+            return false;
+         }
+
+         // Skip the line + the \n.
+         rawMessage = buffer.Slice(0, position.Value);
+         buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+         return true;
+      }
+
+      private async Task ReadOldStyle(NetworkStream stream, CancellationToken cancellationToken) {
+         while (!cancellationToken.IsCancellationRequested) {
+            Message readMessage = null;
+            await Task.Run(() => {
+               readMessage = Message.ReadNext(stream, NBitcoin.Network.TestNet, 70015, cancellationToken, out _);
+            }).ConfigureAwait(false);
+
+            if (readMessage != null) {
+               await this.stateMachine.FireAsync(this.processMessageTrigger,
+                                           readMessage).ConfigureAwait(false);
+            }
+         }
+      }
+
       private Task ProgessMessageAsync(Message message, CancellationToken cancellationToken) {
-         throw new NotImplementedException();
+         this.logger.LogDebug("Message Received. Command: {MessageCommand}", message.Command);
+         this.stateMachine.Fire(PeerConnectionTrigger.WaitMessage);
+         return Task.CompletedTask;
       }
 
       private void Disconnected() {
@@ -178,7 +284,7 @@ namespace MithrilShards.P2P.Network.StateMachine {
       private Task DisconnectingAsync(string reason, Exception ex, CancellationToken cancellationToken) {
          this.logger.LogDebug(ex, "Disconnecting {PeerConnectionId}: {Reason}", this.peerConnection.PeerConnectionId, reason);
          this.peerConnection.ConnectedClient.Close();
-         this.eventBus.Publish(new Events.PeerDisconnected(this.peerConnection.Direction, this.peerConnection.PeerConnectionId, this.remoteEndPoint, reason, ex));
+         this.eventBus.Publish(new PeerDisconnected(this.peerConnection.Direction, this.peerConnection.PeerConnectionId, this.remoteEndPoint, reason, ex));
          this.stateMachine.Fire(PeerConnectionTrigger.PeerDisconnected);
          return Task.CompletedTask;
       }

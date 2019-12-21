@@ -62,11 +62,11 @@ namespace MithrilShards.Core.Forge {
 
       public override async Task StopAsync(CancellationToken cancellationToken) {
          using (this.logger.BeginScope("Stopping forge server.")) {
-            await this.forgeServer.StopAsync(cancellationToken);
+            await this.forgeServer.StopAsync(cancellationToken).ConfigureAwait(false);
          }
 
          using (this.logger.BeginScope("Stopping Forge instance.")) {
-            await base.StopAsync(cancellationToken);
+            await base.StopAsync(cancellationToken).ConfigureAwait(false);
          }
       }
    }

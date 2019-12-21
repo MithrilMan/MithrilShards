@@ -30,8 +30,7 @@ namespace MithrilShards.Core.EventBus {
       /// <param name="loggerFactory">The logger factory.</param>
       /// <param name="subscriptionErrorHandler">The subscription error handler. If null the default one will be used</param>
       public InMemoryEventBus(ILogger<InMemoryEventBus> logger, ISubscriptionErrorHandler subscriptionErrorHandler) {
-         this.logger = logger.NullCheck();
-
+         this.logger = logger;
          this.subscriptionErrorHandler = subscriptionErrorHandler;
          this.subscriptions = new Dictionary<Type, List<ISubscription>>();
       }

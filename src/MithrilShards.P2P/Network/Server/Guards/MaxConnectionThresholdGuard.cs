@@ -1,6 +1,7 @@
-﻿using System.Net.Sockets;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MithrilShards.Core.Network.Server;
+using MithrilShards.Core.Network.Server.Guards;
 
 namespace MithrilShards.P2P.Network.Server.Guards {
    public class MaxConnectionThresholdGuard : ServerPeerConnectionGuardBase {
@@ -12,7 +13,7 @@ namespace MithrilShards.P2P.Network.Server.Guards {
          this.serverPeerStats = serverPeerStats;
       }
 
-      internal override string TryGetDenyReason(TcpClient tcpClient) {
+      internal override string TryGetDenyReason(IPeerContext peerContext) {
          if (this.serverPeerStats.ConnectedInboundPeersCount >= this.settings.MaxInboundConnections) {
             return "Inbound connection refused: max connection threshold reached.";
          }

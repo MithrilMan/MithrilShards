@@ -3,6 +3,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Network;
 
 namespace MithrilShards.P2P.Network {
 

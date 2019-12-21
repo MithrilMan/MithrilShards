@@ -3,10 +3,11 @@
       "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.Seq" ],
       "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
       "WriteTo": [
-         { "Name": "Console" },
          {
-            "Name": "Seq",
-            "Args": { "serverUrl": "http://localhost:5341" }
+            "Name": "Console",
+            "Args": {
+               "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss}|{Level} => RequestPath:{RequestPath} => {SourceContext}{NewLine}    {Message}{NewLine}{Exception}"
+            }
          }
       ],
       "MinimumLevel": {

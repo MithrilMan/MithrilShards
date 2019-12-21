@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Encoders\" />
+  </ItemGroup>
+
+</Project>
