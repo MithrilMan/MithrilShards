@@ -18,6 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.P2P.Benchmark
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{59B8229B-8557-4987-B758-5E41D996DCD2}"
 	ProjectSection(SolutionItems) = preProject
+		readme.md = readme.md
 		Documentation\todo.md = Documentation\todo.md
 	EndProjectSection
 EndProject
@@ -31,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bedrock.Framework", "Extern
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Network.Bedrock", "src\MithrilShards.Network.Bedrock\MithrilShards.Network.Bedrock.csproj", "{C7540DF0-9BEA-40C7-A82C-5559D8767EEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Chain.Bitcoin", "src\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj", "{BBD15267-F1C4-4D1E-B4C5-08D7A91B1343}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Chain.Bitcoin", "src\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj", "{BBD15267-F1C4-4D1E-B4C5-08D7A91B1343}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
