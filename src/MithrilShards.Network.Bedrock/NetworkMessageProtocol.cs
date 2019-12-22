@@ -92,7 +92,7 @@ namespace MithrilShards.P2P.Bedrock {
          // now try to read the payload
          if (reader.Remaining >= this.payloadLength) {
             ReadOnlySequence<byte> payload = input.Slice(reader.Position, this.payloadLength);
-            message = new Message(this.chainDefinition.MagicBytes, this.command, this.payloadLength, payload.ToArray());
+            message = new Message(this.chainDefinition.MagicBytes, this.command, this.payloadLength, this.checksum, payload.ToArray());
 
             examined = consumed = payload.End;
             this.magicNumberRead = this.commandRead = this.payloadLengthRead = this.checksumRead = false;
@@ -201,7 +201,8 @@ namespace MithrilShards.P2P.Bedrock {
    public struct Message {
       private readonly byte[] magic;
       private readonly byte[] command;
-      readonly uint payloadLength;
+      private readonly uint payloadLength;
+      private readonly uint checksum;
       private readonly byte[] payload;
 
       public ReadOnlySpan<byte> Magic => this.magic;
@@ -210,10 +211,11 @@ namespace MithrilShards.P2P.Bedrock {
 
       public ReadOnlySpan<byte> Payload => this.payload;
 
-      public Message(byte[] magic, byte[] command, uint payloadLength, byte[] payload) {
+      public Message(byte[] magic, byte[] command, uint payloadLength, uint checksum, byte[] payload) {
          this.magic = magic;
          this.command = command;
          this.payloadLength = payloadLength;
+         this.checksum = checksum;
          this.payload = payload;
       }
    }
