@@ -3,11 +3,14 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 
 namespace MithrilShards.P2P.Benchmark.Benchmarks {
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-   [RPlotExporter, RankColumn]
+   [RPlotExporter, RankColumn, MarkdownExporterAttribute.GitHub, CsvMeasurementsExporter]
    public class MagicNumberFinder {
       readonly byte[] magicNumberBytes = BitConverter.GetBytes(0x0709110B);
       readonly int magicNumber = 0x0709110B;
