@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MithrilShards.Network.Bedrock {
@@ -35,8 +36,10 @@ namespace MithrilShards.Network.Bedrock {
 
          this.EnsurePeerCanConnect(connection);
 
-         // Use a length prefixed protocol
-         var protocol = new NetworkMessageProtocol(this.loggerFactory.CreateLogger<NetworkMessageProtocol>(), this.chainDefinition);
+         var protocol = new NetworkMessageProtocol(this.loggerFactory.CreateLogger<NetworkMessageProtocol>(),
+                                                   this.chainDefinition,
+                                                   this.networkMessageSerializerManager);
+
          ProtocolReader<Message> reader = Protocol.CreateReader(connection, protocol);
          ProtocolWriter<Message> writer = Protocol.CreateWriter(connection, protocol);
 
@@ -45,12 +48,12 @@ namespace MithrilShards.Network.Bedrock {
 
             this.logger.LogInformation("Received a message of {Length} bytes", message.Payload.Length);
 
-            await this.ParseMessage(message, connection).ConfigureAwait(false);
-
             // REVIEW: We need a ReadResult<T> to indicate completion and cancellation
             if (message.Payload == null) {
                break;
             }
+
+            await this.ParseMessage(message, connection).ConfigureAwait(false);
          }
       }
 
@@ -87,7 +90,9 @@ namespace MithrilShards.Network.Bedrock {
          //TODO instead of returning a Message, it should already return a typed known network message
          if (this.networkMessageSerializerManager.Serializers.TryGetValue(command.ToLowerInvariant(), out INetworkMessageSerializer serializer)) {
             INetworkMessage msg = serializer.Deserialize(message.Payload);
-            this.logger.LogDebug(System.Text.Json.JsonSerializer.Serialize(msg));
+            this.logger.LogDebug(
+               JsonSerializer.Serialize(msg, serializer.GetMessageType(), new JsonSerializerOptions { WriteIndented = true })
+            );
          }
          else {
             this.logger.LogWarning("Serializer for message '{Command}' not found.", command);

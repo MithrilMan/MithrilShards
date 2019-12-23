@@ -11,7 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol {
 
       public BitcoinMainDefinition() {
          this.Name = "BitcoinMain";
-         this.MagicBytes = BitConverter.GetBytes(0x0709110B);
+         this.MagicBytes = BitConverter.GetBytes(0xD9B4BEF9);
          this.genesis = null;
       }
    }

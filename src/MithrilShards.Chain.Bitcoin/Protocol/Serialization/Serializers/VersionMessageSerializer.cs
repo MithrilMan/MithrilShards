@@ -16,13 +16,28 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          message.Version = reader.ReadInt();
          message.Services = reader.ReadULong();
          message.Timestamp = DateTimeOffset.FromUnixTimeSeconds(reader.ReadLong());
-         message.ReceiverAddress = reader.ReadNetworkAddress();
-         // from here down, if version >= 106
-         message.SenderAddress = reader.ReadNetworkAddress();
+
+         message.ReceiverAddressServices = reader.ReadULong();
+         message.ReceiverAddressIP = reader.ReadBytes(16);
+         message.SenderAddressPort = reader.ReadUShort();
+
+         // TODO: add Protocol Version enum ? 
+         if (message.Version < 106) {
+            return message;
+         }
+
+         message.SenderAddressServices = reader.ReadULong();
+         message.SenderAddressIP = reader.ReadBytes(16);
+         message.SenderAddressPort = reader.ReadUShort();
+
          message.Nonce = reader.ReadULong();
          message.UserAgent = reader.ReadVarString();
          message.StartHeight = reader.ReadInt();
-         // from here down, if version >= 70001
+
+         if (message.Version < 70001) {
+            return message;
+         }
+
          message.Relay = reader.ReadBool();
          return message;
       }

@@ -1,6 +1,7 @@
 ﻿using Bedrock.Framework.Protocols;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Serialization;
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
@@ -24,6 +25,7 @@ namespace MithrilShards.Network.Bedrock {
 
       readonly ILogger<NetworkMessageProtocol> logger;
       private readonly IChainDefinition chainDefinition;
+      readonly INetworkMessageSerializerManager networkMessageSerializerManager;
       private readonly byte[] magicNumberBytes;
       private readonly int magicNumber;
 
@@ -36,9 +38,12 @@ namespace MithrilShards.Network.Bedrock {
       private bool checksumRead = false;
 
 
-      public NetworkMessageProtocol(ILogger<NetworkMessageProtocol> logger, IChainDefinition chainDefinition) {
+      public NetworkMessageProtocol(ILogger<NetworkMessageProtocol> logger,
+                                    IChainDefinition chainDefinition,
+                                    INetworkMessageSerializerManager networkMessageSerializerManager) {
          this.logger = logger;
          this.chainDefinition = chainDefinition;
+         this.networkMessageSerializerManager = networkMessageSerializerManager;
 
          this.magicNumberBytes = this.chainDefinition.MagicBytes;
          this.magicNumber = BitConverter.ToInt32(this.chainDefinition.MagicBytes);
