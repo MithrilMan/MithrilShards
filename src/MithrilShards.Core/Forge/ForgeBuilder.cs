@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Core.Forge {
    public class ForgeBuilder : IForgeBuilder {
@@ -66,6 +67,7 @@ namespace MithrilShards.Core.Forge {
                .AddSingleton<IForgeServer, FakeForgeServer>()
                .AddSingleton<IInitialBlockDownloadState, InitialBlockDownloadState>()
                .AddSingleton<IDateTimeProvider, DateTimeProvider>()
+               .AddSingleton<INetworkMessageSerializerManager, NetworkMessageSerializerManager>()
                ;
          });
 

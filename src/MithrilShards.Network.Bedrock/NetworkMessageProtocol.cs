@@ -209,6 +209,10 @@ namespace MithrilShards.P2P.Bedrock {
 
       public ReadOnlySpan<byte> Command => this.command;
 
+      public uint PayloadLength => this.payloadLength;
+
+      public uint Checksum => this.checksum;
+
       public ReadOnlySpan<byte> Payload => this.payload;
 
       public Message(byte[] magic, byte[] command, uint payloadLength, uint checksum, byte[] payload) {
