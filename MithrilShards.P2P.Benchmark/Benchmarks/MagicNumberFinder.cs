@@ -8,7 +8,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 
-namespace MithrilShards.P2P.Benchmark.Benchmarks {
+namespace MithrilShards.Network.Benchmark.Benchmarks {
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
    [RPlotExporter, RankColumn, MarkdownExporterAttribute.GitHub, CsvMeasurementsExporter]
    public class MagicNumberFinder {

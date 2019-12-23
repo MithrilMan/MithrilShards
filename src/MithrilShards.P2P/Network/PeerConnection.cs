@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
-using MithrilShards.P2P.Network.StateMachine;
+using MithrilShards.Network.Network.StateMachine;
 
-namespace MithrilShards.P2P.Network {
+namespace MithrilShards.Network.Network {
 
    public class PeerConnection : IPeerConnection {
       /// <summary>Instance logger.</summary>

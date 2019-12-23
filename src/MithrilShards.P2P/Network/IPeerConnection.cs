@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MithrilShards.P2P.Network {
+namespace MithrilShards.Network.Network {
    public interface IPeerConnection {
       PeerConnectionDirection Direction { get; }
       PeerDisconnectionReason DisconnectReason { get; }

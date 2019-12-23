@@ -14,7 +14,7 @@ using MithrilShards.Core.Network.Events;
 using NBitcoin.Protocol;
 using Stateless;
 
-namespace MithrilShards.P2P.Network.StateMachine {
+namespace MithrilShards.Network.Network.StateMachine {
    public class PeerConnectionStateMachine {
       readonly StateMachine<PeerConnectionState, PeerConnectionTrigger> stateMachine;
       readonly ILogger logger;

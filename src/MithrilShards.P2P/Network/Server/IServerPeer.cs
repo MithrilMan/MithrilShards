@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace MithrilShards.P2P.Network.Server {
+namespace MithrilShards.Network.Network.Server {
    public interface IServerPeer {
       Task ListenAsync(CancellationToken cancellation);
 

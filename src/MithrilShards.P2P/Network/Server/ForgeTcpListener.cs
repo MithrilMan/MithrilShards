@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace MithrilShards.P2P.Network.Server {
+namespace MithrilShards.Network.Network.Server {
    public class ForgeTcpListener : TcpListener {
 
       public bool IsActive { get => base.Active; }

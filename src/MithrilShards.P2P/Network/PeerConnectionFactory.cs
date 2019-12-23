@@ -5,7 +5,7 @@ using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 
-namespace MithrilShards.P2P.Network {
+namespace MithrilShards.Network.Network {
 
    public class PeerConnectionFactory : IPeerConnectionFactory {
       /// <summary>Instance logger.</summary>

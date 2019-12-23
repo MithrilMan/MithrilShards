@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MithrilShards.P2P.Network.Server {
+namespace MithrilShards.Network.Network.Server {
    public interface IServerPeerFactory {
       List<IServerPeer> CreateServerInstances();
    }

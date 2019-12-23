@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Forge;
 
-namespace MithrilShards.P2P.Network.Server {
+namespace MithrilShards.Network.Network.Server {
    public class P2PForgeServer : IForgeServer {
       readonly ILogger<P2PForgeServer> logger;
       readonly IServerPeerFactory serverPeerFactory;

@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using NBitcoin;
 
-namespace MithrilShards.P2P.Benchmark.Benchmarks {
+namespace MithrilShards.Network.Benchmark.Benchmarks {
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
    [RPlotExporter, RankColumn]
    public class BigInt_vs_uint256_parse {

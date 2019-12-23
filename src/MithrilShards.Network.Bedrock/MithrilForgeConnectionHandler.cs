@@ -11,7 +11,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MithrilShards.P2P.Bedrock {
+namespace MithrilShards.Network.Bedrock {
    public class MithrilForgeConnectionHandler : ConnectionHandler {
       private readonly ILogger logger;
       readonly ILoggerFactory loggerFactory;

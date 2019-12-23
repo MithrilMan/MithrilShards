@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using NBitcoin.Protocol;
 
-namespace MithrilShards.P2P.Network {
+namespace MithrilShards.Network.Network {
    public class NetworkMessageDecoder {
       readonly ILogger<NetworkMessageDecoder> logger;
 

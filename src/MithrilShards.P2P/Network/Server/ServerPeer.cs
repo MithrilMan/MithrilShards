@@ -11,7 +11,7 @@ using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Server.Guards;
 
-namespace MithrilShards.P2P.Network.Server {
+namespace MithrilShards.Network.Network.Server {
    public class ServerPeer : IServerPeer, IDisposable {
       /// <summary>TCP server listener accepting inbound connections.</summary>
       private readonly ForgeTcpListener tcpListener;

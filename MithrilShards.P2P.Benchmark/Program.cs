@@ -5,9 +5,9 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Running;
-using MithrilShards.P2P.Benchmark.Benchmarks;
+using MithrilShards.Network.Benchmark.Benchmarks;
 
-namespace MithrilShards.P2P.Benchmark {
+namespace MithrilShards.Network.Benchmark {
    class Program {
 
       public class Config : ManualConfig {

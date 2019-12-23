@@ -5,7 +5,7 @@ using System;
 using System.Buffers;
 using System.Buffers.Binary;
 
-namespace MithrilShards.P2P.Bedrock {
+namespace MithrilShards.Network.Bedrock {
    /// <summary>
    /// Class to handle the common bitcoin-like protocol.
    /// Bitcoin protocol is composed of these fields

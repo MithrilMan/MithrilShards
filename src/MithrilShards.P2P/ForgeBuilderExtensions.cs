@@ -2,10 +2,10 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Core.Forge;
 using MithrilShards.Core.Network.Server;
-using MithrilShards.P2P.Network;
-using MithrilShards.P2P.Network.Server;
+using MithrilShards.Network.Network;
+using MithrilShards.Network.Network.Server;
 
-namespace MithrilShards.P2P {
+namespace MithrilShards.Network {
    public static class ForgeBuilderExtensions {
       public static IForgeBuilder UseP2PForgeServer(this IForgeBuilder forgeBuilder) {
          forgeBuilder.AddShard<P2PForgeServer, ForgeServerSettings>(

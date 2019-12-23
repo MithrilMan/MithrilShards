@@ -3,11 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Forge;
-using MithrilShards.P2P;
+using MithrilShards.Network;
 using MithrilShards.Logging.Serilog;
 using Serilog;
 using MithrilShards.Chain.Bitcoin;
-using MithrilShards.P2P.Bedrock;
+using MithrilShards.Network.Bedrock;
 
 namespace ConnectionTest {
    class Program {

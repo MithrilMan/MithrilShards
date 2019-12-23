@@ -13,7 +13,7 @@ using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
 using BF = Bedrock.Framework;
 
-namespace MithrilShards.P2P.Bedrock {
+namespace MithrilShards.Network.Bedrock {
    public class BedrockForgeServer : IForgeServer {
       readonly ILogger<BedrockForgeServer> logger;
       private readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
