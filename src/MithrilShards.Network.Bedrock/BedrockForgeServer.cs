@@ -19,7 +19,7 @@ namespace MithrilShards.Network.Bedrock {
       private readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
       private readonly IServiceProvider serviceProvider;
       private readonly ForgeServerSettings settings;
-      readonly List<BF.Server> serverPeers;
+      private readonly List<BF.Server> serverPeers;
 
       public BedrockForgeServer(ILogger<BedrockForgeServer> logger,
                                 IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
@@ -33,7 +33,7 @@ namespace MithrilShards.Network.Bedrock {
       }
 
       public async Task InitializeAsync(CancellationToken cancellationToken) {
-         this.serverPeers.AddRange(this.CreateServerInstances());
+         this.CreateServerInstances();
       }
 
       public async Task StartAsync(CancellationToken cancellationToken) {
@@ -48,10 +48,9 @@ namespace MithrilShards.Network.Bedrock {
          }
       }
 
-      private List<BF.Server> CreateServerInstances() {
+      private void CreateServerInstances() {
          using (this.logger.BeginScope("CreateServerInstances")) {
             this.logger.LogInformation("Loading Forge Server listeners configuration.");
-            var servers = new List<BF.Server>();
 
             if (this.serverPeerConnectionGuards.Any()) {
                this.logger.LogInformation(
@@ -64,41 +63,43 @@ namespace MithrilShards.Network.Bedrock {
                this.logger.LogWarning("No peer connection guards detected.");
             }
 
-            if (this.settings.Bindings != null) {
+            if (this.settings.Bindings?.Count > 0) {
+               this.logger.LogInformation("Found {ConfiguredListeners} listeners in configuration.", this.serverPeers.Count);
 
-               foreach (ServerPeerBinding binding in this.settings.Bindings) {
-                  if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
-                     throw new Exception($"Configuration error: binding {binding.Endpoint} must be a valid address:port value. Current value: {binding.Endpoint ?? "NULL"}");
+               Server server = new ServerBuilder(this.serviceProvider)
+                  .UseSockets(sockets => {
+                     foreach (ServerPeerBinding binding in this.settings.Bindings) {
+                        if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
+                           throw new Exception($"Configuration error: binding {binding.Endpoint} must be a valid address:port value. Current value: {binding.Endpoint ?? "NULL"}");
+                        }
+
+                        if (binding.PublicEndpoint == null) {
+                           binding.PublicEndpoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
+                        }
+
+                        if (!binding.IsValidPublicEndpoint()) {
+                           throw new Exception($"Configuration error: binding {nameof(binding.PublicEndpoint)} must be a valid address:port value. Current value: {binding.PublicEndpoint ?? "NULL"}");
+                        }
+
+                        var localEndPoint = IPEndPoint.Parse(binding.Endpoint);
+                        var publicEndPoint = IPEndPoint.Parse(binding.PublicEndpoint);
+
+                        this.logger.LogInformation("Added listener to local endpoint {ListenerLocalEndpoint}. (remote {ListenerPublicEndpoint})", localEndPoint, publicEndPoint);
+
+                        sockets.Listen(
+                           localEndPoint.Address,
+                           localEndPoint.Port,
+                           builder => builder.UseConnectionLogging().UseConnectionHandler<MithrilForgeConnectionHandler>()
+                           );
+                     }
                   }
+               ).Build();
 
-                  if (binding.PublicEndpoint == null) {
-                     binding.PublicEndpoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
-                  }
-
-                  if (!binding.IsValidPublicEndpoint()) {
-                     throw new Exception($"Configuration error: binding {nameof(binding.PublicEndpoint)} must be a valid address:port value. Current value: {binding.PublicEndpoint ?? "NULL"}");
-                  }
-
-                  var endPoint = IPEndPoint.Parse(binding.Endpoint);
-
-                  var server = new ServerBuilder(this.serviceProvider)
-                     .UseSockets(sockets =>
-                        sockets.Listen(endPoint.Address, endPoint.Port,
-                           builder => builder.UseConnectionLogging().UseConnectionHandler<MithrilForgeConnectionHandler>())
-                     ).Build();
-
-                  servers.Add(server);
-               }
-            }
-
-            if (servers.Count == 0) {
-               this.logger.LogWarning("No binding information found in configuration file, no Forge Servers available.");
+               this.serverPeers.Add(server);
             }
             else {
-               this.logger.LogInformation("Found {ConfiguredListeners} listeners in configuration.", servers.Count);
+               this.logger.LogWarning("No binding information found in configuration file, no Forge Servers available.");
             }
-
-            return servers;
          }
       }
    }
