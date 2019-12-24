@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Bedrock.Framework" Version="0.1.3-alpha.g07dc57284a" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -12,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\External\Bedrock.Framework\Bedrock.Framework.csproj" />
     <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
   </ItemGroup>
 

@@ -26,13 +26,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Core", "src\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Logging.Serilog", "src\MithrilShards.Logging.Serilog\MithrilShards.Logging.Serilog.csproj", "{143DF3B2-3E57-45D9-BC8D-D99C340E3987}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{F540FD9A-E8B0-47C1-9EA9-F014538B0BCF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bedrock.Framework", "External\Bedrock.Framework\Bedrock.Framework.csproj", "{2BAB7E9D-A6FF-4D88-96A4-85A0BC944573}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Network.Bedrock", "src\MithrilShards.Network.Bedrock\MithrilShards.Network.Bedrock.csproj", "{C7540DF0-9BEA-40C7-A82C-5559D8767EEE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Chain.Bitcoin", "src\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj", "{BBD15267-F1C4-4D1E-B4C5-08D7A91B1343}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{155873E1-E405-44A8-B2BE-0DDFB46AE409}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet\NuGet.Config = NuGet\NuGet.Config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,10 +61,6 @@ Global
 		{143DF3B2-3E57-45D9-BC8D-D99C340E3987}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{143DF3B2-3E57-45D9-BC8D-D99C340E3987}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{143DF3B2-3E57-45D9-BC8D-D99C340E3987}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2BAB7E9D-A6FF-4D88-96A4-85A0BC944573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2BAB7E9D-A6FF-4D88-96A4-85A0BC944573}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2BAB7E9D-A6FF-4D88-96A4-85A0BC944573}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2BAB7E9D-A6FF-4D88-96A4-85A0BC944573}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C7540DF0-9BEA-40C7-A82C-5559D8767EEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7540DF0-9BEA-40C7-A82C-5559D8767EEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7540DF0-9BEA-40C7-A82C-5559D8767EEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -78,7 +75,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{60A45997-FDF2-4D8E-A00A-2203FDEC2102} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
-		{2BAB7E9D-A6FF-4D88-96A4-85A0BC944573} = {F540FD9A-E8B0-47C1-9EA9-F014538B0BCF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}
