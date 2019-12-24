@@ -30,9 +30,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Network.Bedro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Chain.Bitcoin", "src\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj", "{BBD15267-F1C4-4D1E-B4C5-08D7A91B1343}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{155873E1-E405-44A8-B2BE-0DDFB46AE409}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{155873E1-E405-44A8-B2BE-0DDFB46AE409}"
 	ProjectSection(SolutionItems) = preProject
-		NuGet\NuGet.Config = NuGet\NuGet.Config
+		.nuget\NuGet.config = .nuget\NuGet.config
 	EndProjectSection
 EndProject
 Global
