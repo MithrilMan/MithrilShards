@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
+using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Server.Guards;
 
@@ -67,8 +68,8 @@ namespace MithrilShards.Network.Network.Server {
       private void OnPeerDisconnected(PeerDisconnected @event) {
          // This event is catched by every ServerPeer instance, so if we have multiple endpoints listening, all of them will
          // try to remove the item from the dictionary.
-         if (this.connectedPeers.Remove(@event.PeerId)) {
-            this.logger.LogDebug("Peer {PeerId} disconnected, removed from connectedPeers", @event.PeerId);
+         if (this.connectedPeers.Remove(@event.PeerContext.PeerId)) {
+            this.logger.LogDebug("Peer {PeerId} disconnected, removed from connectedPeers", @event.PeerContext.PeerId);
          }
       }
 
@@ -107,17 +108,23 @@ namespace MithrilShards.Network.Network.Server {
          try {
             while (!this.listenerCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested) {
 
-               TcpClient connectingPeer = await this.tcpListener.AcceptTcpClientAsync()
+               TcpClient connectingTcpClient = await this.tcpListener.AcceptTcpClientAsync()
                   .WithCancellationAsync(this.listenerCancellation.Token)
                   .ConfigureAwait(false);
+
+               IPeerConnection connectingPeer = this.peerConnectionFactory.CreatePeerConnection(connectingTcpClient, cancellationToken);
 
                ServerPeerConnectionGuardResult connectionGuardResult = this.EnsurePeerCanConnect(connectingPeer);
 
                if (connectionGuardResult.IsDenied) {
-                  this.logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected and will be closed.", connectingPeer.Client.RemoteEndPoint);
-                  connectingPeer.Close();
+                  this.logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected and will be closed.", connectingTcpClient.Client.RemoteEndPoint);
+                  connectingTcpClient.Close();
                   continue;
                }
+
+               LoggerExtensions.LogDebug(this.logger, (string)"Connection accepted from client '{ConnectingPeerEndPoint}'.", connectingPeer.PeerContext.RemoteEndPoint);
+
+               this.connectedPeers[connectingPeer.PeerContext.PeerId] = connectingPeer;
 
                //spawn a new task to manage the peer connection
                Task.Run(async () => {
@@ -136,14 +143,9 @@ namespace MithrilShards.Network.Network.Server {
          }
       }
 
-      private async Task EstablishConnection(TcpClient connectingPeer, CancellationToken cancellationToken) {
-         LoggerExtensions.LogDebug(this.logger, (string)"Connection accepted from client '{ConnectingPeerEndPoint}'.", connectingPeer.Client.RemoteEndPoint);
-
-         IPeerConnection acceptedPeer = this.peerConnectionFactory.CreatePeerConnection((TcpClient)connectingPeer, cancellationToken);
-         this.connectedPeers[acceptedPeer.PeerConnectionId] = acceptedPeer;
-
+      private async Task EstablishConnection(IPeerConnection connectingPeer, CancellationToken cancellationToken) {
          try {
-            await acceptedPeer.IncomingConnectionAccepted(cancellationToken).ConfigureAwait(false);
+            await connectingPeer.IncomingConnectionAccepted(cancellationToken).ConfigureAwait(false);
          }
          catch (Exception ex) {
             this.logger.LogCritical(ex, "Should never happen, need to be fixed!");
@@ -154,16 +156,14 @@ namespace MithrilShards.Network.Network.Server {
       /// Check if the client is allowed to connect based on certain criteria.
       /// </summary>
       /// <returns>When criteria is met returns <c>true</c>, to allow connection.</returns>
-      private ServerPeerConnectionGuardResult EnsurePeerCanConnect(TcpClient tcpClient) {
+      private ServerPeerConnectionGuardResult EnsurePeerCanConnect(IPeerConnection peerConnection) {
          if (this.serverPeerConnectionGuards == null) {
             return ServerPeerConnectionGuardResult.Success;
          }
 
-         IPeerContext peerContext = new PeerContext((IPEndPoint)tcpClient.Client.LocalEndPoint, (IPEndPoint)tcpClient.Client.RemoteEndPoint);
-
          return (
             from guard in this.serverPeerConnectionGuards
-            let guardResult = guard.Check(peerContext)
+            let guardResult = guard.Check(peerConnection.PeerContext)
             where guardResult.IsDenied
             select guardResult
             )

@@ -1,5 +1,4 @@
 ﻿using MithrilShards.Core.Network.Protocol;
-using System.Net;
 
 namespace MithrilShards.Core.Network.Events {
    /// <summary>
@@ -14,7 +13,7 @@ namespace MithrilShards.Core.Network.Events {
 
       public System.Exception Exception { get; }
 
-      public PeerMessageSendFailure(EndPoint localEndPoint, EndPoint remoteEndPoint, INetworkMessage message, System.Exception exception) : base(localEndPoint, remoteEndPoint) {
+      public PeerMessageSendFailure(IPeerContext peerContext, INetworkMessage message, System.Exception exception) : base(peerContext) {
          this.Message = message;
          this.Exception = exception;
       }

@@ -1,5 +1,4 @@
 ﻿using MithrilShards.Core.Network.Protocol;
-using System.Net;
 
 namespace MithrilShards.Core.Network.Events {
    /// <summary>
@@ -11,7 +10,7 @@ namespace MithrilShards.Core.Network.Events {
 
       public int MessageSize { get; }
 
-      public PeerMessageReceived(EndPoint localEndPoint, EndPoint remoteEndPoint, INetworkMessage message, int messageSize) : base(localEndPoint, remoteEndPoint) {
+      public PeerMessageReceived(IPeerContext peerContext, INetworkMessage message, int messageSize) : base(peerContext) {
          this.Message = message;
          this.MessageSize = messageSize;
       }

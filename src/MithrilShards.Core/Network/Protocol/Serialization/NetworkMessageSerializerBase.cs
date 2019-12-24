@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Buffers;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization {
    public abstract class NetworkMessageSerializerBase<TMessageType> : INetworkMessageSerializer<TMessageType> where TMessageType : INetworkMessage {
-      public abstract TMessageType Deserialize(ReadOnlySpan<byte> data);
+      public abstract TMessageType Deserialize(ReadOnlySequence<byte> data);
 
       public abstract byte[] Serialize(TMessageType message);
 
@@ -15,7 +15,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          return this.Serialize((TMessageType)message);
       }
 
-      INetworkMessage INetworkMessageSerializer.Deserialize(ReadOnlySpan<byte> data) {
+      INetworkMessage INetworkMessageSerializer.Deserialize(ReadOnlySequence<byte> data) {
          return (TMessageType)this.Deserialize(data);
       }
    }

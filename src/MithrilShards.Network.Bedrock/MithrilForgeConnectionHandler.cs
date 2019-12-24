@@ -40,31 +40,42 @@ namespace MithrilShards.Network.Bedrock {
       }
 
       public override async Task OnConnectedAsync(ConnectionContext connection) {
+         IPeerContext peerContext = new PeerContext(PeerConnectionDirection.Inbound,
+                                                    connection.ConnectionId,
+                                                    connection.LocalEndPoint,
+                                                    connection.RemoteEndPoint);
+         connection.Items[nameof(IPeerContext)] = peerContext;
+
          using (this.logger.BeginScope("Peer connected to server {ServerEndpoint}", connection.LocalEndPoint)) {
 
-            this.EnsurePeerCanConnect(connection);
+            this.eventBus.Publish(new PeerConnectionAttempt(peerContext));
 
-            this.eventBus.Publish(new PeerConnected(PeerConnectionDirection.Inbound, (IPEndPoint)connection.LocalEndPoint, (IPEndPoint)connection.RemoteEndPoint));
+            this.EnsurePeerCanConnect(connection, peerContext);
+
+            this.eventBus.Publish(new PeerConnected(peerContext));
+
+            var contextData = new ConnectionContextData(this.chainDefinition.MagicBytes);
 
             var protocol = new NetworkMessageProtocol(this.loggerFactory.CreateLogger<NetworkMessageProtocol>(),
                                                       this.chainDefinition,
-                                                      this.networkMessageSerializerManager);
+                                                      this.networkMessageSerializerManager,
+                                                      contextData);
 
-            ProtocolReader<Message> reader = Protocol.CreateReader(connection, protocol);
-            ProtocolWriter<Message> writer = Protocol.CreateWriter(connection, protocol);
+            ProtocolReader<INetworkMessage> reader = Protocol.CreateReader(connection, protocol);
+            ProtocolWriter<INetworkMessage> writer = Protocol.CreateWriter(connection, protocol);
 
             while (true) {
-               Message message = await reader.ReadAsync();
-
-               this.logger.LogInformation("Received a message of {Length} bytes", message.Payload.Length);
+               INetworkMessage message = await reader.ReadAsync();
 
                // REVIEW: We need a ReadResult<T> to indicate completion and cancellation
-               if (message.Payload == null) {
+               if (message == null) {
                   break;
                }
 
-               await this.ParseMessage(message, connection).ConfigureAwait(false);
+               await this.ProcessMessage(message, connection, contextData, peerContext).ConfigureAwait(false);
             }
+
+            this.eventBus.Publish(new PeerDisconnected(peerContext, "Client disconnected", null));
          }
       }
 
@@ -72,12 +83,10 @@ namespace MithrilShards.Network.Bedrock {
       /// Check if the client is allowed to connect based on certain criteria.
       /// </summary>
       /// <returns>When criteria is met returns <c>true</c>, to allow connection.</returns>
-      private void EnsurePeerCanConnect(ConnectionContext connection) {
+      private void EnsurePeerCanConnect(ConnectionContext connection, IPeerContext peerContext) {
          if (this.serverPeerConnectionGuards == null) {
             return;
          }
-
-         IPeerContext peerContext = new PeerContext((IPEndPoint)connection.LocalEndPoint, (IPEndPoint)connection.RemoteEndPoint);
 
          ServerPeerConnectionGuardResult result = (
             from guard in this.serverPeerConnectionGuards
@@ -91,29 +100,20 @@ namespace MithrilShards.Network.Bedrock {
          if (result.IsDenied) {
             this.logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected because of {ClientDisconnectedReason} and will be closed.", connection.RemoteEndPoint, result.DenyReason);
             connection.Abort(new ConnectionAbortedException(result.DenyReason));
-            this.eventBus.Publish(new PeerDisconnected(
-               PeerConnectionDirection.Inbound,
-               connection.ConnectionId,
-               connection.LocalEndPoint.AsIPEndPoint(),
-               connection.RemoteEndPoint.AsIPEndPoint(),
-               result.DenyReason,
-               null));
+            this.eventBus.Publish(new PeerDisconnected(peerContext, result.DenyReason, null));
          }
       }
 
-      private async Task ParseMessage(Message message, ConnectionContext connection) {
-         string command = Encoding.ASCII.GetString(message.Command.Trim((byte)'\0'));
-         this.logger.LogDebug("Message '{Command}'", command);
+      private async Task ProcessMessage(INetworkMessage message, ConnectionContext connection, ConnectionContextData contextData, IPeerContext peerContext) {
+         this.logger.LogInformation("Received a message of {Length} bytes", contextData.PayloadLength);
+         this.logger.LogDebug("Parsing message '{Command}'", message.Command);
 
-         //TODO instead of returning a Message, it should already return a typed known network message
-         if (this.networkMessageSerializerManager.Serializers.TryGetValue(command.ToLowerInvariant(), out INetworkMessageSerializer serializer)) {
-            INetworkMessage msg = serializer.Deserialize(message.Payload);
-            this.logger.LogDebug(
-               JsonSerializer.Serialize(msg, serializer.GetMessageType(), new JsonSerializerOptions { WriteIndented = true })
-            );
+         if (message is UnknownMessage) {
+            this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
          }
          else {
-            this.logger.LogWarning("Serializer for message '{Command}' not found.", command);
+            this.eventBus.Publish(new PeerMessageReceived(peerContext, message, (int)contextData.GetTotalMessageLength()));
+            this.logger.LogDebug(JsonSerializer.Serialize(message, message.GetType(), new JsonSerializerOptions { WriteIndented = true }));
          }
       }
    }

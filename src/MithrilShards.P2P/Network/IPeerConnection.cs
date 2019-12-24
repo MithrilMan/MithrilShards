@@ -7,8 +7,9 @@ namespace MithrilShards.Network.Network {
    public interface IPeerConnection {
       PeerConnectionDirection Direction { get; }
       PeerDisconnectionReason DisconnectReason { get; }
-      string PeerConnectionId { get; }
       TimeSpan? TimeOffset { get; }
+
+      IPeerContext PeerContext { get; }
 
       Task IncomingConnectionAccepted(CancellationToken cancellation = default);
    }

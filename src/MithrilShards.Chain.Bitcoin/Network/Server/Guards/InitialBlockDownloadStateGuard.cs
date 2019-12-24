@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core;
+using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Server;
-using MithrilShards.Core.Network.Server.Guards;
 
 namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards {
    /// <summary>

@@ -274,18 +274,13 @@ namespace MithrilShards.Network.Network.StateMachine {
       }
 
       private void Disconnected() {
-         this.logger.LogDebug("Peer {PeerConnectionId} Disconnected", this.peerConnection.PeerConnectionId);
+         this.logger.LogDebug("Peer {PeerConnectionId} Disconnected", this.peerConnection.PeerContext);
       }
 
       private Task DisconnectingAsync(string reason, Exception ex, CancellationToken cancellationToken) {
-         this.logger.LogDebug(ex, "Disconnecting {PeerConnectionId}: {Reason}", this.peerConnection.PeerConnectionId, reason);
+         this.logger.LogDebug(ex, "Disconnecting {PeerConnectionId}: {Reason}", this.peerConnection.PeerContext, reason);
          this.peerConnection.ConnectedClient.Close();
-         this.eventBus.Publish(new PeerDisconnected(this.peerConnection.Direction,
-            this.peerConnection.PeerConnectionId.ToString(),
-            this.peerConnection.ConnectedClient.Client.LocalEndPoint,
-            this.peerConnection.ConnectedClient.Client.RemoteEndPoint,
-            reason,
-            ex));
+         this.eventBus.Publish(new PeerDisconnected(this.peerConnection.PeerContext, reason, ex));
          this.stateMachine.Fire(PeerConnectionTrigger.PeerDisconnected);
          return Task.CompletedTask;
       }

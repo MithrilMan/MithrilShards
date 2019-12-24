@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization {
@@ -11,12 +12,12 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
 
       byte[] Serialize(INetworkMessage message);
 
-      INetworkMessage Deserialize(ReadOnlySpan<byte> data);
+      INetworkMessage Deserialize(ReadOnlySequence<byte> data);
    }
 
    public interface INetworkMessageSerializer<TMessageType> : INetworkMessageSerializer where TMessageType : INetworkMessage {
       byte[] Serialize(TMessageType message);
 
-      TMessageType Deserialize(ReadOnlySpan<byte> data);
+      TMessageType Deserialize(ReadOnlySequence<byte> data);
    }
 }

@@ -9,8 +9,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          throw new NotImplementedException();
       }
 
-      public override VersionMessage Deserialize(ReadOnlySpan<byte> data) {
-         var reader = new SequenceReader<byte>(new ReadOnlySequence<byte>(data.ToArray()));
+      public override VersionMessage Deserialize(ReadOnlySequence<byte> data) {
+         var reader = new SequenceReader<byte>(data);
 
          var message = new VersionMessage();
          message.Version = reader.ReadInt();
