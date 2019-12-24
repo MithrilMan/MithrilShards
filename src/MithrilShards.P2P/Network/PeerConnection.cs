@@ -22,7 +22,7 @@ namespace MithrilShards.Network.Network {
 
       readonly CancellationToken cancellationToken;
 
-      public Guid PeerConnectionId { get; }
+      public string PeerConnectionId { get; }
 
       readonly PeerConnectionStateMachine connectionStateMachine;
 
@@ -43,7 +43,7 @@ namespace MithrilShards.Network.Network {
          this.Direction = peerConnectionDirection;
          this.cancellationToken = cancellationToken;
 
-         this.PeerConnectionId = Guid.NewGuid();
+         this.PeerConnectionId = Guid.NewGuid().ToString();
 
          this.connectionStateMachine = new PeerConnectionStateMachine(logger, eventBus, this, cancellationToken);
       }

@@ -26,7 +26,7 @@ namespace MithrilShards.Network.Network.Server {
       readonly IEventBus eventBus;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
       readonly IPeerConnectionFactory peerConnectionFactory;
-      private readonly Dictionary<Guid, IPeerConnection> connectedPeers;
+      private readonly Dictionary<string, IPeerConnection> connectedPeers;
 
       /// <summary>
       /// IP address and port, on which the server listens to incoming connections.
@@ -55,7 +55,7 @@ namespace MithrilShards.Network.Network.Server {
          this.LocalEndPoint = localEndPoint.EnsureIPv6();
          this.RemoteEndPoint = remoteEndPoint.EnsureIPv6();
 
-         this.connectedPeers = new Dictionary<Guid, IPeerConnection>();
+         this.connectedPeers = new Dictionary<string, IPeerConnection>();
 
          this.listenerCancellation = new CancellationTokenSource();
 

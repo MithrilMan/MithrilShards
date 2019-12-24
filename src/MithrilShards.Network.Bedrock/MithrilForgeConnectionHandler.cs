@@ -1,6 +1,10 @@
 ﻿using Bedrock.Framework.Protocols;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Extensions;
+using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using MithrilShards.Core.Network.Server.Guards;
@@ -16,44 +20,51 @@ namespace MithrilShards.Network.Bedrock {
    public class MithrilForgeConnectionHandler : ConnectionHandler {
       private readonly ILogger logger;
       readonly ILoggerFactory loggerFactory;
+      readonly IEventBus eventBus;
       private readonly IChainDefinition chainDefinition;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
 
       public MithrilForgeConnectionHandler(ILogger<MithrilForgeConnectionHandler> logger,
                                            ILoggerFactory loggerFactory,
+                                           IEventBus eventBus,
                                            IChainDefinition chainDefinition,
                                            IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
                                            INetworkMessageSerializerManager networkMessageSerializerManager) {
          this.logger = logger;
          this.loggerFactory = loggerFactory;
+         this.eventBus = eventBus;
          this.chainDefinition = chainDefinition;
          this.serverPeerConnectionGuards = serverPeerConnectionGuards;
          this.networkMessageSerializerManager = networkMessageSerializerManager;
       }
 
       public override async Task OnConnectedAsync(ConnectionContext connection) {
+         using (this.logger.BeginScope("Peer connected to server {ServerEndpoint}", connection.LocalEndPoint)) {
 
-         this.EnsurePeerCanConnect(connection);
+            this.EnsurePeerCanConnect(connection);
 
-         var protocol = new NetworkMessageProtocol(this.loggerFactory.CreateLogger<NetworkMessageProtocol>(),
-                                                   this.chainDefinition,
-                                                   this.networkMessageSerializerManager);
+            this.eventBus.Publish(new PeerConnected(PeerConnectionDirection.Inbound, (IPEndPoint)connection.LocalEndPoint, (IPEndPoint)connection.RemoteEndPoint));
 
-         ProtocolReader<Message> reader = Protocol.CreateReader(connection, protocol);
-         ProtocolWriter<Message> writer = Protocol.CreateWriter(connection, protocol);
+            var protocol = new NetworkMessageProtocol(this.loggerFactory.CreateLogger<NetworkMessageProtocol>(),
+                                                      this.chainDefinition,
+                                                      this.networkMessageSerializerManager);
 
-         while (true) {
-            Message message = await reader.ReadAsync();
+            ProtocolReader<Message> reader = Protocol.CreateReader(connection, protocol);
+            ProtocolWriter<Message> writer = Protocol.CreateWriter(connection, protocol);
 
-            this.logger.LogInformation("Received a message of {Length} bytes", message.Payload.Length);
+            while (true) {
+               Message message = await reader.ReadAsync();
 
-            // REVIEW: We need a ReadResult<T> to indicate completion and cancellation
-            if (message.Payload == null) {
-               break;
+               this.logger.LogInformation("Received a message of {Length} bytes", message.Payload.Length);
+
+               // REVIEW: We need a ReadResult<T> to indicate completion and cancellation
+               if (message.Payload == null) {
+                  break;
+               }
+
+               await this.ParseMessage(message, connection).ConfigureAwait(false);
             }
-
-            await this.ParseMessage(message, connection).ConfigureAwait(false);
          }
       }
 
@@ -80,6 +91,13 @@ namespace MithrilShards.Network.Bedrock {
          if (result.IsDenied) {
             this.logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected because of {ClientDisconnectedReason} and will be closed.", connection.RemoteEndPoint, result.DenyReason);
             connection.Abort(new ConnectionAbortedException(result.DenyReason));
+            this.eventBus.Publish(new PeerDisconnected(
+               PeerConnectionDirection.Inbound,
+               connection.ConnectionId,
+               connection.LocalEndPoint.AsIPEndPoint(),
+               connection.RemoteEndPoint.AsIPEndPoint(),
+               result.DenyReason,
+               null));
          }
       }
 

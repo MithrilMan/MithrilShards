@@ -8,12 +8,12 @@ namespace MithrilShards.Core.Network.Events {
    /// <seealso cref="Stratis.Bitcoin.EventBus.EventBase" />
    public class PeerDisconnected : PeerEventBase {
       public PeerConnectionDirection Direction { get; }
-      public Guid PeerId { get; }
+      public string PeerId { get; }
       public string Reason { get; }
 
       public Exception Exception { get; }
 
-      public PeerDisconnected(PeerConnectionDirection direction, Guid peerId, IPEndPoint remoteEndPoint, string reason, Exception exception) : base(remoteEndPoint) {
+      public PeerDisconnected(PeerConnectionDirection direction, string peerId, EndPoint localEndPoint, EndPoint remoteEndPoint, string reason, Exception exception) : base(localEndPoint, remoteEndPoint) {
          this.Direction = direction;
          this.PeerId = peerId;
          this.Reason = reason;

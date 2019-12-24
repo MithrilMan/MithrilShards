@@ -14,7 +14,7 @@ namespace MithrilShards.Core.Network.Events {
 
       public System.Exception Exception { get; }
 
-      public PeerMessageSendFailure(IPEndPoint peerEndPoint, INetworkMessage message, System.Exception exception) : base(peerEndPoint) {
+      public PeerMessageSendFailure(EndPoint localEndPoint, EndPoint remoteEndPoint, INetworkMessage message, System.Exception exception) : base(localEndPoint, remoteEndPoint) {
          this.Message = message;
          this.Exception = exception;
       }
