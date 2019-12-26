@@ -5,7 +5,10 @@
       "WriteTo": [
          {
             "Name": "Console",
-            "Args": { "IncludeScopes": true }
+            "Args": {
+               "IncludeScopes": true,
+               "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console"
+            }
          },
          {
             "Name": "Seq",

@@ -54,12 +54,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
       /// </summary>
       public bool Relay { get; set; }
 
-      public ulong ReceiverAddressServices { get; internal set; }
-      public byte[] ReceiverAddressIP { get; internal set; }
-      public ushort SenderAddressPort { get; internal set; }
-      public ulong SenderAddressServices { get; internal set; }
-      public byte[] SenderAddressIP { get; internal set; }
-
       public VersionMessage() : base("version") {
       }
    }

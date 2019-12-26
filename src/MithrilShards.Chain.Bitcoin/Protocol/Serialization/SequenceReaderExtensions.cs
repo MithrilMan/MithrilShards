@@ -100,8 +100,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          }
       }
 
-      public static NetworkAddress ReadNetworkAddress(ref this SequenceReader<byte> reader) {
-         NetworkAddress result = new NetworkAddress();
+      /// <summary>
+      /// Reads the network address.
+      /// </summary>
+      /// <param name="reader">The reader.</param>
+      /// <param name="skipTimeField">if set to <c>true</c> skips time field serialization/deserialization, used by <see cref="VersionMessage"/>.</param>
+      /// <returns></returns>
+      public static NetworkAddress ReadNetworkAddress(ref this SequenceReader<byte> reader, bool skipTimeField) {
+         var result = new NetworkAddress(skipTimeField);
          var innerReader = new SequenceReader<byte>(reader.Sequence.Slice(reader.Position, result.Length));
          result.Deserialize(innerReader);
          reader.Advance(innerReader.Consumed);

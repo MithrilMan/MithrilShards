@@ -9,7 +9,7 @@ namespace MithrilShards.Network.Bedrock {
          forgeBuilder.AddShard<BedrockForgeServer, ForgeServerSettings>(
             (hostBuildContext, services) => {
                services
-                  .Replace(ServiceDescriptor.Transient<IForgeServer, BedrockForgeServer>())
+                  .Replace(ServiceDescriptor.Singleton<IForgeServer, BedrockForgeServer>())
                   .AddSingleton<IServerPeerStats, ServerPeerStats>()
                   ;
             });

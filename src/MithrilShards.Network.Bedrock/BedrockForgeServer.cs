@@ -86,6 +86,7 @@ namespace MithrilShards.Network.Bedrock {
 
                         this.logger.LogInformation("Added listener to local endpoint {ListenerLocalEndpoint}. (remote {ListenerPublicEndpoint})", localEndPoint, publicEndPoint);
 
+                        sockets.Options.NoDelay = true;
                         sockets.Listen(
                            localEndPoint.Address,
                            localEndPoint.Port,

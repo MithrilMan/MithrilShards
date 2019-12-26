@@ -15,12 +15,13 @@ namespace MithrilShards.Network.Network {
 
       /// <summary>Provider of time functions.</summary>
       private readonly IDateTimeProvider dateTimeProvider;
+      readonly IPeerContextFactory peerContextFactory;
 
-      public PeerConnectionFactory(ILoggerFactory loggerFactory, IEventBus eventBus, IDateTimeProvider dateTimeProvider) {
+      public PeerConnectionFactory(ILoggerFactory loggerFactory, IEventBus eventBus, IDateTimeProvider dateTimeProvider, IPeerContextFactory peerContextFactory) {
          this.loggerFactory = loggerFactory;
          this.eventBus = eventBus;
          this.dateTimeProvider = dateTimeProvider;
-
+         this.peerContextFactory = peerContextFactory;
          this.logger = loggerFactory.CreateLogger<PeerConnectionFactory>();
       }
 
@@ -31,6 +32,7 @@ namespace MithrilShards.Network.Network {
             this.dateTimeProvider,
             connectingPeer,
             PeerConnectionDirection.Inbound,
+            this.peerContextFactory,
             cancellationToken
             );
 

@@ -1,0 +1,24 @@
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace MithrilShards.Core.Network.Protocol.Processors {
+   /// <summary>
+   /// Interfaces that define a generic network message
+   /// </summary>
+   public interface INetworkMessageProcessor : IDisposable {
+      bool Enabled { get; }
+
+
+      /// <summary>
+      /// Processes the message asynchronous.
+      /// returns true if the flow must be stopped.
+      /// </summary>
+      /// <param name="message">The message.</param>
+      /// <param name="cancellation">The cancellation token.</param>
+      /// <returns></returns>
+      Task<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation);
+
+      void Attach(IPeerContext peerContext);
+   }
+}

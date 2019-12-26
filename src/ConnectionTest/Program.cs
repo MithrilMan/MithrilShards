@@ -20,7 +20,7 @@ namespace ConnectionTest {
       private static async Task StartBedrockForgeServer(string[] args) {
          await new ForgeBuilder()
             .UseForge<Forge>(args)
-            .UseSerilog("log-settings.json")
+            .UseSerilog("log-settings-with-seq.json")
             .UseBedrockForgeServer()
             .UseBitcoinChain()
             .RunConsoleAsync()

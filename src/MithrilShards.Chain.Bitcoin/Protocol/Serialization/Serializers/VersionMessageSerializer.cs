@@ -12,29 +12,23 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
       public override VersionMessage Deserialize(ReadOnlySequence<byte> data) {
          var reader = new SequenceReader<byte>(data);
 
-         var message = new VersionMessage();
-         message.Version = reader.ReadInt();
-         message.Services = reader.ReadULong();
-         message.Timestamp = DateTimeOffset.FromUnixTimeSeconds(reader.ReadLong());
+         var message = new VersionMessage {
+            Version = reader.ReadInt(),
+            Services = reader.ReadULong(),
+            Timestamp = DateTimeOffset.FromUnixTimeSeconds(reader.ReadLong()),
+            ReceiverAddress = reader.ReadNetworkAddress(skipTimeField: true)
+         };
 
-         message.ReceiverAddressServices = reader.ReadULong();
-         message.ReceiverAddressIP = reader.ReadBytes(16);
-         message.SenderAddressPort = reader.ReadUShort();
-
-         // TODO: add Protocol Version enum ? 
-         if (message.Version < 106) {
+         if (message.Version < KnownVersion.V106) {
             return message;
          }
 
-         message.SenderAddressServices = reader.ReadULong();
-         message.SenderAddressIP = reader.ReadBytes(16);
-         message.SenderAddressPort = reader.ReadUShort();
-
+         message.SenderAddress = reader.ReadNetworkAddress(skipTimeField: true);
          message.Nonce = reader.ReadULong();
          message.UserAgent = reader.ReadVarString();
          message.StartHeight = reader.ReadInt();
 
-         if (message.Version < 70001) {
+         if (message.Version < KnownVersion.V70001) {
             return message;
          }
 

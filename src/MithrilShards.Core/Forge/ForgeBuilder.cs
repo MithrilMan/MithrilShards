@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Core.Forge {
@@ -68,6 +70,9 @@ namespace MithrilShards.Core.Forge {
                .AddSingleton<IInitialBlockDownloadState, InitialBlockDownloadState>()
                .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                .AddSingleton<INetworkMessageSerializerManager, NetworkMessageSerializerManager>()
+               .AddSingleton<INetworkMessageProcessorFactory, NetworkMessageProcessorFactory>()
+               .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
+               .AddSingleton<IPeerContextFactory, PeerContextFactory<PeerContext>>()
                ;
          });
 
