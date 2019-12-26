@@ -83,7 +83,7 @@ namespace MithrilShards.Network.Bedrock {
                   this.networkMessageProcessorFactory.StartProcessors(peerContext);
 
                   while (true) {
-                     INetworkMessage message = await reader.ReadAsync();
+                     INetworkMessage message = await reader.ReadAsync().ConfigureAwait(true);
 
                      // REVIEW: We need a ReadResult<T> to indicate completion and cancellation
                      if (message == null) {
