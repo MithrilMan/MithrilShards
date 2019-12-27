@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using MithrilShards.Core.Extensions;
@@ -49,6 +48,8 @@ namespace MithrilShards.Core.Network {
       /// The negotiated protocol version.
       /// </value>
       public virtual INegotiatedProtocolVersion NegotiatedProtocolVersion { get; } = new NegotiatedProtocolVersion();
+
+      public PeerMetrics Metrics { get; } = new PeerMetrics();
 
       public PeerContext(PeerConnectionDirection direction,
                          string peerId,

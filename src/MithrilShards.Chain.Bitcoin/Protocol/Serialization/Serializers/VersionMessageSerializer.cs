@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
@@ -9,7 +10,25 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
       public VersionMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
 
       public override void Serialize(VersionMessage message, int protocolVersion, IBufferWriter<byte> output) {
-         throw new NotImplementedException();
+         output.WriteInt(message.Version);
+         output.WriteULong(message.Services);
+         output.WriteLong(message.Timestamp.ToUnixTimeSeconds());
+         output.WriteNetworkAddress(message.ReceiverAddress);
+
+         if (protocolVersion < KnownVersion.V106) {
+            return;
+         }
+
+         output.WriteNetworkAddress(message.SenderAddress);
+         output.WriteULong(message.Nonce);
+         output.WriteVarString(message.UserAgent);
+         output.WriteInt(message.StartHeight);
+
+         if (protocolVersion < KnownVersion.V70001) {
+            return;
+         }
+
+         output.WriteBool(message.Relay);
       }
 
       public override INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion) {

@@ -1,5 +1,6 @@
 ﻿using Bedrock.Framework.Protocols;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Core.Crypto;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
@@ -45,6 +46,13 @@ namespace MithrilShards.Network.Bedrock {
             // now try to read the payload
             if (reader.Remaining >= this.contextData.PayloadLength) {
                ReadOnlySequence<byte> payload = input.Slice(reader.Position, this.contextData.PayloadLength);
+
+               //check checksum
+               ReadOnlySpan<byte> checksum = HashGenerator.DoubleSha256(payload.Slice(0, 4).ToArray());
+               if (this.contextData.Checksum != BitConverter.ToUInt32(checksum)) {
+                  throw new ProtocolViolationException("Invalid checksum.");
+               }
+
                //we consumed and examined everything, no matter if the message was a known message or not
                examined = consumed = payload.End;
                this.contextData.ResetFlags();
@@ -58,6 +66,7 @@ namespace MithrilShards.Network.Bedrock {
                else {
                   this.logger.LogWarning("Serializer for message '{Command}' not found.", commandName);
                   message = new UnknownMessage(commandName, payload.ToArray());
+                  this.peerContext.Metrics.Wasted(this.contextData.GetTotalMessageLength());
                   return true;
                }
             }
@@ -109,13 +118,14 @@ namespace MithrilShards.Network.Bedrock {
       /// <remarks>When returns false, reader may be not to the end of the buffer in case a partial magic number lies at the end of the buffer.</remarks>
       /// <returns>true if the magic number has been full read, false otherwise (not enough bytes to read)</returns>
       private bool TryReadMagicNumber(ref SequenceReader<byte> reader) {
+         long prevRemaining = reader.Remaining;
          // advance to the first byte of the magic number.
          while (reader.TryAdvanceTo(this.contextData.FirstMagicNumberByte, advancePastDelimiter: false)) {
             //TODO: compare sequence of bytes instead of reading an int
             if (reader.TryReadLittleEndian(out int magicRead)) {
                if (magicRead == this.contextData.MagicNumber) {
                   this.contextData.MagicNumberRead = true;
-                  this.logger.LogDebug("Magic Number found, after skipping {SkippedBytes} bytes.", reader.Position.GetInteger() - 4);
+                  this.peerContext.Metrics.Wasted(reader.Position.GetInteger() - 4);
                   return true;
                }
                else {
@@ -123,12 +133,14 @@ namespace MithrilShards.Network.Bedrock {
                }
             }
             else {
+               this.peerContext.Metrics.Wasted(reader.Remaining - prevRemaining);
                return false;
             }
          }
 
          // didn't found the first magic byte so can advance up to the end
          reader.Advance(reader.Remaining);
+         this.peerContext.Metrics.Wasted(reader.Remaining);
          return false;
       }
 
@@ -189,15 +201,11 @@ namespace MithrilShards.Network.Bedrock {
          }
 
          if (this.networkMessageSerializerManager.Serializers.TryGetValue(message.Command, out INetworkMessageSerializer serializer)) {
-            serializer.Serialize(message, this.peerContext.NegotiatedProtocolVersion.Version, output);
+            this.peerContext.Metrics.Sent(serializer.Serialize(message, this.peerContext.NegotiatedProtocolVersion.Version, output));
          }
          else {
             this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
          }
-         //Span<byte> lengthBuffer = output.GetSpan(4);
-         //BinaryPrimitives.WriteInt32BigEndian(lengthBuffer, message.Payload.Length);
-         //output.Advance(4);
-         //output.Write(message.Payload);
       }
    }
 }

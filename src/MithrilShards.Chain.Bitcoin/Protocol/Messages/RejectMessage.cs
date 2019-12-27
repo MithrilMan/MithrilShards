@@ -31,7 +31,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
       /// <summary>Optional extra data provided by some errors.
       /// Currently, all errors which provide this field fill it with the TXID or block header hash of the object being
       /// rejected, so the field is 32 bytes.</summary>
-      public byte Data { get; set; }
+      public byte[] Data { get; set; }
 
       public RejectMessage() : base("reject ") {
       }

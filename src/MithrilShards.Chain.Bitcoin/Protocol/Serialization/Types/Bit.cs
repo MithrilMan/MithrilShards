@@ -11,11 +11,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
 
       public int Length => 1;
 
-      public byte[] Serialize() {
+      public void Deserialize(SequenceReader<byte> data) {
          throw new NotImplementedException();
       }
 
-      public void Deserialize(SequenceReader<byte> data) {
+      public int Serialize(IBufferWriter<byte> writer) {
          throw new NotImplementedException();
       }
    }

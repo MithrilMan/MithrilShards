@@ -3,11 +3,11 @@ using System.Text;
 
 namespace MithrilShards.Network.Bedrock {
    public class ConnectionContextData {
-      public const uint SIZE_MAGIC = 4;
-      public const uint SIZE_COMMAND = 12;
-      public const uint SIZE_PAYLOAD_LENGTH = 4;
-      public const uint SIZE_CHECKSUM = 4;
-      public const uint HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
+      public const int SIZE_MAGIC = 4;
+      public const int SIZE_COMMAND = 12;
+      public const int SIZE_PAYLOAD_LENGTH = 4;
+      public const int SIZE_CHECKSUM = 4;
+      public const int HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
 
       private uint payloadLength;
       private byte[] command;
@@ -90,8 +90,8 @@ namespace MithrilShards.Network.Bedrock {
          return Encoding.ASCII.GetString(this.command.AsSpan().Trim((byte)'\0'));
       }
 
-      public uint GetTotalMessageLength() {
-         return HEADER_LENGTH + this.payloadLength;
+      public int GetTotalMessageLength() {
+         return HEADER_LENGTH + (int)this.payloadLength;
       }
    }
 }

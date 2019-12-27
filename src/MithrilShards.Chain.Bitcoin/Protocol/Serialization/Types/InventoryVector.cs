@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          throw new NotImplementedException();
       }
 
-      public byte[] Serialize() {
+      public int Serialize(IBufferWriter<byte> writer) {
          throw new NotImplementedException();
       }
    }

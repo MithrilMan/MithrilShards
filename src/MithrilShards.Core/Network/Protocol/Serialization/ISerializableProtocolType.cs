@@ -18,13 +18,13 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
    }
 
    public interface ISerializableProtocolType<TProtocolType> : ISerializableProtocolType where TProtocolType : ISerializableProtocolType<TProtocolType> {
-      byte[] Serialize();
+      int Serialize(IBufferWriter<byte> writer);
 
       void Deserialize(SequenceReader<byte> data);
    }
 
    public interface ISerializableProtocolTypeEndiannessAware<TProtocolType> : ISerializableProtocolType where TProtocolType : ISerializableProtocolTypeEndiannessAware<TProtocolType> {
-      byte[] Serialize(bool isLittleEndian);
+      int Serialize(IBufferWriter<byte> writer, bool isLittleEndian);
 
       void Deserialize(SequenceReader<byte> data, bool isLittleEndian);
    }

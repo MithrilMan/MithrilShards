@@ -36,21 +36,27 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          return typeof(TMessageType);
       }
 
-      public void Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output) {
+      public int Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output) {
+         if (message is null) {
+            throw new ArgumentNullException(nameof(message));
+         }
+
          var payloadOutput = new ArrayBufferWriter<byte>();
          this.Serialize((TMessageType)message, protocolVersion, payloadOutput);
 
          output.Write(this.precookedMagciAndCommand);
 
          // length
-         BinaryPrimitives.TryWriteUInt32LittleEndian(output.GetSpan(4), (uint)payloadOutput.WrittenCount);
-         output.Advance(4);
+         BinaryPrimitives.TryWriteUInt32LittleEndian(output.GetSpan(SIZE_PAYLOAD_LENGTH), (uint)payloadOutput.WrittenCount);
+         output.Advance(SIZE_PAYLOAD_LENGTH);
 
          //checksum
          output.Write(HashGenerator.DoubleSha256(payloadOutput.WrittenSpan));
 
          // payload
          output.Write(payloadOutput.WrittenSpan);
+
+         return HEADER_LENGTH + payloadOutput.WrittenCount;
       }
    }
 }

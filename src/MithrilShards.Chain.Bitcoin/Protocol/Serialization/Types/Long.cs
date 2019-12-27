@@ -11,12 +11,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
 
       public int Length => 8;
 
-
       public void Deserialize(SequenceReader<byte> data, bool isLittleEndian) {
          throw new NotImplementedException();
       }
 
-      public byte[] Serialize(bool isLittleEndian) {
+      public int Serialize(IBufferWriter<byte> writer, bool isLittleEndian) {
          throw new NotImplementedException();
       }
    }

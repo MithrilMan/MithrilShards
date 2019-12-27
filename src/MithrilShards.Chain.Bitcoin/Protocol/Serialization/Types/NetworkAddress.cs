@@ -68,8 +68,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          this.Port = data.ReadUShort();
       }
 
-      public byte[] Serialize() {
-         throw new NotImplementedException();
+      public int Serialize(IBufferWriter<byte> writer) {
+         int size = 0;
+         // https://bitcoin.org/en/developer-reference#version
+         if (!this.skipTimeField) {
+            size += writer.WriteUInt(this.Time); //DateTimeOffset.FromUnixTimeSeconds(data.ReadUInt);
+         }
+         size += writer.WriteULong(this.Services);
+         size += writer.WriteBytes(this.IP);
+         size += writer.WriteUShort(this.Port);
+
+         return size;
       }
    }
 }
