@@ -158,7 +158,7 @@ namespace MithrilShards.Network.Network.StateMachine {
          while (!cancellationToken.IsCancellationRequested) {
             // Allocate at least 512 bytes from the PipeWriter.
             Memory<byte> memory = writer.GetMemory(minimumBufferSize);
-            int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None).ConfigureAwait(true);
+            int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None).ConfigureAwait(false);
             if (bytesRead == 0) {
                break;
             }
@@ -166,7 +166,7 @@ namespace MithrilShards.Network.Network.StateMachine {
             writer.Advance(bytesRead);
 
             // Make the data available to the PipeReader.
-            FlushResult result = await writer.FlushAsync().ConfigureAwait(true);
+            FlushResult result = await writer.FlushAsync().ConfigureAwait(false);
 
             if (result.IsCompleted) {
                break;
@@ -174,13 +174,13 @@ namespace MithrilShards.Network.Network.StateMachine {
          }
 
          // By completing PipeWriter, tell the PipeReader that there's no more data coming.
-         await writer.CompleteAsync().ConfigureAwait(true);
+         await writer.CompleteAsync().ConfigureAwait(false);
       }
 
       async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellationToken = default) {
          try {
             while (true) {
-               ReadResult result = await reader.ReadAsync(cancellationToken).ConfigureAwait(true);
+               ReadResult result = await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
                ReadOnlySequence<byte> buffer = result.Buffer;
 
                try {
@@ -211,13 +211,13 @@ namespace MithrilShards.Network.Network.StateMachine {
             }
          }
          finally {
-            await reader.CompleteAsync().ConfigureAwait(true);
+            await reader.CompleteAsync().ConfigureAwait(false);
          }
       }
 
       private async Task ReadPipeAsync(PipeReader reader, CancellationToken cancellationToken) {
          while (!cancellationToken.IsCancellationRequested) {
-            ReadResult result = await reader.ReadAsync().ConfigureAwait(true);
+            ReadResult result = await reader.ReadAsync().ConfigureAwait(false);
             ReadOnlySequence<byte> buffer = result.Buffer;
 
             while (this.TryReadNetworkMessage(ref buffer, out ReadOnlySequence<byte> line)) {
@@ -235,7 +235,7 @@ namespace MithrilShards.Network.Network.StateMachine {
          }
 
          // Mark the PipeReader as complete.
-         await reader.CompleteAsync().ConfigureAwait(true);
+         await reader.CompleteAsync().ConfigureAwait(false);
       }
 
       private bool TryReadNetworkMessage(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> rawMessage) {

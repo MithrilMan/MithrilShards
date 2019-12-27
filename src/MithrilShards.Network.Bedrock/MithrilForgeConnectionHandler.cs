@@ -74,16 +74,17 @@ namespace MithrilShards.Network.Bedrock {
                                                     new NetworkMessageWriter(writer))) {
 
                connection.Features.Set(peerContext);
+               protocol.SetPeerContext(peerContext);
 
                this.eventBus.Publish(new PeerConnectionAttempt(peerContext));
                if (this.EnsurePeerCanConnect(connection, peerContext)) {
 
                   this.eventBus.Publish(new PeerConnected(peerContext));
 
-                  this.networkMessageProcessorFactory.StartProcessors(peerContext);
+                  this.networkMessageProcessorFactory.StartProcessorsAsync(peerContext);
 
                   while (true) {
-                     INetworkMessage message = await reader.ReadAsync().ConfigureAwait(true);
+                     INetworkMessage message = await reader.ReadAsync().ConfigureAwait(false);
 
                      // REVIEW: We need a ReadResult<T> to indicate completion and cancellation
                      if (message == null) {
@@ -147,8 +148,10 @@ namespace MithrilShards.Network.Bedrock {
             this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
          }
          else {
-            this.eventBus.Publish(new PeerMessageReceived(peerContext, message, (int)contextData.GetTotalMessageLength()));
             this.logger.LogDebug(JsonSerializer.Serialize(message, message.GetType(), new JsonSerializerOptions { WriteIndented = true }));
+            this.eventBus.Publish(new PeerMessageReceived(peerContext, message, (int)contextData.GetTotalMessageLength()));
+
+            await peerContext.ProcessMessageAsync(message).ConfigureAwait(false);
          }
       }
    }

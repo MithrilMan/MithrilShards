@@ -70,19 +70,19 @@ namespace MithrilShards.Network.Bedrock {
                   .UseSockets(sockets => {
                      foreach (ServerPeerBinding binding in this.settings.Bindings) {
                         if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
-                           throw new Exception($"Configuration error: binding {binding.Endpoint} must be a valid address:port value. Current value: {binding.Endpoint ?? "NULL"}");
+                           throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
                         }
 
-                        if (binding.PublicEndpoint == null) {
-                           binding.PublicEndpoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
+                        if (binding.PublicEndPoint == null) {
+                           binding.PublicEndPoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
                         }
 
-                        if (!binding.IsValidPublicEndpoint()) {
-                           throw new Exception($"Configuration error: binding {nameof(binding.PublicEndpoint)} must be a valid address:port value. Current value: {binding.PublicEndpoint ?? "NULL"}");
+                        if (!binding.IsValidPublicEndPoint()) {
+                           throw new Exception($"Configuration error: binding {nameof(binding.PublicEndPoint)} must be a valid address:port value. Current value: {binding.PublicEndPoint ?? "NULL"}");
                         }
 
-                        var localEndPoint = IPEndPoint.Parse(binding.Endpoint);
-                        var publicEndPoint = IPEndPoint.Parse(binding.PublicEndpoint);
+                        var localEndPoint = IPEndPoint.Parse(binding.EndPoint);
+                        var publicEndPoint = IPEndPoint.Parse(binding.PublicEndPoint);
 
                         this.logger.LogInformation("Added listener to local endpoint {ListenerLocalEndpoint}. (remote {ListenerPublicEndpoint})", localEndPoint, publicEndPoint);
 
@@ -90,7 +90,9 @@ namespace MithrilShards.Network.Bedrock {
                         sockets.Listen(
                            localEndPoint.Address,
                            localEndPoint.Port,
-                           builder => builder.UseConnectionLogging().UseConnectionHandler<MithrilForgeConnectionHandler>()
+                           builder => builder
+                              .UseConnectionLogging()
+                              .UseConnectionHandler<MithrilForgeConnectionHandler>()
                            );
                      }
                   }

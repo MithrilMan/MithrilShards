@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization {
    public interface INetworkMessageSerializer {
@@ -10,14 +9,8 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
       /// <returns></returns>
       Type GetMessageType();
 
-      byte[] Serialize(INetworkMessage message);
+      byte[] Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output);
 
-      INetworkMessage Deserialize(ReadOnlySequence<byte> data);
-   }
-
-   public interface INetworkMessageSerializer<TMessageType> : INetworkMessageSerializer where TMessageType : INetworkMessage {
-      byte[] Serialize(TMessageType message);
-
-      TMessageType Deserialize(ReadOnlySequence<byte> data);
+      INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion);
    }
 }

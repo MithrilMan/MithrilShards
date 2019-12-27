@@ -19,6 +19,6 @@ namespace MithrilShards.Core.Network.Protocol.Processors {
       /// <returns></returns>
       Task<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation);
 
-      void Attach(IPeerContext peerContext);
+      ValueTask AttachAsync(IPeerContext peerContext);
    }
 }

@@ -2,6 +2,8 @@
    public interface IChainDefinition {
       string Name { get; }
 
+      uint Magic { get; }
+
       byte[] MagicBytes { get; }
 
       byte[] genesis { get; }

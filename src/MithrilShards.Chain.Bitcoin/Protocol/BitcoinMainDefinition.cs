@@ -9,8 +9,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol {
 
       public byte[] genesis { get; }
 
+      public uint Magic { get; }
+
       public BitcoinMainDefinition() {
          this.Name = "BitcoinMain";
+         this.Magic = 0xD9B4BEF9;
          this.MagicBytes = BitConverter.GetBytes(0xD9B4BEF9);
          this.genesis = null;
       }

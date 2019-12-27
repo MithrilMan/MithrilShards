@@ -52,23 +52,23 @@ namespace MithrilShards.Network.Network.Server {
 
                foreach (ServerPeerBinding binding in this.settings.Bindings) {
                   if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
-                     throw new Exception($"Configuration error: binding {binding.Endpoint} must be a valid address:port value. Current value: {binding.Endpoint ?? "NULL"}");
+                     throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
                   }
 
-                  if (binding.PublicEndpoint == null) {
-                     binding.PublicEndpoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
+                  if (binding.PublicEndPoint == null) {
+                     binding.PublicEndPoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
                   }
 
-                  if (!binding.IsValidPublicEndpoint()) {
-                     throw new Exception($"Configuration error: binding {nameof(binding.PublicEndpoint)} must be a valid address:port value. Current value: {binding.PublicEndpoint ?? "NULL"}");
+                  if (!binding.IsValidPublicEndPoint()) {
+                     throw new Exception($"Configuration error: binding {nameof(binding.PublicEndPoint)} must be a valid address:port value. Current value: {binding.PublicEndPoint ?? "NULL"}");
                   }
 
 
                   var serverPeer = new ServerPeer(
                      this.loggerFactory.CreateLogger<ServerPeer>(),
                      this.eventBus,
-                     IPEndPoint.Parse(binding.Endpoint),
-                     IPEndPoint.Parse(binding.PublicEndpoint),
+                     IPEndPoint.Parse(binding.EndPoint),
+                     IPEndPoint.Parse(binding.PublicEndPoint),
                      this.serverPeerConnectionGuards,
                      this.peerConnectionFactory
                      );

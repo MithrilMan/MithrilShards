@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Net;
+using System.Text.Json.Serialization;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
@@ -36,6 +37,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       /// </summary>
       public ushort Port { get; set; }
 
+      [JsonIgnore]
       public IPEndPoint EndPoint {
          get { return new IPEndPoint(new IPAddress(this.IP), this.Port); }
          set {

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.MithrilShards;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.PeerAddressBook;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
@@ -73,6 +74,11 @@ namespace MithrilShards.Core.Forge {
                .AddSingleton<INetworkMessageProcessorFactory, NetworkMessageProcessorFactory>()
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IPeerContextFactory, PeerContextFactory<PeerContext>>()
+
+               //add peer address book with peer score manager
+               .AddSingleton<PeerAddressBook>() //required to forward the instance to 2 interfaces below
+               .AddSingleton<IPeerAddressBook>(serviceProvider => serviceProvider.GetRequiredService<PeerAddressBook>())
+               .AddSingleton<IPeerScoreManager>(serviceProvider => serviceProvider.GetRequiredService<PeerAddressBook>())
                ;
          });
 

@@ -1,6 +1,7 @@
 ﻿{
    "ForgeServerSettings": {
       "MaxInboundConnections": 25,
+      "AllowLoopbackConnection": false,
       "Bindings": [
          {
             "IsWhitelistingEndpoint": false,

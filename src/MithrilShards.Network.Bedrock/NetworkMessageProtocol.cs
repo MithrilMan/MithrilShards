@@ -1,5 +1,6 @@
 ﻿using Bedrock.Framework.Protocols;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using System;
@@ -21,6 +22,7 @@ namespace MithrilShards.Network.Bedrock {
       private readonly IChainDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
       readonly ConnectionContextData contextData;
+      private IPeerContext peerContext;
 
       public NetworkMessageProtocol(ILogger<NetworkMessageProtocol> logger,
                                     IChainDefinition chainDefinition,
@@ -32,6 +34,9 @@ namespace MithrilShards.Network.Bedrock {
          this.contextData = contextData;
       }
 
+      internal void SetPeerContext(IPeerContext peerContext) {
+         this.peerContext = peerContext;
+      }
 
       public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, out INetworkMessage message) {
          var reader = new SequenceReader<byte>(input);
@@ -47,7 +52,7 @@ namespace MithrilShards.Network.Bedrock {
                string commandName = this.contextData.GetCommandName();
 
                if (this.networkMessageSerializerManager.Serializers.TryGetValue(commandName, out INetworkMessageSerializer serializer)) {
-                  message = serializer.Deserialize(payload);
+                  message = serializer.Deserialize(payload, this.peerContext.NegotiatedProtocolVersion.Version);
                   return true;
                }
                else {
@@ -179,6 +184,16 @@ namespace MithrilShards.Network.Bedrock {
 
 
       public void WriteMessage(INetworkMessage message, IBufferWriter<byte> output) {
+         if (message is null) {
+            throw new ArgumentNullException(nameof(message));
+         }
+
+         if (this.networkMessageSerializerManager.Serializers.TryGetValue(message.Command, out INetworkMessageSerializer serializer)) {
+            serializer.Serialize(message, this.peerContext.NegotiatedProtocolVersion.Version, output);
+         }
+         else {
+            this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
+         }
          //Span<byte> lengthBuffer = output.GetSpan(4);
          //BinaryPrimitives.WriteInt32BigEndian(lengthBuffer, message.Payload.Length);
          //output.Advance(4);

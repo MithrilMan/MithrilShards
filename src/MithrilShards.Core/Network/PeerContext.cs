@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network.Protocol;
@@ -40,6 +41,15 @@ namespace MithrilShards.Core.Network {
 
       public IFeatureCollection Data { get; } = new FeatureCollection();
 
+      /// <summary>
+      /// Gets the version peers agrees to use when their respective version doesn't match.
+      /// It should be the lower common version both parties implements.
+      /// </summary>
+      /// <value>
+      /// The negotiated protocol version.
+      /// </value>
+      public virtual INegotiatedProtocolVersion NegotiatedProtocolVersion { get; } = new NegotiatedProtocolVersion();
+
       public PeerContext(PeerConnectionDirection direction,
                          string peerId,
                          EndPoint localEndPoint,
@@ -58,7 +68,7 @@ namespace MithrilShards.Core.Network {
          return this.messageWriter;
       }
 
-      public void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor) {
+      public virtual void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor) {
          if (this.messageProcessors.Exists(p => p.GetType() == messageProcessor.GetType())) {
             throw new ArgumentException($"Cannot add multiple processors of the same type. Trying to attack {messageProcessor.GetType().Name} multiple times");
          }
@@ -69,6 +79,16 @@ namespace MithrilShards.Core.Network {
       public void Dispose() {
          foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors) {
             messageProcessor.Dispose();
+         }
+      }
+
+      public async Task ProcessMessageAsync(INetworkMessage message) {
+         foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors) {
+            if (messageProcessor.Enabled) {
+               if (!await messageProcessor.ProcessMessageAsync(message, default).ConfigureAwait(false)) {
+                  break;
+               }
+            }
          }
       }
    }

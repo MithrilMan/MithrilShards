@@ -14,12 +14,21 @@ using MithrilShards.Core.Network.Server.Guards;
 
 namespace MithrilShards.Chain.Bitcoin {
    public static class ForgeBuilderExtensions {
-      public static IForgeBuilder UseBitcoinChain(this IForgeBuilder forgeBuilder) {
+      /// <summary>
+      /// Uses the bitcoin chain.
+      /// </summary>
+      /// <param name="forgeBuilder">The forge builder.</param>
+      /// <param name="minimumSupportedVersion">The minimum version local nodes requires in order to connect to other peers.</param>
+      /// <param name="currentVersion">The current version local peer aim to use with connected peers.</param>
+      /// <returns></returns>
+      public static IForgeBuilder UseBitcoinChain(this IForgeBuilder forgeBuilder, int minimumSupportedVersion, int currentVersion) {
          forgeBuilder.AddShard<BitcoinShard, BitcoinSettings>(
             (hostBuildContext, services) => {
                services
                   .AddSingleton<IChainDefinition, BitcoinMainDefinition>()
                   .AddSingleton<INetworkMessageSerializer, VersionMessageSerializer>()
+                  .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
+                  .AddSingleton<SelfConnectionTracker>()
                   .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())
                   .AddPeerGuards()
                   .AddMessageProcessors();

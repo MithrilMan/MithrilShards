@@ -25,7 +25,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors {
       /// Attaches known processors to specified peer.
       /// </summary>
       /// <param name="peerContext">The peer context.</param>
-      public void StartProcessors(IPeerContext peerContext) {
+      public async Task StartProcessorsAsync(IPeerContext peerContext) {
          if (peerContext is null) {
             throw new ArgumentNullException(nameof(peerContext));
          }
@@ -33,6 +33,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors {
          IEnumerable<INetworkMessageProcessor> processors = this.serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>();
          foreach (INetworkMessageProcessor processor in processors) {
             peerContext.AttachNetworkMessageProcessor(processor);
+            await processor.AttachAsync(peerContext).ConfigureAwait(false);
          }
       }
    }

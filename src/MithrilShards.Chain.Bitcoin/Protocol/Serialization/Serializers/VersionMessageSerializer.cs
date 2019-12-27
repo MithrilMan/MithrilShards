@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Buffers;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
+using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
    public class VersionMessageSerializer : NetworkMessageSerializerBase<VersionMessage> {
-      public override byte[] Serialize(VersionMessage message) {
+      public override byte[] Serialize(VersionMessage message, int protocolVersion, IBufferWriter<byte> output) {
          throw new NotImplementedException();
       }
 
-      public override VersionMessage Deserialize(ReadOnlySequence<byte> data) {
+      public override INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion) {
          var reader = new SequenceReader<byte>(data);
 
          var message = new VersionMessage {
@@ -35,5 +36,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          message.Relay = reader.ReadBool();
          return message;
       }
+
    }
 }

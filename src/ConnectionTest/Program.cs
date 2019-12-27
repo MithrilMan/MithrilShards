@@ -8,6 +8,7 @@ using MithrilShards.Logging.Serilog;
 using Serilog;
 using MithrilShards.Chain.Bitcoin;
 using MithrilShards.Network.Bedrock;
+using MithrilShards.Chain.Bitcoin.Protocol;
 
 namespace ConnectionTest {
    class Program {
@@ -22,7 +23,7 @@ namespace ConnectionTest {
             .UseForge<Forge>(args)
             .UseSerilog("log-settings-with-seq.json")
             .UseBedrockForgeServer()
-            .UseBitcoinChain()
+            .UseBitcoinChain(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion)
             .RunConsoleAsync()
             .ConfigureAwait(false);
       }
@@ -32,7 +33,7 @@ namespace ConnectionTest {
             .UseForge<Forge>(args)
             .UseSerilog("log-settings.json")
             .UseP2PForgeServer()
-            .UseBitcoinChain()
+            .UseBitcoinChain(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion)
             .RunConsoleAsync()
             .ConfigureAwait(false);
       }

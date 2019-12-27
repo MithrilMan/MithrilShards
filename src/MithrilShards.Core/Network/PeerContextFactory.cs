@@ -36,14 +36,14 @@ namespace MithrilShards.Core.Network {
       protected EndPoint GetPublicEndPoint(EndPoint localEndPoint) {
          return this.serverSettings.Bindings
             .Where(binding => {
-               if (!IPEndPoint.TryParse(binding.Endpoint, out IPEndPoint parsedEndPoint)) {
+               if (!IPEndPoint.TryParse(binding.EndPoint, out IPEndPoint parsedEndPoint)) {
                   return false;
                }
                else {
-                  return parsedEndPoint.Equals(localEndPoint) && binding.IsValidPublicEndpoint();
+                  return parsedEndPoint.Equals(localEndPoint) && binding.IsValidPublicEndPoint();
                }
             })
-            .Select(binding => IPEndPoint.Parse(binding.PublicEndpoint))
+            .Select(binding => IPEndPoint.Parse(binding.PublicEndPoint))
             .FirstOrDefault();
       }
    }

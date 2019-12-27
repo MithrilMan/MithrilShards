@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
@@ -33,6 +34,15 @@ namespace MithrilShards.Core.Network {
       IPEndPoint RemoteEndPoint { get; }
 
       /// <summary>
+      /// Gets the version peers agrees to use when their respective version doesn't match.
+      /// It should be the lower common version both parties implements.
+      /// </summary>
+      /// <value>
+      /// The negotiated protocol version.
+      /// </value>
+      INegotiatedProtocolVersion NegotiatedProtocolVersion { get; }
+
+      /// <summary>
       /// Generic container to exchange content between different components that share IPeerContext.
       /// </summary>
       IFeatureCollection Data { get; }
@@ -49,5 +59,12 @@ namespace MithrilShards.Core.Network {
       /// </summary>
       /// <param name="messageProcessor">The message processor to attach.</param>
       void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor);
+
+      /// <summary>
+      /// Processes the message asynchronously, calling all the attached <see cref="INetworkMessageProcessor"/>.
+      /// </summary>
+      /// <param name="message">The network message.</param>
+      /// <returns></returns>
+      Task ProcessMessageAsync(INetworkMessage message);
    }
 }

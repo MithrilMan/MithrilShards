@@ -8,8 +8,12 @@ using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
    public static class SequenceReaderExtensions {
       private const string NotEnoughBytesLeft = "Cannot read data, not enough bytes left.";
-      public static bool ReadBool(ref this SequenceReader<byte> reader, bool isBigEndian = false) {
+      public static bool ReadBool(ref this SequenceReader<byte> reader) {
          return reader.TryRead(out byte value) ? (value > 0) : throw new MessageSerializationException(NotEnoughBytesLeft);
+      }
+
+      public static byte ReadByte(ref this SequenceReader<byte> reader) {
+         return reader.TryRead(out byte value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
       }
 
       public static short ReadShort(ref this SequenceReader<byte> reader, bool isBigEndian = false) {
