@@ -9,7 +9,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
       /// <returns></returns>
       Type GetMessageType();
 
-      byte[] Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output);
+      void Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output);
 
       INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion);
    }

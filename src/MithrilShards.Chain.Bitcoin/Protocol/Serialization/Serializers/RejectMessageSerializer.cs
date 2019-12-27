@@ -1,10 +1,13 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
    public class RejectMessageSerializer : NetworkMessageSerializerBase<RejectMessage> {
+      public RejectMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
+
       public override INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion) {
          var reader = new SequenceReader<byte>(data);
 
@@ -20,8 +23,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          return message;
       }
 
-      public override byte[] Serialize(RejectMessage message, int protocolVersion, IBufferWriter<byte> output) {
-         return null;
+      public override void Serialize(RejectMessage message, int protocolVersion, IBufferWriter<byte> output) {
+         throw new NotImplementedException();
       }
    }
 }

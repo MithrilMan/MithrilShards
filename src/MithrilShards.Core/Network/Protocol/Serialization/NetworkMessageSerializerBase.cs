@@ -2,47 +2,55 @@
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Text;
+using MithrilShards.Core.Crypto;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization {
    public abstract class NetworkMessageSerializerBase<TMessageType> : INetworkMessageSerializer where TMessageType : INetworkMessage {
-      readonly IChainDefinition chainDefinition;
+      const int SIZE_MAGIC = 4;
+      const int SIZE_COMMAND = 12;
+      const int SIZE_PAYLOAD_LENGTH = 4;
+      const int SIZE_CHECKSUM = 4;
+      const int HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
+
+      private readonly byte[] precookedMagciAndCommand;
+
+      protected readonly IChainDefinition chainDefinition;
 
       public NetworkMessageSerializerBase(IChainDefinition chainDefinition) {
-         this.chainDefinition = chainDefinition;
+         this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
+
+         #region build precooked Magic and Command header part
+         // this block get executed only once because the serializer is singleton
+         this.precookedMagciAndCommand = new byte[SIZE_MAGIC + SIZE_COMMAND];
+         this.chainDefinition.MagicBytes.CopyTo(this.precookedMagciAndCommand, 0);
+         var commandSpan = new Span<byte>(this.precookedMagciAndCommand, SIZE_MAGIC, SIZE_COMMAND);
+         Encoding.ASCII.GetBytes(Activator.CreateInstance<TMessageType>().Command.PadRight(12, '\0'), commandSpan);
+         #endregion
       }
 
       public abstract INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion);
 
-      public abstract byte[] Serialize(TMessageType message, int protocolVersion, IBufferWriter<byte> output);
+      public abstract void Serialize(TMessageType message, int protocolVersion, IBufferWriter<byte> output);
 
       public Type GetMessageType() {
          return typeof(TMessageType);
       }
 
-      public byte[] Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output) {
-         Span<byte> outputSpan = output.GetSpan(4);
+      public void Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output) {
+         var payloadOutput = new ArrayBufferWriter<byte>();
+         this.Serialize((TMessageType)message, protocolVersion, payloadOutput);
 
-         this.Serialize((TMessageType)message, protocolVersion, output);
+         output.Write(this.precookedMagciAndCommand);
 
-         // magic
-         Span<byte> outputSpan = output.GetSpan(4);
-         BinaryPrimitives.TryWriteUInt32LittleEndian(outputSpan, this.chainDefinition.Magic);
-         output.Advance(4);
-
-         // command
-         outputSpan = output.GetSpan(12);
-         ReadOnlySpan<char> commandSpan = message.Command.PadRight(12, '\0').AsSpan();
-         Encoding.ASCII.GetBytes(commandSpan, outputSpan);
-         output.Advance(12);
-         
          // length
-         outputSpan = output.GetSpan(4);
-         BinaryPrimitives.TryWriteUInt32LittleEndian(outputSpan, this.chainDefinition.Magic);
+         BinaryPrimitives.TryWriteUInt32LittleEndian(output.GetSpan(4), (uint)payloadOutput.WrittenCount);
          output.Advance(4);
 
-         output.Write(message.Payload);
+         //checksum
+         output.Write(HashGenerator.DoubleSha256(payloadOutput.WrittenSpan));
 
-         return null;
+         // payload
+         output.Write(payloadOutput.WrittenSpan);
       }
    }
 }

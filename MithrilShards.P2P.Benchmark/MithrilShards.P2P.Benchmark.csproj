@@ -25,4 +25,8 @@
     <PackageReference Include="NBitcoin" Version="5.0.12" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\src\MithrilShards.Core\MithrilShards.Core.csproj" />
+  </ItemGroup>
+
 </Project>

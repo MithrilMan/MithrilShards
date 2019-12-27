@@ -6,7 +6,9 @@ using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
    public class VersionMessageSerializer : NetworkMessageSerializerBase<VersionMessage> {
-      public override byte[] Serialize(VersionMessage message, int protocolVersion, IBufferWriter<byte> output) {
+      public VersionMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
+
+      public override void Serialize(VersionMessage message, int protocolVersion, IBufferWriter<byte> output) {
          throw new NotImplementedException();
       }
 
