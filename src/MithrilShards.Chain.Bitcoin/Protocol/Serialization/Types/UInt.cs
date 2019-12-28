@@ -10,7 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       public string InternalName => "int32_t";
       public int Length => 4;
 
-      public void Deserialize(SequenceReader<byte> data, bool isLittleEndian) {
+      public void Deserialize(ref SequenceReader<byte> data, bool isLittleEndian) {
          throw new NotImplementedException();
       }
 

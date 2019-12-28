@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       readonly bool skipTimeField;
 
       public string InternalName => "net_addr";
-      public int Length => 30;
+      public int Length => this.skipTimeField ? 26 : 30;
 
       /// <summary>
       /// The Time (version >= 31402). Not present in version message.
@@ -58,7 +58,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          this.skipTimeField = skipTimeField;
       }
 
-      public void Deserialize(SequenceReader<byte> data) {
+      public void Deserialize(ref SequenceReader<byte> data) {
          // https://bitcoin.org/en/developer-reference#version
          if (!this.skipTimeField) {
             this.Time = data.ReadUInt(); //DateTimeOffset.FromUnixTimeSeconds(data.ReadUInt);

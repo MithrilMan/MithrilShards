@@ -11,7 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
 
       public int Length => throw new NotImplementedException();
 
-      public void Deserialize(SequenceReader<byte> data) {
+      public void Deserialize(ref SequenceReader<byte> data) {
          throw new NotImplementedException();
       }
 

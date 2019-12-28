@@ -80,8 +80,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       }
 
       public static byte[] ReadBytes(ref this SequenceReader<byte> reader, int length) {
-         ReadOnlySequence<byte> result = reader.Sequence.Slice(reader.Position, (int)length);
-         reader.Advance((long)length);
+         ReadOnlySequence<byte> result = reader.Sequence.Slice(reader.Position, length);
+         reader.Advance(length);
 
          // in case the string lies in a single span we can save a copy to a byte array
          return result.ToArray();
@@ -90,17 +90,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       public static ulong ReadVarInt(ref this SequenceReader<byte> reader) {
          reader.TryRead(out byte firstByte);
          if (firstByte < 0xFD) {
-            return (ulong)firstByte;
+            return firstByte;
          }
          else if (firstByte == 0xFD) {
-            return (ulong)reader.ReadUShort();
+            return reader.ReadUShort();
          }
          else if (firstByte == 0xFE) {
-            return (ulong)reader.ReadUInt();
+            return reader.ReadUInt();
          }
          // == 0xFF
          else {
-            return (ulong)reader.ReadULong();
+            return reader.ReadULong();
          }
       }
 
@@ -112,9 +112,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <returns></returns>
       public static NetworkAddress ReadNetworkAddress(ref this SequenceReader<byte> reader, bool skipTimeField) {
          var result = new NetworkAddress(skipTimeField);
-         var innerReader = new SequenceReader<byte>(reader.Sequence.Slice(reader.Position, result.Length));
-         result.Deserialize(innerReader);
-         reader.Advance(innerReader.Consumed);
+         result.Deserialize(ref reader);
          return result;
       }
    }

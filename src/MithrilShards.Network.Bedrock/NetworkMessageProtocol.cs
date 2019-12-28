@@ -48,7 +48,7 @@ namespace MithrilShards.Network.Bedrock {
                ReadOnlySequence<byte> payload = input.Slice(reader.Position, this.contextData.PayloadLength);
 
                //check checksum
-               ReadOnlySpan<byte> checksum = HashGenerator.DoubleSha256(payload.Slice(0, 4).ToArray());
+               ReadOnlySpan<byte> checksum = HashGenerator.DoubleSha256(payload.ToArray()).Slice(0, 4);
                if (this.contextData.Checksum != BitConverter.ToUInt32(checksum)) {
                   throw new ProtocolViolationException("Invalid checksum.");
                }

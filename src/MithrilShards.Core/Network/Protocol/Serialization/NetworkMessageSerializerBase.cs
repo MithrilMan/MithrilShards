@@ -51,7 +51,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          output.Advance(SIZE_PAYLOAD_LENGTH);
 
          //checksum
-         output.Write(HashGenerator.DoubleSha256(payloadOutput.WrittenSpan));
+         output.Write(HashGenerator.DoubleSha256(payloadOutput.WrittenSpan).Slice(0, 4));
 
          // payload
          output.Write(payloadOutput.WrittenSpan);
