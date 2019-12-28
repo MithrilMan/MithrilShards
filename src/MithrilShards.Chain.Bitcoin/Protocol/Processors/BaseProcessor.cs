@@ -66,7 +66,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
             }
             else {
                if (condition()) {
-                  throw new Exception($"Disconnect becasue {reason}");
+                  this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
+                  this.PeerContext.ConnectionCancellationTokenSource.Cancel();
                }
             }
          });

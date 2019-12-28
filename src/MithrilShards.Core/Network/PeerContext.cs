@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using MithrilShards.Core.Extensions;
@@ -50,6 +51,8 @@ namespace MithrilShards.Core.Network {
       public virtual INegotiatedProtocolVersion NegotiatedProtocolVersion { get; } = new NegotiatedProtocolVersion();
 
       public PeerMetrics Metrics { get; } = new PeerMetrics();
+
+      public CancellationTokenSource ConnectionCancellationTokenSource { get; } = new CancellationTokenSource();
 
       public PeerContext(PeerConnectionDirection direction,
                          string peerId,

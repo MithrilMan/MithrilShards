@@ -68,5 +68,7 @@ namespace MithrilShards.Core.Network {
       /// <param name="message">The network message.</param>
       /// <returns></returns>
       Task ProcessMessageAsync(INetworkMessage message);
+
+      CancellationTokenSource ConnectionCancellationTokenSource { get; }
    }
 }

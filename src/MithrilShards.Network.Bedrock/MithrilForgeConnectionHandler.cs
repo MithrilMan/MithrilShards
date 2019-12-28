@@ -72,31 +72,33 @@ namespace MithrilShards.Network.Bedrock {
                                                     connection.LocalEndPoint,
                                                     connection.RemoteEndPoint,
                                                     new NetworkMessageWriter(writer))) {
+               using (peerContext.ConnectionCancellationTokenSource.Token.Register(() => connection.Abort(new ConnectionAbortedException("Requested by PeerContext")))) {
 
-               connection.Features.Set(peerContext);
-               protocol.SetPeerContext(peerContext);
+                  connection.Features.Set(peerContext);
+                  protocol.SetPeerContext(peerContext);
 
-               this.eventBus.Publish(new PeerConnectionAttempt(peerContext));
-               if (this.EnsurePeerCanConnect(connection, peerContext)) {
+                  this.eventBus.Publish(new PeerConnectionAttempt(peerContext));
+                  if (this.EnsurePeerCanConnect(connection, peerContext)) {
 
-                  this.eventBus.Publish(new PeerConnected(peerContext));
+                     this.eventBus.Publish(new PeerConnected(peerContext));
 
-                  this.networkMessageProcessorFactory.StartProcessorsAsync(peerContext);
+                     this.networkMessageProcessorFactory.StartProcessorsAsync(peerContext);
 
-                  while (true) {
-                     INetworkMessage message = await reader.ReadAsync().ConfigureAwait(false);
+                     while (true) {
+                        INetworkMessage message = await reader.ReadAsync().ConfigureAwait(false);
 
-                     // REVIEW: We need a ReadResult<T> to indicate completion and cancellation
-                     if (message == null) {
-                        break;
+                        // REVIEW: We need a ReadResult<T> to indicate completion and cancellation
+                        if (message == null) {
+                           break;
+                        }
+
+                        await this.ProcessMessage(message, connection, contextData, peerContext, writer).ConfigureAwait(false);
                      }
-
-                     await this.ProcessMessage(message, connection, contextData, peerContext, writer).ConfigureAwait(false);
+                     return;
                   }
-                  return;
-               }
 
-               this.eventBus.Publish(new PeerDisconnected(peerContext, "Client disconnected", null));
+                  this.eventBus.Publish(new PeerDisconnected(peerContext, "Client disconnected", null));
+               }
             }
          }
       }

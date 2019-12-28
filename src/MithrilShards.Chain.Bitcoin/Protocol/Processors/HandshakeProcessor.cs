@@ -44,15 +44,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       public override async ValueTask AttachAsync(IPeerContext peerContext) {
          await base.AttachAsync(peerContext).ConfigureAwait(false);
 
-         // ensures the handshake is performed timely
-         this.DisconnectIfAsync(() => {
-            return this.status.IsHandShaked == false; 
-         }, TimeSpan.FromSeconds(10), default);//this.PeerContext.Disconnected);
+         //// ensures the handshake is performed timely
+         //this.DisconnectIfAsync(() => {
+         //   return this.status.IsHandShaked == false;
+         //}, TimeSpan.FromSeconds(10), "Handshake not performed in time", default);//this.PeerContext.Disconnected);
 
-         if (peerContext.Direction == PeerConnectionDirection.Outbound) {
-            this.logger.LogDebug("Commencing handshake with local Version.");
-            await this.messageWriter.WriteAsync(this.CreateVersionMessage()).ConfigureAwait(false);
-         }
+         //if (peerContext.Direction == PeerConnectionDirection.Outbound) {
+         //   this.logger.LogDebug("Commencing handshake with local Version.");
+         //   await this.messageWriter.WriteAsync(this.CreateVersionMessage()).ConfigureAwait(false);
+         //}
       }
 
 
