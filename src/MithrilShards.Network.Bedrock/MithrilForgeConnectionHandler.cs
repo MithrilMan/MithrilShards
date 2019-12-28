@@ -141,17 +141,18 @@ namespace MithrilShards.Network.Bedrock {
                                         ConnectionContextData contextData,
                                         IPeerContext peerContext,
                                         ProtocolWriter<INetworkMessage> writer) {
-         this.logger.LogInformation("Received a message of {Length} bytes", contextData.PayloadLength);
-         this.logger.LogDebug("Parsing message '{Command}'", message.Command);
+         using (this.logger.BeginScope("Processing message '{Command}'", message.Command)) {
+            this.logger.LogDebug("Parsing message '{Command}' with size of {PayloadSize}", message.Command, contextData.PayloadLength);
 
-         if (message is UnknownMessage) {
-            this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
-         }
-         else {
-            this.logger.LogDebug(JsonSerializer.Serialize(message, message.GetType(), new JsonSerializerOptions { WriteIndented = true }));
-            this.eventBus.Publish(new PeerMessageReceived(peerContext, message, (int)contextData.GetTotalMessageLength()));
+            if (message is UnknownMessage) {
+               this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
+            }
+            else {
+               this.logger.LogDebug(JsonSerializer.Serialize(message, message.GetType(), new JsonSerializerOptions { WriteIndented = true }));
+               this.eventBus.Publish(new PeerMessageReceived(peerContext, message, (int)contextData.GetTotalMessageLength()));
 
-            await peerContext.ProcessMessageAsync(message).ConfigureAwait(false);
+               await peerContext.ProcessMessageAsync(message).ConfigureAwait(false);
+            }
          }
       }
    }

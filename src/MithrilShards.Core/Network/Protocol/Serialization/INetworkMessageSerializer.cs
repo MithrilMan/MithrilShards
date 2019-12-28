@@ -19,6 +19,6 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
       /// <returns>number of written bytes</returns>
       int Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output);
 
-      INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion);
+      INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion);
    }
 }

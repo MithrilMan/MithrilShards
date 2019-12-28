@@ -34,7 +34,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          output.WriteBool(message.Relay);
       }
 
-      public override INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion) {
+      public override INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion) {
          var reader = new SequenceReader<byte>(data);
 
          var message = new VersionMessage {

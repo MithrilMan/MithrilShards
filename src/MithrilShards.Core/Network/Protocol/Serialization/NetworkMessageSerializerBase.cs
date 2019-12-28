@@ -28,7 +28,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          #endregion
       }
 
-      public abstract INetworkMessage Deserialize(ReadOnlySequence<byte> data, int protocolVersion);
+      public abstract INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion);
 
       public abstract void Serialize(TMessageType message, int protocolVersion, IBufferWriter<byte> output);
 

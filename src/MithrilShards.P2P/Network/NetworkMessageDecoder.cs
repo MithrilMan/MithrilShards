@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using NBitcoin.Protocol;
 
@@ -14,17 +12,13 @@ namespace MithrilShards.Network.Network {
          this.logger = logger;
       }
 
-      //public SequencePosition Decode(ReadOnlySequence<byte> input, out IEnumerable<ReadOnlyMemory<byte>> rawMessage) {
-      //   IAsyncEnumerable
-      //}
-
       public static bool TryParseMessage(ref ReadOnlySequence<byte> buffer, out Message message) {
          if (buffer.Length == 0) {
             message = null;
             return false;
          }
 
-         using (MemoryStream ms = new MemoryStream(buffer.ToArray())) {
+         using (var ms = new MemoryStream(buffer.ToArray())) {
             try {
                message = Message.ReadNext(ms, NBitcoin.Network.TestNet, 70015, default, out _);
             }
@@ -38,11 +32,6 @@ namespace MithrilShards.Network.Network {
             }
             return true;
          }
-      }
-
-      bool HasMagicPacket(ReadOnlySequence<byte> buffer) {
-         // buffer.TryGet(SequencePosition)
-         return true;
       }
    }
 
