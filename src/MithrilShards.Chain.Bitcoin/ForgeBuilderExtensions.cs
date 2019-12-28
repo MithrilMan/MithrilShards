@@ -26,11 +26,11 @@ namespace MithrilShards.Chain.Bitcoin {
             (hostBuildContext, services) => {
                services
                   .AddSingleton<IChainDefinition, BitcoinMainDefinition>()
-                  .AddSingleton<INetworkMessageSerializer, VersionMessageSerializer>()
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
                   .AddSingleton<SelfConnectionTracker>()
                   .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())
                   .AddPeerGuards()
+                  .AddMessageSerializers()
                   .AddMessageProcessors();
             });
 
@@ -46,6 +46,16 @@ namespace MithrilShards.Chain.Bitcoin {
          return services;
       }
 
+      private static IServiceCollection AddMessageSerializers(this IServiceCollection services) {
+         services
+            .AddSingleton<INetworkMessageSerializer, VersionMessageSerializer>()
+            .AddSingleton<INetworkMessageSerializer, VerackMessageSerializer>()
+            .AddSingleton<INetworkMessageSerializer, RejectMessageSerializer>()
+            .AddSingleton<INetworkMessageSerializer, GetaddrMessageSerializer>()
+            ;
+
+         return services;
+      }
       private static IServiceCollection AddMessageProcessors(this IServiceCollection services) {
          services
             .AddTransient<INetworkMessageProcessor, HandshakeProcessor>()

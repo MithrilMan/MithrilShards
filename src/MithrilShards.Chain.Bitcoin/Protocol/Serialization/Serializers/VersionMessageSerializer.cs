@@ -10,6 +10,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
       public VersionMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
 
       public override void Serialize(VersionMessage message, int protocolVersion, IBufferWriter<byte> output) {
+         // version message doesn't have to look into passed protocolVersion but rely on it's message.Version.
+         protocolVersion = message.Version;
+
          output.WriteInt(message.Version);
          output.WriteULong(message.Services);
          output.WriteLong(message.Timestamp.ToUnixTimeSeconds());
