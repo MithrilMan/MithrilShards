@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
-using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Server.Guards;
 
-namespace MithrilShards.Network.Network.Server {
+namespace MithrilShards.Network.Legacy.Server {
    public class ServerPeer : IServerPeer, IDisposable {
       /// <summary>TCP server listener accepting inbound connections.</summary>
       private readonly ForgeTcpListener tcpListener;

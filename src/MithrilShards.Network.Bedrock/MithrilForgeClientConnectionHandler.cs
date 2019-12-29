@@ -70,15 +70,10 @@ namespace MithrilShards.Network.Bedrock {
 
          connection.ConnectionClosed = peerContext.ConnectionCancellationTokenSource.Token;
 
-         //using CancellationTokenRegistration disconnectRegistration = peerContext.ConnectionCancellationTokenSource.Token.Register(() => {
-         //   connection.Abort(new ConnectionAbortedException("Requested by PeerContext"));
-         //});
-
          connection.Features.Set(peerContext);
          protocol.SetPeerContext(peerContext);
 
          this.eventBus.Publish(new PeerConnected(peerContext));
-
 
          await this.networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
 
@@ -97,8 +92,6 @@ namespace MithrilShards.Network.Bedrock {
                await this.ProcessMessage(result.Message, connection, contextData, peerContext)
                   .WithCancellationAsync(connection.ConnectionClosed)
                   .ConfigureAwait(false);
-
-               //await writer.WriteAsync(protocol,message)
             }
             catch (OperationCanceledException ex) {
                break;

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
-namespace MithrilShards.Network.Network.Server {
+namespace MithrilShards.Network.Legacy.Server {
    public class ForgeTcpListener : TcpListener {
 
       public bool IsActive { get => base.Active; }

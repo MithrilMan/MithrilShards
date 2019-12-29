@@ -8,9 +8,9 @@ using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
-using MithrilShards.Network.Network.StateMachine;
+using MithrilShards.Network.Legacy.StateMachine;
 
-namespace MithrilShards.Network.Network {
+namespace MithrilShards.Network.Legacy {
 
    public class PeerConnection : IPeerConnection, INetworkMessageWriter {
       /// <summary>Instance logger.</summary>
@@ -20,6 +20,7 @@ namespace MithrilShards.Network.Network {
       /// <summary>Provider of time functions.</summary>
       private readonly IDateTimeProvider dateTimeProvider;
       readonly IPeerContextFactory peerContextFactory;
+      readonly NetworkMessageDecoder networkMessageDecoder;
 
       internal TcpClient ConnectedClient { get; }
       public PeerConnectionDirection Direction { get; }
@@ -40,6 +41,7 @@ namespace MithrilShards.Network.Network {
                             TcpClient connectedClient,
                             PeerConnectionDirection peerConnectionDirection,
                             IPeerContextFactory peerContextFactory,
+                            NetworkMessageDecoder networkMessageDecoder,
                             CancellationToken cancellationToken) {
          this.logger = logger;
          this.eventBus = eventBus;
@@ -47,6 +49,7 @@ namespace MithrilShards.Network.Network {
          this.ConnectedClient = connectedClient;
          this.Direction = peerConnectionDirection;
          this.peerContextFactory = peerContextFactory;
+         this.networkMessageDecoder = networkMessageDecoder;
          this.cancellationToken = cancellationToken;
 
          this.PeerContext = this.peerContextFactory.Create(
@@ -56,7 +59,9 @@ namespace MithrilShards.Network.Network {
             connectedClient.Client.RemoteEndPoint,
             this);
 
-         this.connectionStateMachine = new PeerConnectionStateMachine(logger, eventBus, this, cancellationToken);
+         this.networkMessageDecoder.SetPeerContext(this.PeerContext);
+
+         this.connectionStateMachine = new PeerConnectionStateMachine(logger, eventBus, this, networkMessageDecoder, cancellationToken);
       }
 
       /// <inheritdoc/>

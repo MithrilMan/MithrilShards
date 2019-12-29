@@ -1,4 +1,4 @@
-﻿namespace MithrilShards.Network.Network.StateMachine {
+﻿namespace MithrilShards.Network.Legacy.StateMachine {
    /// <summary>
    /// State of the peer connection.
    /// </summary>

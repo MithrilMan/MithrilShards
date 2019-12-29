@@ -69,6 +69,9 @@ namespace MithrilShards.Core.Network {
       /// <returns></returns>
       Task ProcessMessageAsync(INetworkMessage message);
 
+      /// <summary>
+      /// Gets the connection cancellation token source in order to trigger a manual disconnection.
+      /// </summary>
       CancellationTokenSource ConnectionCancellationTokenSource { get; }
    }
 }

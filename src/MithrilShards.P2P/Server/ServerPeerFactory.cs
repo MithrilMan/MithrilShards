@@ -8,7 +8,7 @@ using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
 
-namespace MithrilShards.Network.Network.Server {
+namespace MithrilShards.Network.Legacy.Server {
    public class ServerPeerFactory : IServerPeerFactory {
       readonly ILogger<ServerPeerFactory> logger;
       readonly ILoggerFactory loggerFactory;

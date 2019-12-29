@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MithrilShards.Network.Network {
+namespace MithrilShards.Network.Legacy {
    /// <summary>
    /// Explanation of why a peer has been disconnected.
    /// </summary>

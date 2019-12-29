@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Network.Network {
+namespace MithrilShards.Network.Legacy {
 
    public class PeerConnectionFactory : IPeerConnectionFactory {
       /// <summary>Instance logger.</summary>
@@ -16,12 +18,21 @@ namespace MithrilShards.Network.Network {
       /// <summary>Provider of time functions.</summary>
       private readonly IDateTimeProvider dateTimeProvider;
       readonly IPeerContextFactory peerContextFactory;
+      readonly IChainDefinition chainDefinition;
+      readonly INetworkMessageSerializerManager networkMessageSerializerManager;
 
-      public PeerConnectionFactory(ILoggerFactory loggerFactory, IEventBus eventBus, IDateTimeProvider dateTimeProvider, IPeerContextFactory peerContextFactory) {
+      public PeerConnectionFactory(ILoggerFactory loggerFactory,
+                                   IEventBus eventBus,
+                                   IDateTimeProvider dateTimeProvider,
+                                   IPeerContextFactory peerContextFactory,
+                                   IChainDefinition chainDefinition,
+                                   INetworkMessageSerializerManager networkMessageSerializerManager) {
          this.loggerFactory = loggerFactory;
          this.eventBus = eventBus;
          this.dateTimeProvider = dateTimeProvider;
          this.peerContextFactory = peerContextFactory;
+         this.chainDefinition = chainDefinition;
+         this.networkMessageSerializerManager = networkMessageSerializerManager;
          this.logger = loggerFactory.CreateLogger<PeerConnectionFactory>();
       }
 
@@ -33,6 +44,10 @@ namespace MithrilShards.Network.Network {
             connectingPeer,
             PeerConnectionDirection.Inbound,
             this.peerContextFactory,
+            new NetworkMessageDecoder(this.loggerFactory.CreateLogger<NetworkMessageDecoder>(),
+                                      this.chainDefinition,
+                                      this.networkMessageSerializerManager,
+                                      new ConnectionContextData(this.chainDefinition.MagicBytes)),
             cancellationToken
             );
 

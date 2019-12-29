@@ -9,7 +9,10 @@ using Bedrock.Framework.Protocols;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Forge;
+using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
 using BF = Bedrock.Framework;
@@ -17,6 +20,7 @@ using BF = Bedrock.Framework;
 namespace MithrilShards.Network.Bedrock {
    public class BedrockForgeConnectivity : IForgeConnectivity {
       readonly ILogger<BedrockForgeConnectivity> logger;
+      readonly IEventBus eventBus;
       private readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
       private readonly IServiceProvider serviceProvider;
       readonly MithrilForgeClientConnectionHandler clientConnectionHandler;
@@ -25,11 +29,13 @@ namespace MithrilShards.Network.Bedrock {
       private Client client;
 
       public BedrockForgeConnectivity(ILogger<BedrockForgeConnectivity> logger,
+                                IEventBus eventBus,
                                 IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
                                 IOptions<ForgeConnectivitySettings> settings,
                                 IServiceProvider serviceProvider,
                                 MithrilForgeClientConnectionHandler clientConnectionHandler) {
          this.logger = logger;
+         this.eventBus = eventBus;
          this.serverPeerConnectionGuards = serverPeerConnectionGuards;
          this.serviceProvider = serviceProvider;
          this.clientConnectionHandler = clientConnectionHandler;
@@ -118,8 +124,6 @@ namespace MithrilShards.Network.Bedrock {
                                     .UseConnectionLogging()
                                     .Use(this.SetupClientConnection)
                                     .Build();
-
-         this.AttemptConnection(new IPEndPoint(IPAddress.Parse("192.168.1.10"), 36964));
       }
 
       private IConnectionFactory SetupClientConnection(IConnectionFactory connectionFactory) {
@@ -130,6 +134,7 @@ namespace MithrilShards.Network.Bedrock {
 
       public async Task AttemptConnection(EndPoint remoteEndPoint) {
          using IDisposable logScope = this.logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
+         this.eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.AsIPEndPoint()));
          this.logger.LogDebug("Connected Attempt", remoteEndPoint);
          try {
             await using ConnectionContext connection = await this.client.ConnectAsync((IPEndPoint)remoteEndPoint).ConfigureAwait(false);

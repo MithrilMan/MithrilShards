@@ -2,7 +2,7 @@
    "ForgeConnectivitySettings": {
       "MaxInboundConnections": 25,
       "AllowLoopbackConnection": false,
-      "sBindings": [
+      "Bindings": [
          {
             "IsWhitelistingEndpoint": false,
             "Endpoint": "127.0.0.1:45010"

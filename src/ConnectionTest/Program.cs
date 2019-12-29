@@ -1,21 +1,18 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using MithrilShards.Core.Extensions;
+﻿using System.Threading.Tasks;
 using MithrilShards.Core.Forge;
-using MithrilShards.Network;
 using MithrilShards.Logging.Serilog;
 using Serilog;
 using MithrilShards.Chain.Bitcoin;
 using MithrilShards.Network.Bedrock;
 using MithrilShards.Chain.Bitcoin.Protocol;
+using MithrilShards.Network.Legacy;
 
 namespace ConnectionTest {
    class Program {
       static async Task Main(string[] args) {
 
-         await StartBedrockForgeServer(args).ConfigureAwait(false);
-         //await StartP2PForgeServer(args).ConfigureAwait(false);
+         //await StartBedrockForgeServer(args).ConfigureAwait(false);
+         await StartP2PForgeServer(args).ConfigureAwait(false);
       }
 
       private static async Task StartBedrockForgeServer(string[] args) {

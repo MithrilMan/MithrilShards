@@ -10,20 +10,21 @@ using BenchmarkDotNet.Jobs;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks {
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-   [RPlotExporter, RankColumn, MarkdownExporterAttribute.GitHub, CsvMeasurementsExporter]
+   //[RPlotExporter, CsvMeasurementsExporter]
+   [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class MagicNumberFinder {
       readonly byte[] magicNumberBytes = BitConverter.GetBytes(0x0709110B);
       readonly int magicNumber = 0x0709110B;
 
       private ReadOnlySequence<byte> input;
 
-      //[Params(100, 1000, 10000)]
-      [Params(1_000_000)]
+      [Params(100, 10000)]
+      //[Params(1_000_000)]
       public int PacketSize;
 
       //0 = at the beginning, 1 = at the end
-      //[Params(0f, 0.2f, 0.5f, 1f)]
-      [Params(1f)]
+      [Params(0f, 0.2f, 0.5f, 1f)]
+      //[Params(1f)]
       public float MagicPacketRelativePosition;
 
       [GlobalSetup]

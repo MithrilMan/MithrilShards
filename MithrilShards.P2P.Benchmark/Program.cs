@@ -19,9 +19,7 @@ namespace MithrilShards.Network.Benchmark {
       }
 
       static void Main(string[] args) {
-         //BenchmarkRunner.Run<BigInt_vs_uint256_parse>();
-         //BenchmarkRunner.Run<MagicNumberFinder>();
-         BenchmarkRunner.Run<Benchmarks.SHA256>();
+         BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
       }
    }
 }

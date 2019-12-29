@@ -76,7 +76,6 @@ namespace MithrilShards.Network.Bedrock {
          connection.Features.Set(peerContext);
          protocol.SetPeerContext(peerContext);
 
-         this.eventBus.Publish(new PeerConnectionAttempt(peerContext));
          if (this.EnsurePeerCanConnect(connection, peerContext)) {
 
             this.eventBus.Publish(new PeerConnected(peerContext));
@@ -95,6 +94,7 @@ namespace MithrilShards.Network.Bedrock {
                }
                catch (Exception ex) {
                   this.logger.LogDebug(ex, "Unexpected connection terminated because of {DisconnectionReason}.", ex.Message);
+                  break;
                }
                finally {
                   reader.Advance();
@@ -127,7 +127,7 @@ namespace MithrilShards.Network.Bedrock {
          if (result.IsDenied) {
             this.logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected because of {ClientDisconnectedReason} and will be closed.", connection.RemoteEndPoint, result.DenyReason);
             connection.Abort(new ConnectionAbortedException(result.DenyReason));
-            this.eventBus.Publish(new PeerDisconnected(peerContext, result.DenyReason, null));
+            this.eventBus.Publish(new PeerConnectionAttemptFailed(peerContext, result.DenyReason));
             return false;
          }
 
