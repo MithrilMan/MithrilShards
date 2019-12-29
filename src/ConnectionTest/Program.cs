@@ -6,13 +6,17 @@ using MithrilShards.Chain.Bitcoin;
 using MithrilShards.Network.Bedrock;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Network.Legacy;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net;
+using System;
+using MithrilShards.Diagnostic.StatisticsCollector;
 
 namespace ConnectionTest {
    class Program {
       static async Task Main(string[] args) {
 
-         //await StartBedrockForgeServer(args).ConfigureAwait(false);
-         await StartP2PForgeServer(args).ConfigureAwait(false);
+         await StartBedrockForgeServer(args).ConfigureAwait(false);
+         //await StartP2PForgeServer(args).ConfigureAwait(false);
       }
 
       private static async Task StartBedrockForgeServer(string[] args) {
@@ -21,6 +25,7 @@ namespace ConnectionTest {
             .UseSerilog("log-settings-with-seq.json")
             .UseBedrockForgeServer()
             .UseBitcoinChain(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion)
+            .UseStatisticsCollector()
             .RunConsoleAsync()
             .ConfigureAwait(false);
       }
@@ -31,6 +36,7 @@ namespace ConnectionTest {
             .UseSerilog("log-settings.json")
             .UseP2PForgeServer()
             .UseBitcoinChain(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion)
+            .UseStatisticsCollector()
             .RunConsoleAsync()
             .ConfigureAwait(false);
       }

@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
+    <ProjectReference Include="..\MithrilShards.Diagnostic.StatisticsCollector\MithrilShards.Diagnostic.StatisticsCollector.csproj" />
     <ProjectReference Include="..\MithrilShards.Logging.Serilog\MithrilShards.Logging.Serilog.csproj" />
     <ProjectReference Include="..\MithrilShards.Network.Bedrock\MithrilShards.Network.Bedrock.csproj" />
     <ProjectReference Include="..\MithrilShards.P2P\MithrilShards.Network.Legacy.csproj" />

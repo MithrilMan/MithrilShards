@@ -20,7 +20,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// </summary>
-      private readonly List<ISubscription> eventBusSubscriptionsTokens;
+      private readonly List<SubscriptionToken> eventBusSubscriptionsTokens;
 
       public BitcoinPeerContext PeerContext { get; private set; }
 
@@ -30,7 +30,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          this.logger = logger;
          this.eventBus = eventBus;
 
-         this.eventBusSubscriptionsTokens = new List<ISubscription>();
+         this.eventBusSubscriptionsTokens = new List<SubscriptionToken>();
       }
 
       public virtual ValueTask AttachAsync(IPeerContext peerContext) {
@@ -46,7 +46,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       /// unregistered once the component gets disposed.
       /// </summary>
       /// <param name="subscription">The subscription.</param>
-      protected void RegisterLifeTimeSubscription(ISubscription subscription) {
+      protected void RegisterLifeTimeSubscription(SubscriptionToken subscription) {
          this.eventBusSubscriptionsTokens.Add(subscription);
       }
 
@@ -64,14 +64,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          return Task.Run(async () => {
             await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
             // if cancellation was requested, return without doing anything
-            if (cancellation.IsCancellationRequested) {
-               return;
-            }
-            else {
-               if (condition() && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested) {
-                  this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
-                  this.PeerContext.ConnectionCancellationTokenSource.Cancel();
-               }
+            if (!cancellation.IsCancellationRequested && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && condition()) {
+               this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
+               this.PeerContext.ConnectionCancellationTokenSource.Cancel();
             }
          });
       }

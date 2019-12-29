@@ -74,6 +74,7 @@ namespace MithrilShards.Core.Forge {
                .AddSingleton<INetworkMessageProcessorFactory, NetworkMessageProcessorFactory>()
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IPeerContextFactory, PeerContextFactory<PeerContext>>()
+               .AddHostedService<ConnectionManager>()
 
                //add peer address book with peer score manager
                .AddSingleton<PeerAddressBook>() //required to forward the instance to 2 interfaces below
@@ -132,7 +133,10 @@ namespace MithrilShards.Core.Forge {
             throw new ArgumentNullException(nameof(configureDelegate));
          }
 
-         this.hostBuilder.ConfigureServices(configureDelegate);
+         this.hostBuilder.ConfigureServices((context, services) => {
+            services.AddSingleton<IMithrilShard, TMithrilShard>();
+            configureDelegate(context, services);
+         });
 
          return this;
       }

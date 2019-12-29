@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace MithrilShards.Chain.Bitcoin {
    public class BitcoinShard : IMithrilShard {
       private readonly ILogger<BitcoinShard> logger;
-      private BitcoinSettings settings;
+      private readonly BitcoinSettings settings;
 
       public BitcoinShard(ILogger<BitcoinShard> logger, IOptions<BitcoinSettings> settings) {
          this.logger = logger;

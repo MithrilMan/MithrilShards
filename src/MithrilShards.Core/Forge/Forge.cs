@@ -30,13 +30,17 @@ namespace MithrilShards.Core.Forge {
 
          using (this.logger.BeginScope("Initializing Shards")) {
             foreach (IMithrilShard shard in this.mithrilShards) {
-               await shard.InitializeAsync(stoppingToken).ConfigureAwait(false);
+               if (!(shard is IForgeConnectivity)) {
+                  await shard.InitializeAsync(stoppingToken).ConfigureAwait(false);
+               }
             }
          }
 
          using (this.logger.BeginScope("Starting Shards")) {
             foreach (IMithrilShard shard in this.mithrilShards) {
-               _ = shard.StartAsync(stoppingToken);
+               if (!(shard is IForgeConnectivity)) {
+                  _ = shard.StartAsync(stoppingToken);
+               }
             }
          }
       }
@@ -61,13 +65,21 @@ namespace MithrilShards.Core.Forge {
       }
 
       public override async Task StopAsync(CancellationToken cancellationToken) {
-         using (this.logger.BeginScope("Stopping forge server.")) {
-            await this.forgeServer.StopAsync(cancellationToken).ConfigureAwait(false);
+         using IDisposable logScope = this.logger.BeginScope("Shutting down the Forge.");
+
+         this.logger.LogDebug("Stopping forge server.");
+         await this.forgeServer.StopAsync(cancellationToken).ConfigureAwait(false);
+
+         this.logger.LogDebug("Stopping Shards");
+         foreach (IMithrilShard shard in this.mithrilShards) {
+            if (!(shard is IForgeConnectivity)) {
+               this.logger.LogDebug("Stopping Shard {ShardType}", shard.GetType().Name);
+               _ = shard.StopAsync(cancellationToken);
+            }
          }
 
-         using (this.logger.BeginScope("Stopping Forge instance.")) {
-            await base.StopAsync(cancellationToken).ConfigureAwait(false);
-         }
+         this.logger.LogDebug("Stopping Forge instance.");
+         await base.StopAsync(cancellationToken).ConfigureAwait(false);
       }
    }
 }
