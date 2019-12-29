@@ -10,7 +10,5 @@ namespace MithrilShards.Core.Network.Protocol {
       ValueTask WriteAsync(INetworkMessage message, CancellationToken cancellationToken = default);
 
       ValueTask WriteManyAsync(IEnumerable<INetworkMessage> messages, CancellationToken cancellationToken = default);
-
-      //void WriteMessage(INetworkMessage message, IBufferWriter<byte> output);
    }
 }

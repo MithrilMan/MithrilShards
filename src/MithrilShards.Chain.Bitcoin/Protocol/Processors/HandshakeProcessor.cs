@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -44,15 +45,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       public override async ValueTask AttachAsync(IPeerContext peerContext) {
          await base.AttachAsync(peerContext).ConfigureAwait(false);
 
-         //// ensures the handshake is performed timely
-         //this.DisconnectIfAsync(() => {
-         //   return this.status.IsHandShaked == false;
-         //}, TimeSpan.FromSeconds(10), "Handshake not performed in time", default);//this.PeerContext.Disconnected);
+         // ensures the handshake is performed timely
+         this.DisconnectIfAsync(() => {
+            return this.status.IsHandShaked == false;
+         }, TimeSpan.FromSeconds(5), "Handshake not performed in time");//this.PeerContext.Disconnected);
 
-         //if (peerContext.Direction == PeerConnectionDirection.Outbound) {
-         //   this.logger.LogDebug("Commencing handshake with local Version.");
-         //   await this.messageWriter.WriteAsync(this.CreateVersionMessage()).ConfigureAwait(false);
-         //}
+         if (peerContext.Direction == PeerConnectionDirection.Outbound) {
+            this.logger.LogDebug("Commencing handshake with local Version.");
+            await this.messageWriter.WriteAsync(this.CreateVersionMessage()).ConfigureAwait(false);
+         }
       }
 
 
@@ -72,6 +73,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
 
       private async Task ProcessVersionMessageAsync(VersionMessage version, CancellationToken cancellation) {
          if (this.status.VersionReceived) {
+            if (this.status.IsHandShaked) {
+               this.logger.LogDebug("Receiving version while already handshaked, disconnect.");
+               throw new ProtocolViolationException("Peer already handshaked, disconnecting because of protocol violation.");
+            }
             if (this.PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V70002) {
                var rejectMessage = new RejectMessage() {
                   Code = RejectMessage.RejectCode.Duplicate
@@ -93,8 +98,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
             //TODO
             // this.SupportedTransactionOptions |= TransactionOptions.Witness;
          }
-
-         //this processor will keep stopping message propagation until handshake has been performed, after that, it disable itself
       }
 
       private async Task ProcessVerackMessageAsync(VerackMessage verack, CancellationToken cancellation) {
@@ -160,10 +163,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          return false;
       }
 
-      public void Dispose() {
-      }
-
-
       private VersionMessage CreateVersionMessage() {
          var version = new VersionMessage() {
             Nonce = this.randomNumberGenerator.GetUint64(),
@@ -174,7 +173,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
                EndPoint = this.PeerContext.RemoteEndPoint,
             },
             SenderAddress = new Serialization.Types.NetworkAddress(true) {
-               EndPoint = this.PeerContext.PublicEndPoint,
+               EndPoint = this.PeerContext.PublicEndPoint ?? this.PeerContext.LocalEndPoint,
             },
             Relay = true, //this.IsRelay, TODO: it's part of the node settings
             Services = (ulong)NodeServices.Network // TODO: it's part of the node settings and depends on the configured features/shards

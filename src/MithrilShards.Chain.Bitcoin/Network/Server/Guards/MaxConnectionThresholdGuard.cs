@@ -8,7 +8,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards {
       readonly IServerPeerStats serverPeerStats;
 
       public MaxConnectionThresholdGuard(ILogger<InitialBlockDownloadStateGuard> logger,
-                                         IOptions<ForgeServerSettings> settings,
+                                         IOptions<ForgeConnectivitySettings> settings,
                                          IServerPeerStats serverPeerStats) : base(logger, settings) {
          this.serverPeerStats = serverPeerStats;
       }

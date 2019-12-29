@@ -7,13 +7,13 @@ using MithrilShards.Core.Network.Server;
 
 namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards {
    /// <summary>
-   /// Guards against accepting connections from loopback addresses. (depend on <see cref="ForgeServerSettings.AllowLoopbackConnection"/> configuration settings)
+   /// Guards against accepting connections from loopback addresses. (depend on <see cref="ForgeConnectivitySettings.AllowLoopbackConnection"/> configuration settings)
    /// </summary>
    /// <seealso cref="ServerPeerConnectionGuardBase" />
    public class ConnectToLoopbackGuard : ServerPeerConnectionGuardBase {
 
       public ConnectToLoopbackGuard(ILogger<InitialBlockDownloadStateGuard> logger,
-                                            IOptions<ForgeServerSettings> settings,
+                                            IOptions<ForgeConnectivitySettings> settings,
                                             IInitialBlockDownloadState initialBlockDownloadState
                                             ) : base(logger, settings) {
       }

@@ -6,6 +6,7 @@ using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using System;
 using System.Buffers;
+using System.Net;
 
 namespace MithrilShards.Network.Bedrock {
    /// <summary>
@@ -18,7 +19,7 @@ namespace MithrilShards.Network.Bedrock {
    /// 4    | command   |uint32_t   | First 4 bytes of sha256(sha256(payload))
    /// ?    | command   |uchar[]    | The actual data
    /// </summary>
-   public class NetworkMessageProtocol : IProtocolReader<INetworkMessage>, IProtocolWriter<INetworkMessage> {
+   public class NetworkMessageProtocol : IMessageReader<INetworkMessage>, IMessageWriter<INetworkMessage> {
       readonly ILogger<NetworkMessageProtocol> logger;
       private readonly IChainDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;

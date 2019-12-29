@@ -11,15 +11,16 @@ using MithrilShards.Core.Crypto;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks {
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-   [RPlotExporter, RankColumn, MarkdownExporterAttribute.GitHub, CsvMeasurementsExporter]
+   [/*RPlotExporter, */RankColumn, MarkdownExporterAttribute.GitHub, /*CsvMeasurementsExporter*/]
+   [MemoryDiagnoser]
    public class SHA256 {
 
       private byte[] data;
 
-      [Params(100, 10000)]
+      [Params(1000)]
       public int Payload;
 
-      [Params(10, 100, 1000)]
+      [Params(200)]
       public int N;
 
       [GlobalSetup]

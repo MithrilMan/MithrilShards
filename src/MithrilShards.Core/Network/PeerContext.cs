@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
@@ -11,6 +12,7 @@ using MithrilShards.Core.Network.Protocol.Processors;
 namespace MithrilShards.Core.Network {
    public class PeerContext : IPeerContext {
       private readonly List<INetworkMessageProcessor> messageProcessors = new List<INetworkMessageProcessor>();
+      readonly ILogger logger;
       readonly INetworkMessageWriter messageWriter;
 
       /// <summary>
@@ -54,12 +56,14 @@ namespace MithrilShards.Core.Network {
 
       public CancellationTokenSource ConnectionCancellationTokenSource { get; } = new CancellationTokenSource();
 
-      public PeerContext(PeerConnectionDirection direction,
+      public PeerContext(ILogger logger,
+                         PeerConnectionDirection direction,
                          string peerId,
                          EndPoint localEndPoint,
                          EndPoint publicEndPoint,
                          EndPoint remoteEndPoint,
                          INetworkMessageWriter messageWriter) {
+         this.logger = logger;
          this.Direction = direction;
          this.PeerId = peerId;
          this.messageWriter = messageWriter;
@@ -81,6 +85,7 @@ namespace MithrilShards.Core.Network {
       }
 
       public void Dispose() {
+         this.logger.LogDebug("Disposing PeerContext of {PeerId}.", this.PeerId);
          foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors) {
             messageProcessor.Dispose();
          }

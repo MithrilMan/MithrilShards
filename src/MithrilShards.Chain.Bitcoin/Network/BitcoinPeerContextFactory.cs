@@ -5,7 +5,8 @@ using MithrilShards.Core.Network.Server;
 
 namespace MithrilShards.Chain.Bitcoin.Network {
    public class BitcoinPeerContextFactory : PeerContextFactory<BitcoinPeerContext> {
-      public BitcoinPeerContextFactory(ILogger<PeerContextFactory<BitcoinPeerContext>> logger, IOptions<ForgeServerSettings> serverSettings) : base(logger, serverSettings) {
+      public BitcoinPeerContextFactory(ILogger<PeerContextFactory<BitcoinPeerContext>> logger, ILoggerFactory loggerFactory, IOptions<ForgeConnectivitySettings> serverSettings)
+         : base(logger, loggerFactory, serverSettings) {
       }
    }
 }

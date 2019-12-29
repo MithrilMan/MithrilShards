@@ -5,6 +5,6 @@ namespace MithrilShards.Core.Forge {
    /// Manage the forge server, that allow incoming and outcoming connections.
    /// </summary>
    /// <seealso cref="System.IDisposable" />
-   public interface IForgeServer : IMithrilShard {
+   public interface IForgeConnectivity : IMithrilShard {
    }
 }

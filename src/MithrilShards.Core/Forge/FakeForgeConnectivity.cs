@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace MithrilShards.Core.Forge {
    /// <summary>
-   /// Fake <see cref="IForgeServer"/> implementation that acts as a placeholder and remember to the user assembling shards that
-   /// a valid IForgeServer implementation must be registered wit an instance of <see cref="IForgeBuilder"/>
+   /// Fake <see cref="IForgeConnectivity"/> implementation that acts as a placeholder and remember to the user assembling shards that
+   /// a valid <see cref="IForgeConnectivity"/> implementation must be registered wit an instance of <see cref="IForgeBuilder"/>
    /// </summary>
    /// <seealso cref="MithrilShards.Core.Forge.IForgeServer" />
-   public sealed class FakeForgeServer : IForgeServer {
-      const string error = "A valid instance of ForgeServer must be registered on a IForgeBuilder.";
+   public sealed class FakeForgeConnectivity : IForgeConnectivity {
+      const string error = "A valid concrete implementation of IForgeConnectivity must be registered on a IForgeBuilder.";
 
       public Task InitializeAsync(CancellationToken cancellationToken) {
          throw new NotImplementedException(error);

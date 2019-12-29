@@ -14,7 +14,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards {
       readonly IInitialBlockDownloadState initialBlockDownloadState;
 
       public InitialBlockDownloadStateGuard(ILogger<InitialBlockDownloadStateGuard> logger,
-                                            IOptions<ForgeServerSettings> settings,
+                                            IOptions<ForgeConnectivitySettings> settings,
                                             IInitialBlockDownloadState initialBlockDownloadState
                                             ) : base(logger, settings) {
          this.initialBlockDownloadState = initialBlockDownloadState;

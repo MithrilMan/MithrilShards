@@ -58,6 +58,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       /// <param name="cancellation">The cancellation that may interrupt the <paramref name="condition"/> evaluation.</param>
       /// <returns></returns>
       public Task DisconnectIfAsync(Func<bool> condition, TimeSpan timeout, string reason, CancellationToken cancellation = default) {
+         if (cancellation == default) {
+            cancellation = this.PeerContext.ConnectionCancellationTokenSource.Token;
+         }
          return Task.Run(async () => {
             await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
             // if cancellation was requested, return without doing anything
@@ -65,7 +68,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
                return;
             }
             else {
-               if (condition()) {
+               if (condition() && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested) {
                   this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
                   this.PeerContext.ConnectionCancellationTokenSource.Cancel();
                }
@@ -77,6 +80,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          foreach (SubscriptionToken token in this.eventBusSubscriptionsTokens) {
             token?.Dispose();
          }
+
+         this.PeerContext.ConnectionCancellationTokenSource.Cancel();
       }
    }
 }

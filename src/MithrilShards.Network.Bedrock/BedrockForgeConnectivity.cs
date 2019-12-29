@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Bedrock.Framework;
+using Bedrock.Framework.Protocols;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,26 +15,31 @@ using MithrilShards.Core.Network.Server.Guards;
 using BF = Bedrock.Framework;
 
 namespace MithrilShards.Network.Bedrock {
-   public class BedrockForgeServer : IForgeServer {
-      readonly ILogger<BedrockForgeServer> logger;
+   public class BedrockForgeConnectivity : IForgeConnectivity {
+      readonly ILogger<BedrockForgeConnectivity> logger;
       private readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
       private readonly IServiceProvider serviceProvider;
-      private readonly ForgeServerSettings settings;
+      readonly MithrilForgeClientConnectionHandler clientConnectionHandler;
+      private readonly ForgeConnectivitySettings settings;
       private readonly List<BF.Server> serverPeers;
+      private Client client;
 
-      public BedrockForgeServer(ILogger<BedrockForgeServer> logger,
+      public BedrockForgeConnectivity(ILogger<BedrockForgeConnectivity> logger,
                                 IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
-                                IOptions<ForgeServerSettings> settings,
-                                IServiceProvider serviceProvider) {
+                                IOptions<ForgeConnectivitySettings> settings,
+                                IServiceProvider serviceProvider,
+                                MithrilForgeClientConnectionHandler clientConnectionHandler) {
          this.logger = logger;
          this.serverPeerConnectionGuards = serverPeerConnectionGuards;
          this.serviceProvider = serviceProvider;
+         this.clientConnectionHandler = clientConnectionHandler;
          this.settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
          this.serverPeers = new List<BF.Server>();
       }
 
       public async Task InitializeAsync(CancellationToken cancellationToken) {
          this.CreateServerInstances();
+         this.CreateClientBuilder();
       }
 
       public async Task StartAsync(CancellationToken cancellationToken) {
@@ -92,7 +98,7 @@ namespace MithrilShards.Network.Bedrock {
                            localEndPoint.Port,
                            builder => builder
                               .UseConnectionLogging()
-                              .UseConnectionHandler<MithrilForgeConnectionHandler>()
+                              .UseConnectionHandler<MithrilForgeServerConnectionHandler>()
                            );
                      }
                   }
@@ -104,6 +110,36 @@ namespace MithrilShards.Network.Bedrock {
                this.logger.LogWarning("No binding information found in configuration file, no Forge Servers available.");
             }
          }
+      }
+
+      private void CreateClientBuilder() {
+         this.client = new ClientBuilder(this.serviceProvider)
+                                    .UseSockets()
+                                    .UseConnectionLogging()
+                                    .Use(this.SetupClientConnection)
+                                    .Build();
+
+         this.AttemptConnection(new IPEndPoint(IPAddress.Parse("192.168.1.10"), 36964));
+      }
+
+      private IConnectionFactory SetupClientConnection(IConnectionFactory connectionFactory) {
+         this.logger.LogDebug("SetupClientConnection called");
+
+         return connectionFactory;
+      }
+
+      public async Task AttemptConnection(EndPoint remoteEndPoint) {
+         using IDisposable logScope = this.logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
+         this.logger.LogDebug("Connected Attempt", remoteEndPoint);
+         try {
+            await using ConnectionContext connection = await this.client.ConnectAsync((IPEndPoint)remoteEndPoint).ConfigureAwait(false);
+            this.logger.LogDebug("Connected to {RemoteEndPoint}", connection.RemoteEndPoint);
+            await this.clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
+         }
+         catch (Exception ex) {
+            this.logger.LogDebug(ex, "Unexpected connection terminated because of {DisconnectionReason}.", ex.Message);
+         }
+         this.logger.LogDebug("Connection terminated.");
       }
    }
 }

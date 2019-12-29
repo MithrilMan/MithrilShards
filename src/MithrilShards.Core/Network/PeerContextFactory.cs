@@ -8,20 +8,23 @@ using MithrilShards.Core.Network.Server;
 namespace MithrilShards.Core.Network {
    public class PeerContextFactory<TPeerContext> : IPeerContextFactory where TPeerContext : IPeerContext {
       readonly ILogger<PeerContextFactory<TPeerContext>> logger;
-      readonly ForgeServerSettings serverSettings;
+      readonly ILoggerFactory loggerFactory;
+      readonly ForgeConnectivitySettings serverSettings;
 
-      public PeerContextFactory(ILogger<PeerContextFactory<TPeerContext>> logger, IOptions<ForgeServerSettings> serverSettings) {
+      public PeerContextFactory(ILogger<PeerContextFactory<TPeerContext>> logger, ILoggerFactory loggerFactory, IOptions<ForgeConnectivitySettings> serverSettings) {
          this.logger = logger;
+         this.loggerFactory = loggerFactory;
          this.serverSettings = serverSettings?.Value;
       }
 
       public virtual IPeerContext Create(PeerConnectionDirection direction,
-                          string peerId,
-                          EndPoint localEndPoint,
-                          EndPoint remoteEndPoint,
-                          INetworkMessageWriter messageWriter) {
+                                         string peerId,
+                                         EndPoint localEndPoint,
+                                         EndPoint remoteEndPoint,
+                                         INetworkMessageWriter messageWriter) {
 
          var peerContext = (TPeerContext)System.Activator.CreateInstance(typeof(TPeerContext),
+            this.loggerFactory.CreateLogger<IPeerContext>(),
             direction,
             peerId,
             localEndPoint,

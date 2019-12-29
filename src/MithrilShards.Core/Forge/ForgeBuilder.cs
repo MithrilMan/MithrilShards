@@ -67,7 +67,7 @@ namespace MithrilShards.Core.Forge {
                .AddSingleton<IForgeDataFolderLock, ForgeDataFolderLock>()
                .AddSingleton<IEventBus, InMemoryEventBus>()
                .AddSingleton<ISubscriptionErrorHandler, DefaultSubscriptionErrorHandler>()
-               .AddSingleton<IForgeServer, FakeForgeServer>()
+               .AddSingleton<IForgeConnectivity, FakeForgeConnectivity>()
                .AddSingleton<IInitialBlockDownloadState, InitialBlockDownloadState>()
                .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                .AddSingleton<INetworkMessageSerializerManager, NetworkMessageSerializerManager>()

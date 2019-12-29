@@ -9,14 +9,14 @@ using MithrilShards.Core.MithrilShards;
 namespace MithrilShards.Core.Forge {
    public class Forge : BackgroundService, IForge {
       private readonly IForgeDataFolderLock forgeDataFolderLock;
-      readonly IForgeServer forgeServer;
+      readonly IForgeConnectivity forgeServer;
       readonly IEnumerable<IMithrilShard> mithrilShards;
       readonly DefaultConfigurationWriter defaultConfigurationManager;
       private readonly ILogger logger;
 
       public IServiceProvider Services => throw new NotImplementedException();
 
-      public Forge(ILogger<Forge> logger, IForgeDataFolderLock forgeDataFolderLock, IForgeServer forgeServer, IEnumerable<IMithrilShard> mithrilShards, DefaultConfigurationWriter defaultConfigurationManager = null) {
+      public Forge(ILogger<Forge> logger, IForgeDataFolderLock forgeDataFolderLock, IForgeConnectivity forgeServer, IEnumerable<IMithrilShard> mithrilShards, DefaultConfigurationWriter defaultConfigurationManager = null) {
          this.forgeDataFolderLock = forgeDataFolderLock;
          this.forgeServer = forgeServer;
          this.mithrilShards = mithrilShards;

@@ -7,9 +7,9 @@ using MithrilShards.Core.Network.Server.Guards;
 namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards {
    public abstract class ServerPeerConnectionGuardBase : IServerPeerConnectionGuard {
       protected readonly ILogger logger;
-      protected readonly ForgeServerSettings settings;
+      protected readonly ForgeConnectivitySettings settings;
 
-      public ServerPeerConnectionGuardBase(ILogger logger, IOptions<ForgeServerSettings> options) {
+      public ServerPeerConnectionGuardBase(ILogger logger, IOptions<ForgeConnectivitySettings> options) {
          this.logger = logger;
          this.settings = options.Value;
       }

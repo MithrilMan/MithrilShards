@@ -15,13 +15,13 @@ namespace MithrilShards.Network.Network.Server {
       readonly IEventBus eventBus;
       readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
       readonly IPeerConnectionFactory peerConnectionFactory;
-      readonly ForgeServerSettings settings;
+      readonly ForgeConnectivitySettings settings;
 
       public ServerPeerFactory(ILogger<ServerPeerFactory> logger,
                                ILoggerFactory loggerFactory,
                                IEventBus eventBus,
                                IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
-                               IOptions<ForgeServerSettings> settings,
+                               IOptions<ForgeConnectivitySettings> settings,
                                IPeerConnectionFactory peerConnectionFactory
                                ) {
          this.logger = logger;
