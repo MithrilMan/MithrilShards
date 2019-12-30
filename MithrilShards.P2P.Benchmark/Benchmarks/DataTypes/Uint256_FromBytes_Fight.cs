@@ -5,10 +5,11 @@ using BenchmarkDotNet.Jobs;
 using NBitcoin;
 using MithrilShards.Core.Crypto;
 using System.Collections.Generic;
+using static MithrilShards.Network.Benchmark.Program;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.DataTypes {
+   [Config(typeof(MyConfig))]
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-   //[RPlotExporter, CsvMeasurementsExporter]
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class Uint256_FromBytes_Fight {
       private List<byte[]> data;
@@ -27,12 +28,12 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.DataTypes {
          }
       }
 
-      [Benchmark]
-      public void UInt256_BigInteger_FromBytes() {
-         for (int i = 0; i < this.N; i++) {
-            _ = new BigInteger(this.data[i]);
-         }
-      }
+      //[Benchmark]
+      //public void UInt256_BigInteger_FromBytes() {
+      //   for (int i = 0; i < this.N; i++) {
+      //      _ = new BigInteger(this.data[i]);
+      //   }
+      //}
 
       [Benchmark]
       public void UInt256_Neo_FromBytes() {
@@ -41,12 +42,12 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.DataTypes {
          }
       }
 
-      [Benchmark]
-      public void uint256_NBitcoin_FromBytes() {
-         for (int i = 0; i < this.N; i++) {
-            _ = new uint256(new ReadOnlySpan<byte>(this.data[i]));
-         }
-      }
+      //[Benchmark]
+      //public void uint256_NBitcoin_FromBytes() {
+      //   for (int i = 0; i < this.N; i++) {
+      //      _ = new uint256(new ReadOnlySpan<byte>(this.data[i]));
+      //   }
+      //}
 
       [Benchmark]
       public void uint256_MithrilShards_FromBytes() {
@@ -59,6 +60,20 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.DataTypes {
       public void uint256_MithrilShards4Longs_FromBytes() {
          for (int i = 0; i < this.N; i++) {
             _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Long(this.data[i]);
+         }
+      }
+
+      [Benchmark]
+      public void uint256_Unsafe_MithrilShards_FromBytes() {
+         for (int i = 0; i < this.N; i++) {
+            _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256(this.data[i]);
+         }
+      }
+
+      [Benchmark]
+      public void uint256_Unsafe_MithrilShards4Longs_FromBytes() {
+         for (int i = 0; i < this.N; i++) {
+            _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256As4Long(this.data[i]);
          }
       }
    }

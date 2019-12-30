@@ -10,7 +10,6 @@ using BenchmarkDotNet.Jobs;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks {
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-   //[RPlotExporter, CsvMeasurementsExporter]
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class MagicNumberFinder {
       readonly byte[] magicNumberBytes = BitConverter.GetBytes(0x0709110B);

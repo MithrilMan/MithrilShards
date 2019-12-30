@@ -8,7 +8,6 @@ using MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.DataTypes {
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-   //[RPlotExporter, CsvMeasurementsExporter]
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class Uint256_ParseFromString_Fight {
       private string[] data;

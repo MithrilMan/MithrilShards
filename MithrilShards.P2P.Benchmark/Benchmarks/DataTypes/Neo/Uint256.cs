@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 #pragma warning disable IDE0044 // Add readonly modifier
@@ -174,6 +175,17 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       /// </summary>
       public static bool operator <=(UInt256 left, UInt256 right) {
          return left.CompareTo(right) <= 0;
+      }
+
+
+
+
+      private static readonly NBitcoin.DataEncoders.HexEncoder Encoder = new NBitcoin.DataEncoders.HexEncoder();
+      public override string ToString() {
+         ulong[] arr = new ulong[]{ this.value1, this.value2, this.value3, this.value4 };
+         Span<byte> toBeReversed = MemoryMarshal.Cast<ulong, byte>(arr).ToArray();
+         toBeReversed.Reverse();
+         return Encoder.EncodeData(toBeReversed.ToArray());
       }
    }
 }
