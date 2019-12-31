@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace MithrilShards.Network.Benchmark.Benchmarks.DataTypes {
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
-   public class Uint256_FromBytes_Fight {
+   public class Uint256_FromBytes_Fight_Finalists {
       private List<byte[]> data;
 
 
@@ -27,13 +27,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.DataTypes {
       }
 
       [Benchmark]
-      public void UInt256_BigInteger_FromBytes() {
-         for (int i = 0; i < this.N; i++) {
-            _ = new BigInteger(this.data[i]);
-         }
-      }
-
-      [Benchmark]
       public void UInt256_Neo_FromBytes() {
          for (int i = 0; i < this.N; i++) {
             _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256(this.data[i]);
@@ -44,34 +37,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.DataTypes {
       public void uint256_NBitcoin_FromBytes() {
          for (int i = 0; i < this.N; i++) {
             _ = new uint256(new ReadOnlySpan<byte>(this.data[i]));
-         }
-      }
-
-      [Benchmark]
-      public void uint256_Stratis_FromBytes() {
-         for (int i = 0; i < this.N; i++) {
-            _ = new  P2P.Benchmark.Benchmarks.DataTypes.Stratis.uint256(this.data[i]);
-         }
-      }
-
-      [Benchmark]
-      public void uint256_MithrilShards_FromBytes() {
-         for (int i = 0; i < this.N; i++) {
-            _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256(this.data[i]);
-         }
-      }
-
-      [Benchmark]
-      public void uint256_MithrilShards4Longs_FromBytes() {
-         for (int i = 0; i < this.N; i++) {
-            _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Long(this.data[i]);
-         }
-      }
-
-      [Benchmark]
-      public void uint256_Unsafe_MithrilShards_FromBytes() {
-         for (int i = 0; i < this.N; i++) {
-            _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256(this.data[i]);
          }
       }
 

@@ -81,6 +81,34 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards {
       }
    }
 
+   [StructLayout(LayoutKind.Sequential)]
+   public class UInt256As4Jhon {
+      private const int EXPECTED_SIZE = 32;
+      private static readonly NBitcoin.DataEncoders.HexEncoder Encoder = new NBitcoin.DataEncoders.HexEncoder();
+
+      private readonly ulong part1;
+      private readonly ulong part2;
+      private readonly ulong part3;
+      private readonly ulong part4;
+
+      /// <summary>
+      /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
+      /// </summary>
+      /// <param name="data">The data.</param>
+      public UInt256As4Jhon(ReadOnlySpan<byte> input) {
+         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+         input[..EXPECTED_SIZE].CopyTo(dst);
+      }
+
+      public override string ToString() {
+         ulong[] arr = new ulong[] { this.part1, this.part1, this.part1, this.part1 };
+         Span<byte> toBeReversed = MemoryMarshal.Cast<ulong, byte>(arr).ToArray();
+         toBeReversed.Reverse();
+         return Encoder.EncodeData(toBeReversed.ToArray());
+      }
+   }
+
+   [StructLayout(LayoutKind.Sequential)]
    public class UnsafeUInt256As4Long {
       private const int EXPECTED_SIZE = 32;
       private static readonly NBitcoin.DataEncoders.HexEncoder Encoder = new NBitcoin.DataEncoders.HexEncoder();
@@ -97,7 +125,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards {
       public unsafe UnsafeUInt256As4Long(ReadOnlySpan<byte> input) {
          fixed (ulong* p = &this.data1) {
             var dst = new Span<byte>(p, EXPECTED_SIZE);
-            input.CopyTo(dst);
+            input[..EXPECTED_SIZE].CopyTo(dst);
          }
       }
 
