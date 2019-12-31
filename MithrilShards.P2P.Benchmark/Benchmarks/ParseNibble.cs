@@ -36,7 +36,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks {
       }
 
       [Benchmark]
-      private int ParseNibble2(char c) {
+      private static int ParseNibble2(char c) {
          switch (c) {
             case '0':
             case '1':
