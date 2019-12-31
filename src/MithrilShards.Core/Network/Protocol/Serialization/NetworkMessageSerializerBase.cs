@@ -24,7 +24,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          this.precookedMagciAndCommand = new byte[SIZE_MAGIC + SIZE_COMMAND];
          this.chainDefinition.MagicBytes.CopyTo(this.precookedMagciAndCommand, 0);
          var commandSpan = new Span<byte>(this.precookedMagciAndCommand, SIZE_MAGIC, SIZE_COMMAND);
-         Encoding.ASCII.GetBytes(Activator.CreateInstance<TMessageType>().Command.PadRight(12, '\0'), commandSpan);
+         System.Text.Encoding.ASCII.GetBytes(Activator.CreateInstance<TMessageType>().Command.PadRight(12, '\0'), commandSpan);
          #endregion
       }
 

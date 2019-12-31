@@ -19,9 +19,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
       [Params(1000)]
       public int Payload;
 
-      [Params(200)]
-      public int N;
-
       [GlobalSetup]
       public void Setup() {
          this.data = new byte[this.Payload];
@@ -31,16 +28,12 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
 
       [Benchmark]
       public void NBitcoin_Hash256() {
-         for (int i = 0; i < this.N; i++) {
-            NBitcoin.Crypto.Hashes.Hash256(this.data);
-         }
+         NBitcoin.Crypto.Hashes.Hash256(this.data);
       }
 
       [Benchmark]
       public void MithrilShards_DoubleSha256() {
-         for (int i = 0; i < this.N; i++) {
-            new NBitcoin.uint256(HashGenerator.DoubleSha256(this.data));
-         }
+         new NBitcoin.uint256(HashGenerator.DoubleSha256(this.data));
       }
    }
 }

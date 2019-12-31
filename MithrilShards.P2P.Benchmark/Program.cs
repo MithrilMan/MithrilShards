@@ -34,6 +34,7 @@ namespace MithrilShards.Network.Benchmark {
          Console.WriteLine("MithrilShards.UnsafeUInt256: " + new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256(data).ToString());
          Console.WriteLine("MithrilShards.UnsafeUInt256As4Long: " + new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256As4Long(data).ToString());
          Console.WriteLine("MithrilShards.UInt256As4Jhon: " + new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Jhon(data).ToString());
+         Console.WriteLine("MithrilShards.Core.DataTypes.UInt256: " + new MithrilShards.Core.DataTypes.UInt256(data).ToString());
 
          BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
       }

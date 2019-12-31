@@ -101,7 +101,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards {
       }
 
       public override string ToString() {
-         ulong[] arr = new ulong[] { this.part1, this.part1, this.part1, this.part1 };
+         ulong[] arr = new ulong[] { this.part1, this.part2, this.part3, this.part4 };
          Span<byte> toBeReversed = MemoryMarshal.Cast<ulong, byte>(arr).ToArray();
          toBeReversed.Reverse();
          return Encoder.EncodeData(toBeReversed.ToArray());
