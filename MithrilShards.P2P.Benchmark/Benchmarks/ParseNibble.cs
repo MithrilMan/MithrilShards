@@ -13,7 +13,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks {
 
       [GlobalSetup]
       public void Setup() {
-         this.data = (char)new Random().Next(0, 0xFF);
+         this.data = "0123456789ABCDEF"[(char)new Random().Next(0, 15)];
       }
 
 
@@ -23,6 +23,9 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks {
 
       [Benchmark]
       public int ParseNibble_B() => ParseNibble2(this.data);
+
+      [Benchmark]
+      public int ParseNibble_C() => ParseNibble3(this.data);
 
       private static int ParseNibble1(char c) {
          if (c >= '0' && c <= '9') {
@@ -35,7 +38,6 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks {
          throw new ArgumentException("Invalid nibble: " + c);
       }
 
-      [Benchmark]
       private static int ParseNibble2(char c) {
          switch (c) {
             case '0':
@@ -66,7 +68,21 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks {
             default:
                throw new ArgumentException("Invalid nibble: " + c);
          }
-         return c;
+      }
+
+      private static int ParseNibble3(char c) {
+         if (c >= '0' && c <= '9') {
+            return c - '0';
+         }
+         else if (c >= 'a' && c <= 'f') {
+            return c - ('a' - 10);
+         }
+         else if (c >= 'A' && c <= 'F') {
+            return c - ('A' - 10);
+         }
+         else {
+            throw new ArgumentException("Invalid nibble: " + c);
+         }
       }
    }
 }

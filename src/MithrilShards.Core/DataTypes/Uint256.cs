@@ -24,9 +24,72 @@ namespace MithrilShards.Core.DataTypes {
       /// </summary>
       /// <param name="data">The data.</param>
       public UInt256(ReadOnlySpan<byte> input) {
+         if (input.Length != EXPECTED_SIZE) {
+            throw new FormatException("the byte array should be 32 bytes long");
+         }
+
          Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
-         input[..EXPECTED_SIZE].CopyTo(dst);
+         input.CopyTo(dst);
       }
+
+      /// <summary>
+      /// Initializes a new instance of the <see cref="UInt256"/> class.
+      /// Passed hex string must be a valid hex string with 64 char length, or 66 if prefix 0x is used, otherwise an exception is thrown.
+      /// </summary>
+      public UInt256(string hexString) {
+         if (hexString is null) {
+            throw new ArgumentNullException(nameof(hexString));
+         }
+
+         //account for 0x prefix
+         if (hexString.Length < EXPECTED_SIZE * 2) {
+            throw new FormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
+         }
+
+         ReadOnlySpan<char> hexAsSpan = (hexString[0] == '0' && hexString[1] == 'X') ? hexString.AsSpan(2) : hexString.AsSpan();
+
+         if (hexString.Length != EXPECTED_SIZE * 2) {
+            throw new FormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
+         }
+
+         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+
+         int i = hexString.Length - 1;
+         int j = 0;
+
+         while (i > 0) {
+            char c = hexAsSpan[i--];
+            if (c >= '0' && c <= '9') {
+               dst[j] = (byte)(c - '0');
+            }
+            else if (c >= 'a' && c <= 'f') {
+               dst[j] = (byte)(c - ('a' - 10));
+            }
+            else if (c >= 'A' && c <= 'F') {
+               dst[j] = (byte)(c - ('A' - 10));
+            }
+            else {
+               throw new ArgumentException("Invalid nibble: " + c);
+            }
+
+            c = hexAsSpan[i--];
+            if (c >= '0' && c <= '9') {
+               dst[j] |= (byte)((c - '0') << 4);
+            }
+            else if (c >= 'a' && c <= 'f') {
+               dst[j] |= (byte)((c - ('a' - 10)) << 4);
+            }
+            else if (c >= 'A' && c <= 'F') {
+               dst[j] |= (byte)((c - ('A' - 10)) << 4);
+            }
+            else {
+               throw new ArgumentException("Invalid nibble: " + c);
+            }
+
+            j++;
+         }
+      }
+
 
       /// <summary>
       /// Converts to string in hexadecimal format.
@@ -58,47 +121,26 @@ namespace MithrilShards.Core.DataTypes {
       /// <returns>
       /// A <see cref="System.String" /> that represents this instance.
       /// </returns>
-      public static bool TryParse(string hex, out UInt256 result) {
-         if (hex is null) {
-            throw new ArgumentNullException(nameof(hex));
+      public static bool TryParse(string hexString, out UInt256 result) {
+         try {
+            result = new UInt256(hexString);
+            return false;
          }
-
-         //account for 0x prefix
-         if (hex.Length <= EXPECTED_SIZE * 2) {
+         catch {
             result = null;
             return false;
          }
-
-         ReadOnlySpan<char> hexAsSpan = (hex[0] == '0' && hex[1] == 'X') ? hex.AsSpan(2) : hex.AsSpan();
-
-         if (hex.Length != EXPECTED_SIZE * 2) {
-            result = null;
-            return false;
-         }
-
-         Span<byte> bytes = stackalloc byte[EXPECTED_SIZE];
-
-         int i = bytes.Length - 1;
-         int j = 0;
-
-         while (i >= 0) {
-            //bytes[i--] = HexEncoder.HexStringTable[hexAsSpan[j++] << 4 | hexAsSpan[j++]];
-            bytes[i--] = (byte)(ParseNibble(hexAsSpan[j++]) << 4 | ParseNibble(hexAsSpan[j++]));
-         }
-
-         result = new UInt256(bytes);
-         return true;
       }
 
-      private static byte ParseNibble(char c) {
-         if (c >= '0' && c <= '9') {
-            return (byte)(c - '0');
-         }
-         c = (char)(c & ~0x20);
-         if (c >= 'A' && c <= 'F') {
-            return (byte)(c - ('A' - 10));
-         }
-         throw new ArgumentException("Invalid nibble: " + c);
+      /// <summary>
+      /// Try to parse from an hex string to UInt256.
+      /// </summary>
+      /// <param name="hexString">The hexadecimal to parse.</param>
+      /// <returns>
+      /// A <see cref="System.String" /> that represents this instance.
+      /// </returns>
+      public static UInt256 Parse(string hexString) {
+         return new UInt256(hexString);
       }
    }
 }

@@ -21,17 +21,32 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256 {
 
       [Benchmark]
       public void UInt256_BigInteger_Parse() {
-         BigInteger.Parse(this.data, System.Globalization.NumberStyles.HexNumber);
+         _ = BigInteger.Parse(this.data, System.Globalization.NumberStyles.HexNumber);
       }
 
       [Benchmark]
       public void UInt256_Neo_Parse() {
-         P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256.Parse(this.data);
+         _ = P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256.Parse(this.data);
       }
 
       [Benchmark]
       public void uint256_NBitcoin_Parse() {
-         uint256.Parse(this.data);
+         _ = uint256.Parse(this.data);
+      }
+
+      [Benchmark]
+      public void uint256_NBitcoin_StringConstructor() {
+         _ = new uint256(this.data);
+      }
+
+      [Benchmark]
+      public void uint256_MithrilShards_Parse() {
+         _ = MithrilShards.Core.DataTypes.UInt256.Parse(this.data);
+      }
+
+      [Benchmark]
+      public void uint256_MithrilShards_StringConstructor() {
+         _ = new MithrilShards.Core.DataTypes.UInt256(this.data);
       }
    }
 }
