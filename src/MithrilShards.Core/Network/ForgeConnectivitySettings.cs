@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Network.Server;
 
-namespace MithrilShards.Core.Network.Server {
+namespace MithrilShards.Core.Network {
    public class ForgeConnectivitySettings : MithrilShardSettingsBase {
       const int maxInboundConnectionsDefault = 20;
       const int maxOutboundConnectionsDefault = 20;
@@ -13,10 +14,13 @@ namespace MithrilShards.Core.Network.Server {
 
       public bool AllowLoopbackConnection { get; set; }
 
-      public List<ServerPeerBinding> Bindings { get; }
+      public List<ServerPeerBinding> Listeners { get; }
+
+      public List<ClientPeerBinding> Connections { get; }
 
       public ForgeConnectivitySettings() {
-         this.Bindings = new List<ServerPeerBinding>();
+         this.Listeners = new List<ServerPeerBinding>();
+         this.Connections = new List<ClientPeerBinding>();
 
          this.MaxInboundConnections = maxInboundConnectionsDefault;
          this.MaxOutboundConnections = maxOutboundConnectionsDefault;

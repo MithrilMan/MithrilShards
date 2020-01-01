@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Core.Forge;
-using MithrilShards.Core.Network.Server;
+using MithrilShards.Core.Network;
 using MithrilShards.Network.Legacy.Server;
 
 namespace MithrilShards.Network.Legacy {
@@ -12,7 +12,7 @@ namespace MithrilShards.Network.Legacy {
                services
                   .Replace(ServiceDescriptor.Transient<IForgeConnectivity, P2PForgeServer>()) //replace fake forgeServer with real one
                   .AddSingleton<IServerPeerFactory, ServerPeerFactory>()
-                  .AddSingleton<IServerPeerStats, ServerPeerStats>()
+                  .AddSingleton<IConnectivityPeerStats, ConnectivityPeerStats>()
                   .AddSingleton<IPeerConnectionFactory, PeerConnectionFactory>()
                   ;
             });

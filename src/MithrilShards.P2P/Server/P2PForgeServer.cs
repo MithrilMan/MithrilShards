@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,11 @@ namespace MithrilShards.Network.Legacy.Server {
          this.logger = logger;
          this.serverPeerFactory = serverPeerFactory;
          this.serverPeers = new List<IServerPeer>();
+      }
+
+      public Task AttemptConnection(EndPoint remoteEndPoint, CancellationToken cancellation) {
+         this.logger.LogWarning("AttemptConnection not implemented.");
+         return Task.CompletedTask;
       }
 
       public async Task InitializeAsync(CancellationToken cancellationToken) {

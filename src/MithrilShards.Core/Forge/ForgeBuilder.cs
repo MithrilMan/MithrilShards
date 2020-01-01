@@ -5,12 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core.EventBus;
 using MithrilShards.Core.MithrilShards;
-using MithrilShards.Core.Network;
-using MithrilShards.Core.Network.PeerAddressBook;
-using MithrilShards.Core.Network.Protocol.Processors;
-using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Core.Forge {
    public class ForgeBuilder : IForgeBuilder {
@@ -63,24 +58,7 @@ namespace MithrilShards.Core.Forge {
             services
                .AddOptions()
                .AddHostedService<TForgeImplementation>()
-               .AddSingleton<IDataFolders, DataFolders>(serviceProvider => new DataFolders("."))
-               .AddSingleton<IForgeDataFolderLock, ForgeDataFolderLock>()
-               .AddSingleton<IEventBus, InMemoryEventBus>()
-               .AddSingleton<ISubscriptionErrorHandler, DefaultSubscriptionErrorHandler>()
-               .AddSingleton<IForgeConnectivity, FakeForgeConnectivity>()
-               .AddSingleton<IInitialBlockDownloadState, InitialBlockDownloadState>()
-               .AddSingleton<IDateTimeProvider, DateTimeProvider>()
-               .AddSingleton<INetworkMessageSerializerManager, NetworkMessageSerializerManager>()
-               .AddSingleton<INetworkMessageProcessorFactory, NetworkMessageProcessorFactory>()
-               .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
-               .AddSingleton<IPeerContextFactory, PeerContextFactory<PeerContext>>()
-               .AddHostedService<ConnectionManager>()
-
-               //add peer address book with peer score manager
-               .AddSingleton<PeerAddressBook>() //required to forward the instance to 2 interfaces below
-               .AddSingleton<IPeerAddressBook>(serviceProvider => serviceProvider.GetRequiredService<PeerAddressBook>())
-               .AddSingleton<IPeerScoreManager>(serviceProvider => serviceProvider.GetRequiredService<PeerAddressBook>())
-               ;
+               .ConfigureForge(context);
          });
 
          this.isForgeSet = true;
@@ -89,6 +67,7 @@ namespace MithrilShards.Core.Forge {
 
          return this;
       }
+
 
       //
       // Summary:

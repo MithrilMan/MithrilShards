@@ -23,7 +23,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards {
       internal override string TryGetDenyReason(IPeerContext peerContext) {
          if (this.initialBlockDownloadState.isInIBD) {
 
-            bool clientIsWhiteListed = this.settings.Bindings
+            bool clientIsWhiteListed = this.settings.Listeners
                .Any(binding => binding.IsWhitelistingEndpoint && binding.Matches(peerContext.LocalEndPoint));
 
             if (!clientIsWhiteListed) {

@@ -1,4 +1,7 @@
-﻿using MithrilShards.Core.MithrilShards;
+﻿using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using MithrilShards.Core.MithrilShards;
 
 namespace MithrilShards.Core.Forge {
    /// <summary>
@@ -6,5 +9,6 @@ namespace MithrilShards.Core.Forge {
    /// </summary>
    /// <seealso cref="System.IDisposable" />
    public interface IForgeConnectivity : IMithrilShard {
+      Task AttemptConnection(EndPoint remoteEndPoint, CancellationToken cancellation);
    }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,6 +11,10 @@ namespace MithrilShards.Core.Forge {
    /// <seealso cref="MithrilShards.Core.Forge.IForgeServer" />
    public sealed class FakeForgeConnectivity : IForgeConnectivity {
       const string error = "A valid concrete implementation of IForgeConnectivity must be registered on a IForgeBuilder.";
+
+      public Task AttemptConnection(EndPoint remoteEndPoint, CancellationToken cancellation) {
+         throw new NotImplementedException();
+      }
 
       public Task InitializeAsync(CancellationToken cancellationToken) {
          throw new NotImplementedException(error);

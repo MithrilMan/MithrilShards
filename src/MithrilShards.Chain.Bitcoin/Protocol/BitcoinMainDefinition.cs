@@ -1,4 +1,5 @@
-﻿using MithrilShards.Core.Network.Protocol;
+﻿using MithrilShards.Core.DataTypes;
+using MithrilShards.Core.Network.Protocol;
 using System;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol {
@@ -7,15 +8,18 @@ namespace MithrilShards.Chain.Bitcoin.Protocol {
 
       public byte[] MagicBytes { get; }
 
-      public byte[] genesis { get; }
+      public UInt256 Genesis { get; }
 
       public uint Magic { get; }
 
+      public int DefaultMaxPayloadSize { get; }
+
       public BitcoinMainDefinition() {
          this.Name = "BitcoinMain";
-         this.Magic = 0x522357AC; //0xD9B4BEF9;
-         this.MagicBytes = BitConverter.GetBytes(0x522357AC); //0xD9B4BEF9);
-         this.genesis = null;
+         this.Magic = 0xD9B4BEF9;
+         this.MagicBytes = BitConverter.GetBytes(0xD9B4BEF9);
+         this.Genesis = null;
+         this.DefaultMaxPayloadSize = 32_000_000;
       }
    }
 }

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Statistics;
+using MithrilShards.Core.Extensions;
 
 namespace MithrilShards.Core.Network {
    public class ConnectionManager : IConnectionManager, IStatisticFeedsProvider {
@@ -18,6 +22,7 @@ namespace MithrilShards.Core.Network {
       private readonly ILogger<ConnectionManager> logger;
       private readonly IEventBus eventBus;
       readonly IStatisticFeedsCollector statisticFeedsCollector;
+      readonly IEnumerable<IConnector> connectors;
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
@@ -41,10 +46,15 @@ namespace MithrilShards.Core.Network {
       public int ConnectedOutboundPeersCount => this.outboundPeers.Count;
 
 
-      public ConnectionManager(ILogger<ConnectionManager> logger, IEventBus eventBus, IStatisticFeedsCollector statisticFeedsCollector) {
+      public ConnectionManager(ILogger<ConnectionManager> logger,
+                               IEventBus eventBus,
+                               IStatisticFeedsCollector statisticFeedsCollector,
+                               IEnumerable<IConnector> connectors
+                               ) {
          this.logger = logger;
          this.eventBus = eventBus;
          this.statisticFeedsCollector = statisticFeedsCollector;
+         this.connectors = connectors;
       }
 
       /// <summary>
@@ -77,6 +87,9 @@ namespace MithrilShards.Core.Network {
             this.eventBusSubscriptionsTokens.Add(this.eventBus.Subscribe<PeerConnected>(this.AddConnectedPeer));
             this.eventBusSubscriptionsTokens.Add(this.eventBus.Subscribe<PeerDisconnected>(this.RemoveConnectedPeer));
          }
+
+         // start the task that tries to connect to other peers
+         _ = this.StartOutgoingConnectionAttempts(cancellationToken);
 
          return Task.CompletedTask;
       }
@@ -127,6 +140,37 @@ namespace MithrilShards.Core.Network {
                TimeSpan.FromSeconds(15)
             )
          );
+      }
+
+      protected virtual async Task StartOutgoingConnectionAttempts(CancellationToken cancellation) {
+         using IDisposable logger = this.logger.BeginScope("Starting Connectors");
+         if (this.connectors == null) {
+            this.logger.LogWarning("No Connectors found, the Forge will not try to connect to any peer.");
+            return;
+         }
+         foreach (IConnector connector in this.connectors) {
+            try {
+               connector.StartConnectionLoopAsync(this, cancellation);
+            }
+            catch (OperationCanceledException Exception) {
+               this.logger.LogDebug("Connector {Connector} canceled.", connector.GetType().Name);
+            }
+            catch (Exception ex) {
+               this.logger.LogError(ex, "Connector {Connector} failure, it has been stopped, node may have connection problems.", connector.GetType().Name);
+            }
+         }
+      }
+
+      public bool CanConnectTo(IPEndPoint endPoint) {
+
+         // ensures I'm not already connected to the same endpoint
+         if (this.outboundPeers.Values.ToList().Any(peer => peer.RemoteEndPoint.Equals(endPoint.EnsureIPv6()))) {
+            this.logger.LogDebug("Already connected to peer {RemoteEndPoint}", endPoint);
+            return false;
+         }
+
+         //TODO enhance this logic using a similar approach to IServerPeerConnectionGuards, but for clients
+         return true;
       }
    }
 }

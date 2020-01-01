@@ -37,7 +37,7 @@ namespace MithrilShards.Core.Network {
       }
 
       protected EndPoint GetPublicEndPoint(EndPoint localEndPoint) {
-         return this.serverSettings.Bindings
+         return this.serverSettings.Listeners
             .Where(binding => {
                if (!IPEndPoint.TryParse(binding.EndPoint, out IPEndPoint parsedEndPoint)) {
                   return false;

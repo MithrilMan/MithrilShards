@@ -5,13 +5,13 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Bedrock.Framework;
-using Bedrock.Framework.Protocols;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Forge;
+using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
@@ -75,12 +75,12 @@ namespace MithrilShards.Network.Bedrock {
                this.logger.LogWarning("No peer connection guards detected.");
             }
 
-            if (this.settings.Bindings?.Count > 0) {
+            if (this.settings.Listeners?.Count > 0) {
                this.logger.LogInformation("Found {ConfiguredListeners} listeners in configuration.", this.serverPeers.Count);
 
                Server server = new ServerBuilder(this.serviceProvider)
                   .UseSockets(sockets => {
-                     foreach (ServerPeerBinding binding in this.settings.Bindings) {
+                     foreach (ServerPeerBinding binding in this.settings.Listeners) {
                         if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
                            throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
                         }
@@ -122,29 +122,24 @@ namespace MithrilShards.Network.Bedrock {
          this.client = new ClientBuilder(this.serviceProvider)
                                     .UseSockets()
                                     .UseConnectionLogging()
-                                    .Use(this.SetupClientConnection)
                                     .Build();
       }
 
-      private IConnectionFactory SetupClientConnection(IConnectionFactory connectionFactory) {
-         this.logger.LogDebug("SetupClientConnection called");
-
-         return connectionFactory;
-      }
-
-      public async Task AttemptConnection(EndPoint remoteEndPoint) {
+      public async Task AttemptConnection(EndPoint remoteEndPoint, CancellationToken cancellation) {
          using IDisposable logScope = this.logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
          this.eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.AsIPEndPoint()));
-         this.logger.LogDebug("Connected Attempt", remoteEndPoint);
+         this.logger.LogDebug("Connection attempt to {RemoteEndPoint}", remoteEndPoint);
          try {
             await using ConnectionContext connection = await this.client.ConnectAsync((IPEndPoint)remoteEndPoint).ConfigureAwait(false);
             this.logger.LogDebug("Connected to {RemoteEndPoint}", connection.RemoteEndPoint);
             await this.clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
          }
+         catch (OperationCanceledException ex) {
+            this.logger.LogDebug("Operation cancelled.");
+         }
          catch (Exception ex) {
             this.logger.LogDebug(ex, "Unexpected connection terminated because of {DisconnectionReason}.", ex.Message);
          }
-         this.logger.LogDebug("Connection terminated.");
       }
    }
 }

@@ -5,6 +5,7 @@ using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
 
@@ -48,9 +49,9 @@ namespace MithrilShards.Network.Legacy.Server {
                this.logger.LogWarning("No peer connection guards detected.");
             }
 
-            if (this.settings.Bindings != null) {
+            if (this.settings.Listeners != null) {
 
-               foreach (ServerPeerBinding binding in this.settings.Bindings) {
+               foreach (ServerPeerBinding binding in this.settings.Listeners) {
                   if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
                      throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
                   }

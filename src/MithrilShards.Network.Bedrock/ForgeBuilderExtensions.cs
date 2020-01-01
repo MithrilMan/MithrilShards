@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Core.Forge;
-using MithrilShards.Core.Network.Server;
+using MithrilShards.Core.Network;
 
 namespace MithrilShards.Network.Bedrock {
    public static class ForgeBuilderExtensions {
@@ -14,7 +14,7 @@ namespace MithrilShards.Network.Bedrock {
             (hostBuildContext, services) => {
                services
                   .Replace(ServiceDescriptor.Singleton<IForgeConnectivity, BedrockForgeConnectivity>())
-                  .AddSingleton<IServerPeerStats, ServerPeerStats>()
+                  .AddSingleton<IConnectivityPeerStats, ConnectivityPeerStats>()
                   .AddSingleton<MithrilForgeClientConnectionHandler>()
                   ;
             });
