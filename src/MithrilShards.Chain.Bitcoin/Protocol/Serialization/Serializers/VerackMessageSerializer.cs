@@ -8,7 +8,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
       public VerackMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
 
       private static readonly VerackMessage instance = new VerackMessage();
-      public override INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion) {
+      public override VerackMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion) {
          // having a singleton verack is fine because it contains no data
          return instance;
       }

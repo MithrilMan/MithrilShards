@@ -28,7 +28,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          #endregion
       }
 
-      public abstract INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion);
+      public abstract TMessageType Deserialize(ref SequenceReader<byte> reader, int protocolVersion);
 
       public abstract void Serialize(TMessageType message, int protocolVersion, IBufferWriter<byte> output);
 
@@ -57,6 +57,11 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          output.Write(payloadOutput.WrittenSpan);
 
          return HEADER_LENGTH + payloadOutput.WrittenCount;
+      }
+
+      public INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion) {
+         var reader = new SequenceReader<byte>(data);
+         return this.Deserialize(ref reader, protocolVersion);
       }
    }
 }

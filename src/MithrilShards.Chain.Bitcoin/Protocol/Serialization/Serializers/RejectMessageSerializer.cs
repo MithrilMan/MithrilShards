@@ -9,9 +9,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
       const int MAX_DATA_SIZE = 1_000; // usually it should contains 32 bytes, let be generous
       public RejectMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
 
-      public override INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion) {
-         var reader = new SequenceReader<byte>(data);
-
+      public override RejectMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion) {
          var message = new RejectMessage {
             Reason = reader.ReadVarString(),
             Code = (RejectMessage.RejectCode)reader.ReadByte()
