@@ -1,5 +1,6 @@
 ﻿{
    "ForgeConnectivitySettings": {
+      "ForceShutdownAfter": 300,
       "MaxInboundConnections": 25,
       "AllowLoopbackConnection": false,
       "Listeners": [

@@ -78,8 +78,10 @@ namespace MithrilShards.Network.Bedrock {
             if (this.settings.Listeners?.Count > 0) {
                this.logger.LogInformation("Found {ConfiguredListeners} listeners in configuration.", this.serverPeers.Count);
 
-               Server server = new ServerBuilder(this.serviceProvider)
+               ServerBuilder builder = new ServerBuilder(this.serviceProvider)
                   .UseSockets(sockets => {
+                     sockets.Options.NoDelay = true;
+
                      foreach (ServerPeerBinding binding in this.settings.Listeners) {
                         if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
                            throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
@@ -98,7 +100,6 @@ namespace MithrilShards.Network.Bedrock {
 
                         this.logger.LogInformation("Added listener to local endpoint {ListenerLocalEndpoint}. (remote {ListenerPublicEndpoint})", localEndPoint, publicEndPoint);
 
-                        sockets.Options.NoDelay = true;
                         sockets.Listen(
                            localEndPoint.Address,
                            localEndPoint.Port,
@@ -108,7 +109,11 @@ namespace MithrilShards.Network.Bedrock {
                            );
                      }
                   }
-               ).Build();
+               );
+
+               builder.ShutdownTimeout = TimeSpan.FromSeconds(this.settings.ForceShutdownAfter);
+
+               Server server = builder.Build();
 
                this.serverPeers.Add(server);
             }
