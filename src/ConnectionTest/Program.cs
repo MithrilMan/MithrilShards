@@ -10,9 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System;
 using MithrilShards.Diagnostic.StatisticsCollector;
+using System.Linq;
 
 namespace ConnectionTest {
-   class Program {
+   static class Program {
       static async Task Main(string[] args) {
 
          await StartBedrockForgeServer(args).ConfigureAwait(false);
@@ -20,25 +21,45 @@ namespace ConnectionTest {
       }
 
       private static async Task StartBedrockForgeServer(string[] args) {
-         await new ForgeBuilder()
-            .UseForge<Forge>(args)
+         await BuildForge(args)
             .UseSerilog("log-settings-with-seq.json")
             .UseBedrockForgeServer()
-            .UseBitcoinChain(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion)
             .UseStatisticsCollector()
             .RunConsoleAsync()
             .ConfigureAwait(false);
       }
 
       private static async Task StartP2PForgeServer(string[] args) {
-         await new ForgeBuilder()
-            .UseForge<Forge>(args)
+         await BuildForge(args)
             .UseSerilog("log-settings.json")
             .UseP2PForgeServer()
-            .UseBitcoinChain(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion)
             .UseStatisticsCollector()
             .RunConsoleAsync()
             .ConfigureAwait(false);
+      }
+
+      private static IForgeBuilder BuildForge(string[] args) {
+         string network = args
+            .DefaultIfEmpty("--network=bitcoin-main")
+            .Where(arg => arg.StartsWith("--network"))
+            .Select(arg => arg.ToLower().Replace("--network=", ""))
+            .FirstOrDefault();
+
+         Console.WriteLine($"Building {network} forge...");
+
+         switch (network) {
+            case "bitcoin-main":
+               return new ForgeBuilder()
+                  .UseForge<Forge>(args)
+                  .UseBitcoinChain<BitcoinMainDefinition>(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion);
+            case "bitcoin-testnet":
+               return new ForgeBuilder()
+                  .UseForge<Forge>(args, "forge-settings-bitcoin-testnet.json")
+                  .UseBitcoinChain<BitcoinTestnetDefinition>(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion);
+            default:
+               Console.WriteLine($"UNKNOWN NETWORK specified in -network argument: {network}. Fallback to Bitcoin-Main");
+               throw new ArgumentException("Unknown Network");
+         }
       }
    }
 }

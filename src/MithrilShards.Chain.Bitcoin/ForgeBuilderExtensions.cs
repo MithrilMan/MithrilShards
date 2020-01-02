@@ -21,11 +21,13 @@ namespace MithrilShards.Chain.Bitcoin {
       /// <param name="minimumSupportedVersion">The minimum version local nodes requires in order to connect to other peers.</param>
       /// <param name="currentVersion">The current version local peer aim to use with connected peers.</param>
       /// <returns></returns>
-      public static IForgeBuilder UseBitcoinChain(this IForgeBuilder forgeBuilder, int minimumSupportedVersion, int currentVersion) {
+      public static IForgeBuilder UseBitcoinChain<TChainDefinition>(this IForgeBuilder forgeBuilder,
+                                                                    int minimumSupportedVersion,
+                                                                    int currentVersion) where TChainDefinition : class, IChainDefinition {
          forgeBuilder.AddShard<BitcoinShard, BitcoinSettings>(
             (hostBuildContext, services) => {
                services
-                  .AddSingleton<IChainDefinition, BitcoinMainDefinition>()
+                  .AddSingleton<IChainDefinition, TChainDefinition>()
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
                   .AddSingleton<SelfConnectionTracker>()
                   .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())

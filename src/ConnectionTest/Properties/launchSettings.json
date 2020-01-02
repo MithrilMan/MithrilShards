@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "bitcoin-main": {
+      "commandName": "Project",
+      "commandLineArgs": "--network=bitcoin-main"
+    },
+    "bitcoin-testnet": {
+      "commandName": "Project",
+      "commandLineArgs": "--network=bitcoin-testnet"
+    }
+  }
+}

@@ -116,10 +116,8 @@ namespace MithrilShards.Network.Bedrock {
             this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
          }
          else {
-            this.logger.LogDebug(JsonSerializer.Serialize(message, message.GetType(), new JsonSerializerOptions { WriteIndented = true }));
-            this.eventBus.Publish(new PeerMessageReceived(peerContext, message, (int)contextData.GetTotalMessageLength()));
-
             await peerContext.ProcessMessageAsync(message).ConfigureAwait(false);
+            this.eventBus.Publish(new PeerMessageReceived(peerContext, message, contextData.GetTotalMessageLength()));
          }
       }
    }

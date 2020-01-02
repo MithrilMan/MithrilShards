@@ -88,9 +88,22 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
             //TODO bad behavior, call peer score manager
             //https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1909-L1914
          }
-         else if (this.PeerContext.Direction == PeerConnectionDirection.Inbound) {
-            await this.StartHandshakeAsync(version, cancellation).ConfigureAwait(false);
+         else {
             this.status.VersionReceived = true;
+            this.status.PeerVersion = version;
+
+            if (this.status.VersionAckReceived) {
+               await this.OnHandshaked().ConfigureAwait(false);
+            }
+            else {
+               this.logger.LogDebug("Waiting verack...");
+               if (this.PeerContext.Direction == PeerConnectionDirection.Inbound) {
+                  await this.StartHandshakeAsync(cancellation).ConfigureAwait(false);
+               }
+               else {
+                  await this.messageWriter.WriteAsync(new VerackMessage()).ConfigureAwait(false);
+               }
+            }
          }
 
          this.PeerContext.TimeOffset = this.dateTimeProvider.GetTimeOffset() - version.Timestamp;
@@ -101,25 +114,24 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       }
 
       private async Task ProcessVerackMessageAsync(VerackMessage verack, CancellationToken cancellation) {
-         if (this.status.VersionReceived == true) {
-            if (this.PeerContext.Direction == PeerConnectionDirection.Inbound) {
-               this.PeerContext.NegotiatedProtocolVersion.Version = Math.Min(this.status.PeerVersion.Version, this.nodeImplementation.ImplementationVersion);
-               this.status.IsHandShaked = true;
-               this.logger.LogDebug("Handshake successful");
-            }
-            else {
-               this.logger.LogDebug("Responding to handshake with local Version.");
-               await this.messageWriter.WriteAsync(this.CreateVersionMessage()).ConfigureAwait(false);
-            }
+         if (this.status.VersionAckReceived) {
+            this.logger.LogDebug("Unexpected verack, already received.");
+            //TODO bad behavior, call peer score manager
          }
          else {
-            this.logger.LogDebug("Unexpected verack without having received peer Version.");
-            //TODO bad behavior, call peer score manager
+            this.status.VersionAckReceived = true;
+            if (this.status.VersionReceived) {
+               this.PeerContext.NegotiatedProtocolVersion.Version = Math.Min(this.status.PeerVersion.Version, this.nodeImplementation.ImplementationVersion);
+               await this.OnHandshaked().ConfigureAwait(false);
+            }
+            else {
+               this.logger.LogDebug("Waiting version message...");
+            }
          }
       }
 
-      private async Task StartHandshakeAsync(VersionMessage version, CancellationToken cancellation) {
-         this.status.PeerVersion = version;
+      private async Task StartHandshakeAsync(CancellationToken cancellation) {
+         VersionMessage version = this.status.PeerVersion;
 
          if (this.VersionNotSupported(version)) {
             throw new ProtocolViolationException("Peer version not supported.");
@@ -137,15 +149,20 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
 
          this.logger.LogDebug("Responding to handshake with local Version.");
          await this.messageWriter.WriteAsync(this.CreateVersionMessage()).ConfigureAwait(false);
-
          await this.messageWriter.WriteAsync(new VerackMessage()).ConfigureAwait(false);
 
-         if (version.Version >= KnownVersion.V31402) {
+         await this.OnHandshaked().ConfigureAwait(false);
+      }
+
+      private async Task OnHandshaked() {
+         this.logger.LogDebug("Handshake successful");
+         this.status.IsHandShaked = true;
+
+         if (this.status.PeerVersion.Version >= KnownVersion.V31402) {
             await this.messageWriter.WriteAsync(new GetaddrMessage()).ConfigureAwait(false);
          }
-
-         //TODO
       }
+
 
       private bool ConnectedToSelf(VersionMessage version) {
          if (this.selfConnectionTracker.IsSelfConnection(version.Nonce)) {
