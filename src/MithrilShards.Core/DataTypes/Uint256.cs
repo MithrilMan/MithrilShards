@@ -121,7 +121,7 @@ namespace MithrilShards.Core.DataTypes {
       public static bool TryParse(string hexString, out UInt256 result) {
          try {
             result = new UInt256(hexString);
-            return false;
+            return true;
          }
          catch {
             result = null;
