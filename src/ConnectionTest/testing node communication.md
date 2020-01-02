@@ -8,7 +8,7 @@ I used the docker implementation:
 
 then I modified the suggested docker run arguments, in order to open the node port, this way, to run the image with an reachable testnet node, run the image as
 
-`$ docker run -t -i -p 19000:19000 -p 19001:19001 -p 19011:19011 freewil/bitcoin-testnet-box`
+`docker run -t -i -p 19000:19000 -p 19001:19001 -p 19011:19011 freewil/bitcoin-testnet-box`
 
 after that, in the tty console, write `make start` to start the node and this way you can connect to the testnet box using the endpoint `127.0.0.1:19000`
 
