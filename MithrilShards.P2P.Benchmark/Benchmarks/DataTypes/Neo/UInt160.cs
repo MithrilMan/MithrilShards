@@ -79,7 +79,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       /// </summary>
       public static new UInt160 Parse(string value) {
          if (value == null)
-            throw new ArgumentNullException();
+            throw new ArgumentNullException(nameof(value));
          if (value.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
             value = value.Substring(2);
          if (value.Length != Length * 2)

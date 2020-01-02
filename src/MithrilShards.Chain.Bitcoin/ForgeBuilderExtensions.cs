@@ -56,6 +56,7 @@ namespace MithrilShards.Chain.Bitcoin {
             .AddSingleton<INetworkMessageSerializer, GetaddrMessageSerializer>()
             .AddSingleton<INetworkMessageSerializer, PingMessageSerializer>()
             .AddSingleton<INetworkMessageSerializer, PongMessageSerializer>()
+            .AddSingleton<INetworkMessageSerializer, SendCmpctMessageSerializer>()
             ;
 
          return services;
@@ -63,6 +64,7 @@ namespace MithrilShards.Chain.Bitcoin {
       private static IServiceCollection AddMessageProcessors(this IServiceCollection services) {
          services
             .AddTransient<INetworkMessageProcessor, HandshakeProcessor>()
+            .AddTransient<INetworkMessageProcessor, CompactHeaderProcessor>()
             ;
 
          return services;

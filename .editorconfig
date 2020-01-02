@@ -27,7 +27,7 @@ dotnet_style_qualification_for_field                              = true : error
 dotnet_style_qualification_for_method                             = true : error
 dotnet_style_qualification_for_property                           = true : error
 dotnet_style_readonly_field                                       = true : error
-dotnet_style_require_accessibility_modifiers                      = true : silent
+dotnet_style_require_accessibility_modifiers                      = always : silent
 
 csharp_indent_case_contents                                       = true
 csharp_indent_case_contents_when_block                            = true
@@ -86,3 +86,6 @@ dotnet_diagnostic.CA1063.severity = none
 dotnet_diagnostic.CA2007.severity = error
 # VSTHRD111: Consider calling ConfigureAwait on the awaited valuetask
 dotnet_diagnostic.VSTHRD111.severity = error
+
+# CA1051: Do not declare visible instance fields
+dotnet_diagnostic.CA1051.severity = silent

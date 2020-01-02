@@ -9,6 +9,7 @@ using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
@@ -52,12 +53,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
 
          if (peerContext.Direction == PeerConnectionDirection.Outbound) {
             this.logger.LogDebug("Commencing handshake with local Version.");
-            await this.messageWriter.WriteAsync(this.CreateVersionMessage()).ConfigureAwait(false);
+            await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
          }
       }
 
 
-      public override async Task<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation) {
+      public override async ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation) {
          switch (message) {
             case VersionMessage typedMessage:
                await this.ProcessVersionMessageAsync(typedMessage, cancellation).ConfigureAwait(false);
@@ -82,7 +83,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
                   Code = RejectMessage.RejectCode.Duplicate
                };
 
-               await this.messageWriter.WriteAsync(rejectMessage, cancellation).ConfigureAwait(false);
+               await this.SendMessageAsync(rejectMessage, cancellation).ConfigureAwait(false);
                this.logger.LogWarning("Rejecting {MessageType}.", nameof(VersionMessage));
             }
             //TODO bad behavior, call peer score manager
@@ -101,7 +102,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
                   await this.StartHandshakeAsync(cancellation).ConfigureAwait(false);
                }
                else {
-                  await this.messageWriter.WriteAsync(new VerackMessage()).ConfigureAwait(false);
+                  await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
                }
             }
          }
@@ -148,8 +149,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          }
 
          this.logger.LogDebug("Responding to handshake with local Version.");
-         await this.messageWriter.WriteAsync(this.CreateVersionMessage()).ConfigureAwait(false);
-         await this.messageWriter.WriteAsync(new VerackMessage()).ConfigureAwait(false);
+         await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
+         await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
 
          await this.OnHandshaked().ConfigureAwait(false);
       }
@@ -159,8 +160,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          this.status.IsHandShaked = true;
 
          if (this.status.PeerVersion.Version >= KnownVersion.V31402) {
-            await this.messageWriter.WriteAsync(new GetaddrMessage()).ConfigureAwait(false);
+            await this.SendMessageAsync(new GetaddrMessage()).ConfigureAwait(false);
          }
+
+         this.eventBus.Publish(new PeerHandshaked(this.PeerContext));
       }
 
 

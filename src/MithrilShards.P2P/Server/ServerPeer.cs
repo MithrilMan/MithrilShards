@@ -172,6 +172,7 @@ namespace MithrilShards.Network.Legacy.Server {
 
       public void Dispose() {
          this.onPeerDisconnectedSubscription.Dispose();
+         this.listenerCancellation.Dispose();
       }
    }
 }

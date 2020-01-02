@@ -91,7 +91,7 @@ namespace MithrilShards.Network.Legacy.StateMachine {
             this.stateMachine.Configure(PeerConnectionState.ProcessMessage)
                .SubstateOf(PeerConnectionState.Connected)
                .OnEntryFromAsync(this.processMessageTrigger,
-                                 async (message) => await this.ProgessMessageAsync(message, cancellationToken).ConfigureAwait(false))
+                                 async (message) => await this.ProcessMessageAsync(message, cancellationToken).ConfigureAwait(false))
                .Permit(PeerConnectionTrigger.MessageProcessed, PeerConnectionState.WaitingMessage);
 
             this.stateMachine.Configure(PeerConnectionState.Disconnecting)
@@ -230,7 +230,7 @@ namespace MithrilShards.Network.Legacy.StateMachine {
          return true;
       }
 
-      private async Task ProgessMessageAsync(INetworkMessage message, CancellationToken cancellationToken) {
+      private async Task ProcessMessageAsync(INetworkMessage message, CancellationToken cancellationToken) {
          using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", message.Command);
          this.logger.LogDebug("Parsing message '{Command}'", message.Command);
          if (message is UnknownMessage) {

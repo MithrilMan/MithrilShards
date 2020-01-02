@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       protected readonly ILogger<BaseProcessor> logger;
       protected readonly IEventBus eventBus;
 
-      protected INetworkMessageWriter messageWriter;
+      private INetworkMessageWriter messageWriter;
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
@@ -39,7 +39,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          return default;
       }
 
-      public abstract Task<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation);
+      public abstract ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation);
 
       /// <summary>
       /// Registers the component life time subscription to an <see cref="IEventBus"/> event that will be automatically
@@ -77,6 +77,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          }
 
          this.PeerContext.ConnectionCancellationTokenSource.Cancel();
+      }
+
+      /// <summary>
+      /// Sends the message asynchronously to the other peer.
+      /// </summary>
+      /// <param name="message">The message to send.</param>
+      /// <param name="cancellationToken">The cancellation token.</param>
+      /// <returns></returns>
+      public async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default) {
+         await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
       }
    }
 }
