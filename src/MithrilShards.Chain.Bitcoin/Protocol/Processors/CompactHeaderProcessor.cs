@@ -62,11 +62,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
          {
             SendCmpctMessage sendCmpct => await this.ProcessSendCmpctMessageAsync(sendCmpct, cancellation).ConfigureAwait(false),
             GetHeadersMessage getHeaders => await this.GetHeadersMessageAsync(getHeaders, cancellation).ConfigureAwait(false),
+            HeadersMessage headers => await this.HeadersMessageAsync(headers, cancellation).ConfigureAwait(false),
             _ => true
          };
       }
 
       private ValueTask<bool> GetHeadersMessageAsync(GetHeadersMessage message, CancellationToken cancellation) {
+         return new ValueTask<bool>(true);
+      }
+
+      private ValueTask<bool> HeadersMessageAsync(HeadersMessage message, CancellationToken cancellation) {
          return new ValueTask<bool>(true);
       }
 

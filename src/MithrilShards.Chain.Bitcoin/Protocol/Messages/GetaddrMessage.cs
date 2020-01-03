@@ -2,9 +2,9 @@
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
    [NetworkMessage("getaddr")]
-   public class GetaddrMessage : NetworkMessage {
+   public class GetAddrMessage : NetworkMessage {
 
-      public GetaddrMessage() : base("getaddr") {
+      public GetAddrMessage() : base("getaddr") {
       }
    }
 }

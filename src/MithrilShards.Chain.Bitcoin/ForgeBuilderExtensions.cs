@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Network.Server.Guards;
@@ -49,16 +51,11 @@ namespace MithrilShards.Chain.Bitcoin {
       }
 
       private static IServiceCollection AddMessageSerializers(this IServiceCollection services) {
-         services
-            .AddSingleton<INetworkMessageSerializer, VersionMessageSerializer>()
-            .AddSingleton<INetworkMessageSerializer, VerackMessageSerializer>()
-            .AddSingleton<INetworkMessageSerializer, RejectMessageSerializer>()
-            .AddSingleton<INetworkMessageSerializer, GetaddrMessageSerializer>()
-            .AddSingleton<INetworkMessageSerializer, PingMessageSerializer>()
-            .AddSingleton<INetworkMessageSerializer, PongMessageSerializer>()
-            .AddSingleton<INetworkMessageSerializer, SendCmpctMessageSerializer>()
-            .AddSingleton<INetworkMessageSerializer, GetHeadersMessageSerializer>()
-            ;
+         // discover and register all message serializer in this assembly
+         Type serializerInterface = typeof(INetworkMessageSerializer);
+         foreach (Type messageSerializer in typeof(BitcoinShard).Assembly.GetTypes().Where(t => serializerInterface.IsAssignableFrom(t))) {
+            services.AddSingleton(typeof(INetworkMessageSerializer), messageSerializer);
+         }
 
          return services;
       }

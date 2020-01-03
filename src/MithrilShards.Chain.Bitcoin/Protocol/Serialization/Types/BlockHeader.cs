@@ -38,6 +38,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       /// </summary>
       public uint Nonce { get; set; }
 
+      public ulong TransactionCount { get; set; }
+
       public void Deserialize(ref SequenceReader<byte> reader) {
          this.Version = reader.ReadInt();
          this.PreviousBlockHash = reader.ReadUInt256();
@@ -45,6 +47,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          this.TimeStamp = reader.ReadUInt();
          this.Bits = reader.ReadUInt();
          this.Nonce = reader.ReadUInt();
+         this.TransactionCount = reader.ReadVarInt();
       }
 
       public int Serialize(IBufferWriter<byte> writer) {
@@ -55,6 +58,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          size += writer.WriteUInt(this.TimeStamp);
          size += writer.WriteUInt(this.Bits);
          size += writer.WriteUInt(this.Nonce);
+         size += writer.WriteVarInt(this.TransactionCount);
 
          return size;
       }
