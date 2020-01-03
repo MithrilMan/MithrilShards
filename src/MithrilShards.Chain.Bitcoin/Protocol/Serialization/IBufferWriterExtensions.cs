@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Text;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
 using MithrilShards.Core.DataTypes;
@@ -11,6 +9,16 @@ using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
    public static class IBufferWriterExtensions {
+      /// <summary>
+      /// Serialize a <typeparamref name="TItem"/> type.
+      /// </summary>
+      /// <typeparam name="TItem">The type of the item to serialize.</typeparam>
+      /// <param name="writer">The writer used to write the serialized data.</param>
+      /// <param name="item">The item to serialize.</param>
+      /// <returns>The length of bytes serialized.</returns>
+      public delegate int ItemSerializer<TItem>(IBufferWriter<byte> writer, TItem item);
+
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteBool(this IBufferWriter<byte> writer, bool value) {
          const int size = 1;
          writer.GetSpan(size)[0] = (byte)(value ? 1 : 0);
@@ -18,6 +26,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return size;
       }
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteByte(this IBufferWriter<byte> writer, byte value) {
          const int size = 1;
          writer.GetSpan(size)[0] = value;
@@ -25,6 +34,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return 1;
       }
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteShort(this IBufferWriter<byte> writer, short value, bool isBigEndian = false) {
          const int size = 2;
          if (isBigEndian) {
@@ -38,6 +48,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return size;
       }
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteUShort(this IBufferWriter<byte> writer, ushort value, bool isBigEndian = false) {
          const int size = 2;
          if (isBigEndian) {
@@ -52,6 +63,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       }
 
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteInt(this IBufferWriter<byte> writer, int value, bool isBigEndian = false) {
          const int size = 4;
          if (isBigEndian) {
@@ -65,6 +77,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return size;
       }
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteUInt(this IBufferWriter<byte> writer, uint value, bool isBigEndian = false) {
          const int size = 4;
          if (isBigEndian) {
@@ -78,6 +91,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return size;
       }
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteLong(this IBufferWriter<byte> writer, long value, bool isBigEndian = false) {
          const int size = 8;
          if (isBigEndian) {
@@ -91,6 +105,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return size;
       }
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteULong(this IBufferWriter<byte> writer, ulong value, bool isBigEndian = false) {
          const int size = 8;
          if (isBigEndian) {
@@ -104,6 +119,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return size;
       }
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteVarString(this IBufferWriter<byte> writer, string value) {
          int stringLength = value?.Length ?? 0;
          int size = WriteVarInt(writer, (ulong)stringLength);
@@ -113,6 +129,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return size + stringLength;
       }
 
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteBytes(this IBufferWriter<byte> writer, byte[] value) {
          if (value is null) {
             throw new ArgumentNullException(nameof(value));
@@ -123,8 +140,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       }
 
       /// <summary>
-      ///  Writes the array of passed <typeparamref name="TSerializableType"/> types.
-      ///  Internally it writes a VarInt followed by the list of serialized items.
+      /// Writes the array of passed <typeparamref name="TSerializableType"/> types.
+      /// Internally it writes a VarInt followed by the list of serialized items.
       /// </summary>
       /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
       /// <param name="writer">The writer.</param>
@@ -144,6 +161,31 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return size;
       }
 
+      /// <summary>
+      /// Writes the array of <typeparamref name="TItemType" />.
+      /// Internally it writes a VarInt followed by the list of serialized items.
+      /// </summary>
+      /// <typeparam name="TItemType">The type of the item type.</typeparam>
+      /// <param name="writer">The writer.</param>
+      /// <param name="items">The items.</param>
+      /// <param name="serializer">The serialization method to use to deserialize a single <typeparamref name="TItemType"/> instance.</param>
+      /// <returns></returns>
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      public static int WriteArray<TItemType>(this IBufferWriter<byte> writer, TItemType[] items, ItemSerializer<TItemType> serializer) {
+         if ((items?.Length ?? 0) == 0) {
+            return writer.WriteVarInt(0);
+         }
+
+         int size = WriteVarInt(writer, (ulong)items.Length);
+
+         for (int i = 0; i < items.Length; i++) {
+            size += serializer(writer, items[i]);
+         }
+
+         return size;
+      }
+
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteVarInt(this IBufferWriter<byte> writer, ulong value) {
          if (value < 0xFD) {
             const int size = 1;
@@ -184,11 +226,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <param name="reader">The reader.</param>
       /// <param name="skipTimeField">if set to <c>true</c> skips time field serialization/deserialization, used by <see cref="VersionMessage"/>.</param>
       /// <returns></returns>
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteNetworkAddress(this IBufferWriter<byte> writer, NetworkAddress value) {
          return value.Serialize(writer);
       }
 
-
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteUInt256(this IBufferWriter<byte> writer, UInt256 value) {
          ReadOnlySpan<byte> span = value.GetBytes();
          writer.Write(span);

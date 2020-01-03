@@ -49,7 +49,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
             await this.SendMessageAsync(new GetHeadersMessage {
                Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
                BlockLocator = new Serialization.Types.BlockLocator {
-                  BlockLocatorHashes = new Serialization.Types.UInt256Type[1] { new Serialization.Types.UInt256Type { Value = this.chainDefinition.Genesis } }
+                  BlockLocatorHashes = new UInt256[1] { this.chainDefinition.Genesis }
                },
                HashStop = UInt256.Zero
             }).ConfigureAwait(false);
