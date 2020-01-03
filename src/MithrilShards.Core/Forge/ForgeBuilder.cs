@@ -90,7 +90,7 @@ namespace MithrilShards.Core.Forge {
 
       public IForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
          where TMithrilShard : class, IMithrilShard
-         where TMithrilShardSettings : class, IMithrilShardSettings {
+         where TMithrilShardSettings : class, IMithrilShardSettings, new() {
 
          this.AddShard<TMithrilShard>(configureDelegate);
 

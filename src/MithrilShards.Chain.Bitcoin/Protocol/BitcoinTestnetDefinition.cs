@@ -18,7 +18,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol {
          this.Name = "BitcoinMain";
          this.Magic = 0xDAB5BFFA;
          this.MagicBytes = BitConverter.GetBytes(0xDAB5BFFA);
-         this.Genesis = null;
+         this.Genesis = new UInt256("000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943");
          this.DefaultMaxPayloadSize = 32_000_000;
       }
    }

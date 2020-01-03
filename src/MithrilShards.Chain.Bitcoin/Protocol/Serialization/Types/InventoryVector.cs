@@ -42,9 +42,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
 
       public int Length => 36;
 
-      public void Deserialize(ref SequenceReader<byte> data) {
-         this.Type = data.ReadUInt();
-         this.Hash = data.ReadBytes(32);
+      public void Deserialize(ref SequenceReader<byte> reader) {
+         this.Type = reader.ReadUInt();
+         this.Hash = reader.ReadBytes(32);
       }
 
       public int Serialize(IBufferWriter<byte> writer) {

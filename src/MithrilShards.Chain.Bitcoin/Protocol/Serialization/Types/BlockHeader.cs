@@ -42,13 +42,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
 
       public int Length => -1;
 
-      public void Deserialize(ref SequenceReader<byte> data) {
-         this.Version = data.ReadInt();
-         this.PreviousBlockHash = data.ReadBytes(32);
-         this.MerkleRoot = data.ReadBytes(32);
-         this.TimeStamp = data.ReadUInt();
-         this.Bits = data.ReadUInt();
-         this.Nonce = data.ReadUInt();
+      public void Deserialize(ref SequenceReader<byte> reader) {
+         this.Version = reader.ReadInt();
+         this.PreviousBlockHash = reader.ReadBytes(32);
+         this.MerkleRoot = reader.ReadBytes(32);
+         this.TimeStamp = reader.ReadUInt();
+         this.Bits = reader.ReadUInt();
+         this.Nonce = reader.ReadUInt();
       }
 
       public int Serialize(IBufferWriter<byte> writer) {

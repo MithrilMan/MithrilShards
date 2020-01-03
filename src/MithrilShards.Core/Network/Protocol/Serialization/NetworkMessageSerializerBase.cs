@@ -5,7 +5,7 @@ using System.Text;
 using MithrilShards.Core.Crypto;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization {
-   public abstract class NetworkMessageSerializerBase<TMessageType> : INetworkMessageSerializer where TMessageType : INetworkMessage {
+   public abstract class NetworkMessageSerializerBase<TMessageType> : INetworkMessageSerializer where TMessageType : INetworkMessage, new() {
       const int SIZE_MAGIC = 4;
       const int SIZE_COMMAND = 12;
       const int SIZE_PAYLOAD_LENGTH = 4;
@@ -24,7 +24,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          this.precookedMagciAndCommand = new byte[SIZE_MAGIC + SIZE_COMMAND];
          this.chainDefinition.MagicBytes.CopyTo(this.precookedMagciAndCommand, 0);
          var commandSpan = new Span<byte>(this.precookedMagciAndCommand, SIZE_MAGIC, SIZE_COMMAND);
-         System.Text.Encoding.ASCII.GetBytes(Activator.CreateInstance<TMessageType>().Command.PadRight(12, '\0'), commandSpan);
+         System.Text.Encoding.ASCII.GetBytes(new TMessageType().Command.PadRight(12, '\0'), commandSpan);
          #endregion
       }
 

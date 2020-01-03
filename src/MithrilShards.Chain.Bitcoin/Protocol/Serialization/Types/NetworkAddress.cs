@@ -58,14 +58,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          this.skipTimeField = skipTimeField;
       }
 
-      public void Deserialize(ref SequenceReader<byte> data) {
+      public void Deserialize(ref SequenceReader<byte> reader) {
          // https://bitcoin.org/en/developer-reference#version
          if (!this.skipTimeField) {
-            this.Time = data.ReadUInt(); //DateTimeOffset.FromUnixTimeSeconds(data.ReadUInt);
+            this.Time = reader.ReadUInt(); //DateTimeOffset.FromUnixTimeSeconds(data.ReadUInt);
          }
-         this.Services = data.ReadULong();
-         this.IP = data.ReadBytes(16);
-         this.Port = data.ReadUShort();
+         this.Services = reader.ReadULong();
+         this.IP = reader.ReadBytes(16);
+         this.Port = reader.ReadUShort();
       }
 
       public int Serialize(IBufferWriter<byte> writer) {

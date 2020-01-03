@@ -20,7 +20,7 @@ namespace MithrilShards.Core.Forge {
       /// <returns></returns>
       IForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
          where TMithrilShard : class, IMithrilShard
-         where TMithrilShardSettings : class, IMithrilShardSettings;
+         where TMithrilShardSettings : class, IMithrilShardSettings, new();
 
       /// <summary>
       /// Adds a shard into the forge.

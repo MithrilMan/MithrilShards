@@ -57,6 +57,7 @@ namespace MithrilShards.Chain.Bitcoin {
             .AddSingleton<INetworkMessageSerializer, PingMessageSerializer>()
             .AddSingleton<INetworkMessageSerializer, PongMessageSerializer>()
             .AddSingleton<INetworkMessageSerializer, SendCmpctMessageSerializer>()
+            .AddSingleton<INetworkMessageSerializer, GetHeadersMessageSerializer>()
             ;
 
          return services;

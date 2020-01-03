@@ -6,6 +6,8 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
+using MithrilShards.Core.DataTypes;
+using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
    public static class IBufferWriterExtensions {
@@ -120,6 +122,28 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return value.Length;
       }
 
+      /// <summary>
+      ///  Writes the array of passed <typeparamref name="TSerializableType"/> types.
+      ///  Internally it writes a VarInt followed by the list of serialized items.
+      /// </summary>
+      /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
+      /// <param name="writer">The writer.</param>
+      /// <param name="items">The items.</param>
+      /// <returns></returns>
+      public static int WriteArray<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType[] items) where TSerializableType : ISerializableProtocolType<TSerializableType>, new() {
+         if ((items?.Length ?? 0) == 0) {
+            return writer.WriteVarInt(0);
+         }
+
+         int size = WriteVarInt(writer, (ulong)items.Length);
+
+         for (int i = 0; i < items.Length; i++) {
+            size += items[i].Serialize(writer);
+         }
+
+         return size;
+      }
+
       public static int WriteVarInt(this IBufferWriter<byte> writer, ulong value) {
          if (value < 0xFD) {
             const int size = 1;
@@ -162,6 +186,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <returns></returns>
       public static int WriteNetworkAddress(this IBufferWriter<byte> writer, NetworkAddress value) {
          return value.Serialize(writer);
+      }
+
+
+      public static int WriteUInt256(this IBufferWriter<byte> writer, UInt256 value) {
+         ReadOnlySpan<byte> span = value.GetBytes();
+         writer.Write(span);
+         return span.Length;
       }
    }
 }

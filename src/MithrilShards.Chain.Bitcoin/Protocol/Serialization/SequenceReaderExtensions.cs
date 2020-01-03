@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
+using MithrilShards.Core.DataTypes;
+using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
    public static class SequenceReaderExtensions {
@@ -87,6 +89,29 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          return result.ToArray();
       }
 
+
+      /// <summary>
+      /// Reads an array of <typeparamref name="TSerializableType"/> types.
+      /// Internally it expects a VarInt that specifies the length of items to read.
+      /// </summary>
+      /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
+      /// <param name="reader">The reader.</param>
+      /// <returns></returns>
+      public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader)
+         where TSerializableType : ISerializableProtocolType<TSerializableType>, new() {
+
+         ulong itemsCount = reader.ReadVarInt();
+
+         TSerializableType[] result = new TSerializableType[itemsCount];
+
+         for (ulong i = 0; i < itemsCount; i++) {
+            TSerializableType itemModel = result[i] = new TSerializableType();
+            itemModel.Deserialize(ref reader);
+         }
+
+         return result;
+      }
+
       public static ulong ReadVarInt(ref this SequenceReader<byte> reader) {
          reader.TryRead(out byte firstByte);
          if (firstByte < 0xFD) {
@@ -114,6 +139,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          var result = new NetworkAddress(skipTimeField);
          result.Deserialize(ref reader);
          return result;
+      }
+
+      public static UInt256 ReadUInt256(ref this SequenceReader<byte> reader) {
+         ReadOnlySequence<byte> sequence = reader.Sequence.Slice(reader.Position, 32);
+         if (sequence.IsSingleSegment) {
+            return new UInt256(sequence.FirstSpan);
+         }
+         else {
+            return new UInt256(sequence.ToArray());
+         }
       }
    }
 }

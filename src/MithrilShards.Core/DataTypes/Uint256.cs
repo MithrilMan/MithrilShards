@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
-using MithrilShards.Core.Encoding;
 
 namespace MithrilShards.Core.DataTypes {
    [StructLayout(LayoutKind.Sequential)]
    public class UInt256 {
       private const int EXPECTED_SIZE = 32;
+
+      public static UInt256 Zero = new UInt256("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
 #pragma warning disable IDE0044 // Add readonly modifier
       private ulong part1;
@@ -138,6 +137,10 @@ namespace MithrilShards.Core.DataTypes {
       /// </returns>
       public static UInt256 Parse(string hexString) {
          return new UInt256(hexString);
+      }
+
+      public ReadOnlySpan<byte> GetBytes() {
+         return MemoryMarshal.AsBytes(MemoryMarshal.CreateReadOnlySpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
       }
    }
 }

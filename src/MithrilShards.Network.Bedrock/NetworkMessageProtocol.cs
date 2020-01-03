@@ -210,7 +210,7 @@ namespace MithrilShards.Network.Bedrock {
                this.logger.LogDebug("Sent message '{Command}'.", message.Command);
             }
             else {
-               this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
+               this.logger.LogError("Serializer for message '{Command}' not found.", message.Command);
             }
          }
       }

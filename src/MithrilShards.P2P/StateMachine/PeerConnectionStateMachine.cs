@@ -234,7 +234,7 @@ namespace MithrilShards.Network.Legacy.StateMachine {
          using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", message.Command);
          this.logger.LogDebug("Parsing message '{Command}'", message.Command);
          if (message is UnknownMessage) {
-            this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
+            this.logger.LogWarning("Deserializer for message '{Command}' not found.", message.Command);
          }
          else {
             this.logger.LogDebug(JsonSerializer.Serialize(message, message.GetType(), new JsonSerializerOptions { WriteIndented = true }));

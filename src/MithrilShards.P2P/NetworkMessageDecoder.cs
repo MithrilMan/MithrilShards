@@ -64,7 +64,7 @@ namespace MithrilShards.Network.Legacy {
                   return true;
                }
                else {
-                  this.logger.LogWarning("Serializer for message '{Command}' not found.", commandName);
+                  this.logger.LogWarning("Deserializer for message '{Command}' not found.", commandName);
                   message = new UnknownMessage(commandName, payload.ToArray());
                   this.peerContext.Metrics.Wasted(this.ContextData.GetTotalMessageLength());
                   return true;

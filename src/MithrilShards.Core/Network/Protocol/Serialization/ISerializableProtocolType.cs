@@ -20,12 +20,12 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
    public interface ISerializableProtocolType<TProtocolType> : ISerializableProtocolType where TProtocolType : ISerializableProtocolType<TProtocolType> {
       int Serialize(IBufferWriter<byte> writer);
 
-      void Deserialize(ref SequenceReader<byte> data);
+      void Deserialize(ref SequenceReader<byte> reader);
    }
 
    public interface ISerializableProtocolTypeEndiannessAware<TProtocolType> : ISerializableProtocolType where TProtocolType : ISerializableProtocolTypeEndiannessAware<TProtocolType> {
       int Serialize(IBufferWriter<byte> writer, bool isLittleEndian);
 
-      void Deserialize(ref SequenceReader<byte> data, bool isLittleEndian);
+      void Deserialize(ref SequenceReader<byte> reader, bool isLittleEndian);
    }
 }
