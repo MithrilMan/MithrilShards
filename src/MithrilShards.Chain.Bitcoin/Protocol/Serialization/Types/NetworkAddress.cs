@@ -61,7 +61,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
             this.Time = reader.ReadUInt(); //DateTimeOffset.FromUnixTimeSeconds(data.ReadUInt);
          }
          this.Services = reader.ReadULong();
-         this.IP = reader.ReadBytes(16);
+         this.IP = reader.ReadBytes(16).ToArray();
          this.Port = reader.ReadUShort();
       }
 

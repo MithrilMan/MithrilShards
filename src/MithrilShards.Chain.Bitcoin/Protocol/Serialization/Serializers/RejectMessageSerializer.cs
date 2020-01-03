@@ -16,7 +16,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          };
 
          if (reader.Remaining > 0) {
-            message.Data = reader.ReadBytes((int)Math.Min(reader.Remaining, MAX_DATA_SIZE));
+            message.Data = reader.ReadBytes((int)Math.Min(reader.Remaining, MAX_DATA_SIZE)).ToArray();
          }
 
          return message;

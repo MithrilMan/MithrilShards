@@ -1,6 +1,5 @@
 ﻿using System.Buffers;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
-using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
@@ -9,7 +8,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
       public GetHeadersMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
 
       public override void Serialize(GetHeadersMessage message, int protocolVersion, IBufferWriter<byte> output) {
-         output.WriteULong(message.Version);
+         output.WriteUInt(message.Version);
          message.BlockLocator.Serialize(output);
          output.WriteUInt256(message.HashStop);
       }

@@ -16,8 +16,6 @@ namespace MithrilShards.Network.Bedrock {
          this.writer = writer;
       }
 
-
-
       public ValueTask WriteAsync(INetworkMessage message, CancellationToken cancellationToken = default) {
          return this.writer.WriteAsync(this.messageWriter, message, cancellationToken);
       }

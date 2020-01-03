@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Network;
@@ -59,11 +60,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       public override async ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation) {
          return message switch
          {
-            SendCmpctMessage typedMessage => await this.ProcessSendCmpctMessageAsync(typedMessage, cancellation).ConfigureAwait(false),
+            SendCmpctMessage sendCmpct => await this.ProcessSendCmpctMessageAsync(sendCmpct, cancellation).ConfigureAwait(false),
+            GetHeadersMessage getHeaders => await this.GetHeadersMessageAsync(getHeaders, cancellation).ConfigureAwait(false),
             _ => true
          };
       }
 
+      private ValueTask<bool> GetHeadersMessageAsync(GetHeadersMessage message, CancellationToken cancellation) {
+         return new ValueTask<bool>(true);
+      }
 
       private ValueTask<bool> ProcessSendCmpctMessageAsync(SendCmpctMessage message, CancellationToken cancellation) {
          if (message.UseCmpctBlock && message.Version == 1) {

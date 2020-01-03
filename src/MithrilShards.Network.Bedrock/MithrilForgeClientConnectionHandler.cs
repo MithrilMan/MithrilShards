@@ -112,10 +112,7 @@ namespace MithrilShards.Network.Bedrock {
          using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", message.Command);
          this.logger.LogDebug("Parsing message '{Command}' with size of {PayloadSize}", message.Command, contextData.PayloadLength);
 
-         if (message is UnknownMessage) {
-            this.logger.LogWarning("Serializer for message '{Command}' not found.", message.Command);
-         }
-         else {
+         if (!(message is UnknownMessage)) {
             await peerContext.ProcessMessageAsync(message).ConfigureAwait(false);
             this.eventBus.Publish(new PeerMessageReceived(peerContext, message, contextData.GetTotalMessageLength()));
          }

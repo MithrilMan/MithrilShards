@@ -172,11 +172,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteArray<TItemType>(this IBufferWriter<byte> writer, TItemType[] items, ItemSerializer<TItemType> serializer) {
-         if ((items?.Length ?? 0) == 0) {
-            return writer.WriteVarInt(0);
-         }
+         int length = items?.Length ?? 0;
 
-         int size = WriteVarInt(writer, (ulong)items.Length);
+         int size = WriteVarInt(writer, (ulong)length);
 
          for (int i = 0; i < items.Length; i++) {
             size += serializer(writer, items[i]);

@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
@@ -98,12 +99,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static byte[] ReadBytes(ref this SequenceReader<byte> reader, int length) {
-         ReadOnlySequence<byte> result = reader.Sequence.Slice(reader.Position, length);
+      public static ReadOnlySpan<byte> ReadBytes(ref this SequenceReader<byte> reader, int length) {
+         ReadOnlySequence<byte> sequence = reader.Sequence.Slice(reader.Position, length);
          reader.Advance(length);
 
-         // in case the string lies in a single span we can save a copy to a byte array
-         return result.ToArray();
+         if (sequence.IsSingleSegment) {
+            return sequence.FirstSpan;
+         }
+         else {
+            return sequence.ToArray();
+         }
       }
 
 
@@ -186,13 +191,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static UInt256 ReadUInt256(ref this SequenceReader<byte> reader) {
-         ReadOnlySequence<byte> sequence = reader.Sequence.Slice(reader.Position, 32);
-         if (sequence.IsSingleSegment) {
-            return new UInt256(sequence.FirstSpan);
-         }
-         else {
-            return new UInt256(sequence.ToArray());
-         }
+         return new UInt256(reader.ReadBytes(32));
       }
    }
 }

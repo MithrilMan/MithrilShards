@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
@@ -36,17 +37,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       /// </summary>
       public uint Type { get; set; }
 
-      public byte[] Hash { get; set; }
+      public UInt256 Hash { get; set; }
 
       public void Deserialize(ref SequenceReader<byte> reader) {
          this.Type = reader.ReadUInt();
-         this.Hash = reader.ReadBytes(32);
+         this.Hash = reader.ReadUInt256();
       }
 
       public int Serialize(IBufferWriter<byte> writer) {
          int size = 0;
          size += writer.WriteUInt(this.Type);
-         size += writer.WriteBytes(this.Hash);
+         size += writer.WriteUInt256(this.Hash);
 
          return size;
       }
