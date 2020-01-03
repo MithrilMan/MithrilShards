@@ -6,14 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="forge-settings-bitcoin-testnet.json" />
+    <None Remove="forge-settings-bitcoin-regtest.json" />
     <None Remove="forge-settings.json" />
     <None Remove="log-settings-with-seq.json" />
     <None Remove="log-settings.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="forge-settings-bitcoin-testnet.json">
+    <Content Include="forge-settings-bitcoin-regtest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="log-settings-with-seq.json">

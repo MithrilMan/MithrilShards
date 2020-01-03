@@ -4,9 +4,9 @@
       "commandName": "Project",
       "commandLineArgs": "--network=bitcoin-main"
     },
-    "bitcoin-testnet": {
+    "bitcoin-regtest": {
       "commandName": "Project",
-      "commandLineArgs": "--network=bitcoin-testnet"
+      "commandLineArgs": "--network=bitcoin-regtest"
     }
   }
 }
