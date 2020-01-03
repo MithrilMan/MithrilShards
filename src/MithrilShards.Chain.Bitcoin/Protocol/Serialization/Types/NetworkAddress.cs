@@ -9,11 +9,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
    /// <summary>
    /// Network address (net_addr).
    /// </summary>
-   public class NetworkAddress : ISerializableProtocolType<NetworkAddress> {
+   public class NetworkAddress : ISerializableProtocolType {
       readonly bool skipTimeField;
-
-      public string InternalName => "net_addr";
-      public int Length => this.skipTimeField ? 26 : 30;
 
       /// <summary>
       /// The Time (version >= 31402). Not present in version message.

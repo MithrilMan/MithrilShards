@@ -3,11 +3,7 @@ using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
-   public class BlockLocator : ISerializableProtocolType<BlockLocator> {
-      public string InternalName => "block_locator";
-
-      public int Length => -1;
-
+   public class BlockLocator : ISerializableProtocolType {
       /// <summary>
       /// Block locator objects.
       /// Newest back to genesis block (dense to start, but then sparse)

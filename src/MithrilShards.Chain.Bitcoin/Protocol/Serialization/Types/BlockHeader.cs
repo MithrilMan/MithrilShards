@@ -6,9 +6,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
    /// <summary>
    /// Inventory vector (inv_vect).
    /// </summary>
-   public class BlockHeader : ISerializableProtocolType<InventoryVector> {
-      public string InternalName => "Block header";
-
+   public class BlockHeader : ISerializableProtocolType {
       /// <summary>
       /// Block version information (note, this is signed)
       /// </summary>
@@ -38,9 +36,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       /// The nonce used to generate this block… to allow variations of the header and compute different hashes.
       /// </summary>
       public uint Nonce { get; set; }
-
-
-      public int Length => -1;
 
       public void Deserialize(ref SequenceReader<byte> reader) {
          this.Version = reader.ReadInt();

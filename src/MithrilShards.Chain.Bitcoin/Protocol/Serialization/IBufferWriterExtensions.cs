@@ -147,7 +147,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <param name="writer">The writer.</param>
       /// <param name="items">The items.</param>
       /// <returns></returns>
-      public static int WriteArray<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType[] items) where TSerializableType : ISerializableProtocolType<TSerializableType>, new() {
+      public static int WriteArray<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType[] items) where TSerializableType : ISerializableProtocolType, new() {
          if ((items?.Length ?? 0) == 0) {
             return writer.WriteVarInt(0);
          }

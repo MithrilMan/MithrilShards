@@ -116,7 +116,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader)
-         where TSerializableType : ISerializableProtocolType<TSerializableType>, new() {
+         where TSerializableType : ISerializableProtocolType, new() {
 
          ulong itemsCount = reader.ReadVarInt();
 

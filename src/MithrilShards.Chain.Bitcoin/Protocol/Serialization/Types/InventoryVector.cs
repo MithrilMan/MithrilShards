@@ -6,7 +6,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
    /// <summary>
    /// Inventory vector (inv_vect).
    /// </summary>
-   public class InventoryVector : ISerializableProtocolType<InventoryVector> {
+   public class InventoryVector : ISerializableProtocolType {
       public sealed class InventoryType {
          /// <summary>Any data of with this number may be ignored</summary>
          public const int ERROR = 0;
@@ -31,16 +31,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          public const int MSG_CMPCT_BLOCK = 4;
       }
 
-      public string InternalName => "inv_vect";
-
       /// <summary>
       /// Identifies the object type linked to this inventory
       /// </summary>
       public uint Type { get; set; }
 
       public byte[] Hash { get; set; }
-
-      public int Length => 36;
 
       public void Deserialize(ref SequenceReader<byte> reader) {
          this.Type = reader.ReadUInt();
