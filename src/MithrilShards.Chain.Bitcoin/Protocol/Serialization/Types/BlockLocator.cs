@@ -11,7 +11,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       public UInt256[] BlockLocatorHashes { get; set; }
 
       public void Deserialize(ref SequenceReader<byte> reader) {
-
          this.BlockLocatorHashes = reader.ReadArray(SequenceReaderExtensions.ReadUInt256);
       }
 
