@@ -3,7 +3,7 @@ using MithrilShards.Core.Network.Protocol;
 using System;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol {
-   public class BitcoinMainDefinition : IChainDefinition {
+   public class BitcoinRegtestDefinition : IChainDefinition {
       public string Name { get; }
 
       public byte[] MagicBytes { get; }
@@ -14,11 +14,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol {
 
       public int DefaultMaxPayloadSize { get; }
 
-      public BitcoinMainDefinition() {
-         this.Name = "Bitcoin Main";
-         this.Magic = 0xD9B4BEF9;
-         this.MagicBytes = BitConverter.GetBytes(0xD9B4BEF9);
-         this.Genesis = null;
+      public BitcoinRegtestDefinition() {
+         this.Name = "Bitcoin Regtest";
+         this.Magic = 0xDAB5BFFA;
+         this.MagicBytes = BitConverter.GetBytes(0xDAB5BFFA);
+         this.Genesis = new UInt256("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206");
          this.DefaultMaxPayloadSize = 32_000_000;
       }
    }
