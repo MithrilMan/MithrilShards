@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       /// <summary>
       /// The Time (version >= 31402). Not present in version message.
       /// </summary>
-      public uint Time { get; set; }
+      public DateTimeOffset Time { get; set; }
 
       /// <summary>
       /// Same service(s) listed in version.
@@ -47,6 +47,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          }
       }
 
+      public NetworkAddress() : this(false) { }
+
       /// <summary>
       /// Initializes a new instance of the <see cref="NetworkAddress"/> class.
       /// </summary>
@@ -55,21 +57,21 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          this.skipTimeField = skipTimeField;
       }
 
-      public void Deserialize(ref SequenceReader<byte> reader) {
+      public void Deserialize(ref SequenceReader<byte> reader, int protocolVersion) {
          // https://bitcoin.org/en/developer-reference#version
-         if (!this.skipTimeField) {
-            this.Time = reader.ReadUInt(); //DateTimeOffset.FromUnixTimeSeconds(data.ReadUInt);
+         if (!this.skipTimeField && protocolVersion >= KnownVersion.V31402) {
+            this.Time = DateTimeOffset.FromUnixTimeSeconds(reader.ReadUInt());
          }
          this.Services = reader.ReadULong();
          this.IP = reader.ReadBytes(16).ToArray();
          this.Port = reader.ReadUShort();
       }
 
-      public int Serialize(IBufferWriter<byte> writer) {
+      public int Serialize(IBufferWriter<byte> writer, int protocolVersion) {
          int size = 0;
          // https://bitcoin.org/en/developer-reference#version
-         if (!this.skipTimeField) {
-            size += writer.WriteUInt(this.Time); //DateTimeOffset.FromUnixTimeSeconds(data.ReadUInt);
+         if (!this.skipTimeField && protocolVersion >= KnownVersion.V31402) {
+            size += writer.WriteUInt((uint)this.Time.ToUnixTimeSeconds());
          }
          size += writer.WriteULong(this.Services);
          size += writer.WriteBytes(this.IP);

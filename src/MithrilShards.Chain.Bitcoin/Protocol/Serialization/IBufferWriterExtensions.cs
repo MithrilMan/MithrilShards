@@ -147,7 +147,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <param name="writer">The writer.</param>
       /// <param name="items">The items.</param>
       /// <returns></returns>
-      public static int WriteArray<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType[] items) where TSerializableType : ISerializableProtocolType, new() {
+      public static int WriteArray<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType[] items, int protocolVersion) where TSerializableType : ISerializableProtocolType, new() {
          if ((items?.Length ?? 0) == 0) {
             return writer.WriteVarInt(0);
          }
@@ -155,7 +155,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
          int size = WriteVarInt(writer, (ulong)items.Length);
 
          for (int i = 0; i < items.Length; i++) {
-            size += items[i].Serialize(writer);
+            size += items[i].Serialize(writer, protocolVersion);
          }
 
          return size;
@@ -225,8 +225,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <param name="skipTimeField">if set to <c>true</c> skips time field serialization/deserialization, used by <see cref="VersionMessage"/>.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static int WriteNetworkAddress(this IBufferWriter<byte> writer, NetworkAddress value) {
-         return value.Serialize(writer);
+      public static int WriteNetworkAddress(this IBufferWriter<byte> writer, NetworkAddress value, int protocolVersion) {
+         return value.Serialize(writer, protocolVersion);
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]

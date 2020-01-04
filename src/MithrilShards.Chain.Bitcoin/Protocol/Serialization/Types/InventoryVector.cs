@@ -39,12 +39,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
 
       public UInt256 Hash { get; set; }
 
-      public void Deserialize(ref SequenceReader<byte> reader) {
+      public void Deserialize(ref SequenceReader<byte> reader, int protocolVersion) {
          this.Type = reader.ReadUInt();
          this.Hash = reader.ReadUInt256();
       }
 
-      public int Serialize(IBufferWriter<byte> writer) {
+      public int Serialize(IBufferWriter<byte> writer, int protocolVersion) {
          int size = 0;
          size += writer.WriteUInt(this.Type);
          size += writer.WriteUInt256(this.Hash);

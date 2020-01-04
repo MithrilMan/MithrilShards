@@ -16,13 +16,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          output.WriteInt(message.Version);
          output.WriteULong(message.Services);
          output.WriteLong(message.Timestamp.ToUnixTimeSeconds());
-         output.WriteNetworkAddress(message.ReceiverAddress);
+         output.WriteNetworkAddress(message.ReceiverAddress, protocolVersion);
 
          if (protocolVersion < KnownVersion.V106) {
             return;
          }
 
-         output.WriteNetworkAddress(message.SenderAddress);
+         output.WriteNetworkAddress(message.SenderAddress, protocolVersion);
          output.WriteULong(message.Nonce);
          output.WriteVarString(message.UserAgent);
          output.WriteInt(message.StartHeight);
@@ -39,14 +39,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
             Version = reader.ReadInt(),
             Services = reader.ReadULong(),
             Timestamp = DateTimeOffset.FromUnixTimeSeconds(reader.ReadLong()),
-            ReceiverAddress = reader.ReadNetworkAddress(skipTimeField: true)
+            ReceiverAddress = reader.ReadNetworkAddress(skipTimeField: true, protocolVersion)
          };
 
          if (message.Version < KnownVersion.V106) {
             return message;
          }
 
-         message.SenderAddress = reader.ReadNetworkAddress(skipTimeField: true);
+         message.SenderAddress = reader.ReadNetworkAddress(skipTimeField: true, protocolVersion);
          message.Nonce = reader.ReadULong();
          message.UserAgent = reader.ReadVarString();
          message.StartHeight = reader.ReadInt();

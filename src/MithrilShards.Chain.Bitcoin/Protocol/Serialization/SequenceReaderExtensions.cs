@@ -120,7 +120,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <param name="reader">The reader.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader)
+      public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion)
          where TSerializableType : ISerializableProtocolType, new() {
 
          ulong itemsCount = reader.ReadVarInt();
@@ -129,7 +129,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
 
          for (ulong i = 0; i < itemsCount; i++) {
             TSerializableType itemModel = result[i] = new TSerializableType();
-            itemModel.Deserialize(ref reader);
+            itemModel.Deserialize(ref reader, protocolVersion);
          }
 
          return result;
@@ -183,9 +183,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <param name="skipTimeField">if set to <c>true</c> skips time field serialization/deserialization, used by <see cref="VersionMessage"/>.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static NetworkAddress ReadNetworkAddress(ref this SequenceReader<byte> reader, bool skipTimeField) {
+      public static NetworkAddress ReadNetworkAddress(ref this SequenceReader<byte> reader, bool skipTimeField, int protocolVersion) {
          var result = new NetworkAddress(skipTimeField);
-         result.Deserialize(ref reader);
+         result.Deserialize(ref reader, protocolVersion);
          return result;
       }
 

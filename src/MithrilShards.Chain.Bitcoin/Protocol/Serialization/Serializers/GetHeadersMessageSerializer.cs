@@ -9,7 +9,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
 
       public override void Serialize(GetHeadersMessage message, int protocolVersion, IBufferWriter<byte> output) {
          output.WriteUInt(message.Version);
-         message.BlockLocator.Serialize(output);
+         message.BlockLocator.Serialize(output, protocolVersion);
          output.WriteUInt256(message.HashStop);
       }
 
@@ -20,7 +20,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
 
          //TODO add extension to read and write blocklocator
          message.BlockLocator = new Types.BlockLocator();
-         message.BlockLocator.Deserialize(ref reader);
+         message.BlockLocator.Deserialize(ref reader, protocolVersion);
 
          message.HashStop = reader.ReadUInt256();
 

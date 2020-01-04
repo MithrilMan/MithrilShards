@@ -6,8 +6,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors {
    /// <summary>
    /// Interfaces that define a generic network message
    /// </summary>
-   public interface INetworkMessageProcessor : IDisposable {
-      bool Enabled { get; }
+   public interface INetworkMessageHandler<TNetworkMessage> where TNetworkMessage : INetworkMessage {
 
 
       /// <summary>
@@ -17,8 +16,6 @@ namespace MithrilShards.Core.Network.Protocol.Processors {
       /// <param name="message">The message.</param>
       /// <param name="cancellation">The cancellation token.</param>
       /// <returns></returns>
-      ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation);
-
-      ValueTask AttachAsync(IPeerContext peerContext);
+      ValueTask<bool> ProcessMessageAsync(TNetworkMessage message, CancellationToken cancellation);
    }
 }

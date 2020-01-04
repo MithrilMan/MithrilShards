@@ -9,12 +9,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
       public HeadersMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
 
       public override void Serialize(HeadersMessage message, int protocolVersion, IBufferWriter<byte> output) {
-         output.WriteArray(message.Headers);
+         output.WriteArray(message.Headers, protocolVersion);
       }
 
       public override HeadersMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion) {
          return new HeadersMessage {
-            Headers = reader.ReadArray<BlockHeader>()
+            Headers = reader.ReadArray<BlockHeader>(protocolVersion)
          };
       }
    }

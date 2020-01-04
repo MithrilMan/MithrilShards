@@ -40,7 +40,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
 
       public ulong TransactionCount { get; set; }
 
-      public void Deserialize(ref SequenceReader<byte> reader) {
+      public void Deserialize(ref SequenceReader<byte> reader, int protocolVersion) {
          this.Version = reader.ReadInt();
          this.PreviousBlockHash = reader.ReadUInt256();
          this.MerkleRoot = reader.ReadUInt256();
@@ -50,7 +50,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          this.TransactionCount = reader.ReadVarInt();
       }
 
-      public int Serialize(IBufferWriter<byte> writer) {
+      public int Serialize(IBufferWriter<byte> writer, int protocolVersion) {
          int size = 0;
          size += writer.WriteInt(this.Version);
          size += writer.WriteUInt256(this.PreviousBlockHash);
