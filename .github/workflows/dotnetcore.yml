@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -13,10 +13,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.100'
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.2
-    - name: Setup NuGet Sources
-      run: nuget sources add -name "bedrockframework" -Source "https://f.feedz.io/davidfowl/bedrockframework/nuget/index.json"
     - name: dotnet Restore
       run: dotnet restore
     - name: Build with dotnet
