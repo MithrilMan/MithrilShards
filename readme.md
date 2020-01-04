@@ -8,3 +8,4 @@ Target application: **DLT**.
 
 -- Work In Progres --
 
+![](https://github.com/MithrilMan/MithrilShards/workflows/Master/badge.svg)
