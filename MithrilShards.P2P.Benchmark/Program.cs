@@ -14,9 +14,10 @@ namespace MithrilShards.Network.Benchmark
             //this.Add(CsvMeasurementsExporter.Default);
             //this.Add(RPlotExporter.Default);
             //this.Add(Job.Default
-            //   .With(new GcMode() {
-            //   Force = false // tell BenchmarkDotNet not to force GC collections after every iteration
-            //}));
+            //   .With(new GcMode()
+            //   {
+            //      Force = false // tell BenchmarkDotNet not to force GC collections after every iteration
+            //   }));
          }
       }
 
@@ -37,6 +38,9 @@ namespace MithrilShards.Network.Benchmark
          Console.WriteLine("MithrilShards.Core.DataTypes.UInt256: " + new MithrilShards.Core.DataTypes.UInt256("0123456789abcdef0123456789ABCDEF0123456789abcdef0123456789ABCDEF").ToString());
 
          BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+
+         //for debug
+         //BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
       }
    }
 }

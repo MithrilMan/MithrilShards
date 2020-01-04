@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MithrilShards.Core.Network.Protocol.Processors
 {
@@ -15,17 +17,19 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       internal class ProcessorHandler
       {
          internal readonly INetworkMessageProcessor processor;
-         internal readonly MethodInfo handler;
-         public ProcessorHandler(INetworkMessageProcessor processor, MethodInfo handler)
+         internal readonly Func<object, object[], object> handler;
+         public ProcessorHandler(INetworkMessageProcessor processor, Func<object, object[], object> handler)
          {
             this.processor = processor;
             this.handler = handler;
          }
-         internal void Invoke(INetworkMessage message, CancellationToken cancellation)
+         internal ValueTask<bool> InvokeAsync(INetworkMessage message, CancellationToken cancellation)
          {
-            this.handler.Invoke(this.processor, new object[] { message, cancellation });
+            return (ValueTask<bool>)this.handler.Invoke(this.processor, new object[] { message, cancellation });
          }
       }
+
+      private delegate ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation);
 
       /// <summary>
       /// The mapping between MessageType and which processor instance is able to handle the request.
@@ -63,7 +67,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
                   this.mapping[handledMessageType] = handlers;
                }
 
-               handlers.Add(new ProcessorHandler(processor, method));
+               handlers.Add(new ProcessorHandler(processor, CreateLambdaWrapper(method)));
             }
          }
       }
@@ -74,16 +78,43 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       /// </summary>
       /// <param name="message">The message.</param>
       /// <returns><see langword="true"/> if message has been processed, <see langword="false"/> otherwise.</returns>
-      public bool ProcessMessage(INetworkMessage message, CancellationToken cancellation)
+      public async ValueTask<bool> ProcessMessage(INetworkMessage message, CancellationToken cancellation)
       {
          if (!this.mapping.TryGetValue(message.GetType(), out List<ProcessorHandler> handlers)) return false;
 
          for (int i = 0; i < handlers.Count; i++)
          {
-            handlers[i].Invoke(message, cancellation);
+            // when an handler return false, mean it doesn't want other handlers to continue parsing the message
+            if (!await handlers[i].InvokeAsync(message, cancellation).ConfigureAwait(false)) break;
          }
 
          return true;
+      }
+
+
+      /// <summary>
+      /// Improve performance over a straight <see cref="MethodInfo.Invoke"/>, creating a compiled lambda expression that
+      /// allow to have a call on a generic function that internally performs needed cast to invoke the proper open delegate.
+      /// </summary>
+      /// <param name="method">The method.</param>
+      /// <remarks>Of course this method is intended to generate the wrapper that should cached and invoked in place
+      /// of the wrapped MethodInfo. If the use case doesn't allow reuse, don't use this method.</remarks>
+      /// <returns></returns>
+      private static Func<object, object[], object> CreateLambdaWrapper(MethodInfo method)
+      {
+         ParameterExpression instance = Expression.Parameter(typeof(object), "target");
+         ParameterExpression arguments = Expression.Parameter(typeof(object[]), "arguments");
+
+         MethodCallExpression call = Expression.Call(
+            Expression.Convert(instance, method.DeclaringType),
+            method,
+            method.GetParameters()
+               .Select((parameter, index) => Expression.Convert(Expression.ArrayIndex(arguments, Expression.Constant(index)), parameter.ParameterType))
+               .ToArray());
+
+         return Expression
+            .Lambda<Func<object, object[], object>>(Expression.Convert(call, typeof(object)), instance, arguments)
+            .Compile();
       }
    }
 }
