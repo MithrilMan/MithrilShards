@@ -46,7 +46,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{BEA3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{54E1A44C-2EAC-440E-8802-B2EDCC328624}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+		.github\workflows\master.yml = .github\workflows\master.yml
+		.github\workflows\pr-on-master.yml = .github\workflows\pr-on-master.yml
 	EndProjectSection
 EndProject
 Global
