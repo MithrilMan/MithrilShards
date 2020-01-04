@@ -42,6 +42,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Diagnostic.St
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shards", "Shards", "{45D8469B-1E71-4366-89F7-B58FC6C789F6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{BEA3071B-CDD3-4FD7-9B59-71C1F7CF23BB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{54E1A44C-2EAC-440E-8802-B2EDCC328624}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +99,7 @@ Global
 		{60A45997-FDF2-4D8E-A00A-2203FDEC2102} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
 		{BBD15267-F1C4-4D1E-B4C5-08D7A91B1343} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
 		{C1B18295-7204-48B6-B6B1-5FA036B8ACE8} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
+		{54E1A44C-2EAC-440E-8802-B2EDCC328624} = {BEA3071B-CDD3-4FD7-9B59-71C1F7CF23BB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}
