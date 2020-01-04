@@ -58,19 +58,21 @@ namespace MithrilShards.Chain.Bitcoin
       {
          // discover and register all message serializer in this assembly
          Type serializerInterface = typeof(INetworkMessageSerializer);
-         foreach (Type messageSerializer in typeof(BitcoinShard).Assembly.GetTypes().Where(t => serializerInterface.IsAssignableFrom(t)))
+         foreach (Type messageSerializerType in typeof(BitcoinShard).Assembly.GetTypes().Where(t => serializerInterface.IsAssignableFrom(t)))
          {
-            services.AddSingleton(typeof(INetworkMessageSerializer), messageSerializer);
+            services.AddSingleton(typeof(INetworkMessageSerializer), messageSerializerType);
          }
 
          return services;
       }
       private static IServiceCollection AddMessageProcessors(this IServiceCollection services)
       {
-         services
-            .AddTransient<INetworkMessageProcessor, HandshakeProcessor>()
-            .AddTransient<INetworkMessageProcessor, CompactHeaderProcessor>()
-            ;
+         // discover and register all message serializer in this assembly
+         Type serializerInterface = typeof(INetworkMessageProcessor);
+         foreach (Type processorType in typeof(BitcoinShard).Assembly.GetTypes().Where(t => !t.IsAbstract && serializerInterface.IsAssignableFrom(t)))
+         {
+            services.AddTransient(typeof(INetworkMessageProcessor), processorType);
+         }
 
          return services;
       }

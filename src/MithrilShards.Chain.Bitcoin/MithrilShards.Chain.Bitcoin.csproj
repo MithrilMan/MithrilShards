@@ -20,4 +20,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.4.43" />
   </ItemGroup>
 
+   <ItemGroup>
+      <ProjectCapability Include="DynamicDependentFile" />
+      <ProjectCapability Include="DynamicFileNesting" />
+   </ItemGroup>
 </Project>

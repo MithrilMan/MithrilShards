@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -41,6 +42,13 @@ namespace MithrilShards.Core.Network.Protocol.Processors
             peerContext.AttachNetworkMessageProcessor(processor);
             await processor.AttachAsync(peerContext).ConfigureAwait(false);
          }
+
+         peerContext.Data.Set(new PeerNetworkMessageProcessorContainer(processors));
+      }
+
+      public async ValueTask ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
+      {
+         peerContext.Data.Get<PeerNetworkMessageProcessorContainer>().ProcessMessage(message, cancellation);
       }
    }
 }

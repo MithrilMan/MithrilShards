@@ -98,7 +98,7 @@ namespace MithrilShards.Network.Bedrock
                      break;
                   }
 
-                  await this.ProcessMessage(result.Message, connection, contextData, peerContext).ConfigureAwait(false);
+                  await this.ProcessMessage(result.Message, connection, contextData, peerContext, connection.ConnectionClosed).ConfigureAwait(false);
                }
                catch (Exception ex)
                {
@@ -150,7 +150,8 @@ namespace MithrilShards.Network.Bedrock
       private async Task ProcessMessage(INetworkMessage message,
                                         ConnectionContext connection,
                                         ConnectionContextData contextData,
-                                        IPeerContext peerContext)
+                                        IPeerContext peerContext,
+                                        CancellationToken cancellation)
       {
 
          using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", message.Command);
@@ -158,7 +159,7 @@ namespace MithrilShards.Network.Bedrock
 
          if (!(message is UnknownMessage))
          {
-            await peerContext.ProcessMessageAsync(message).ConfigureAwait(false);
+            await this.networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
             this.eventBus.Publish(new PeerMessageReceived(peerContext, message, contextData.GetTotalMessageLength()));
          }
       }

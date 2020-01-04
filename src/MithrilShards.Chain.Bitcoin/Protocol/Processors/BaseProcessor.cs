@@ -43,8 +43,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return default;
       }
 
-      public abstract ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation);
-
       /// <summary>
       /// Registers the component life time subscription to an <see cref="IEventBus"/> event that will be automatically
       /// unregistered once the component gets disposed.

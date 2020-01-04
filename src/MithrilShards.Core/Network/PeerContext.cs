@@ -98,19 +98,5 @@ namespace MithrilShards.Core.Network
             messageProcessor.Dispose();
          }
       }
-
-      public async Task ProcessMessageAsync(INetworkMessage message)
-      {
-         foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors)
-         {
-            if (messageProcessor.Enabled)
-            {
-               if (!await messageProcessor.ProcessMessageAsync(message, default).ConfigureAwait(false))
-               {
-                  break;
-               }
-            }
-         }
-      }
    }
 }

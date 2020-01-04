@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace MithrilShards.Core.Network.Protocol.Processors
 {
@@ -13,5 +14,14 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       /// </summary>
       /// <param name="peerContext">The peer context.</param>
       Task StartProcessorsAsync(IPeerContext peerContext);
+
+      /// <summary>
+      /// Processes the message asynchronously, calling all <see cref="INetworkMessageProcessor" /> instances that have to handle current message type.
+      /// </summary>
+      /// <param name="message">The network message.</param>
+      /// <param name="peerContext">The peer context.</param>
+      /// <param name="cancellation">The cancellation.</param>
+      /// <returns></returns>
+      ValueTask ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation);
    }
 }

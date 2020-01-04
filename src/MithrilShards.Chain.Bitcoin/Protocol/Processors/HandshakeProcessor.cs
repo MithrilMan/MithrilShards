@@ -7,72 +7,15 @@ using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network;
-using MithrilShards.Core.Network.Events;
-using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
-   public class HandshakeProcessor : BaseProcessor
+   public partial class HandshakeProcessor : BaseProcessor,
+      INetworkMessageHandler<VersionMessage>,
+      INetworkMessageHandler<VerackMessage>
    {
-      internal class Status
-      {
-         private readonly HandshakeProcessor processor;
-
-         internal VersionMessage PeerVersion { get; private set; } = null;
-
-         internal bool IsHandShaked { get; private set; } = false;
-
-         internal bool VersionAckReceived { get; private set; } = false;
-
-         public Status(HandshakeProcessor processor)
-         {
-            this.processor = processor;
-         }
-
-         internal async ValueTask VersionReceivedAsync(VersionMessage version)
-         {
-            this.PeerVersion = version;
-            this.processor.PeerContext.NegotiatedProtocolVersion.Version
-               = Math.Min(this.PeerVersion.Version, this.processor.nodeImplementation.ImplementationVersion);
-
-            await this.processor.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
-            await this.OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
-         }
-
-         internal async ValueTask VerAckReceivedAsync()
-         {
-            this.VersionAckReceived = true;
-            await this.OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
-         }
-
-         private async ValueTask OnHandshakeStatusUpdatedAsync()
-         {
-            if (!this.VersionAckReceived)
-            {
-               this.processor.logger.LogDebug("Waiting verack...");
-               return;
-            }
-
-            if (this.PeerVersion == null)
-            {
-               this.processor.logger.LogDebug("Waiting version message...");
-               return;
-            }
-
-            // if we reach this point, peer completed the handshake, yay!
-            this.IsHandShaked = true;
-            this.processor.logger.LogDebug("Handshake successful");
-            if (this.PeerVersion.Version >= KnownVersion.V31402)
-            {
-               await this.processor.SendMessageAsync(new GetAddrMessage()).ConfigureAwait(false);
-            }
-
-            this.processor.eventBus.Publish(new PeerHandshaked(this.processor.PeerContext));
-         }
-      }
-
       private readonly Status status;
       readonly IDateTimeProvider dateTimeProvider;
       readonly IRandomNumberGenerator randomNumberGenerator;
@@ -97,6 +40,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          await base.AttachAsync(peerContext).ConfigureAwait(false);
 
+         //add the status to the PeerContext, this way other processors may query the status
+         this.PeerContext.Data.Set(this.status);
+
          // ensures the handshake is performed timely
          this.DisconnectIfAsync(() =>
          {
@@ -111,17 +57,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       }
 
 
-      public override async ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation)
-      {
-         return message switch
-         {
-            VersionMessage version => await this.ProcessVersionMessageAsync(version, cancellation).ConfigureAwait(false),
-            VerackMessage verack => await this.ProcessVerackMessageAsync(verack, cancellation).ConfigureAwait(false),
-            _ => true
-         };
-      }
-
-      private async Task<bool> ProcessVersionMessageAsync(VersionMessage version, CancellationToken cancellation)
+      public async ValueTask<bool> ProcessMessageAsync(VersionMessage version, CancellationToken cancellation)
       {
          // did peers already handshaked?
          if (this.status.IsHandShaked)
@@ -148,12 +84,19 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             throw new ProtocolViolationException("Version message already received, disconnecting because of protocol violation.");
          }
 
+         if (this.VersionNotSupported(version)) throw new ProtocolViolationException("Peer version not supported.");
+
+         if (this.ConnectedToSelf(version)) throw new ProtocolViolationException("Connection to self detected.");
+
          // first time we receive version
          await this.status.VersionReceivedAsync(version).ConfigureAwait(false);
 
+         await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
+
          if (this.PeerContext.Direction == PeerConnectionDirection.Inbound)
          {
-            await this.StartHandshakeAsync(cancellation).ConfigureAwait(false);
+            this.logger.LogDebug("Responding to handshake with local Version.");
+            await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
          }
 
          this.PeerContext.TimeOffset = this.dateTimeProvider.GetTimeOffset() - version.Timestamp;
@@ -167,7 +110,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return false;
       }
 
-      private async Task<bool> ProcessVerackMessageAsync(VerackMessage verack, CancellationToken cancellation)
+      public async ValueTask<bool> ProcessMessageAsync(VerackMessage verack, CancellationToken cancellation)
       {
          if (this.status.VersionAckReceived)
          {
@@ -181,32 +124,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          // will prevent to handle version messages to other Processors
          return false;
-      }
-
-      private async Task StartHandshakeAsync(CancellationToken cancellation)
-      {
-         VersionMessage version = this.status.PeerVersion;
-
-         if (this.VersionNotSupported(version))
-         {
-            throw new ProtocolViolationException("Peer version not supported.");
-         }
-
-         if (this.ConnectedToSelf(version))
-         {
-            throw new ProtocolViolationException("Connection to self detected.");
-         }
-
-         // check the address used to connect to local node, in order to track how the node is seen outside (external address tracker)
-         if (this.PeerContext.Direction == PeerConnectionDirection.Inbound && version.ReceiverAddress.EndPoint.Address.IsRoutable(true))
-         {
-            //todo
-            //   SeenLocal(addrMe);
-         }
-
-         this.logger.LogDebug("Responding to handshake with local Version.");
-         await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
-         await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
       }
 
       private bool ConnectedToSelf(VersionMessage version)

@@ -5,6 +5,7 @@ using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Network.Legacy
@@ -21,6 +22,7 @@ namespace MithrilShards.Network.Legacy
       private readonly IDateTimeProvider dateTimeProvider;
       readonly IPeerContextFactory peerContextFactory;
       readonly IChainDefinition chainDefinition;
+      private readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
 
       public PeerConnectionFactory(ILoggerFactory loggerFactory,
@@ -28,6 +30,7 @@ namespace MithrilShards.Network.Legacy
                                    IDateTimeProvider dateTimeProvider,
                                    IPeerContextFactory peerContextFactory,
                                    IChainDefinition chainDefinition,
+                                   INetworkMessageProcessorFactory networkMessageProcessorFactory,
                                    INetworkMessageSerializerManager networkMessageSerializerManager)
       {
          this.loggerFactory = loggerFactory;
@@ -35,6 +38,7 @@ namespace MithrilShards.Network.Legacy
          this.dateTimeProvider = dateTimeProvider;
          this.peerContextFactory = peerContextFactory;
          this.chainDefinition = chainDefinition;
+         this.networkMessageProcessorFactory = networkMessageProcessorFactory;
          this.networkMessageSerializerManager = networkMessageSerializerManager;
          this.logger = loggerFactory.CreateLogger<PeerConnectionFactory>();
       }
@@ -52,6 +56,7 @@ namespace MithrilShards.Network.Legacy
                                       this.chainDefinition,
                                       this.networkMessageSerializerManager,
                                       new ConnectionContextData(this.chainDefinition.MagicBytes)),
+            this.networkMessageProcessorFactory,
             cancellationToken
             );
 
