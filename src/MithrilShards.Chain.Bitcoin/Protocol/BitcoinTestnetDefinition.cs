@@ -1,9 +1,11 @@
-﻿using MithrilShards.Core.DataTypes;
+﻿using System;
+using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol;
-using System;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol {
-   public class BitcoinTestnetDefinition : IChainDefinition {
+namespace MithrilShards.Chain.Bitcoin.Protocol
+{
+   public class BitcoinTestnetDefinition : IChainDefinition
+   {
       public string Name { get; }
 
       public byte[] MagicBytes { get; }
@@ -14,7 +16,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol {
 
       public int DefaultMaxPayloadSize { get; }
 
-      public BitcoinTestnetDefinition() {
+      public BitcoinTestnetDefinition()
+      {
          this.Name = "Bitcoin Testnet";
          this.Magic = 0xDAB5BFFA;
          this.MagicBytes = BitConverter.GetBytes(0x0709110B);

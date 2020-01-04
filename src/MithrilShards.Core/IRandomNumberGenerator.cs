@@ -1,7 +1,9 @@
 ﻿using System;
 
-namespace MithrilShards.Core {
-   public interface IRandomNumberGenerator {
+namespace MithrilShards.Core
+{
+   public interface IRandomNumberGenerator
+   {
       void GetBytes(Span<byte> data);
 
       void GetNonZeroBytes(Span<byte> data);

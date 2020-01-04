@@ -1,12 +1,13 @@
 ﻿using System;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
 using MithrilShards.Core.Network.Protocol.Serialization;
-using Types = MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
 
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
+namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
+{
    [NetworkMessage("version")]
-   public class VersionMessage : NetworkMessage {
+   public class VersionMessage : NetworkMessage
+   {
 
       /// <summary>
       /// Identifies protocol version being used by the node
@@ -54,7 +55,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
       /// </summary>
       public bool Relay { get; set; }
 
-      public VersionMessage() : base("version") {
+      public VersionMessage() : base("version")
+      {
       }
    }
 }

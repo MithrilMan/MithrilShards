@@ -1,10 +1,13 @@
 ﻿using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
+namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
+{
    [NetworkMessage("getaddr")]
-   public class GetAddrMessage : NetworkMessage {
+   public class GetAddrMessage : NetworkMessage
+   {
 
-      public GetAddrMessage() : base("getaddr") {
+      public GetAddrMessage() : base("getaddr")
+      {
       }
    }
 }

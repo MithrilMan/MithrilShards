@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Buffers;
 
-namespace MithrilShards.Core.Network.Protocol.Serialization {
-   public interface INetworkMessageSerializer {
+namespace MithrilShards.Core.Network.Protocol.Serialization
+{
+   public interface INetworkMessageSerializer
+   {
       /// <summary>
       /// Gets the type of the message managed by the serializer.
       /// </summary>

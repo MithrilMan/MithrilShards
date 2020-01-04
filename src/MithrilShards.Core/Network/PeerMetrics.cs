@@ -1,7 +1,7 @@
-﻿using System.Threading;
-
-namespace MithrilShards.Core.Network {
-   public class PeerMetrics {
+﻿namespace MithrilShards.Core.Network
+{
+   public class PeerMetrics
+   {
       private long receivedBytes;
       private long sentBytes;
       private long wastedBytes;
@@ -28,14 +28,17 @@ namespace MithrilShards.Core.Network {
       /// </value>
       public long WastedBytes => this.wastedBytes;
 
-      public void Received(long amount) {
+      public void Received(long amount)
+      {
          this.receivedBytes += amount;
       }
-      public void Sent(long amount) {
+      public void Sent(long amount)
+      {
          this.sentBytes += amount;
       }
 
-      public void Wasted(long amount) {
+      public void Wasted(long amount)
+      {
          this.wastedBytes += amount;
       }
    }

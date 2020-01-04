@@ -1,7 +1,9 @@
 ﻿using System;
 
-namespace MithrilShards.Core.EventBus {
-   public interface ISubscriptionErrorHandler {
+namespace MithrilShards.Core.EventBus
+{
+   public interface ISubscriptionErrorHandler
+   {
       /// <summary>
       /// Handles the specified event error.
       /// </summary>

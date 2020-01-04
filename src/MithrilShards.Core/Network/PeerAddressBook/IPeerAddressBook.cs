@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Text;
 
-namespace MithrilShards.Core.Network.PeerAddressBook {
+namespace MithrilShards.Core.Network.PeerAddressBook
+{
    /// <summary>
    /// Provides an interface for implementing an address book needed to connect to other peers.
    /// </summary>
-   public interface IPeerAddressBook : IPeerScoreManager {
+   public interface IPeerAddressBook : IPeerScoreManager
+   {
       void AddAddress(IPeerContext peer);
       void AddAddresses(IEnumerable<IPeerContext> peers);
 

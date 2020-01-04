@@ -7,7 +7,8 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Network.Legacy {
+namespace MithrilShards.Network.Legacy
+{
    /// <summary>
    /// Class to handle the common bitcoin-like protocol.
    /// Bitcoin protocol is composed of these fields
@@ -18,7 +19,8 @@ namespace MithrilShards.Network.Legacy {
    /// 4    | command   |uint32_t   | First 4 bytes of sha256(sha256(payload))
    /// ?    | command   |uchar[]    | The actual data
    /// </summary>
-   public class NetworkMessageDecoder {
+   public class NetworkMessageDecoder
+   {
       readonly ILogger<NetworkMessageDecoder> logger;
       readonly IChainDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
@@ -28,28 +30,34 @@ namespace MithrilShards.Network.Legacy {
       public NetworkMessageDecoder(ILogger<NetworkMessageDecoder> logger,
                                    IChainDefinition chainDefinition,
                                    INetworkMessageSerializerManager networkMessageSerializerManager,
-                                   ConnectionContextData contextData) {
+                                   ConnectionContextData contextData)
+      {
          this.logger = logger;
          this.chainDefinition = chainDefinition;
          this.networkMessageSerializerManager = networkMessageSerializerManager;
          this.ContextData = contextData;
       }
 
-      internal void SetPeerContext(IPeerContext peerContext) {
+      internal void SetPeerContext(IPeerContext peerContext)
+      {
          this.peerContext = peerContext;
       }
 
-      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, out INetworkMessage message) {
+      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, out INetworkMessage message)
+      {
          var reader = new SequenceReader<byte>(input);
 
-         if (this.TryReadHeader(ref reader)) {
+         if (this.TryReadHeader(ref reader))
+         {
             // now try to read the payload
-            if (reader.Remaining >= this.ContextData.PayloadLength) {
+            if (reader.Remaining >= this.ContextData.PayloadLength)
+            {
                ReadOnlySequence<byte> payload = input.Slice(reader.Position, this.ContextData.PayloadLength);
 
                //check checksum
                ReadOnlySpan<byte> checksum = HashGenerator.DoubleSha256(payload.ToArray()).Slice(0, 4);
-               if (this.ContextData.Checksum != BitConverter.ToUInt32(checksum)) {
+               if (this.ContextData.Checksum != BitConverter.ToUInt32(checksum))
+               {
                   throw new ProtocolViolationException("Invalid checksum.");
                }
 
@@ -60,10 +68,12 @@ namespace MithrilShards.Network.Legacy {
                string commandName = this.ContextData.GetCommandName();
 
                if (this.networkMessageSerializerManager
-                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message)) {
+                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message))
+               {
                   return true;
                }
-               else {
+               else
+               {
                   this.logger.LogWarning("Deserializer for message '{Command}' not found.", commandName);
                   message = new UnknownMessage(commandName, payload.ToArray());
                   this.peerContext.Metrics.Wasted(this.ContextData.GetTotalMessageLength());
@@ -79,27 +89,36 @@ namespace MithrilShards.Network.Legacy {
          return false;
       }
 
-      private bool TryReadHeader(ref SequenceReader<byte> reader) {
-         if (!this.ContextData.MagicNumberRead) {
-            if (!this.TryReadMagicNumber(ref reader)) {
+      private bool TryReadHeader(ref SequenceReader<byte> reader)
+      {
+         if (!this.ContextData.MagicNumberRead)
+         {
+            if (!this.TryReadMagicNumber(ref reader))
+            {
                return false;
             }
          }
 
-         if (!this.ContextData.CommandRead) {
-            if (!this.TryReadCommand(ref reader)) {
+         if (!this.ContextData.CommandRead)
+         {
+            if (!this.TryReadCommand(ref reader))
+            {
                return false;
             }
          }
 
-         if (!this.ContextData.PayloadLengthRead) {
-            if (!this.TryReadPayloadLenght(ref reader)) {
+         if (!this.ContextData.PayloadLengthRead)
+         {
+            if (!this.TryReadPayloadLenght(ref reader))
+            {
                return false;
             }
          }
 
-         if (!this.ContextData.ChecksumRead) {
-            if (!this.TryReadChecksum(ref reader)) {
+         if (!this.ContextData.ChecksumRead)
+         {
+            if (!this.TryReadChecksum(ref reader))
+            {
                return false;
             }
          }
@@ -117,22 +136,28 @@ namespace MithrilShards.Network.Legacy {
       /// <param name="reader">The reader.</param>
       /// <remarks>When returns false, reader may be not to the end of the buffer in case a partial magic number lies at the end of the buffer.</remarks>
       /// <returns>true if the magic number has been full read, false otherwise (not enough bytes to read)</returns>
-      private bool TryReadMagicNumber(ref SequenceReader<byte> reader) {
+      private bool TryReadMagicNumber(ref SequenceReader<byte> reader)
+      {
          long prevRemaining = reader.Remaining;
          // advance to the first byte of the magic number.
-         while (reader.TryAdvanceTo(this.ContextData.FirstMagicNumberByte, advancePastDelimiter: false)) {
+         while (reader.TryAdvanceTo(this.ContextData.FirstMagicNumberByte, advancePastDelimiter: false))
+         {
             //TODO: compare sequence of bytes instead of reading an int
-            if (reader.TryReadLittleEndian(out int magicRead)) {
-               if (magicRead == this.ContextData.MagicNumber) {
+            if (reader.TryReadLittleEndian(out int magicRead))
+            {
+               if (magicRead == this.ContextData.MagicNumber)
+               {
                   this.ContextData.MagicNumberRead = true;
                   this.peerContext.Metrics.Wasted(reader.Position.GetInteger() - 4);
                   return true;
                }
-               else {
+               else
+               {
                   reader.Rewind(3);
                }
             }
-            else {
+            else
+            {
                this.peerContext.Metrics.Wasted(reader.Remaining - prevRemaining);
                return false;
             }
@@ -150,14 +175,17 @@ namespace MithrilShards.Network.Legacy {
       /// </summary>
       /// <param name="reader">The reader.</param>
       /// <returns>true if the command has been read, false otherwise (not enough bytes to read)</returns>
-      private bool TryReadCommand(ref SequenceReader<byte> reader) {
-         if (reader.Remaining >= ConnectionContextData.SIZE_COMMAND) {
+      private bool TryReadCommand(ref SequenceReader<byte> reader)
+      {
+         if (reader.Remaining >= ConnectionContextData.SIZE_COMMAND)
+         {
             ReadOnlySequence<byte> commandReader = reader.Sequence.Slice(reader.Position, ConnectionContextData.SIZE_COMMAND);
             this.ContextData.Command = commandReader.ToArray();
             reader.Advance(ConnectionContextData.SIZE_COMMAND);
             return true;
          }
-         else {
+         else
+         {
             return false;
          }
       }
@@ -168,12 +196,15 @@ namespace MithrilShards.Network.Legacy {
       /// </summary>
       /// <param name="reader">The reader.</param>
       /// <returns>true if the payload length has been read, false otherwise (not enough bytes to read)</returns>
-      private bool TryReadPayloadLenght(ref SequenceReader<byte> reader) {
-         if (reader.TryReadLittleEndian(out int payloadLengthBytes)) {
+      private bool TryReadPayloadLenght(ref SequenceReader<byte> reader)
+      {
+         if (reader.TryReadLittleEndian(out int payloadLengthBytes))
+         {
             this.ContextData.PayloadLength = (uint)payloadLengthBytes;
             return true;
          }
-         else {
+         else
+         {
             return false;
          }
       }
@@ -184,12 +215,15 @@ namespace MithrilShards.Network.Legacy {
       /// </summary>
       /// <param name="reader">The reader.</param>
       /// <returns>true if the checksum has been read, false otherwise (not enough bytes to read)</returns>
-      private bool TryReadChecksum(ref SequenceReader<byte> reader) {
-         if (reader.TryReadLittleEndian(out int checksumBytes)) {
+      private bool TryReadChecksum(ref SequenceReader<byte> reader)
+      {
+         if (reader.TryReadLittleEndian(out int checksumBytes))
+         {
             this.ContextData.Checksum = (uint)checksumBytes;
             return true;
          }
-         else {
+         else
+         {
             return false;
          }
       }
@@ -197,7 +231,8 @@ namespace MithrilShards.Network.Legacy {
    }
 
 
-   public class InvalidNetworkMessageException : Exception {
+   public class InvalidNetworkMessageException : Exception
+   {
       public InvalidNetworkMessageException() { }
       public InvalidNetworkMessageException(string message) : base(message) { }
       public InvalidNetworkMessageException(string message, Exception inner) : base(message, inner) { }

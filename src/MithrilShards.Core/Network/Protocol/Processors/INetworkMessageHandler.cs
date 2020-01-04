@@ -1,12 +1,13 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace MithrilShards.Core.Network.Protocol.Processors {
+namespace MithrilShards.Core.Network.Protocol.Processors
+{
    /// <summary>
    /// Interfaces that define a generic network message
    /// </summary>
-   public interface INetworkMessageHandler<TNetworkMessage> where TNetworkMessage : INetworkMessage {
+   public interface INetworkMessageHandler<TNetworkMessage> where TNetworkMessage : INetworkMessage
+   {
 
 
       /// <summary>

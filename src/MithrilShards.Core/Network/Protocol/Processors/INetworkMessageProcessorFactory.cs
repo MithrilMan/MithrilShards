@@ -1,11 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace MithrilShards.Core.Network.Protocol.Processors {
+namespace MithrilShards.Core.Network.Protocol.Processors
+{
    /// <summary>
    /// Interfaces that define a generic network message
    /// </summary>
-   public interface INetworkMessageProcessorFactory {
+   public interface INetworkMessageProcessorFactory
+   {
 
       /// <summary>
       /// Starts the processors attaching them to <paramref name="peerContext"/>.

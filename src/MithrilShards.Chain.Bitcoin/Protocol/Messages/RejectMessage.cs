@@ -1,9 +1,12 @@
 ﻿using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
+namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
+{
    [NetworkMessage("reject ")]
-   public class RejectMessage : NetworkMessage {
-      public enum RejectCode : byte {
+   public class RejectMessage : NetworkMessage
+   {
+      public enum RejectCode : byte
+      {
          /// <summary>REJECT_MALFORMED</summary>
          Malformed = 0x01,
          /// <summary>REJECT_INVALID</summary>
@@ -33,7 +36,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
       /// rejected, so the field is 32 bytes.</summary>
       public byte[] Data { get; set; }
 
-      public RejectMessage() : base("reject ") {
+      public RejectMessage() : base("reject ")
+      {
       }
    }
 }

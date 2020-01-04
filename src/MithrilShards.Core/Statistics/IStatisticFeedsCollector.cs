@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace MithrilShards.Core.Statistics {
+﻿namespace MithrilShards.Core.Statistics
+{
    /// <summary>
    /// Define methods needed to search for and register statistic feeds provided by implementations of IStatisticFeedsProvider
    /// </summary>
-   public interface IStatisticFeedsCollector {
+   public interface IStatisticFeedsCollector
+   {
       /// <summary>
       /// Registers the statistic feeds.
       /// </summary>

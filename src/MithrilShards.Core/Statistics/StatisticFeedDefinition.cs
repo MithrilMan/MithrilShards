@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MithrilShards.Core.Statistics {
-   public class StatisticFeedDefinition {
+namespace MithrilShards.Core.Statistics
+{
+   public class StatisticFeedDefinition
+   {
       /// <summary>
       /// Gets the unique feed identifier.
       /// </summary>
@@ -23,7 +25,8 @@ namespace MithrilShards.Core.Statistics {
       /// </summary>
       public TimeSpan FrequencyTarget { get; }
 
-      public StatisticFeedDefinition(string feedId, string title, List<FieldDefinition> counterDefinitions, TimeSpan frequencyTarget) {
+      public StatisticFeedDefinition(string feedId, string title, List<FieldDefinition> counterDefinitions, TimeSpan frequencyTarget)
+      {
          this.FeedId = feedId;
          this.Title = title ?? throw new ArgumentNullException(nameof(title));
          this.FieldsDefinition = counterDefinitions ?? throw new ArgumentNullException(nameof(title));

@@ -6,8 +6,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.MithrilShards;
 
-namespace MithrilShards.Core.Forge {
-   public interface IForgeBuilder {
+namespace MithrilShards.Core.Forge
+{
+   public interface IForgeBuilder
+   {
 
       string ConfigurationFileName { get; }
 

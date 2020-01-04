@@ -10,8 +10,10 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
-   public abstract class BaseProcessor : INetworkMessageProcessor {
+namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
+{
+   public abstract class BaseProcessor : INetworkMessageProcessor
+   {
       protected readonly ILogger<BaseProcessor> logger;
       protected readonly IEventBus eventBus;
 
@@ -26,14 +28,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
 
       public bool Enabled { get; private set; } = true;
 
-      public BaseProcessor(ILogger<BaseProcessor> logger, IEventBus eventBus) {
+      public BaseProcessor(ILogger<BaseProcessor> logger, IEventBus eventBus)
+      {
          this.logger = logger;
          this.eventBus = eventBus;
 
          this.eventBusSubscriptionsTokens = new List<SubscriptionToken>();
       }
 
-      public virtual ValueTask AttachAsync(IPeerContext peerContext) {
+      public virtual ValueTask AttachAsync(IPeerContext peerContext)
+      {
          this.PeerContext = peerContext as BitcoinPeerContext ?? throw new ArgumentException("Expected BitcoinPeerContext", nameof(peerContext));
          this.messageWriter = this.PeerContext.GetMessageWriter();
          return default;
@@ -46,7 +50,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       /// unregistered once the component gets disposed.
       /// </summary>
       /// <param name="subscription">The subscription.</param>
-      protected void RegisterLifeTimeSubscription(SubscriptionToken subscription) {
+      protected void RegisterLifeTimeSubscription(SubscriptionToken subscription)
+      {
          this.eventBusSubscriptionsTokens.Add(subscription);
       }
 
@@ -57,22 +62,28 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       /// <param name="timeout">The timeout that will trigger the condition evaluation.</param>
       /// <param name="cancellation">The cancellation that may interrupt the <paramref name="condition"/> evaluation.</param>
       /// <returns></returns>
-      public Task DisconnectIfAsync(Func<bool> condition, TimeSpan timeout, string reason, CancellationToken cancellation = default) {
-         if (cancellation == default) {
+      public Task DisconnectIfAsync(Func<bool> condition, TimeSpan timeout, string reason, CancellationToken cancellation = default)
+      {
+         if (cancellation == default)
+         {
             cancellation = this.PeerContext.ConnectionCancellationTokenSource.Token;
          }
-         return Task.Run(async () => {
+         return Task.Run(async () =>
+         {
             await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
             // if cancellation was requested, return without doing anything
-            if (!cancellation.IsCancellationRequested && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && condition()) {
+            if (!cancellation.IsCancellationRequested && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && condition())
+            {
                this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
                this.PeerContext.ConnectionCancellationTokenSource.Cancel();
             }
          });
       }
 
-      public virtual void Dispose() {
-         foreach (SubscriptionToken token in this.eventBusSubscriptionsTokens) {
+      public virtual void Dispose()
+      {
+         foreach (SubscriptionToken token in this.eventBusSubscriptionsTokens)
+         {
             token?.Dispose();
          }
 
@@ -85,7 +96,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors {
       /// <param name="message">The message to send.</param>
       /// <param name="cancellationToken">The cancellation token.</param>
       /// <returns></returns>
-      public async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default) {
+      public async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default)
+      {
          await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
       }
    }

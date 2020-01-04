@@ -7,9 +7,11 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Network.Legacy {
+namespace MithrilShards.Network.Legacy
+{
 
-   public class PeerConnectionFactory : IPeerConnectionFactory {
+   public class PeerConnectionFactory : IPeerConnectionFactory
+   {
       /// <summary>Instance logger.</summary>
       private readonly ILogger logger;
       readonly ILoggerFactory loggerFactory;
@@ -26,7 +28,8 @@ namespace MithrilShards.Network.Legacy {
                                    IDateTimeProvider dateTimeProvider,
                                    IPeerContextFactory peerContextFactory,
                                    IChainDefinition chainDefinition,
-                                   INetworkMessageSerializerManager networkMessageSerializerManager) {
+                                   INetworkMessageSerializerManager networkMessageSerializerManager)
+      {
          this.loggerFactory = loggerFactory;
          this.eventBus = eventBus;
          this.dateTimeProvider = dateTimeProvider;
@@ -36,7 +39,8 @@ namespace MithrilShards.Network.Legacy {
          this.logger = loggerFactory.CreateLogger<PeerConnectionFactory>();
       }
 
-      public IPeerConnection CreatePeerConnection(TcpClient connectingPeer, CancellationToken cancellationToken) {
+      public IPeerConnection CreatePeerConnection(TcpClient connectingPeer, CancellationToken cancellationToken)
+      {
          var peer = new PeerConnection(
             this.loggerFactory.CreateLogger<PeerConnection>(),
             this.eventBus,

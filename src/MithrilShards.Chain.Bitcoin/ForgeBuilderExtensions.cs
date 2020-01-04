@@ -6,7 +6,6 @@ using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Network.Server.Guards;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Chain.Bitcoin.Protocol.Processors;
-using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers;
 using MithrilShards.Core.Forge;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
@@ -14,8 +13,10 @@ using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using MithrilShards.Core.Network.Server.Guards;
 
-namespace MithrilShards.Chain.Bitcoin {
-   public static class ForgeBuilderExtensions {
+namespace MithrilShards.Chain.Bitcoin
+{
+   public static class ForgeBuilderExtensions
+   {
       /// <summary>
       /// Uses the bitcoin chain.
       /// </summary>
@@ -25,9 +26,11 @@ namespace MithrilShards.Chain.Bitcoin {
       /// <returns></returns>
       public static IForgeBuilder UseBitcoinChain<TChainDefinition>(this IForgeBuilder forgeBuilder,
                                                                     int minimumSupportedVersion,
-                                                                    int currentVersion) where TChainDefinition : class, IChainDefinition {
+                                                                    int currentVersion) where TChainDefinition : class, IChainDefinition
+      {
          forgeBuilder.AddShard<BitcoinShard, BitcoinSettings>(
-            (hostBuildContext, services) => {
+            (hostBuildContext, services) =>
+            {
                services
                   .AddSingleton<IChainDefinition, TChainDefinition>()
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
@@ -41,7 +44,8 @@ namespace MithrilShards.Chain.Bitcoin {
          return forgeBuilder;
       }
 
-      private static IServiceCollection AddPeerGuards(this IServiceCollection services) {
+      private static IServiceCollection AddPeerGuards(this IServiceCollection services)
+      {
          services
             .AddSingleton<IServerPeerConnectionGuard, InitialBlockDownloadStateGuard>()
             .AddSingleton<IServerPeerConnectionGuard, MaxConnectionThresholdGuard>()
@@ -50,16 +54,19 @@ namespace MithrilShards.Chain.Bitcoin {
          return services;
       }
 
-      private static IServiceCollection AddMessageSerializers(this IServiceCollection services) {
+      private static IServiceCollection AddMessageSerializers(this IServiceCollection services)
+      {
          // discover and register all message serializer in this assembly
          Type serializerInterface = typeof(INetworkMessageSerializer);
-         foreach (Type messageSerializer in typeof(BitcoinShard).Assembly.GetTypes().Where(t => serializerInterface.IsAssignableFrom(t))) {
+         foreach (Type messageSerializer in typeof(BitcoinShard).Assembly.GetTypes().Where(t => serializerInterface.IsAssignableFrom(t)))
+         {
             services.AddSingleton(typeof(INetworkMessageSerializer), messageSerializer);
          }
 
          return services;
       }
-      private static IServiceCollection AddMessageProcessors(this IServiceCollection services) {
+      private static IServiceCollection AddMessageProcessors(this IServiceCollection services)
+      {
          services
             .AddTransient<INetworkMessageProcessor, HandshakeProcessor>()
             .AddTransient<INetworkMessageProcessor, CompactHeaderProcessor>()

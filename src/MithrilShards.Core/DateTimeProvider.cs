@@ -1,8 +1,10 @@
 ﻿using System;
 using MithrilShards.Core.Extensions;
 
-namespace MithrilShards.Core {
-   public class DateTimeProvider : IDateTimeProvider {
+namespace MithrilShards.Core
+{
+   public class DateTimeProvider : IDateTimeProvider
+   {
       /// <summary>Static instance of the object to prevent the need of creating new instance.</summary>
       public static IDateTimeProvider Default { get; }
 
@@ -12,44 +14,52 @@ namespace MithrilShards.Core {
       /// <summary>
       /// Initializes a default instance of the object.
       /// </summary>
-      static DateTimeProvider() {
+      static DateTimeProvider()
+      {
          Default = new DateTimeProvider();
       }
 
       /// <summary>
       /// Initializes instance of the object.
       /// </summary>
-      public DateTimeProvider() {
+      public DateTimeProvider()
+      {
          this.adjustedTimeOffset = TimeSpan.Zero;
       }
 
       /// <inheritdoc />
-      public virtual long GetTime() {
+      public virtual long GetTime()
+      {
          return DateTime.UtcNow.ToUnixTimestamp();
       }
 
       /// <inheritdoc />
-      public virtual DateTime GetUtcNow() {
+      public virtual DateTime GetUtcNow()
+      {
          return DateTime.UtcNow;
       }
 
       /// <inheritdoc />
-      public virtual DateTimeOffset GetTimeOffset() {
+      public virtual DateTimeOffset GetTimeOffset()
+      {
          return DateTimeOffset.UtcNow;
       }
 
       /// <inheritdoc />
-      public DateTime GetAdjustedTime() {
+      public DateTime GetAdjustedTime()
+      {
          return this.GetUtcNow().Add(this.adjustedTimeOffset);
       }
 
       /// <inheritdoc />
-      public long GetAdjustedTimeAsUnixTimestamp() {
+      public long GetAdjustedTimeAsUnixTimestamp()
+      {
          return new DateTimeOffset(this.GetAdjustedTime()).ToUnixTimeSeconds();
       }
 
       /// <inheritdoc />
-      public void SetAdjustedTimeOffset(TimeSpan adjustedTimeOffset) {
+      public void SetAdjustedTimeOffset(TimeSpan adjustedTimeOffset)
+      {
          this.adjustedTimeOffset = adjustedTimeOffset;
       }
    }

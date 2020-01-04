@@ -1,5 +1,7 @@
-﻿namespace MithrilShards.Core.EventBus {
-   public interface ISubscription {
+﻿namespace MithrilShards.Core.EventBus
+{
+   public interface ISubscription
+   {
       /// <summary>
       /// Token returned to the subscriber
       /// </summary>

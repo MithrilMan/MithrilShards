@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,8 +6,10 @@ using Microsoft.AspNetCore.Http.Features;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
-namespace MithrilShards.Core.Network {
-   public interface IPeerContext : IDisposable {
+namespace MithrilShards.Core.Network
+{
+   public interface IPeerContext : IDisposable
+   {
       /// <summary>
       /// Gets the direction of the peer connection.
       /// </summary>

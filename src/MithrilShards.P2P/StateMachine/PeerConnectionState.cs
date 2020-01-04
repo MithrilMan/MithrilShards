@@ -1,8 +1,10 @@
-﻿namespace MithrilShards.Network.Legacy.StateMachine {
+﻿namespace MithrilShards.Network.Legacy.StateMachine
+{
    /// <summary>
    /// State of the peer connection.
    /// </summary>
-   public enum PeerConnectionState : int {
+   public enum PeerConnectionState : int
+   {
       Initializing,
       Disconnectable,
       Connected,

@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MithrilShards.Core.Network.Client {
+namespace MithrilShards.Core.Network.Client
+{
    /// <summary>
    /// Defines the methods required to implement a logic for connecting to external peers
    /// </summary>
-   public interface IConnector {
+   public interface IConnector
+   {
       /// <summary>
       /// Tries to connect to a peer.
       /// </summary>

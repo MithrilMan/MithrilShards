@@ -1,7 +1,9 @@
 ﻿using System;
 
-namespace MithrilShards.Logging.ConsoleTableFormatter {
-   public class OutputWriter {
+namespace MithrilShards.Logging.ConsoleTableFormatter
+{
+   public class OutputWriter
+   {
       public const int ConsoleWidth = 80;
 
       /// <summary>
@@ -12,24 +14,29 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
 
       private readonly Writer writer;
 
-      public OutputWriter(Writer writer = null) {
+      public OutputWriter(Writer writer = null)
+      {
          this.writer = writer ?? Console.Write;
       }
 
-      public OutputWriter Write(string text) {
+      public OutputWriter Write(string text)
+      {
          this.writer(text);
 
          return this;
       }
 
-      public OutputWriter WriteLine(string text = null) {
+      public OutputWriter WriteLine(string text = null)
+      {
          this.writer(text + '\n');
 
          return this;
       }
 
-      public OutputWriter DrawLine(char? character = '-', int lenght = ConsoleWidth) {
-         if (character == null) {
+      public OutputWriter DrawLine(char? character = '-', int lenght = ConsoleWidth)
+      {
+         if (character == null)
+         {
             return this;
          }
 

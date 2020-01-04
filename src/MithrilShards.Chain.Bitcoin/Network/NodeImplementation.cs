@@ -1,10 +1,10 @@
-﻿using MithrilShards.Chain.Bitcoin.Protocol.Messages;
-
-namespace MithrilShards.Chain.Bitcoin.Network {
+﻿namespace MithrilShards.Chain.Bitcoin.Network
+{
    /// <summary>
    /// Holds information about current implemented version and minimum required version from other peers.
    /// </summary>
-   public class NodeImplementation {
+   public class NodeImplementation
+   {
       /// <summary>
       /// Gets the minimum version local node supports.
       /// </summary>
@@ -21,7 +21,8 @@ namespace MithrilShards.Chain.Bitcoin.Network {
       /// </value>
       public int ImplementationVersion { get; }
 
-      public NodeImplementation(int minimumSupportedVersion, int implementationVersion) {
+      public NodeImplementation(int minimumSupportedVersion, int implementationVersion)
+      {
          this.MinimumSupportedVersion = minimumSupportedVersion;
          this.ImplementationVersion = implementationVersion;
       }

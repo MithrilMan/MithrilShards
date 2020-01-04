@@ -2,18 +2,19 @@
 using System.Net;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Extensions;
-using MithrilShards.Core.Crypto;
 
-namespace MithrilShards.Network.Benchmark.Benchmarks {
+namespace MithrilShards.Network.Benchmark.Benchmarks
+{
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
-   public class IsRoutable {
+   public class IsRoutable
+   {
 
       private IPAddress data;
 
       [GlobalSetup]
-      public void Setup() {
+      public void Setup()
+      {
          var random = new Random();
          byte[] randomIP = new byte[4];
          random.NextBytes(randomIP);
@@ -21,12 +22,14 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
       }
 
       [Benchmark]
-      public void NBitcoin_IsRoutable() {
+      public void NBitcoin_IsRoutable()
+      {
          NBitcoin.IpExtensions.IsRoutable(this.data, true);
       }
 
       [Benchmark]
-      public void MithrilShards_IsRoutable() {
+      public void MithrilShards_IsRoutable()
+      {
          MithrilShards.Core.Extensions.IPAddressExtensions.IsRoutable(this.data, true);
       }
    }

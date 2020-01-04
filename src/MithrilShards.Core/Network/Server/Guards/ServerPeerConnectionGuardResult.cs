@@ -1,12 +1,15 @@
-﻿namespace MithrilShards.Core.Network.Server.Guards {
-   public struct ServerPeerConnectionGuardResult {
+﻿namespace MithrilShards.Core.Network.Server.Guards
+{
+   public struct ServerPeerConnectionGuardResult
+   {
       /// <summary>
       /// Returns a successful guard check.
       /// </summary>
       /// <remarks>
       /// The value returned by this property corresponds to a passed guard execution.
       /// </remarks>
-      public static ServerPeerConnectionGuardResult Success {
+      public static ServerPeerConnectionGuardResult Success
+      {
          get { return default; }
       }
 
@@ -16,8 +19,10 @@
 
       public static ServerPeerConnectionGuardResult Allow() => Success;
 
-      public static ServerPeerConnectionGuardResult Deny(string denyReason) {
-         return new ServerPeerConnectionGuardResult {
+      public static ServerPeerConnectionGuardResult Deny(string denyReason)
+      {
+         return new ServerPeerConnectionGuardResult
+         {
             IsDenied = true,
             DenyReason = denyReason
          };

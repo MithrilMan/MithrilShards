@@ -1,9 +1,11 @@
-﻿using MithrilShards.Core.DataTypes;
+﻿using System;
+using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol;
-using System;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol {
-   public class NamecoinMainDefinition : IChainDefinition {
+namespace MithrilShards.Chain.Bitcoin.Protocol
+{
+   public class NamecoinMainDefinition : IChainDefinition
+   {
       public string Name { get; }
 
       public byte[] MagicBytes { get; }
@@ -14,7 +16,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol {
 
       public int DefaultMaxPayloadSize { get; }
 
-      public NamecoinMainDefinition() {
+      public NamecoinMainDefinition()
+      {
          this.Name = "Namecoin Main";
          this.Magic = 0xFEB4BEF9;
          this.MagicBytes = BitConverter.GetBytes(0xFEB4BEF9);

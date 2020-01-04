@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MithrilShards.Core.Encoding {
-   public class HexEncoder {
+﻿namespace MithrilShards.Core.Encoding
+{
+   public class HexEncoder
+   {
 
    }
 }

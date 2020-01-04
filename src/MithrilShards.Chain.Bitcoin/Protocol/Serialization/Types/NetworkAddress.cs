@@ -5,11 +5,13 @@ using System.Text.Json.Serialization;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
+namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types
+{
    /// <summary>
    /// Network address (net_addr).
    /// </summary>
-   public class NetworkAddress : ISerializableProtocolType {
+   public class NetworkAddress : ISerializableProtocolType
+   {
       readonly bool skipTimeField;
 
       /// <summary>
@@ -35,10 +37,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       public ushort Port { get; set; }
 
       [JsonIgnore]
-      public IPEndPoint EndPoint {
+      public IPEndPoint EndPoint
+      {
          get { return new IPEndPoint(new IPAddress(this.IP), this.Port); }
-         set {
-            if (value == null) {
+         set
+         {
+            if (value == null)
+            {
                throw new InvalidOperationException("Can't set 'AddressReceiver' to null.");
             }
 
@@ -53,13 +58,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
       /// Initializes a new instance of the <see cref="NetworkAddress"/> class.
       /// </summary>
       /// <param name="skipTimeField">if set to <c>true</c> skips time field serialization/deserialization, used by <see cref="VersionMessage"/>.</param>
-      public NetworkAddress(bool skipTimeField) {
+      public NetworkAddress(bool skipTimeField)
+      {
          this.skipTimeField = skipTimeField;
       }
 
-      public void Deserialize(ref SequenceReader<byte> reader, int protocolVersion) {
+      public void Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
+      {
          // https://bitcoin.org/en/developer-reference#version
-         if (!this.skipTimeField && protocolVersion >= KnownVersion.V31402) {
+         if (!this.skipTimeField && protocolVersion >= KnownVersion.V31402)
+         {
             this.Time = DateTimeOffset.FromUnixTimeSeconds(reader.ReadUInt());
          }
          this.Services = reader.ReadULong();
@@ -67,10 +75,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types {
          this.Port = reader.ReadUShort();
       }
 
-      public int Serialize(IBufferWriter<byte> writer, int protocolVersion) {
+      public int Serialize(IBufferWriter<byte> writer, int protocolVersion)
+      {
          int size = 0;
          // https://bitcoin.org/en/developer-reference#version
-         if (!this.skipTimeField && protocolVersion >= KnownVersion.V31402) {
+         if (!this.skipTimeField && protocolVersion >= KnownVersion.V31402)
+         {
             size += writer.WriteUInt((uint)this.Time.ToUnixTimeSeconds());
          }
          size += writer.WriteULong(this.Services);

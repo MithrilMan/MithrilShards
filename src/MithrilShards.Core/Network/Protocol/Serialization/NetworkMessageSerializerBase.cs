@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Buffers;
 using System.Buffers.Binary;
-using System.Text;
 using MithrilShards.Core.Crypto;
 
-namespace MithrilShards.Core.Network.Protocol.Serialization {
-   public abstract class NetworkMessageSerializerBase<TMessageType> : INetworkMessageSerializer where TMessageType : INetworkMessage, new() {
+namespace MithrilShards.Core.Network.Protocol.Serialization
+{
+   public abstract class NetworkMessageSerializerBase<TMessageType> : INetworkMessageSerializer where TMessageType : INetworkMessage, new()
+   {
       const int SIZE_MAGIC = 4;
       const int SIZE_COMMAND = 12;
       const int SIZE_PAYLOAD_LENGTH = 4;
@@ -16,7 +17,8 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
 
       protected readonly IChainDefinition chainDefinition;
 
-      public NetworkMessageSerializerBase(IChainDefinition chainDefinition) {
+      public NetworkMessageSerializerBase(IChainDefinition chainDefinition)
+      {
          this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
 
          #region build precooked Magic and Command header part
@@ -32,12 +34,15 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
 
       public abstract void Serialize(TMessageType message, int protocolVersion, IBufferWriter<byte> output);
 
-      public Type GetMessageType() {
+      public Type GetMessageType()
+      {
          return typeof(TMessageType);
       }
 
-      public int Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output) {
-         if (message is null) {
+      public int Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output)
+      {
+         if (message is null)
+         {
             throw new ArgumentNullException(nameof(message));
          }
 
@@ -59,7 +64,8 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          return HEADER_LENGTH + payloadOutput.WrittenCount;
       }
 
-      public INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion) {
+      public INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion)
+      {
          var reader = new SequenceReader<byte>(data);
          return this.Deserialize(ref reader, protocolVersion);
       }
