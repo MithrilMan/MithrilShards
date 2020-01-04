@@ -17,7 +17,7 @@ jobs:
       uses: NuGet/setup-nuget@v1.0.2
     - name: Setup NuGet Sources
       run: nuget sources add -name "bedrockframework" -Source "https://f.feedz.io/davidfowl/bedrockframework/nuget/index.json"
+    - name: dotnet Restore
+      run: dotnet restore
     - name: Build with dotnet
-      run: |
-        dotnet restore
-        dotnet build --configuration Release
+      run: dotnet build --configuration Release
