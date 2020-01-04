@@ -31,11 +31,5 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          //TODO
          return new ValueTask<bool>(true);
       }
-
-      public override ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation)
-      {
-         //WIP
-         return new ValueTask<bool>(true);
-      }
    }
 }

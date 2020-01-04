@@ -12,6 +12,7 @@ using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Processors;
 using Stateless;
 
 namespace MithrilShards.Network.Legacy.StateMachine
@@ -23,6 +24,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
       readonly IEventBus eventBus;
       readonly PeerConnection peerConnection;
       readonly NetworkMessageDecoder networkMessageDecoder;
+      private readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
       readonly PeerConnectionDirection peerDirection;
       private SequencePosition examined;
       private SequencePosition consumed;
@@ -45,12 +47,18 @@ namespace MithrilShards.Network.Legacy.StateMachine
       public PeerConnectionState Status { get => this.stateMachine.State; }
 
 
-      public PeerConnectionStateMachine(ILogger logger, IEventBus eventBus, PeerConnection peerConnection, NetworkMessageDecoder networkMessageDecoder, CancellationToken cancellationToken)
+      public PeerConnectionStateMachine(ILogger logger,
+                                        IEventBus eventBus,
+                                        PeerConnection peerConnection,
+                                        NetworkMessageDecoder networkMessageDecoder,
+                                        INetworkMessageProcessorFactory networkMessageProcessorFactory,
+                                        CancellationToken cancellationToken)
       {
          this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
          this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
          this.peerConnection = peerConnection ?? throw new ArgumentNullException(nameof(peerConnection));
          this.networkMessageDecoder = networkMessageDecoder;
+         this.networkMessageProcessorFactory = networkMessageProcessorFactory ?? throw new ArgumentNullException(nameof(networkMessageProcessorFactory));
          this.stateMachine = new StateMachine<PeerConnectionState, PeerConnectionTrigger>(PeerConnectionState.Initializing, FiringMode.Immediate);
 
          this.processMessageTrigger = this.stateMachine.SetTriggerParameters<INetworkMessage>(PeerConnectionTrigger.ProcessMessage);
@@ -276,7 +284,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
             this.logger.LogDebug(JsonSerializer.Serialize(message, message.GetType(), new JsonSerializerOptions { WriteIndented = true }));
             this.eventBus.Publish(new PeerMessageReceived(this.peerConnection.PeerContext, message, this.networkMessageDecoder.ContextData.GetTotalMessageLength()));
 
-            await this.peerConnection.PeerContext.ProcessMessageAsync(message).ConfigureAwait(false);
+            await this.networkMessageProcessorFactory.ProcessMessageAsync(message, this.peerConnection.PeerContext, cancellationToken).ConfigureAwait(false);
          }
 
 

@@ -64,13 +64,6 @@ namespace MithrilShards.Core.Network
       void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor);
 
       /// <summary>
-      /// Processes the message asynchronously, calling all the attached <see cref="INetworkMessageProcessor"/>.
-      /// </summary>
-      /// <param name="message">The network message.</param>
-      /// <returns></returns>
-      Task ProcessMessageAsync(INetworkMessage message);
-
-      /// <summary>
       /// Gets the connection cancellation token source in order to trigger a manual disconnection.
       /// </summary>
       CancellationTokenSource ConnectionCancellationTokenSource { get; }

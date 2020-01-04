@@ -8,6 +8,7 @@ using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Network.Legacy.StateMachine;
 
 namespace MithrilShards.Network.Legacy
@@ -23,6 +24,7 @@ namespace MithrilShards.Network.Legacy
       private readonly IDateTimeProvider dateTimeProvider;
       readonly IPeerContextFactory peerContextFactory;
       readonly NetworkMessageDecoder networkMessageDecoder;
+      private readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
 
       internal TcpClient ConnectedClient { get; }
       public PeerConnectionDirection Direction { get; }
@@ -44,6 +46,7 @@ namespace MithrilShards.Network.Legacy
                             PeerConnectionDirection peerConnectionDirection,
                             IPeerContextFactory peerContextFactory,
                             NetworkMessageDecoder networkMessageDecoder,
+                            INetworkMessageProcessorFactory networkMessageProcessorFactory,
                             CancellationToken cancellationToken)
       {
          this.logger = logger;
@@ -53,6 +56,7 @@ namespace MithrilShards.Network.Legacy
          this.Direction = peerConnectionDirection;
          this.peerContextFactory = peerContextFactory;
          this.networkMessageDecoder = networkMessageDecoder;
+         this.networkMessageProcessorFactory = networkMessageProcessorFactory;
          this.cancellationToken = cancellationToken;
 
          this.PeerContext = this.peerContextFactory.Create(
@@ -64,7 +68,7 @@ namespace MithrilShards.Network.Legacy
 
          this.networkMessageDecoder.SetPeerContext(this.PeerContext);
 
-         this.connectionStateMachine = new PeerConnectionStateMachine(logger, eventBus, this, networkMessageDecoder, cancellationToken);
+         this.connectionStateMachine = new PeerConnectionStateMachine(logger, eventBus, this, networkMessageDecoder, networkMessageProcessorFactory, cancellationToken);
       }
 
       /// <inheritdoc/>
