@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace MithrilShards.Core {
+namespace MithrilShards.Core
+{
    /// <summary>
    /// Providing date time functionality.
    /// </summary>
-   public interface IDateTimeProvider {
+   public interface IDateTimeProvider
+   {
       /// <summary>
       /// Get the current time in Linux format.
       /// </summary>

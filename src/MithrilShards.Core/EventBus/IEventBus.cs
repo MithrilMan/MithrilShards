@@ -1,10 +1,12 @@
 ﻿using System;
 
-namespace MithrilShards.Core.EventBus {
+namespace MithrilShards.Core.EventBus
+{
    /// <summary>
    /// Event Bus interface
    /// </summary>
-   public interface IEventBus {
+   public interface IEventBus
+   {
       /// <summary>
       /// Subscribes to the specified event type with the specified action
       /// </summary>

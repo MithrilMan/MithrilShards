@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Buffers;
-using System.Buffers.Binary;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
-   public class VersionMessageSerializer : NetworkMessageSerializerBase<VersionMessage> {
+namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers
+{
+   public class VersionMessageSerializer : NetworkMessageSerializerBase<VersionMessage>
+   {
       public VersionMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
 
-      public override void Serialize(VersionMessage message, int protocolVersion, IBufferWriter<byte> output) {
+      public override void Serialize(VersionMessage message, int protocolVersion, IBufferWriter<byte> output)
+      {
          // version message doesn't have to look into passed protocolVersion but rely on it's message.Version.
          protocolVersion = message.Version;
 
@@ -18,7 +20,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          output.WriteLong(message.Timestamp.ToUnixTimeSeconds());
          output.WriteNetworkAddress(message.ReceiverAddress, protocolVersion);
 
-         if (protocolVersion < KnownVersion.V106) {
+         if (protocolVersion < KnownVersion.V106)
+         {
             return;
          }
 
@@ -27,22 +30,26 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          output.WriteVarString(message.UserAgent);
          output.WriteInt(message.StartHeight);
 
-         if (protocolVersion < KnownVersion.V70001) {
+         if (protocolVersion < KnownVersion.V70001)
+         {
             return;
          }
 
          output.WriteBool(message.Relay);
       }
 
-      public override VersionMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion) {
-         var message = new VersionMessage {
+      public override VersionMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
+      {
+         var message = new VersionMessage
+         {
             Version = reader.ReadInt(),
             Services = reader.ReadULong(),
             Timestamp = DateTimeOffset.FromUnixTimeSeconds(reader.ReadLong()),
             ReceiverAddress = reader.ReadNetworkAddress(skipTimeField: true, protocolVersion)
          };
 
-         if (message.Version < KnownVersion.V106) {
+         if (message.Version < KnownVersion.V106)
+         {
             return message;
          }
 
@@ -51,7 +58,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers {
          message.UserAgent = reader.ReadVarString();
          message.StartHeight = reader.ReadInt();
 
-         if (message.Version < KnownVersion.V70001) {
+         if (message.Version < KnownVersion.V70001)
+         {
             return message;
          }
 

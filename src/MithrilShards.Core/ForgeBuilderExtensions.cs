@@ -8,10 +8,13 @@ using MithrilShards.Core.Network.PeerAddressBook;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Core {
-   internal static class ForgeBuilderExtensions {
+namespace MithrilShards.Core
+{
+   internal static class ForgeBuilderExtensions
+   {
 
-      public static IServiceCollection ConfigureForge(this IServiceCollection services, HostBuilderContext context) {
+      public static IServiceCollection ConfigureForge(this IServiceCollection services, HostBuilderContext context)
+      {
          services
                // data folder
                .AddSingleton<IDataFolders, DataFolders>(serviceProvider => new DataFolders("."))
@@ -32,7 +35,8 @@ namespace MithrilShards.Core {
          return services;
       }
 
-      private static IServiceCollection ConfigureNetwork(this IServiceCollection services) {
+      private static IServiceCollection ConfigureNetwork(this IServiceCollection services)
+      {
          services
             .AddSingleton<IForgeConnectivity, FakeForgeConnectivity>()
             .AddSingleton<INetworkMessageSerializerManager, NetworkMessageSerializerManager>()

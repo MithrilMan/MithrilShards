@@ -9,8 +9,10 @@ using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
-namespace MithrilShards.Core.Network {
-   public class PeerContext : IPeerContext {
+namespace MithrilShards.Core.Network
+{
+   public class PeerContext : IPeerContext
+   {
       private readonly List<INetworkMessageProcessor> messageProcessors = new List<INetworkMessageProcessor>();
       readonly ILogger logger;
       readonly INetworkMessageWriter messageWriter;
@@ -62,7 +64,8 @@ namespace MithrilShards.Core.Network {
                          EndPoint localEndPoint,
                          EndPoint publicEndPoint,
                          EndPoint remoteEndPoint,
-                         INetworkMessageWriter messageWriter) {
+                         INetworkMessageWriter messageWriter)
+      {
          this.logger = logger;
          this.Direction = direction;
          this.PeerId = peerId;
@@ -72,29 +75,38 @@ namespace MithrilShards.Core.Network {
          this.RemoteEndPoint = remoteEndPoint.AsIPEndPoint();
       }
 
-      public INetworkMessageWriter GetMessageWriter() {
+      public INetworkMessageWriter GetMessageWriter()
+      {
          return this.messageWriter;
       }
 
-      public virtual void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor) {
-         if (this.messageProcessors.Exists(p => p.GetType() == messageProcessor.GetType())) {
+      public virtual void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor)
+      {
+         if (this.messageProcessors.Exists(p => p.GetType() == messageProcessor.GetType()))
+         {
             throw new ArgumentException($"Cannot add multiple processors of the same type. Trying to attack {messageProcessor.GetType().Name} multiple times");
          }
 
          this.messageProcessors.Add(messageProcessor);
       }
 
-      public void Dispose() {
+      public void Dispose()
+      {
          this.logger.LogDebug("Disposing PeerContext of {PeerId}.", this.PeerId);
-         foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors) {
+         foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors)
+         {
             messageProcessor.Dispose();
          }
       }
 
-      public async Task ProcessMessageAsync(INetworkMessage message) {
-         foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors) {
-            if (messageProcessor.Enabled) {
-               if (!await messageProcessor.ProcessMessageAsync(message, default).ConfigureAwait(false)) {
+      public async Task ProcessMessageAsync(INetworkMessage message)
+      {
+         foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors)
+         {
+            if (messageProcessor.Enabled)
+            {
+               if (!await messageProcessor.ProcessMessageAsync(message, default).ConfigureAwait(false))
+               {
                   break;
                }
             }

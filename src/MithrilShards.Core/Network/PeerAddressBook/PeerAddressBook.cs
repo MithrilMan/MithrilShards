@@ -1,34 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace MithrilShards.Core.Network.PeerAddressBook {
-   public class PeerAddressBook : IPeerAddressBook, IPeerScoreManager {
-      public void AddAddress(IPeerContext peer) {
+namespace MithrilShards.Core.Network.PeerAddressBook
+{
+   public class PeerAddressBook : IPeerAddressBook, IPeerScoreManager
+   {
+      public void AddAddress(IPeerContext peer)
+      {
          throw new NotImplementedException();
       }
 
-      public void AddAddresses(IEnumerable<IPeerContext> peers) {
+      public void AddAddresses(IEnumerable<IPeerContext> peers)
+      {
          throw new NotImplementedException();
       }
 
-      public void Ban(IPeerContext peer, DateTimeOffset until, string reason) {
+      public void Ban(IPeerContext peer, DateTimeOffset until, string reason)
+      {
          throw new NotImplementedException();
       }
 
-      public uint DecreaseScore(IPeerContext peer, int amount) {
+      public uint DecreaseScore(IPeerContext peer, int amount)
+      {
          throw new NotImplementedException();
       }
 
-      public uint IncreaseScore(IPeerContext peer, int amount) {
+      public uint IncreaseScore(IPeerContext peer, int amount)
+      {
          throw new NotImplementedException();
       }
 
-      public void RemoveAddress(IPeerContext peer) {
+      public void RemoveAddress(IPeerContext peer)
+      {
          throw new NotImplementedException();
       }
 
-      public void RemoveAddresses(IEnumerable<IPeerContext> peers) {
+      public void RemoveAddresses(IEnumerable<IPeerContext> peers)
+      {
          throw new NotImplementedException();
       }
    }

@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace MithrilShards.Chain.Bitcoin.Network {
+namespace MithrilShards.Chain.Bitcoin.Network
+{
    /// <summary>
    /// From https://github.com/bitcoin/bitcoin/blob/1dbf3350c683f93d7fc9b861400724f6fd2b2f1d/src/protocol.h#L262-L268
    /// Bits 24-31 are reserved for temporary experiments. Just pick a bit that
@@ -12,7 +13,8 @@ namespace MithrilShards.Chain.Bitcoin.Network {
    // BIP process.
    /// </summary>
    [Flags]
-   public enum NodeServices : ulong {
+   public enum NodeServices : ulong
+   {
       /// <summary>
       /// NODE_NETWORK means that the node is capable of serving the block chain. It is currently
       /// set by all Bitcoin Core nodes, and is unset by SPV clients or other peers that just want

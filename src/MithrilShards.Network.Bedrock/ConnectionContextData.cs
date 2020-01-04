@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Text;
 
-namespace MithrilShards.Network.Bedrock {
-   public class ConnectionContextData {
+namespace MithrilShards.Network.Bedrock
+{
+   public class ConnectionContextData
+   {
       public const int SIZE_MAGIC = 4;
       public const int SIZE_COMMAND = 12;
       public const int SIZE_PAYLOAD_LENGTH = 4;
@@ -33,9 +35,11 @@ namespace MithrilShards.Network.Bedrock {
       /// <value>
       /// The length of the payload.
       /// </value>
-      public uint PayloadLength {
+      public uint PayloadLength
+      {
          get => this.payloadLength;
-         set {
+         set
+         {
             this.payloadLength = value;
             this.PayloadLengthRead = true;
          }
@@ -48,9 +52,11 @@ namespace MithrilShards.Network.Bedrock {
       /// <value>
       /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
       /// </value>
-      public byte[] Command {
+      public byte[] Command
+      {
          get => this.command;
-         set {
+         set
+         {
             this.command = value;
             this.CommandRead = true;
          }
@@ -63,15 +69,18 @@ namespace MithrilShards.Network.Bedrock {
       /// <value>
       /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
       /// </value>
-      public uint Checksum {
+      public uint Checksum
+      {
          get => this.checksum;
-         set {
+         set
+         {
             this.checksum = value;
             this.ChecksumRead = true;
          }
       }
 
-      public ConnectionContextData(byte[] magicNumberBytesmagicBytes) {
+      public ConnectionContextData(byte[] magicNumberBytesmagicBytes)
+      {
          this.MagicNumberBytes = magicNumberBytesmagicBytes;
          this.MagicNumber = BitConverter.ToInt32(magicNumberBytesmagicBytes);
          this.FirstMagicNumberByte = magicNumberBytesmagicBytes[0];
@@ -79,18 +88,21 @@ namespace MithrilShards.Network.Bedrock {
          this.ResetFlags();
       }
 
-      public void ResetFlags() {
+      public void ResetFlags()
+      {
          this.MagicNumberRead = false;
          this.PayloadLengthRead = false;
          this.CommandRead = false;
          this.ChecksumRead = false;
       }
 
-      public string GetCommandName() {
+      public string GetCommandName()
+      {
          return Encoding.ASCII.GetString(this.command.AsSpan().Trim((byte)'\0'));
       }
 
-      public int GetTotalMessageLength() {
+      public int GetTotalMessageLength()
+      {
          return HEADER_LENGTH + (int)this.payloadLength;
       }
    }

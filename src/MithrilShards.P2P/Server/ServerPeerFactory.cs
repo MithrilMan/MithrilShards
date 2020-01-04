@@ -9,8 +9,10 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
 
-namespace MithrilShards.Network.Legacy.Server {
-   public class ServerPeerFactory : IServerPeerFactory {
+namespace MithrilShards.Network.Legacy.Server
+{
+   public class ServerPeerFactory : IServerPeerFactory
+   {
       readonly ILogger<ServerPeerFactory> logger;
       readonly ILoggerFactory loggerFactory;
       readonly IEventBus eventBus;
@@ -24,7 +26,8 @@ namespace MithrilShards.Network.Legacy.Server {
                                IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
                                IOptions<ForgeConnectivitySettings> settings,
                                IPeerConnectionFactory peerConnectionFactory
-                               ) {
+                               )
+      {
          this.logger = logger;
          this.loggerFactory = loggerFactory;
          this.eventBus = eventBus;
@@ -33,34 +36,43 @@ namespace MithrilShards.Network.Legacy.Server {
          this.settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
       }
 
-      public List<IServerPeer> CreateServerInstances() {
-         using (this.logger.BeginScope("CreateServerInstances")) {
+      public List<IServerPeer> CreateServerInstances()
+      {
+         using (this.logger.BeginScope("CreateServerInstances"))
+         {
             this.logger.LogInformation("Loading Forge Server listeners configuration.");
             var servers = new List<IServerPeer>();
 
-            if (this.serverPeerConnectionGuards.Any()) {
+            if (this.serverPeerConnectionGuards.Any())
+            {
                this.logger.LogInformation(
                   "Using {PeerConnectionGuardsCount} peer connection guards: {PeerConnectionGuards}.",
                   this.serverPeerConnectionGuards.Count(),
                   this.serverPeerConnectionGuards.Select(guard => guard.GetType().Name)
                   );
             }
-            else {
+            else
+            {
                this.logger.LogWarning("No peer connection guards detected.");
             }
 
-            if (this.settings.Listeners != null) {
+            if (this.settings.Listeners != null)
+            {
 
-               foreach (ServerPeerBinding binding in this.settings.Listeners) {
-                  if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint)) {
+               foreach (ServerPeerBinding binding in this.settings.Listeners)
+               {
+                  if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint))
+                  {
                      throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
                   }
 
-                  if (binding.PublicEndPoint == null) {
+                  if (binding.PublicEndPoint == null)
+                  {
                      binding.PublicEndPoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
                   }
 
-                  if (!binding.IsValidPublicEndPoint()) {
+                  if (!binding.IsValidPublicEndPoint())
+                  {
                      throw new Exception($"Configuration error: binding {nameof(binding.PublicEndPoint)} must be a valid address:port value. Current value: {binding.PublicEndPoint ?? "NULL"}");
                   }
 
@@ -78,10 +90,12 @@ namespace MithrilShards.Network.Legacy.Server {
                }
             }
 
-            if (servers.Count == 0) {
+            if (servers.Count == 0)
+            {
                this.logger.LogWarning("No binding information found in configuration file, no Forge Servers available.");
             }
-            else {
+            else
+            {
                this.logger.LogInformation("Found {ConfiguredListeners} listeners in configuration.", servers.Count);
             }
 

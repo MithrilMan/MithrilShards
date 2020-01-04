@@ -14,8 +14,10 @@ using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
 using Stateless;
 
-namespace MithrilShards.Network.Legacy.StateMachine {
-   public class PeerConnectionStateMachine {
+namespace MithrilShards.Network.Legacy.StateMachine
+{
+   public class PeerConnectionStateMachine
+   {
       readonly StateMachine<PeerConnectionState, PeerConnectionTrigger> stateMachine;
       readonly ILogger logger;
       readonly IEventBus eventBus;
@@ -43,7 +45,8 @@ namespace MithrilShards.Network.Legacy.StateMachine {
       public PeerConnectionState Status { get => this.stateMachine.State; }
 
 
-      public PeerConnectionStateMachine(ILogger logger, IEventBus eventBus, PeerConnection peerConnection, NetworkMessageDecoder networkMessageDecoder, CancellationToken cancellationToken) {
+      public PeerConnectionStateMachine(ILogger logger, IEventBus eventBus, PeerConnection peerConnection, NetworkMessageDecoder networkMessageDecoder, CancellationToken cancellationToken)
+      {
          this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
          this.eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
          this.peerConnection = peerConnection ?? throw new ArgumentNullException(nameof(peerConnection));
@@ -54,24 +57,30 @@ namespace MithrilShards.Network.Legacy.StateMachine {
          this.disconnectFromPeerTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.DisconnectFromPeer);
          this.peerDroppedTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.PeerDropped);
 
-         if (this.peerConnection.Direction == PeerConnectionDirection.Inbound) {
+         if (this.peerConnection.Direction == PeerConnectionDirection.Inbound)
+         {
             this.ConfigureInboundStateMachine(cancellationToken);
          }
-         else {
+         else
+         {
             this.ConfigureOutboundStateMachine(cancellationToken);
          }
 
          this.EnableStateTransitionLogs();
       }
 
-      internal void ForceDisconnection() {
-         if (this.stateMachine.IsInState(PeerConnectionState.Connected)) {
+      internal void ForceDisconnection()
+      {
+         if (this.stateMachine.IsInState(PeerConnectionState.Connected))
+         {
             this.stateMachine.FireAsync(this.disconnectFromPeerTrigger, (reason: "Unexpected state transition.", ex: (Exception)null));
          }
       }
 
-      private void ConfigureInboundStateMachine(CancellationToken cancellationToken) {
-         using (this.logger.BeginScope("Inbound Peer State Machine")) {
+      private void ConfigureInboundStateMachine(CancellationToken cancellationToken)
+      {
+         using (this.logger.BeginScope("Inbound Peer State Machine"))
+         {
             this.stateMachine.Configure(PeerConnectionState.Initializing)
                .Permit(PeerConnectionTrigger.AcceptConnection, PeerConnectionState.Connected);
 
@@ -108,39 +117,47 @@ namespace MithrilShards.Network.Legacy.StateMachine {
          }
       }
 
-      private void ConfigureOutboundStateMachine(CancellationToken cancellationToken) {
+      private void ConfigureOutboundStateMachine(CancellationToken cancellationToken)
+      {
 
       }
 
-      public async Task AcceptIncomingConnection() {
+      public async Task AcceptIncomingConnection()
+      {
          await this.stateMachine.FireAsync(PeerConnectionTrigger.AcceptConnection).ConfigureAwait(false);
       }
 
       /// <summary>
       /// Reads messages from the connection stream.
       /// </summary>
-      private async Task StartReceivingMessages(CancellationToken cancellationToken) {
-         try {
+      private async Task StartReceivingMessages(CancellationToken cancellationToken)
+      {
+         try
+         {
             await this.stateMachine.FireAsync(PeerConnectionTrigger.WaitMessage).ConfigureAwait(false);
 
             await this.ProcessNetworkMessages(this.peerConnection.ConnectedClient.Client, cancellationToken).ConfigureAwait(false);
          }
-         catch (Exception ex) when (ex is IOException || ex is OperationCanceledException || ex is ObjectDisposedException) {
+         catch (Exception ex) when (ex is IOException || ex is OperationCanceledException || ex is ObjectDisposedException)
+         {
             await this.stateMachine.FireAsync(this.peerDroppedTrigger,
                                               (reason: "The node stopped receiving messages.", ex)).ConfigureAwait(false);
             return;
          }
-         catch (Exception ex) {
+         catch (Exception ex)
+         {
             await this.stateMachine.FireAsync(this.peerDroppedTrigger,
                                               (reason: "Unexpected failure whilst receiving messages.", ex)).ConfigureAwait(false);
             return;
          }
-         finally {
+         finally
+         {
             //TODO: close pipes
          }
       }
 
-      private async Task ProcessNetworkMessages(Socket socket, CancellationToken cancellationToken) {
+      private async Task ProcessNetworkMessages(Socket socket, CancellationToken cancellationToken)
+      {
          var pipe = new Pipe();
 
          Task writer = this.FillPipeAsync(socket, pipe.Writer, cancellationToken);
@@ -152,14 +169,17 @@ namespace MithrilShards.Network.Legacy.StateMachine {
       }
 
 
-      private async Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken cancellationToken) {
+      private async Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken cancellationToken)
+      {
          const int minimumBufferSize = 512;
 
-         while (!cancellationToken.IsCancellationRequested) {
+         while (!cancellationToken.IsCancellationRequested)
+         {
             // Allocate at least 512 bytes from the PipeWriter.
             Memory<byte> memory = writer.GetMemory(minimumBufferSize);
             int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None).ConfigureAwait(false);
-            if (bytesRead == 0) {
+            if (bytesRead == 0)
+            {
                break;
             }
             // Tell the PipeWriter how much was read from the Socket.
@@ -168,7 +188,8 @@ namespace MithrilShards.Network.Legacy.StateMachine {
             // Make the data available to the PipeReader.
             FlushResult result = await writer.FlushAsync().ConfigureAwait(false);
 
-            if (result.IsCompleted) {
+            if (result.IsCompleted)
+            {
                break;
             }
          }
@@ -177,31 +198,40 @@ namespace MithrilShards.Network.Legacy.StateMachine {
          await writer.CompleteAsync().ConfigureAwait(false);
       }
 
-      async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellationToken = default) {
-         try {
-            while (true) {
+      async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellationToken = default)
+      {
+         try
+         {
+            while (true)
+            {
                ReadResult result = await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
                ReadOnlySequence<byte> buffer = result.Buffer;
 
-               try {
+               try
+               {
                   // Process one message from the buffer, modifying the input buffer on each iteration.
-                  if (this.networkMessageDecoder.TryParseMessage(in buffer, out this.consumed, out this.examined, out INetworkMessage message)) {
+                  if (this.networkMessageDecoder.TryParseMessage(in buffer, out this.consumed, out this.examined, out INetworkMessage message))
+                  {
                      await this.stateMachine.FireAsync(this.processMessageTrigger, message).ConfigureAwait(false);
                   }
 
                   // There's no more data to be processed.
-                  if (result.IsCompleted) {
-                     if (buffer.Length > 0) {
+                  if (result.IsCompleted)
+                  {
+                     if (buffer.Length > 0)
+                     {
                         // The message is incomplete and there's no more data to process.
                         throw new InvalidDataException("Incomplete message.");
                      }
                      break;
                   }
                }
-               catch (InvalidNetworkMessageException ex) {
+               catch (InvalidNetworkMessageException ex)
+               {
                   throw;
                }
-               finally {
+               finally
+               {
                   // Since all messages in the buffer are being processed, you can use the
                   // remaining buffer's Start and End position to determine consumed and examined.
                   reader.AdvanceTo(this.consumed, this.examined);
@@ -209,17 +239,20 @@ namespace MithrilShards.Network.Legacy.StateMachine {
                }
             }
          }
-         finally {
+         finally
+         {
             await reader.CompleteAsync().ConfigureAwait(false);
          }
       }
 
 
-      private bool TryReadNetworkMessage(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> rawMessage) {
+      private bool TryReadNetworkMessage(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> rawMessage)
+      {
          // Look for a EOL in the buffer.
          SequencePosition? position = buffer.PositionOf((byte)'\n');
 
-         if (position == null) {
+         if (position == null)
+         {
             rawMessage = default;
             return false;
          }
@@ -230,13 +263,16 @@ namespace MithrilShards.Network.Legacy.StateMachine {
          return true;
       }
 
-      private async Task ProcessMessageAsync(INetworkMessage message, CancellationToken cancellationToken) {
+      private async Task ProcessMessageAsync(INetworkMessage message, CancellationToken cancellationToken)
+      {
          using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", message.Command);
          this.logger.LogDebug("Parsing message '{Command}'", message.Command);
-         if (message is UnknownMessage) {
+         if (message is UnknownMessage)
+         {
             this.logger.LogWarning("Deserializer for message '{Command}' not found.", message.Command);
          }
-         else {
+         else
+         {
             this.logger.LogDebug(JsonSerializer.Serialize(message, message.GetType(), new JsonSerializerOptions { WriteIndented = true }));
             this.eventBus.Publish(new PeerMessageReceived(this.peerConnection.PeerContext, message, this.networkMessageDecoder.ContextData.GetTotalMessageLength()));
 
@@ -247,11 +283,13 @@ namespace MithrilShards.Network.Legacy.StateMachine {
          this.stateMachine.Fire(PeerConnectionTrigger.WaitMessage);
       }
 
-      private void Disconnected() {
+      private void Disconnected()
+      {
          this.logger.LogDebug("Peer {PeerConnectionId} Disconnected", this.peerConnection.PeerContext);
       }
 
-      private Task DisconnectingAsync(string reason, Exception ex, CancellationToken cancellationToken) {
+      private Task DisconnectingAsync(string reason, Exception ex, CancellationToken cancellationToken)
+      {
          this.logger.LogDebug(ex, "Disconnecting {PeerConnectionId}: {Reason}", this.peerConnection.PeerContext, reason);
          this.peerConnection.ConnectedClient.Close();
          this.eventBus.Publish(new PeerDisconnected(this.peerConnection.PeerContext, reason, ex));
@@ -265,8 +303,10 @@ namespace MithrilShards.Network.Legacy.StateMachine {
       /// </summary>
       /// <remarks>Transition logs are enabled only if the code is compiled with DEBUG symbol</remarks>
       [Conditional("DEBUG")]
-      private void EnableStateTransitionLogs() {
-         this.stateMachine.OnTransitioned(transition => {
+      private void EnableStateTransitionLogs()
+      {
+         this.stateMachine.OnTransitioned(transition =>
+         {
             this.logger.LogDebug("From {FromState} to {ToState}", transition.Source, transition.Destination);
          });
       }

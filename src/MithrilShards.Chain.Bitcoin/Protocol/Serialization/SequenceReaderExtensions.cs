@@ -6,8 +6,10 @@ using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
-   public static class SequenceReaderExtensions {
+namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
+{
+   public static class SequenceReaderExtensions
+   {
       /// <summary>
       /// Deserialize a <typeparamref name="TItem"/> type.
       /// </summary>
@@ -19,77 +21,98 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       private const string NotEnoughBytesLeft = "Cannot read data, not enough bytes left.";
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static bool ReadBool(ref this SequenceReader<byte> reader) {
+      public static bool ReadBool(ref this SequenceReader<byte> reader)
+      {
          return reader.TryRead(out byte value) ? (value > 0) : throw new MessageSerializationException(NotEnoughBytesLeft);
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static byte ReadByte(ref this SequenceReader<byte> reader) {
+      public static byte ReadByte(ref this SequenceReader<byte> reader)
+      {
          return reader.TryRead(out byte value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static short ReadShort(ref this SequenceReader<byte> reader, bool isBigEndian = false) {
-         if (isBigEndian) {
+      public static short ReadShort(ref this SequenceReader<byte> reader, bool isBigEndian = false)
+      {
+         if (isBigEndian)
+         {
             return reader.TryReadBigEndian(out short value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
-         else {
+         else
+         {
             return reader.TryReadLittleEndian(out short value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static ushort ReadUShort(ref this SequenceReader<byte> reader, bool isBigEndian = false) {
-         if (isBigEndian) {
+      public static ushort ReadUShort(ref this SequenceReader<byte> reader, bool isBigEndian = false)
+      {
+         if (isBigEndian)
+         {
             return reader.TryReadBigEndian(out short value) ? (ushort)value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
-         else {
+         else
+         {
             return reader.TryReadLittleEndian(out short value) ? (ushort)value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static int ReadInt(ref this SequenceReader<byte> reader, bool isBigEndian = false) {
-         if (isBigEndian) {
+      public static int ReadInt(ref this SequenceReader<byte> reader, bool isBigEndian = false)
+      {
+         if (isBigEndian)
+         {
             return reader.TryReadBigEndian(out int value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
-         else {
+         else
+         {
             return reader.TryReadLittleEndian(out int value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static uint ReadUInt(ref this SequenceReader<byte> reader, bool isBigEndian = false) {
-         if (isBigEndian) {
+      public static uint ReadUInt(ref this SequenceReader<byte> reader, bool isBigEndian = false)
+      {
+         if (isBigEndian)
+         {
             return reader.TryReadBigEndian(out int value) ? (uint)value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
-         else {
+         else
+         {
             return reader.TryReadLittleEndian(out int value) ? (uint)value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static long ReadLong(ref this SequenceReader<byte> reader, bool isBigEndian = false) {
-         if (isBigEndian) {
+      public static long ReadLong(ref this SequenceReader<byte> reader, bool isBigEndian = false)
+      {
+         if (isBigEndian)
+         {
             return reader.TryReadBigEndian(out long value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
-         else {
+         else
+         {
             return reader.TryReadLittleEndian(out long value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static ulong ReadULong(ref this SequenceReader<byte> reader, bool isBigEndian = false) {
-         if (isBigEndian) {
+      public static ulong ReadULong(ref this SequenceReader<byte> reader, bool isBigEndian = false)
+      {
+         if (isBigEndian)
+         {
             return reader.TryReadBigEndian(out long value) ? (ulong)value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
-         else {
+         else
+         {
             return reader.TryReadLittleEndian(out long value) ? (ulong)value : throw new MessageSerializationException(NotEnoughBytesLeft);
          }
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static string ReadVarString(ref this SequenceReader<byte> reader) {
+      public static string ReadVarString(ref this SequenceReader<byte> reader)
+      {
          ulong stringLength = ReadVarInt(ref reader);
          ReadOnlySequence<byte> result = reader.Sequence.Slice(reader.Position, (int)stringLength);
          reader.Advance((long)stringLength);
@@ -99,14 +122,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static ReadOnlySpan<byte> ReadBytes(ref this SequenceReader<byte> reader, int length) {
+      public static ReadOnlySpan<byte> ReadBytes(ref this SequenceReader<byte> reader, int length)
+      {
          ReadOnlySequence<byte> sequence = reader.Sequence.Slice(reader.Position, length);
          reader.Advance(length);
 
-         if (sequence.IsSingleSegment) {
+         if (sequence.IsSingleSegment)
+         {
             return sequence.FirstSpan;
          }
-         else {
+         else
+         {
             return sequence.ToArray();
          }
       }
@@ -121,13 +147,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion)
-         where TSerializableType : ISerializableProtocolType, new() {
+         where TSerializableType : ISerializableProtocolType, new()
+      {
 
          ulong itemsCount = reader.ReadVarInt();
 
          TSerializableType[] result = new TSerializableType[itemsCount];
 
-         for (ulong i = 0; i < itemsCount; i++) {
+         for (ulong i = 0; i < itemsCount; i++)
+         {
             TSerializableType itemModel = result[i] = new TSerializableType();
             itemModel.Deserialize(ref reader, protocolVersion);
          }
@@ -145,13 +173,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static TItemType[] ReadArray<TItemType>(ref this SequenceReader<byte> reader, ItemDeserializer<TItemType> deserializer)
-         where TItemType : class {
+         where TItemType : class
+      {
 
          ulong itemsCount = reader.ReadVarInt();
 
          TItemType[] result = new TItemType[itemsCount];
 
-         for (ulong i = 0; i < itemsCount; i++) {
+         for (ulong i = 0; i < itemsCount; i++)
+         {
             result[i] = deserializer(ref reader);
          }
 
@@ -159,19 +189,24 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static ulong ReadVarInt(ref this SequenceReader<byte> reader) {
+      public static ulong ReadVarInt(ref this SequenceReader<byte> reader)
+      {
          reader.TryRead(out byte firstByte);
-         if (firstByte < 0xFD) {
+         if (firstByte < 0xFD)
+         {
             return firstByte;
          }
-         else if (firstByte == 0xFD) {
+         else if (firstByte == 0xFD)
+         {
             return reader.ReadUShort();
          }
-         else if (firstByte == 0xFE) {
+         else if (firstByte == 0xFE)
+         {
             return reader.ReadUInt();
          }
          // == 0xFF
-         else {
+         else
+         {
             return reader.ReadULong();
          }
       }
@@ -183,14 +218,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization {
       /// <param name="skipTimeField">if set to <c>true</c> skips time field serialization/deserialization, used by <see cref="VersionMessage"/>.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static NetworkAddress ReadNetworkAddress(ref this SequenceReader<byte> reader, bool skipTimeField, int protocolVersion) {
+      public static NetworkAddress ReadNetworkAddress(ref this SequenceReader<byte> reader, bool skipTimeField, int protocolVersion)
+      {
          var result = new NetworkAddress(skipTimeField);
          result.Deserialize(ref reader, protocolVersion);
          return result;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static UInt256 ReadUInt256(ref this SequenceReader<byte> reader) {
+      public static UInt256 ReadUInt256(ref this SequenceReader<byte> reader)
+      {
          return new UInt256(reader.ReadBytes(32));
       }
    }

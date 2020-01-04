@@ -1,5 +1,7 @@
-﻿namespace MithrilShards.Core.Network {
-   public interface IConnectivityPeerStats {
+﻿namespace MithrilShards.Core.Network
+{
+   public interface IConnectivityPeerStats
+   {
       /// <summary>
       /// Gets the connected inbound peers count.
       /// </summary>

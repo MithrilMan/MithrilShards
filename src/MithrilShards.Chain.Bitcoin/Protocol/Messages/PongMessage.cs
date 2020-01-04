@@ -1,15 +1,18 @@
 ﻿using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Messages {
+namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
+{
    [NetworkMessage("pong")]
-   public class PongMessage : NetworkMessage {
+   public class PongMessage : NetworkMessage
+   {
 
       /// <summary>
       /// A random nonce that identifies the ping request.
       /// </summary>
       public ulong Nonce { get; set; }
 
-      public PongMessage() : base("pong") {
+      public PongMessage() : base("pong")
+      {
       }
    }
 }

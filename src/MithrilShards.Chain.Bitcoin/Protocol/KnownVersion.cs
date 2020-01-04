@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MithrilShards.Chain.Bitcoin.Protocol {
+﻿namespace MithrilShards.Chain.Bitcoin.Protocol
+{
    /// <summary>
    /// Versions reference
    /// https://github.com/bitcoin/bitcoin/blob/master/src/version.h
    /// https://bitcoin.org/en/developer-reference#protocol-versions
    /// </summary>
-   public sealed class KnownVersion {
+   public sealed class KnownVersion
+   {
       /// <summary>
       /// Version 106.
       /// Bitcoin Core 0.1.6 (Oct 2009).

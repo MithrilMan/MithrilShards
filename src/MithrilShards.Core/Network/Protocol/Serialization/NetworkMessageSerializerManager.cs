@@ -1,16 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
-namespace MithrilShards.Core.Network.Protocol.Serialization {
-   public class NetworkMessageSerializerManager : INetworkMessageSerializerManager {
+namespace MithrilShards.Core.Network.Protocol.Serialization
+{
+   public class NetworkMessageSerializerManager : INetworkMessageSerializerManager
+   {
       readonly ILogger<NetworkMessageSerializerManager> logger;
       readonly IEnumerable<INetworkMessageSerializer> messageSerializers;
       private Dictionary<string, INetworkMessageSerializer> serializers;
 
-      public NetworkMessageSerializerManager(ILogger<NetworkMessageSerializerManager> logger, IEnumerable<INetworkMessageSerializer> messageSerializers) {
+      public NetworkMessageSerializerManager(ILogger<NetworkMessageSerializerManager> logger, IEnumerable<INetworkMessageSerializer> messageSerializers)
+      {
          this.logger = logger;
          this.messageSerializers = messageSerializers;
 
@@ -18,7 +21,8 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
       }
 
 
-      private void InitializeMessageSerializers() {
+      private void InitializeMessageSerializers()
+      {
          this.serializers = (
             from serializer in this.messageSerializers
             let managedMessageType = serializer.GetMessageType()
@@ -35,8 +39,10 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
                   );
       }
 
-      public bool TrySerialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output, out int serializedLength) {
-         if (this.serializers.TryGetValue(message.Command, out INetworkMessageSerializer serializer)) {
+      public bool TrySerialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output, out int serializedLength)
+      {
+         if (this.serializers.TryGetValue(message.Command, out INetworkMessageSerializer serializer))
+         {
             serializedLength = serializer.Serialize(message, protocolVersion, output);
             return true;
          }
@@ -45,8 +51,10 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
          return false;
       }
 
-      public bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, out INetworkMessage message) {
-         if (this.serializers.TryGetValue(commandName, out INetworkMessageSerializer serializer)) {
+      public bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, out INetworkMessage message)
+      {
+         if (this.serializers.TryGetValue(commandName, out INetworkMessageSerializer serializer))
+         {
             message = serializer.Deserialize(ref data, protocolVersion);
             return true;
          }

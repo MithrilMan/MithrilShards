@@ -1,11 +1,13 @@
 ﻿using System;
 
-namespace MithrilShards.Core.Network.Protocol.Serialization {
+namespace MithrilShards.Core.Network.Protocol.Serialization
+{
    /// <summary>
    /// Define the requirements and the serialization type in order to serialize and deserialize current message in the appropriate context.
    /// </summary>
    [AttributeUsage(AttributeTargets.Property)]
-   public class NetworkMessageFieldAttribute : Attribute {
+   public class NetworkMessageFieldAttribute : Attribute
+   {
 
       public Type SerializedType { get; }
 
@@ -24,13 +26,15 @@ namespace MithrilShards.Core.Network.Protocol.Serialization {
       /// </summary>
       public int MaxVersion { get; }
 
-      public NetworkMessageFieldAttribute(Type serializedType, int position, int minVersion = int.MinValue, int maxVersion = int.MaxValue) {
+      public NetworkMessageFieldAttribute(Type serializedType, int position, int minVersion = int.MinValue, int maxVersion = int.MaxValue)
+      {
          this.SerializedType = serializedType;
          this.Position = position;
          this.MinVersion = minVersion;
          this.MaxVersion = maxVersion;
 
-         if (!serializedType.IsAssignableFrom(typeof(ISerializableProtocolType))) {
+         if (!serializedType.IsAssignableFrom(typeof(ISerializableProtocolType)))
+         {
             throw new ArgumentException($"Invalid {nameof(this.SerializedType)}. It must be a Type that implements {nameof(ISerializableProtocolType)}", nameof(serializedType));
          }
       }

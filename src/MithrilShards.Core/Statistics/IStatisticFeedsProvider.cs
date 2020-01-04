@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace MithrilShards.Core.Statistics {
+﻿namespace MithrilShards.Core.Statistics
+{
    /// <summary>
    /// Every component implementing this interface is exporting statistics relative to its job.
    /// </summary>
-   public interface IStatisticFeedsProvider {
+   public interface IStatisticFeedsProvider
+   {
       /// <summary>
       /// Handy placeholder that feeds provider should use to Register a feed definition.
       /// </summary>

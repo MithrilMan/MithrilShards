@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Numerics;
-using System.Security.Cryptography;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Exporters.Csv;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using MithrilShards.Core.Crypto;
-using MithrilShards.Network.Benchmark.Benchmarks;
 
-namespace MithrilShards.Network.Benchmark {
-   class Program {
+namespace MithrilShards.Network.Benchmark
+{
+   class Program
+   {
 
-      public class MyConfig : ManualConfig {
-         public MyConfig() {
+      public class MyConfig : ManualConfig
+      {
+         public MyConfig()
+         {
             //this.Add(CsvMeasurementsExporter.Default);
             //this.Add(RPlotExporter.Default);
             //this.Add(Job.Default
@@ -23,7 +20,8 @@ namespace MithrilShards.Network.Benchmark {
          }
       }
 
-      static void Main(string[] args) {
+      static void Main(string[] args)
+      {
          byte[] data = new byte[32];
          new Random().NextBytes(data);
 

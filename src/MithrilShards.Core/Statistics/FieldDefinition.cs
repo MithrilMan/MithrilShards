@@ -1,7 +1,9 @@
 ﻿using System;
 
-namespace MithrilShards.Core.Statistics {
-   public class FieldDefinition {
+namespace MithrilShards.Core.Statistics
+{
+   public class FieldDefinition
+   {
 
       /// <summary>
       /// Gets the Counter label.
@@ -36,7 +38,8 @@ namespace MithrilShards.Core.Statistics {
       /// <param name="widthHint">The width hint.</param>
       /// <param name="unitOfMeasure">The unit of measure.</param>
       /// <param name="valueFormatter">The value formatter (null if value doesn't need to be formatted).</param>
-      public FieldDefinition(string label, string description, int widthHint, string unitOfMeasure, Func<string, string> valueFormatter = null) {
+      public FieldDefinition(string label, string description, int widthHint, string unitOfMeasure, Func<string, string> valueFormatter = null)
+      {
          this.Label = label ?? throw new ArgumentNullException(nameof(label));
          this.Description = description ?? throw new ArgumentNullException(nameof(description));
          this.WidthHint = widthHint;

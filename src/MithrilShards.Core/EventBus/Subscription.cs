@@ -1,7 +1,9 @@
 ﻿using System;
 
-namespace MithrilShards.Core.EventBus {
-   internal class Subscription<TEventBase> : ISubscription where TEventBase : EventBase {
+namespace MithrilShards.Core.EventBus
+{
+   internal class Subscription<TEventBase> : ISubscription where TEventBase : EventBase
+   {
       /// <summary>
       /// Token returned to the subscriber
       /// </summary>
@@ -12,13 +14,16 @@ namespace MithrilShards.Core.EventBus {
       /// </summary>
       private readonly Action<TEventBase> action;
 
-      public Subscription(Action<TEventBase> action, SubscriptionToken token) {
+      public Subscription(Action<TEventBase> action, SubscriptionToken token)
+      {
          this.action = action ?? throw new ArgumentNullException(nameof(action));
          this.SubscriptionToken = token ?? throw new ArgumentNullException(nameof(token));
       }
 
-      public void Publish(EventBase eventItem) {
-         if (!(eventItem is TEventBase)) {
+      public void Publish(EventBase eventItem)
+      {
+         if (!(eventItem is TEventBase))
+         {
             throw new ArgumentException("Event Item is not the correct type.");
          }
 

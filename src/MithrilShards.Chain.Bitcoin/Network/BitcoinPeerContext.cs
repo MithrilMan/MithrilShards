@@ -5,8 +5,10 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
-namespace MithrilShards.Chain.Bitcoin.Network {
-   public class BitcoinPeerContext : PeerContext {
+namespace MithrilShards.Chain.Bitcoin.Network
+{
+   public class BitcoinPeerContext : PeerContext
+   {
 
       public TimeSpan? TimeOffset { get; set; }
 
@@ -17,10 +19,12 @@ namespace MithrilShards.Chain.Bitcoin.Network {
                                 EndPoint publicEndPoint,
                                 EndPoint remoteEndPoint,
                                 INetworkMessageWriter messageWriter)
-         : base(logger, direction, peerId, localEndPoint, publicEndPoint, remoteEndPoint, messageWriter) {
+         : base(logger, direction, peerId, localEndPoint, publicEndPoint, remoteEndPoint, messageWriter)
+      {
       }
 
-      public override void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor) {
+      public override void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor)
+      {
          base.AttachNetworkMessageProcessor(messageProcessor);
       }
    }

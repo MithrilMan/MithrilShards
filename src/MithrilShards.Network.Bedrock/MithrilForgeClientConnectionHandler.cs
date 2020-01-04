@@ -1,4 +1,7 @@
-﻿using Bedrock.Framework.Protocols;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Bedrock.Framework.Protocols;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,16 +12,12 @@ using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
-using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
-using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace MithrilShards.Network.Bedrock {
-   public class MithrilForgeClientConnectionHandler : ConnectionHandler {
+namespace MithrilShards.Network.Bedrock
+{
+   public class MithrilForgeClientConnectionHandler : ConnectionHandler
+   {
       private readonly ILogger logger;
       readonly ILoggerFactory loggerFactory;
       readonly IEventBus eventBus;
@@ -36,7 +35,8 @@ namespace MithrilShards.Network.Bedrock {
                                            INetworkMessageSerializerManager networkMessageSerializerManager,
                                            INetworkMessageProcessorFactory networkMessageProcessorFactory,
                                            IPeerContextFactory peerContextFactory,
-                                           IOptions<ForgeConnectivitySettings> connectivitySettings) {
+                                           IOptions<ForgeConnectivitySettings> connectivitySettings)
+      {
          this.logger = logger;
          this.loggerFactory = loggerFactory;
          this.eventBus = eventBus;
@@ -47,8 +47,10 @@ namespace MithrilShards.Network.Bedrock {
          this.connectivitySettings = connectivitySettings?.Value;
       }
 
-      public override async Task OnConnectedAsync(ConnectionContext connection) {
-         if (connection is null) {
+      public override async Task OnConnectedAsync(ConnectionContext connection)
+      {
+         if (connection is null)
+         {
             throw new ArgumentNullException(nameof(connection));
          }
 
@@ -77,15 +79,19 @@ namespace MithrilShards.Network.Bedrock {
 
          await this.networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
 
-         while (true) {
-            if (connection.ConnectionClosed.IsCancellationRequested) {
+         while (true)
+         {
+            if (connection.ConnectionClosed.IsCancellationRequested)
+            {
                break;
             }
 
-            try {
+            try
+            {
                ReadResult<INetworkMessage> result = await reader.ReadAsync(protocol, connection.ConnectionClosed).ConfigureAwait(false);
 
-               if (result.IsCompleted) {
+               if (result.IsCompleted)
+               {
                   break;
                }
 
@@ -93,10 +99,12 @@ namespace MithrilShards.Network.Bedrock {
                   .WithCancellationAsync(connection.ConnectionClosed)
                   .ConfigureAwait(false);
             }
-            catch (OperationCanceledException ex) {
+            catch (OperationCanceledException ex)
+            {
                break;
             }
-            finally {
+            finally
+            {
                reader.Advance();
             }
          }
@@ -108,11 +116,13 @@ namespace MithrilShards.Network.Bedrock {
       private async Task ProcessMessage(INetworkMessage message,
                                         ConnectionContext connection,
                                         ConnectionContextData contextData,
-                                        IPeerContext peerContext) {
+                                        IPeerContext peerContext)
+      {
          using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", message.Command);
          this.logger.LogDebug("Parsing message '{Command}' with size of {PayloadSize}", message.Command, contextData.PayloadLength);
 
-         if (!(message is UnknownMessage)) {
+         if (!(message is UnknownMessage))
+         {
             await peerContext.ProcessMessageAsync(message).ConfigureAwait(false);
             this.eventBus.Publish(new PeerMessageReceived(peerContext, message, contextData.GetTotalMessageLength()));
          }

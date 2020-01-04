@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace MithrilShards.Core.MithrilShards {
-   public interface IMithrilShardDefinition {
+namespace MithrilShards.Core.MithrilShards
+{
+   public interface IMithrilShardDefinition
+   {
       string Name { get; }
 
       string Description { get; }

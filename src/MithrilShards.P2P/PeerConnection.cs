@@ -10,9 +10,11 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Network.Legacy.StateMachine;
 
-namespace MithrilShards.Network.Legacy {
+namespace MithrilShards.Network.Legacy
+{
 
-   public class PeerConnection : IPeerConnection, INetworkMessageWriter {
+   public class PeerConnection : IPeerConnection, INetworkMessageWriter
+   {
       /// <summary>Instance logger.</summary>
       private readonly ILogger logger;
       readonly IEventBus eventBus;
@@ -42,7 +44,8 @@ namespace MithrilShards.Network.Legacy {
                             PeerConnectionDirection peerConnectionDirection,
                             IPeerContextFactory peerContextFactory,
                             NetworkMessageDecoder networkMessageDecoder,
-                            CancellationToken cancellationToken) {
+                            CancellationToken cancellationToken)
+      {
          this.logger = logger;
          this.eventBus = eventBus;
          this.dateTimeProvider = dateTimeProvider;
@@ -65,21 +68,26 @@ namespace MithrilShards.Network.Legacy {
       }
 
       /// <inheritdoc/>
-      public async Task IncomingConnectionAccepted(CancellationToken cancellation = default(CancellationToken)) {
-         try {
+      public async Task IncomingConnectionAccepted(CancellationToken cancellation = default(CancellationToken))
+      {
+         try
+         {
             await this.connectionStateMachine.AcceptIncomingConnection().ConfigureAwait(false);
          }
-         catch (Exception ex) {
+         catch (Exception ex)
+         {
             this.logger.LogCritical(ex, "Unexpected error.");
             this.connectionStateMachine.ForceDisconnection();
          }
       }
 
-      public ValueTask WriteAsync(INetworkMessage message, CancellationToken cancellationToken) {
+      public ValueTask WriteAsync(INetworkMessage message, CancellationToken cancellationToken)
+      {
          throw new NotImplementedException();
       }
 
-      public ValueTask WriteManyAsync(IEnumerable<INetworkMessage> messages, CancellationToken cancellationToken) {
+      public ValueTask WriteManyAsync(IEnumerable<INetworkMessage> messages, CancellationToken cancellationToken)
+      {
          throw new NotImplementedException();
       }
    }

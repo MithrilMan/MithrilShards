@@ -1,5 +1,7 @@
-﻿namespace MithrilShards.Core.Network.Protocol.Serialization {
-   public interface IProtocolTypeSerializer<TSerializableProtocolType> where TSerializableProtocolType : ISerializableProtocolType {
+﻿namespace MithrilShards.Core.Network.Protocol.Serialization
+{
+   public interface IProtocolTypeSerializer<TSerializableProtocolType> where TSerializableProtocolType : ISerializableProtocolType
+   {
       /// <summary>
       /// Serializes the specified value in a byte array.
       /// </summary>

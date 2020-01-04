@@ -1,10 +1,12 @@
-﻿using MithrilShards.Core.Network;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MithrilShards.Core.Network;
 
-namespace MithrilShards.Network.Legacy {
-   public interface IPeerConnection {
+namespace MithrilShards.Network.Legacy
+{
+   public interface IPeerConnection
+   {
       PeerConnectionDirection Direction { get; }
       PeerDisconnectionReason DisconnectReason { get; }
       TimeSpan? TimeOffset { get; }

@@ -1,26 +1,28 @@
-﻿using System.Threading.Tasks;
-using MithrilShards.Core.Forge;
-using MithrilShards.Logging.Serilog;
-using Serilog;
-using MithrilShards.Chain.Bitcoin;
-using MithrilShards.Network.Bedrock;
-using MithrilShards.Chain.Bitcoin.Protocol;
-using MithrilShards.Network.Legacy;
-using Microsoft.Extensions.DependencyInjection;
-using System.Net;
-using System;
-using MithrilShards.Diagnostic.StatisticsCollector;
+﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using MithrilShards.Chain.Bitcoin;
+using MithrilShards.Chain.Bitcoin.Protocol;
+using MithrilShards.Core.Forge;
+using MithrilShards.Diagnostic.StatisticsCollector;
+using MithrilShards.Logging.Serilog;
+using MithrilShards.Network.Bedrock;
+using MithrilShards.Network.Legacy;
+using Serilog;
 
-namespace ConnectionTest {
-   static class Program {
-      static async Task Main(string[] args) {
+namespace ConnectionTest
+{
+   static class Program
+   {
+      static async Task Main(string[] args)
+      {
 
          await StartBedrockForgeServer(args).ConfigureAwait(false);
          //await StartP2PForgeServer(args).ConfigureAwait(false);
       }
 
-      private static async Task StartBedrockForgeServer(string[] args) {
+      private static async Task StartBedrockForgeServer(string[] args)
+      {
          await BuildForge(args)
             .UseSerilog("log-settings-with-seq.json")
             .UseBedrockForgeServer()
@@ -29,7 +31,8 @@ namespace ConnectionTest {
             .ConfigureAwait(false);
       }
 
-      private static async Task StartP2PForgeServer(string[] args) {
+      private static async Task StartP2PForgeServer(string[] args)
+      {
          await BuildForge(args)
             .UseSerilog("log-settings.json")
             .UseP2PForgeServer()
@@ -38,7 +41,8 @@ namespace ConnectionTest {
             .ConfigureAwait(false);
       }
 
-      private static IForgeBuilder BuildForge(string[] args) {
+      private static IForgeBuilder BuildForge(string[] args)
+      {
          string network = args
             .DefaultIfEmpty("--network=bitcoin-main")
             .Where(arg => arg.StartsWith("--network"))
@@ -47,7 +51,8 @@ namespace ConnectionTest {
 
          Console.WriteLine($"Building {network} forge...");
 
-         switch (network) {
+         switch (network)
+         {
             case "bitcoin-main":
                return new ForgeBuilder()
                   .UseForge<Forge>(args)

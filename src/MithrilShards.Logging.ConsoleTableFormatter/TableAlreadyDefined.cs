@@ -1,9 +1,11 @@
 ﻿using System;
 
-namespace MithrilShards.Logging.ConsoleTableFormatter {
+namespace MithrilShards.Logging.ConsoleTableFormatter
+{
 
    [Serializable]
-   public class TableAlreadyDefinedException : Exception {
+   public class TableAlreadyDefinedException : Exception
+   {
       private const string DEFAULT_ERROR_MESSAGE = "Table already prepared, cannot alter the definition.";
       public TableAlreadyDefinedException() : base(DEFAULT_ERROR_MESSAGE) { }
       public TableAlreadyDefinedException(string message) : base(message) { }

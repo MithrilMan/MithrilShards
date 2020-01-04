@@ -1,11 +1,13 @@
-﻿using MithrilShards.Core.Extensions;
-using System.Net;
+﻿using System.Net;
+using MithrilShards.Core.Extensions;
 
-namespace MithrilShards.Core.Network.Server {
+namespace MithrilShards.Core.Network.Server
+{
    /// <summary>
    /// Server Peer endpoint the node is listening to.
    /// </summary>
-   public class ServerPeerBinding {
+   public class ServerPeerBinding
+   {
       /// <summary>IP address and port number on which the node server listens.</summary>
       public string EndPoint { get; set; }
 
@@ -24,30 +26,37 @@ namespace MithrilShards.Core.Network.Server {
       /// <param name="otherEndpoint">The endpoint to match to <see cref="EndPoint"/>.</param>
       /// <remarks>If the binding endpoint is any IP (0.0.0.0 IPV4 or [::] IPV6 address) just checks the port.</remarks>
       /// <returns></returns>
-      public bool Matches(IPEndPoint otherEndpoint) {
+      public bool Matches(IPEndPoint otherEndpoint)
+      {
          IPEndPoint endpoint = IPEndPoint.Parse(this.EndPoint);
-         if (endpoint.IsAnyIP()) {
+         if (endpoint.IsAnyIP())
+         {
             return endpoint.Port == otherEndpoint.Port;
          }
-         else {
+         else
+         {
             return otherEndpoint.Equals(this.EndPoint);
          }
       }
 
-      public bool IsValidEndpoint(out IPEndPoint parsedEndpoint) {
+      public bool IsValidEndpoint(out IPEndPoint parsedEndpoint)
+      {
          parsedEndpoint = null;
          return this.EndPoint != null && IPEndPoint.TryParse(this.EndPoint, out parsedEndpoint);
       }
 
-      public bool IsValidPublicEndPoint() {
+      public bool IsValidPublicEndPoint()
+      {
          return this.PublicEndPoint != null && IPEndPoint.TryParse(this.PublicEndPoint, out _);
       }
 
-      public bool TryGetIPEndPoint(out IPEndPoint endPoint) {
+      public bool TryGetIPEndPoint(out IPEndPoint endPoint)
+      {
          return IPEndPoint.TryParse(this.EndPoint, out endPoint);
       }
 
-      public bool TryGetPublicIPEndPoint(out IPEndPoint publicEndPoint) {
+      public bool TryGetPublicIPEndPoint(out IPEndPoint publicEndPoint)
+      {
          return IPEndPoint.TryParse(this.PublicEndPoint, out publicEndPoint);
       }
    }

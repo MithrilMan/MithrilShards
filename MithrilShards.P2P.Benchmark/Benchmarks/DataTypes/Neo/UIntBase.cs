@@ -4,13 +4,15 @@ using System.IO;
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable IDE0009 // Member access should be qualified.
 
-namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
+namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
+{
    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0011:Add braces", Justification = "<Pending>")]
    /// <summary>
    /// Base class for little-endian unsigned integers. Two classes inherit from this: UInt160 and UInt256.
    /// Only basic comparison/serialization are proposed for these classes. For arithmetic purposes, use BigInteger class.
    /// </summary>
-   public abstract class UIntBase  {
+   public abstract class UIntBase
+   {
       /// <summary>
       /// Number of bytes of the unsigned int.
       /// Currently, inherited classes use 20-bytes (UInt160) or 32-bytes (UInt256)
@@ -30,7 +32,8 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       /// Method Parse receives a big-endian hex string and stores as a UInt160 or UInt256 little-endian byte array
       /// Example: Parse("0xa400ff00ff00ff00ff00ff00ff00ff00ff00ff01") should create UInt160 01ff00ff00ff00ff00ff00ff00ff00ff00ff00a4
       /// </summary>
-      public static UIntBase Parse(string s) {
+      public static UIntBase Parse(string s)
+      {
          if (s.Length == 40 || s.Length == 42)
             return UInt160.Parse(s);
          else if (s.Length == 64 || s.Length == 66)
@@ -53,7 +56,8 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       /// Method TryParse tries to parse a big-endian hex string and stores it as a UInt160 or UInt256 little-endian bytes array
       /// Example: TryParse("0xa400ff00ff00ff00ff00ff00ff00ff00ff00ff01", result) should create result UInt160 01ff00ff00ff00ff00ff00ff00ff00ff00ff00a4
       /// </summary>
-      public static bool TryParse<T>(string s, out T result) where T : UIntBase {
+      public static bool TryParse<T>(string s, out T result) where T : UIntBase
+      {
          int size;
          if (typeof(T) == typeof(UInt160))
             size = 20;
@@ -65,14 +69,18 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
             size = 32;
          else
             size = 0;
-         if (size == 20) {
-            if (UInt160.TryParse(s, out UInt160 r)) {
+         if (size == 20)
+         {
+            if (UInt160.TryParse(s, out UInt160 r))
+            {
                result = (T)(UIntBase)r;
                return true;
             }
          }
-         else if (size == 32) {
-            if (UInt256.TryParse(s, out UInt256 r)) {
+         else if (size == 32)
+         {
+            if (UInt256.TryParse(s, out UInt256 r))
+            {
                result = (T)(UIntBase)r;
                return true;
             }

@@ -1,7 +1,9 @@
 ﻿using MithrilShards.Core.DataTypes;
 
-namespace MithrilShards.Core.Network.Protocol {
-   public interface IChainDefinition {
+namespace MithrilShards.Core.Network.Protocol
+{
+   public interface IChainDefinition
+   {
       /// <summary>
       /// Gets the name of the chain definition (e.g. "Bitcoin Main")
       /// </summary>

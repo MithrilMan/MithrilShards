@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
-using System.Text;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 
-namespace MithrilShards.Network.Benchmark.Benchmarks {
+namespace MithrilShards.Network.Benchmark.Benchmarks
+{
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
-   public class MagicNumberFinder {
+   public class MagicNumberFinder
+   {
       readonly byte[] magicNumberBytes = BitConverter.GetBytes(0x0709110B);
       readonly int magicNumber = 0x0709110B;
 
@@ -27,14 +24,17 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
       public float MagicPacketRelativePosition;
 
       [GlobalSetup]
-      public void Setup() {
+      public void Setup()
+      {
          byte[] data = new byte[this.PacketSize];
          new Random().NextBytes(data);
 
          //ensure magic packet is at the right position, replace every occurrence of the first magic packet in the string with something else
-         for (int i = 0; i < data.Length; i++) {
+         for (int i = 0; i < data.Length; i++)
+         {
             byte b = data[i];
-            if (b == this.magicNumberBytes[0]) {
+            if (b == this.magicNumberBytes[0])
+            {
                data[i] = (byte)'\0';
             }
          }
@@ -42,7 +42,8 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
          // insert magic packet at the right position
          int position = (int)(data.Length * this.MagicPacketRelativePosition);
          position = Math.Min(position, data.Length - (this.magicNumberBytes.Length + 1));
-         for (int i = 0; i < this.magicNumberBytes.Length; i++) {
+         for (int i = 0; i < this.magicNumberBytes.Length; i++)
+         {
             data[position + i] = this.magicNumberBytes[i];
          }
 
@@ -51,13 +52,15 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
 
 
       [Benchmark]
-      public bool FindWithTryAdvanceTo() {
+      public bool FindWithTryAdvanceTo()
+      {
          var reader = new SequenceReader<byte>(this.input);
          return this.FindWithTryAdvanceTo(ref reader);
       }
 
       [Benchmark]
-      public bool FindWithForLoop() {
+      public bool FindWithForLoop()
+      {
          var reader = new SequenceReader<byte>(this.input);
          return this.FindWithForLoop(ref reader);
       }
@@ -65,18 +68,24 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
 
 
 
-      private bool FindWithTryAdvanceTo(ref SequenceReader<byte> reader) {
+      private bool FindWithTryAdvanceTo(ref SequenceReader<byte> reader)
+      {
          // advance to the first byte of the magic number.
-         while (reader.TryAdvanceTo(this.magicNumberBytes[0], advancePastDelimiter: false)) {
-            if (reader.TryReadLittleEndian(out int magicRead)) {
-               if (magicRead == this.magicNumber) {
+         while (reader.TryAdvanceTo(this.magicNumberBytes[0], advancePastDelimiter: false))
+         {
+            if (reader.TryReadLittleEndian(out int magicRead))
+            {
+               if (magicRead == this.magicNumber)
+               {
                   return true;
                }
-               else {
+               else
+               {
                   reader.Rewind(3);
                }
             }
-            else {
+            else
+            {
                return false;
             }
          }
@@ -86,12 +95,16 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
          return false;
       }
 
-      private bool FindWithForLoop(ref SequenceReader<byte> reader) {
-         for (int i = 0; i < this.magicNumberBytes.Length; i++) {
+      private bool FindWithForLoop(ref SequenceReader<byte> reader)
+      {
+         for (int i = 0; i < this.magicNumberBytes.Length; i++)
+         {
             byte expectedByte = this.magicNumberBytes[i];
 
-            if (reader.TryRead(out byte receivedByte)) {
-               if (expectedByte != receivedByte) {
+            if (reader.TryRead(out byte receivedByte))
+            {
+               if (expectedByte != receivedByte)
+               {
                   // If we did not receive the next byte we expected
                   // we either received the first byte of the magic value
                   // or not. If yes, we set index to 0 here, which is then
@@ -102,7 +115,8 @@ namespace MithrilShards.Network.Benchmark.Benchmarks {
                   i = receivedByte == this.magicNumberBytes[0] ? 0 : -1;
                }
             }
-            else {
+            else
+            {
                //nothing left to read
                // in case there are partial matches for the magic packet, don't consider them as consumed
                // so they will be examined again next iteration when hopefully the full magic number will be present

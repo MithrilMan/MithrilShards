@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MithrilShards.Core.Extensions {
-   public static class TaskExtensions {
+namespace MithrilShards.Core.Extensions
+{
+   public static class TaskExtensions
+   {
       //   /// <summary>
       //   /// Throws OperationCanceledException if token cancels before the real task completes.
       //   /// Doesn't abort the inner task, but allows the calling code to get "unblocked" and react to stuck tasks.
@@ -69,11 +69,14 @@ namespace MithrilShards.Core.Extensions {
       /// <param name="cancellationToken">The cancellation token.</param>
       /// <returns></returns>
       /// <exception cref="OperationCanceledException">Task has been canceled.</exception>
-      public static async Task<T> WithCancellationAsync<T>(this Task<T> task, CancellationToken cancellationToken) {
+      public static async Task<T> WithCancellationAsync<T>(this Task<T> task, CancellationToken cancellationToken)
+      {
          var tcs = new TaskCompletionSource<bool>();
 
-         using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs)) {
-            if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false)) {
+         using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs))
+         {
+            if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
+            {
                throw new OperationCanceledException(cancellationToken);
             }
          }
@@ -89,11 +92,14 @@ namespace MithrilShards.Core.Extensions {
       /// <param name="cancellationToken">The cancellation token.</param>
       /// <returns></returns>
       /// <exception cref="OperationCanceledException">Task has been canceled.</exception>
-      public static async Task WithCancellationAsync(this Task task, CancellationToken cancellationToken) {
+      public static async Task WithCancellationAsync(this Task task, CancellationToken cancellationToken)
+      {
          var tcs = new TaskCompletionSource<bool>();
 
-         using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs)) {
-            if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false)) {
+         using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs))
+         {
+            if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
+            {
                throw new OperationCanceledException(cancellationToken);
             }
          }

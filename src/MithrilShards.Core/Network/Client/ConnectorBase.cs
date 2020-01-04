@@ -6,8 +6,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
 
-namespace MithrilShards.Core.Network.Client {
-   public abstract class ConnectorBase : IConnector {
+namespace MithrilShards.Core.Network.Client
+{
+   public abstract class ConnectorBase : IConnector
+   {
       protected ILogger<RequiredConnection> logger;
       protected IEventBus eventBus;
       protected readonly IConnectivityPeerStats peerStats;
@@ -15,7 +17,8 @@ namespace MithrilShards.Core.Network.Client {
 
       public TimeSpan DefaultDelayBetweenAttempts { get; protected set; }
 
-      public ConnectorBase(ILogger<RequiredConnection> logger, IEventBus eventBus, IOptions<ForgeConnectivitySettings> options, IConnectivityPeerStats serverPeerStats) {
+      public ConnectorBase(ILogger<RequiredConnection> logger, IEventBus eventBus, IOptions<ForgeConnectivitySettings> options, IConnectivityPeerStats serverPeerStats)
+      {
          this.logger = logger;
          this.eventBus = eventBus;
          this.peerStats = serverPeerStats;
@@ -30,7 +33,8 @@ namespace MithrilShards.Core.Network.Client {
       /// <param name="hint">The hint.</param>
       /// <remarks>Override this method to have a custom logic for delayed connection attempts.</remarks>
       /// <returns></returns>
-      public virtual TimeSpan ComputeDelayAdjustment() {
+      public virtual TimeSpan ComputeDelayAdjustment()
+      {
          return this.DefaultDelayBetweenAttempts;
       }
 
@@ -38,19 +42,25 @@ namespace MithrilShards.Core.Network.Client {
       /// Task that runs until the application ends (or the passed cancellation token is canceled).
       /// </summary>
       /// <param name="cancellation"></param>
-      public virtual async Task StartConnectionLoopAsync(IConnectionManager connectionManager, CancellationToken cancellation) {
-         while (!cancellation.IsCancellationRequested) {
-            try {
-               await foreach (Task item in this.AttemptConnectionAsync(connectionManager, cancellation).ConfigureAwait(false)) {
+      public virtual async Task StartConnectionLoopAsync(IConnectionManager connectionManager, CancellationToken cancellation)
+      {
+         while (!cancellation.IsCancellationRequested)
+         {
+            try
+            {
+               await foreach (Task item in this.AttemptConnectionAsync(connectionManager, cancellation).ConfigureAwait(false))
+               {
                   await Task.Delay(this.ComputeDelayAdjustment(), cancellation).ConfigureAwait(false);
                }
                await Task.Delay(this.ComputeDelayAdjustment(), cancellation).ConfigureAwait(false);
             }
-            catch (OperationCanceledException Exception) {
+            catch (OperationCanceledException Exception)
+            {
                this.logger.LogDebug("Connector {Connector} canceled.", this.GetType().Name);
                break;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                this.logger.LogError(ex, "Connector {Connector} failure, it has been stopped, node may have connection problems.", this.GetType().Name);
                break;
             }

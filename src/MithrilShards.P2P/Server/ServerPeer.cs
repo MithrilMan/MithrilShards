@@ -11,8 +11,10 @@ using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Server.Guards;
 
-namespace MithrilShards.Network.Legacy.Server {
-   public class ServerPeer : IServerPeer, IDisposable {
+namespace MithrilShards.Network.Legacy.Server
+{
+   public class ServerPeer : IServerPeer, IDisposable
+   {
       /// <summary>TCP server listener accepting inbound connections.</summary>
       private readonly ForgeTcpListener tcpListener;
       private readonly SubscriptionToken onPeerDisconnectedSubscription;
@@ -46,7 +48,8 @@ namespace MithrilShards.Network.Legacy.Server {
                         IPEndPoint localEndPoint,
                         IPEndPoint remoteEndPoint,
                         IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
-                        IPeerConnectionFactory peerConnectionFactory) {
+                        IPeerConnectionFactory peerConnectionFactory)
+      {
 
          this.logger = logger;
          this.eventBus = eventBus;
@@ -64,10 +67,12 @@ namespace MithrilShards.Network.Legacy.Server {
          this.onPeerDisconnectedSubscription = this.eventBus.Subscribe<PeerDisconnected>(this.OnPeerDisconnected);
       }
 
-      private void OnPeerDisconnected(PeerDisconnected @event) {
+      private void OnPeerDisconnected(PeerDisconnected @event)
+      {
          // This event is catched by every ServerPeer instance, so if we have multiple endpoints listening, all of them will
          // try to remove the item from the dictionary.
-         if (this.connectedPeers.Remove(@event.PeerContext.PeerId)) {
+         if (this.connectedPeers.Remove(@event.PeerContext.PeerId))
+         {
             this.logger.LogDebug("Peer {PeerId} disconnected, removed from connectedPeers", @event.PeerContext.PeerId);
          }
       }
@@ -76,13 +81,17 @@ namespace MithrilShards.Network.Legacy.Server {
       /// <summary>
       /// Starts listening on the server's initialized endpoint.
       /// </summary>
-      public async Task ListenAsync(CancellationToken cancellation) {
-         using (this.logger.BeginScope("Listener {LocalEndpoint}", this.tcpListener.LocalEndpoint)) {
-            try {
+      public async Task ListenAsync(CancellationToken cancellation)
+      {
+         using (this.logger.BeginScope("Listener {LocalEndpoint}", this.tcpListener.LocalEndpoint))
+         {
+            try
+            {
                this.tcpListener.Start();
                await this.AcceptClientsAsync(cancellation).ConfigureAwait(false);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                this.logger.LogCritical(e, "Listen exception occurred.");
                throw;
             }
@@ -90,8 +99,10 @@ namespace MithrilShards.Network.Legacy.Server {
       }
 
       /// <inheritdoc />
-      public void StopListening() {
-         if (this.tcpListener.IsActive) {
+      public void StopListening()
+      {
+         if (this.tcpListener.IsActive)
+         {
             this.logger.LogInformation("Stopping listening to {EndPoint}", this.LocalEndPoint);
             this.tcpListener.Stop();
             this.listenerCancellation.Cancel();
@@ -101,11 +112,14 @@ namespace MithrilShards.Network.Legacy.Server {
       /// <summary>
       /// Implements loop accepting connections from newly connected clients.
       /// </summary>
-      private async Task AcceptClientsAsync(CancellationToken cancellationToken) {
+      private async Task AcceptClientsAsync(CancellationToken cancellationToken)
+      {
          this.logger.LogDebug("Accepting incoming connections.");
 
-         try {
-            while (!this.listenerCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested) {
+         try
+         {
+            while (!this.listenerCancellation.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+            {
 
                TcpClient connectingTcpClient = await this.tcpListener.AcceptTcpClientAsync()
                   .WithCancellationAsync(this.listenerCancellation.Token)
@@ -115,7 +129,8 @@ namespace MithrilShards.Network.Legacy.Server {
 
                ServerPeerConnectionGuardResult connectionGuardResult = this.EnsurePeerCanConnect(connectingPeer);
 
-               if (connectionGuardResult.IsDenied) {
+               if (connectionGuardResult.IsDenied)
+               {
                   this.logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected and will be closed.", connectingTcpClient.Client.RemoteEndPoint);
                   connectingTcpClient.Close();
                   continue;
@@ -126,27 +141,34 @@ namespace MithrilShards.Network.Legacy.Server {
                this.connectedPeers[connectingPeer.PeerContext.PeerId] = connectingPeer;
 
                //spawn a new task to manage the peer connection
-               Task.Run(async () => {
+               Task.Run(async () =>
+               {
                   await this.EstablishConnection(connectingPeer, cancellationToken).ConfigureAwait(false);
                });
             }
          }
-         catch (OperationCanceledException) {
+         catch (OperationCanceledException)
+         {
             this.logger.LogDebug("Shutdown detected, stop accepting connections.");
          }
-         catch (Exception e) {
+         catch (Exception e)
+         {
             this.logger.LogDebug("Exception occurred: {0}", e.ToString());
          }
-         finally {
+         finally
+         {
             this.StopListening();
          }
       }
 
-      private async Task EstablishConnection(IPeerConnection connectingPeer, CancellationToken cancellationToken) {
-         try {
+      private async Task EstablishConnection(IPeerConnection connectingPeer, CancellationToken cancellationToken)
+      {
+         try
+         {
             await connectingPeer.IncomingConnectionAccepted(cancellationToken).ConfigureAwait(false);
          }
-         catch (Exception ex) {
+         catch (Exception ex)
+         {
             this.logger.LogCritical(ex, "Should never happen, need to be fixed!");
          }
       }
@@ -155,8 +177,10 @@ namespace MithrilShards.Network.Legacy.Server {
       /// Check if the client is allowed to connect based on certain criteria.
       /// </summary>
       /// <returns>When criteria is met returns <c>true</c>, to allow connection.</returns>
-      private ServerPeerConnectionGuardResult EnsurePeerCanConnect(IPeerConnection peerConnection) {
-         if (this.serverPeerConnectionGuards == null) {
+      private ServerPeerConnectionGuardResult EnsurePeerCanConnect(IPeerConnection peerConnection)
+      {
+         if (this.serverPeerConnectionGuards == null)
+         {
             return ServerPeerConnectionGuardResult.Success;
          }
 
@@ -170,7 +194,8 @@ namespace MithrilShards.Network.Legacy.Server {
             .FirstOrDefault();
       }
 
-      public void Dispose() {
+      public void Dispose()
+      {
          this.onPeerDisconnectedSubscription.Dispose();
          this.listenerCancellation.Dispose();
       }

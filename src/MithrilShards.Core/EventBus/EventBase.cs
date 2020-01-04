@@ -1,20 +1,24 @@
 ﻿using System;
 
-namespace MithrilShards.Core.EventBus {
+namespace MithrilShards.Core.EventBus
+{
    /// <summary>
    /// Basic abstract implementation of <see cref="IEvent"/>.
    /// </summary>
    /// <seealso cref="Stratis.Bitcoin.EventBus.IEvent" />
-   public abstract class EventBase {
+   public abstract class EventBase
+   {
       /// <inheritdoc />
       public Guid CorrelationId { get; }
 
-      public EventBase() {
+      public EventBase()
+      {
          // Assigns an unique id to the event.
          this.CorrelationId = Guid.NewGuid();
       }
 
-      public override string ToString() {
+      public override string ToString()
+      {
          return $"{this.CorrelationId.ToString()} - {this.GetType().Name}";
       }
    }

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MithrilShards.Logging.ConsoleTableFormatter {
-   public class TableBuilder {
+namespace MithrilShards.Logging.ConsoleTableFormatter
+{
+   public class TableBuilder
+   {
       private readonly OutputWriter writer;
       private bool prepared;
 
@@ -11,14 +13,17 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
       public TableStyle TableStyle { get; private set; }
       public int Width { get; private set; }
 
-      public TableBuilder(OutputWriter writer) {
+      public TableBuilder(OutputWriter writer)
+      {
          this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
 
          this.ColumnDefinitions = new List<ColumnDefinition>();
       }
 
-      public TableBuilder AddColumns(params ColumnDefinition[] columns) {
-         if (this.prepared) {
+      public TableBuilder AddColumns(params ColumnDefinition[] columns)
+      {
+         if (this.prepared)
+         {
             throw new TableAlreadyDefinedException();
          }
 
@@ -26,8 +31,10 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
          return this;
       }
 
-      public TableBuilder AddColumn(ColumnDefinition column) {
-         if (this.prepared) {
+      public TableBuilder AddColumn(ColumnDefinition column)
+      {
+         if (this.prepared)
+         {
             throw new TableAlreadyDefinedException();
          }
 
@@ -35,8 +42,10 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
          return this;
       }
 
-      public TableBuilder SetStyle(TableStyle style) {
-         if (this.prepared) {
+      public TableBuilder SetStyle(TableStyle style)
+      {
+         if (this.prepared)
+         {
             throw new TableAlreadyDefinedException();
          }
 
@@ -49,13 +58,16 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
       /// After having called this method, no alteration could be made on the table definition and only rows can be added.
       /// </summary>
       /// <returns></returns>
-      public TableBuilder Prepare() {
-         if (this.prepared) {
+      public TableBuilder Prepare()
+      {
+         if (this.prepared)
+         {
             throw new TableAlreadyDefinedException();
          }
 
          this.prepared = true;
-         if (this.TableStyle == null) {
+         if (this.TableStyle == null)
+         {
             this.TableStyle = new TableStyle();
          }
 
@@ -63,19 +75,23 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
          return this;
       }
 
-      public TableBuilder Start(string title = null) {
-         if (!this.prepared) {
+      public TableBuilder Start(string title = null)
+      {
+         if (!this.prepared)
+         {
             this.Prepare();
          }
 
-         if (title != null) {
+         if (title != null)
+         {
             this.DrawTitle(title);
          }
 
          this.DrawTopBorder();
 
          this.DrawLeftBorder();
-         for (int i = 0; i < this.ColumnDefinitions.Count; i++) {
+         for (int i = 0; i < this.ColumnDefinitions.Count; i++)
+         {
             this.DrawColumn(i, this.ColumnDefinitions[i].Label.Center(this.ColumnDefinitions[i].Width));
          }
          this.DrawRightBorder();
@@ -85,34 +101,43 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
          return this;
       }
 
-      private void DrawTitle(string title) {
-         if (this.TableStyle.TitleBorder) {
+      private void DrawTitle(string title)
+      {
+         if (this.TableStyle.TitleBorder)
+         {
             this.DrawTopBorder();
             this.DrawLeftBorder();
             int availableSpace = this.Width - (this.TableStyle.Left == null ? 0 : 1) - (this.TableStyle.Right == null ? 0 : 1);
             this.writer.Write(title.Center(availableSpace));
             this.DrawRightBorder();
          }
-         else {
+         else
+         {
             this.writer.WriteLine(title.Center(this.Width));
          }
       }
 
-      public TableBuilder DrawRow(params string[] values) {
-         if (values is null) {
+      public TableBuilder DrawRow(params string[] values)
+      {
+         if (values is null)
+         {
             throw new ArgumentNullException(nameof(values));
          }
 
-         if (values.Length > this.ColumnDefinitions.Count) {
+         if (values.Length > this.ColumnDefinitions.Count)
+         {
             throw new ArgumentOutOfRangeException("values length is greater than column lengths.");
          }
 
          this.DrawLeftBorder();
-         for (int i = 0; i < this.ColumnDefinitions.Count; i++) {
-            if (i < values.Length) {
+         for (int i = 0; i < this.ColumnDefinitions.Count; i++)
+         {
+            if (i < values.Length)
+            {
                this.DrawColumn(i, values[i]);
             }
-            else {
+            else
+            {
                this.DrawColumn(i, string.Empty);
             }
          }
@@ -121,14 +146,16 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
          return this;
       }
 
-      public TableBuilder End() {
+      public TableBuilder End()
+      {
          this.DrawBottomBorder();
          this.writer.WriteLine();
 
          return this;
       }
 
-      private void ComputeTableWidth() {
+      private void ComputeTableWidth()
+      {
          this.Width =
              (this.TableStyle.Left == null ? 0 : 1) // length of the left border
              + this.ColumnDefinitions.Sum(cd => cd.Width) //sum of the column widths
@@ -137,22 +164,28 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
              ;
       }
 
-      private void DrawTopBorder() {
-         if (this.TableStyle.Top != null) {
+      private void DrawTopBorder()
+      {
+         if (this.TableStyle.Top != null)
+         {
             this.writer.DrawLine(this.TableStyle.Top, this.Width);
          }
       }
 
-      private void DrawLeftBorder() {
-         if (this.TableStyle.Left != null) {
+      private void DrawLeftBorder()
+      {
+         if (this.TableStyle.Left != null)
+         {
             this.writer.Write(this.TableStyle.Left.ToString());
          }
       }
 
-      private void DrawColumn(int columnIndex, string value) {
+      private void DrawColumn(int columnIndex, string value)
+      {
          ColumnDefinition columnDefinition = this.ColumnDefinitions[columnIndex];
 
-         switch (columnDefinition.Alignment) {
+         switch (columnDefinition.Alignment)
+         {
             case ColumnAlignment.Left:
                this.writer.Write(value.AlignLeft(columnDefinition.Width));
                break;
@@ -167,28 +200,36 @@ namespace MithrilShards.Logging.ConsoleTableFormatter {
          }
 
          bool isLastColumn = columnIndex == this.ColumnDefinitions.Count - 1;
-         if (!isLastColumn) {
+         if (!isLastColumn)
+         {
             this.DrawColumnSeparator();
          }
       }
 
-      private void DrawColumnSeparator() {
-         if (this.TableStyle.Separator.Length > 0) {
+      private void DrawColumnSeparator()
+      {
+         if (this.TableStyle.Separator.Length > 0)
+         {
             this.writer.Write(this.TableStyle.Separator.ToString());
          }
       }
 
-      private void DrawRightBorder() {
-         if (this.TableStyle.Right != null) {
+      private void DrawRightBorder()
+      {
+         if (this.TableStyle.Right != null)
+         {
             this.writer.WriteLine(this.TableStyle.Right.ToString());
          }
-         else {
+         else
+         {
             this.writer.WriteLine();
          }
       }
 
-      private void DrawBottomBorder() {
-         if (this.TableStyle.Bottom != null) {
+      private void DrawBottomBorder()
+      {
+         if (this.TableStyle.Bottom != null)
+         {
             this.writer.DrawLine(this.TableStyle.Bottom, this.Width);
          }
       }

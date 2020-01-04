@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core.Extensions;
 
-namespace MithrilShards.Core.EventBus {
-   public class InMemoryEventBus : IEventBus {
+namespace MithrilShards.Core.EventBus
+{
+   public class InMemoryEventBus : IEventBus
+   {
       /// <summary>Instance logger.</summary>
       private readonly ILogger logger;
 
@@ -29,20 +30,25 @@ namespace MithrilShards.Core.EventBus {
       /// </summary>
       /// <param name="loggerFactory">The logger factory.</param>
       /// <param name="subscriptionErrorHandler">The subscription error handler. If null the default one will be used</param>
-      public InMemoryEventBus(ILogger<InMemoryEventBus> logger, ISubscriptionErrorHandler subscriptionErrorHandler) {
+      public InMemoryEventBus(ILogger<InMemoryEventBus> logger, ISubscriptionErrorHandler subscriptionErrorHandler)
+      {
          this.logger = logger;
          this.subscriptionErrorHandler = subscriptionErrorHandler;
          this.subscriptions = new Dictionary<Type, List<ISubscription>>();
       }
 
       /// <inheritdoc />
-      public SubscriptionToken Subscribe<TEvent>(Action<TEvent> handler) where TEvent : EventBase {
-         if (handler == null) {
+      public SubscriptionToken Subscribe<TEvent>(Action<TEvent> handler) where TEvent : EventBase
+      {
+         if (handler == null)
+         {
             throw new ArgumentNullException(nameof(handler));
          }
 
-         lock (this.subscriptionsLock) {
-            if (!this.subscriptions.ContainsKey(typeof(TEvent))) {
+         lock (this.subscriptionsLock)
+         {
+            if (!this.subscriptions.ContainsKey(typeof(TEvent)))
+            {
                this.subscriptions.Add(typeof(TEvent), new List<ISubscription>());
             }
 
@@ -54,19 +60,24 @@ namespace MithrilShards.Core.EventBus {
       }
 
       /// <inheritdoc />
-      public void Unsubscribe(SubscriptionToken subscriptionToken) {
+      public void Unsubscribe(SubscriptionToken subscriptionToken)
+      {
          // Ignore null token
-         if (subscriptionToken == null) {
+         if (subscriptionToken == null)
+         {
             this.logger.LogDebug("Unsubscribe called with a null token, ignored.");
             return;
          }
 
-         lock (this.subscriptionsLock) {
-            if (this.subscriptions.ContainsKey(subscriptionToken.EventType)) {
+         lock (this.subscriptionsLock)
+         {
+            if (this.subscriptions.ContainsKey(subscriptionToken.EventType))
+            {
                List<ISubscription> allSubscriptions = this.subscriptions[subscriptionToken.EventType];
 
                ISubscription subscriptionToRemove = allSubscriptions.FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
-               if (subscriptionToRemove != null) {
+               if (subscriptionToRemove != null)
+               {
                   this.subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
                }
             }
@@ -74,24 +85,31 @@ namespace MithrilShards.Core.EventBus {
       }
 
       /// <inheritdoc />
-      public void Publish<TEvent>(TEvent @event) where TEvent : EventBase {
-         if (@event == null) {
+      public void Publish<TEvent>(TEvent @event) where TEvent : EventBase
+      {
+         if (@event == null)
+         {
             throw new ArgumentNullException(nameof(@event));
          }
 
          List<ISubscription> allSubscriptions = new List<ISubscription>();
-         lock (this.subscriptionsLock) {
-            if (this.subscriptions.ContainsKey(typeof(TEvent))) {
+         lock (this.subscriptionsLock)
+         {
+            if (this.subscriptions.ContainsKey(typeof(TEvent)))
+            {
                allSubscriptions = this.subscriptions[typeof(TEvent)].ToList();
             }
          }
 
-         for (int index = 0; index < allSubscriptions.Count; index++) {
+         for (int index = 0; index < allSubscriptions.Count; index++)
+         {
             ISubscription subscription = allSubscriptions[index];
-            try {
+            try
+            {
                subscription.Publish(@event);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                this.subscriptionErrorHandler?.Handle(@event, ex, subscription);
             }
          }

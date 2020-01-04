@@ -1,5 +1,7 @@
-﻿namespace MithrilShards.Core.Forge {
-   public interface IDataFolders {
+﻿namespace MithrilShards.Core.Forge
+{
+   public interface IDataFolders
+   {
       string RootPath { get; }
 
       /// <summary>

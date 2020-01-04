@@ -10,36 +10,43 @@ using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
-      [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
+namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
+{
+   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0011:Add braces", Justification = "<Pending>")]
-   public static class Helper {
+   public static class Helper
+   {
       private static readonly DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-      internal static byte[] ToArray(this SecureString s) {
+      internal static byte[] ToArray(this SecureString s)
+      {
          if (s == null)
             throw new NullReferenceException();
          if (s.Length == 0)
             return Array.Empty<byte>();
          List<byte> result = new List<byte>();
          IntPtr ptr = SecureStringMarshal.SecureStringToGlobalAllocAnsi(s);
-         try {
+         try
+         {
             int i = 0;
-            do {
+            do
+            {
                byte b = Marshal.ReadByte(ptr, i++);
                if (b == 0)
                   break;
                result.Add(b);
             } while (true);
          }
-         finally {
+         finally
+         {
             Marshal.ZeroFreeGlobalAllocAnsi(ptr);
          }
          return result.ToArray();
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      private static int BitLen(int w) {
+      private static int BitLen(int w)
+      {
          return (w < 1 << 15 ? (w < 1 << 7
              ? (w < 1 << 3 ? (w < 1 << 1
              ? (w < 1 << 0 ? (w < 0 ? 32 : 0) : 1)
@@ -56,13 +63,15 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static byte[] Concat(params byte[][] buffers) {
+      public static byte[] Concat(params byte[][] buffers)
+      {
          int length = 0;
          for (int i = 0; i < buffers.Length; i++)
             length += buffers[i].Length;
          byte[] dst = new byte[length];
          int p = 0;
-         foreach (byte[] src in buffers) {
+         foreach (byte[] src in buffers)
+         {
             Buffer.BlockCopy(src, 0, dst, p, src.Length);
             p += src.Length;
          }
@@ -70,12 +79,14 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      internal static int GetBitLength(this BigInteger i) {
+      internal static int GetBitLength(this BigInteger i)
+      {
          byte[] b = i.ToByteArray();
          return (b.Length - 1) * 8 + BitLen(i.Sign > 0 ? b[b.Length - 1] : 255 - b[b.Length - 1]);
       }
 
-      internal static int GetLowestSetBit(this BigInteger i) {
+      internal static int GetLowestSetBit(this BigInteger i)
+      {
          if (i.Sign == 0)
             return -1;
          byte[] b = i.ToByteArray();
@@ -88,27 +99,34 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
          throw new Exception();
       }
 
-      internal static void Remove<T>(this HashSet<T> set, ISet<T> other) {
-         if (set.Count > other.Count) {
+      internal static void Remove<T>(this HashSet<T> set, ISet<T> other)
+      {
+         if (set.Count > other.Count)
+         {
             set.ExceptWith(other);
          }
-         else {
+         else
+         {
             set.RemoveWhere(u => other.Contains(u));
          }
       }
 
 
-      internal static void Remove<T, V>(this HashSet<T> set, IReadOnlyDictionary<T, V> other) {
-         if (set.Count > other.Count) {
+      internal static void Remove<T, V>(this HashSet<T> set, IReadOnlyDictionary<T, V> other)
+      {
+         if (set.Count > other.Count)
+         {
             set.ExceptWith(other.Keys);
          }
-         else {
+         else
+         {
             set.RemoveWhere(u => other.ContainsKey(u));
          }
       }
 
 
-      public static byte[] HexToBytes(this string value) {
+      public static byte[] HexToBytes(this string value)
+      {
          if (value == null || value.Length == 0)
             return Array.Empty<byte>();
          if (value.Length % 2 == 1)
@@ -120,16 +138,19 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      internal static BigInteger Mod(this BigInteger x, BigInteger y) {
+      internal static BigInteger Mod(this BigInteger x, BigInteger y)
+      {
          x %= y;
          if (x.Sign < 0)
             x += y;
          return x;
       }
 
-      internal static BigInteger ModInverse(this BigInteger a, BigInteger n) {
+      internal static BigInteger ModInverse(this BigInteger a, BigInteger n)
+      {
          BigInteger i = n, v = 0, d = 1;
-         while (a > 0) {
+         while (a > 0)
+         {
             BigInteger t = i / a, x = a;
             a = i % x;
             i = x;
@@ -142,7 +163,8 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
          return v;
       }
 
-      internal static BigInteger NextBigInteger(this Random rand, int sizeInBits) {
+      internal static BigInteger NextBigInteger(this Random rand, int sizeInBits)
+      {
          if (sizeInBits < 0)
             throw new ArgumentException("sizeInBits must be non-negative");
          if (sizeInBits == 0)
@@ -156,7 +178,8 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
          return new BigInteger(b);
       }
 
-      internal static BigInteger NextBigInteger(this RandomNumberGenerator rng, int sizeInBits) {
+      internal static BigInteger NextBigInteger(this RandomNumberGenerator rng, int sizeInBits)
+      {
          if (sizeInBits < 0)
             throw new ArgumentException("sizeInBits must be non-negative");
          if (sizeInBits == 0)
@@ -170,49 +193,57 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
          return new BigInteger(b);
       }
 
-      public static BigInteger Sum(this IEnumerable<BigInteger> source) {
+      public static BigInteger Sum(this IEnumerable<BigInteger> source)
+      {
          var sum = BigInteger.Zero;
          foreach (var bi in source) sum += bi;
          return sum;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      internal static bool TestBit(this BigInteger i, int index) {
+      internal static bool TestBit(this BigInteger i, int index)
+      {
          return (i & (BigInteger.One << index)) > BigInteger.Zero;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static byte[] ToByteArrayStandard(this BigInteger i) {
+      public static byte[] ToByteArrayStandard(this BigInteger i)
+      {
          if (i.IsZero) return Array.Empty<byte>();
          return i.ToByteArray();
       }
 
-      public static string ToHexString(this byte[] value) {
+      public static string ToHexString(this byte[] value)
+      {
          StringBuilder sb = new StringBuilder();
          foreach (byte b in value)
             sb.AppendFormat("{0:x2}", b);
          return sb.ToString();
       }
 
-      public static string ToHexString(this byte[] value, bool reverse = false) {
+      public static string ToHexString(this byte[] value, bool reverse = false)
+      {
          StringBuilder sb = new StringBuilder();
          for (int i = 0; i < value.Length; i++)
             sb.AppendFormat("{0:x2}", value[reverse ? value.Length - i - 1 : i]);
          return sb.ToString();
       }
 
-      public static string ToHexString(this ReadOnlySpan<byte> value) {
+      public static string ToHexString(this ReadOnlySpan<byte> value)
+      {
          StringBuilder sb = new StringBuilder();
          foreach (byte b in value)
             sb.AppendFormat("{0:x2}", b);
          return sb.ToString();
       }
 
-      public static uint ToTimestamp(this DateTime time) {
+      public static uint ToTimestamp(this DateTime time)
+      {
          return (uint)(time.ToUniversalTime() - unixEpoch).TotalSeconds;
       }
 
-      public static ulong ToTimestampMS(this DateTime time) {
+      public static ulong ToTimestampMS(this DateTime time)
+      {
          return (ulong)(time.ToUniversalTime() - unixEpoch).TotalMilliseconds;
       }
 
@@ -220,7 +251,8 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       /// Checks if address is IPv4 Maped to IPv6 format, if so, Map to IPv4.
       /// Otherwise, return current address.
       /// </summary>
-      internal static IPAddress Unmap(this IPAddress address) {
+      internal static IPAddress Unmap(this IPAddress address)
+      {
          if (address.IsIPv4MappedToIPv6)
             address = address.MapToIPv4();
          return address;
@@ -230,16 +262,19 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
       /// Checks if IPEndPoint is IPv4 Maped to IPv6 format, if so, unmap to IPv4.
       /// Otherwise, return current endpoint.
       /// </summary>
-      internal static IPEndPoint Unmap(this IPEndPoint endPoint) {
+      internal static IPEndPoint Unmap(this IPEndPoint endPoint)
+      {
          if (!endPoint.Address.IsIPv4MappedToIPv6)
             return endPoint;
          return new IPEndPoint(endPoint.Address.Unmap(), endPoint.Port);
       }
 
-      internal static BigInteger WeightedAverage<T>(this IEnumerable<T> source, Func<T, BigInteger> valueSelector, Func<T, BigInteger> weightSelector) {
+      internal static BigInteger WeightedAverage<T>(this IEnumerable<T> source, Func<T, BigInteger> valueSelector, Func<T, BigInteger> weightSelector)
+      {
          BigInteger sum_weight = BigInteger.Zero;
          BigInteger sum_value = BigInteger.Zero;
-         foreach (T item in source) {
+         foreach (T item in source)
+         {
             BigInteger weight = weightSelector(item);
             sum_weight += weight;
             sum_value += valueSelector(item) * weight;
@@ -248,7 +283,8 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
          return sum_value / sum_weight;
       }
 
-      internal static IEnumerable<TResult> WeightedFilter<T, TResult>(this IList<T> source, double start, double end, Func<T, BigInteger> weightSelector, Func<T, BigInteger, TResult> resultSelector) {
+      internal static IEnumerable<TResult> WeightedFilter<T, TResult>(this IList<T> source, double start, double end, Func<T, BigInteger> weightSelector, Func<T, BigInteger, TResult> resultSelector)
+      {
          if (source == null) throw new ArgumentNullException(nameof(source));
          if (start < 0 || start > 1) throw new ArgumentOutOfRangeException(nameof(start));
          if (end < start || start + end > 1) throw new ArgumentOutOfRangeException(nameof(end));
@@ -258,22 +294,27 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo {
          double amount = (double)source.Select(weightSelector).Sum();
          BigInteger sum = 0;
          double current = 0;
-         foreach (T item in source) {
+         foreach (T item in source)
+         {
             if (current >= end) break;
             BigInteger weight = weightSelector(item);
             sum += weight;
             double old = current;
             current = (double)sum / amount;
             if (current <= start) continue;
-            if (old < start) {
-               if (current > end) {
+            if (old < start)
+            {
+               if (current > end)
+               {
                   weight = (long)((end - start) * amount);
                }
-               else {
+               else
+               {
                   weight = (long)((current - start) * amount);
                }
             }
-            else if (current > end) {
+            else if (current > end)
+            {
                weight = (long)((end - old) * amount);
             }
             yield return resultSelector(item, weight);

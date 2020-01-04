@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
-namespace MithrilShards.P2P.Benchmark.Benchmarks {
+namespace MithrilShards.P2P.Benchmark.Benchmarks
+{
    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
-   public class ParseNibble {
+   public class ParseNibble
+   {
 
       char data;
 
       [GlobalSetup]
-      public void Setup() {
+      public void Setup()
+      {
          this.data = "0123456789ABCDEF"[(char)new Random().Next(0, 15)];
       }
 
@@ -27,19 +28,24 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks {
       [Benchmark]
       public int ParseNibble_C() => ParseNibble3(this.data);
 
-      private static int ParseNibble1(char c) {
-         if (c >= '0' && c <= '9') {
+      private static int ParseNibble1(char c)
+      {
+         if (c >= '0' && c <= '9')
+         {
             return c - '0';
          }
          c = (char)(c & ~0x20);
-         if (c >= 'A' && c <= 'F') {
+         if (c >= 'A' && c <= 'F')
+         {
             return c - ('A' - 10);
          }
          throw new ArgumentException("Invalid nibble: " + c);
       }
 
-      private static int ParseNibble2(char c) {
-         switch (c) {
+      private static int ParseNibble2(char c)
+      {
+         switch (c)
+         {
             case '0':
             case '1':
             case '2':
@@ -70,17 +76,22 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks {
          }
       }
 
-      private static int ParseNibble3(char c) {
-         if (c >= '0' && c <= '9') {
+      private static int ParseNibble3(char c)
+      {
+         if (c >= '0' && c <= '9')
+         {
             return c - '0';
          }
-         else if (c >= 'a' && c <= 'f') {
+         else if (c >= 'a' && c <= 'f')
+         {
             return c - ('a' - 10);
          }
-         else if (c >= 'A' && c <= 'F') {
+         else if (c >= 'A' && c <= 'F')
+         {
             return c - ('A' - 10);
          }
-         else {
+         else
+         {
             throw new ArgumentException("Invalid nibble: " + c);
          }
       }

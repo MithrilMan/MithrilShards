@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis {
+namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis
+{
    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0009:Member access should be qualified.", Justification = "<Pending>")]
    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0011:Add braces", Justification = "<Pending>")]
-   public class uint256 {
+   public class uint256
+   {
       private const int WIDTH_BYTE = 256 / 8;
       internal readonly UInt32 pn0;
       internal readonly UInt32 pn1;
@@ -19,8 +19,10 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis {
       internal readonly UInt32 pn7;
 
 
-      public uint256(byte[] vch, bool lendian = true) {
-         if (vch.Length != WIDTH_BYTE) {
+      public uint256(byte[] vch, bool lendian = true)
+      {
+         if (vch.Length != WIDTH_BYTE)
+         {
             throw new FormatException("the byte array should be 256 byte long");
          }
 
@@ -39,19 +41,24 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis {
       }
 
       public uint256(byte[] vch)
-          : this(vch, true) {
+          : this(vch, true)
+      {
       }
    }
 
-   public static class Utils {
-      public static uint ToUInt32(byte[] value, int index, bool littleEndian) {
-         if (littleEndian) {
+   public static class Utils
+   {
+      public static uint ToUInt32(byte[] value, int index, bool littleEndian)
+      {
+         if (littleEndian)
+         {
             return value[index]
                    + ((uint)value[index + 1] << 8)
                    + ((uint)value[index + 2] << 16)
                    + ((uint)value[index + 3] << 24);
          }
-         else {
+         else
+         {
             return value[index + 3]
                    + ((uint)value[index + 2] << 8)
                    + ((uint)value[index + 1] << 16)
