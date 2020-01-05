@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Network;
@@ -20,6 +21,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<GetHeadersMessage>,
       INetworkMessageHandler<HeadersMessage>
    {
+      private const int MAX_HEADERS = 2000;
+
       private readonly IChainDefinition chainDefinition;
 
       public HeaderProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, IChainDefinition chainDefinition)
@@ -62,8 +65,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return new ValueTask<bool>(true);
       }
 
-      public ValueTask<bool> ProcessMessageAsync(HeadersMessage message, CancellationToken cancellation)
+      public ValueTask<bool> ProcessMessageAsync(HeadersMessage headers, CancellationToken cancellation)
       {
+         if (headers.Headers?.Length > 2000)
+         {
+            this.logger.LogDebug("Too many headers received.");
+            throw new ProtocolViolationException($"Expected no more than {MAX_HEADERS} headers, got {headers.Headers.Length}");
+         }
+
          return new ValueTask<bool>(true);
       }
    }
