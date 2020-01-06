@@ -14,6 +14,7 @@ using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using MithrilShards.Core.Network.Server.Guards;
+using MithrilShards.Core.Extensions;
 
 namespace MithrilShards.Network.Bedrock
 {
@@ -69,8 +70,8 @@ namespace MithrilShards.Network.Bedrock
 
          using IPeerContext peerContext = this.peerContextFactory.Create(PeerConnectionDirection.Inbound,
                                                  connection.ConnectionId,
-                                                 connection.LocalEndPoint,
-                                                 connection.RemoteEndPoint,
+                                                 connection.LocalEndPoint.AsIPEndPoint().EnsureIPv6(),
+                                                 connection.RemoteEndPoint.AsIPEndPoint().EnsureIPv6(),
                                                  new NetworkMessageWriter(protocol, writer));
          using CancellationTokenRegistration cancellationRegistration = peerContext.ConnectionCancellationTokenSource.Token.Register(() =>
          {
