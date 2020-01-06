@@ -24,4 +24,9 @@
     <Folder Include="Chain\" />
   </ItemGroup>
 
+   <ItemGroup>
+      <ProjectCapability Include="DynamicDependentFile" />
+      <ProjectCapability Include="DynamicFileNesting" />
+   </ItemGroup>
+
 </Project>

@@ -5,6 +5,7 @@ using MithrilShards.Core.Forge;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.PeerAddressBook;
+using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
@@ -48,10 +49,12 @@ namespace MithrilShards.Core
             .AddHostedService(serviceProvider => serviceProvider.GetRequiredService<IConnectionManager>())
             .AddSingleton<IConnector, RequiredConnection>()
 
-            //add peer address book with peer score manager
-            .AddSingleton<PeerAddressBook>() //required to forward the instance to 2 interfaces below
-            .AddSingleton<IPeerAddressBook>(serviceProvider => serviceProvider.GetRequiredService<PeerAddressBook>())
-            .AddSingleton<IPeerScoreManager>(serviceProvider => serviceProvider.GetRequiredService<PeerAddressBook>())
+            //peer address book
+            .AddSingleton<IPeerAddressBook, PeerAddressBook>()
+
+            //with peer behavior manager
+            .AddSingleton<IPeerBehaviorManager, PeerBehaviorManager>()
+            .AddHostedService(serviceProvider => serviceProvider.GetRequiredService<IPeerBehaviorManager>())
             ;
 
          return services;

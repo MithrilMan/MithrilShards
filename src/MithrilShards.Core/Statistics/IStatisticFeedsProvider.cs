@@ -1,4 +1,6 @@
-﻿namespace MithrilShards.Core.Statistics
+﻿using System.Collections.Generic;
+
+namespace MithrilShards.Core.Statistics
 {
    /// <summary>
    /// Every component implementing this interface is exporting statistics relative to its job.
@@ -13,10 +15,10 @@
       void RegisterStatisticFeeds();
 
       /// <summary>
-      /// Gets the statistic feed values.
+      /// Gets the statistic feed values rows.
       /// </summary>
       /// <param name="feedId">The feed identifier.</param>
       /// <returns>The feed values, ordered by column definition</returns>
-      string[] GetStatisticFeedValues(string feedId);
+      List<string[]> GetStatisticFeedValues(string feedId);
    }
 }

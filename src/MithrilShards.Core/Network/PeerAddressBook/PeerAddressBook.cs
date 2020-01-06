@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MithrilShards.Core.Network.PeerAddressBook
 {
-   public class PeerAddressBook : IPeerAddressBook, IPeerScoreManager
+   public class PeerAddressBook : IPeerAddressBook
    {
       public void AddAddress(IPeerContext peer)
       {
@@ -16,16 +16,6 @@ namespace MithrilShards.Core.Network.PeerAddressBook
       }
 
       public void Ban(IPeerContext peer, DateTimeOffset until, string reason)
-      {
-         throw new NotImplementedException();
-      }
-
-      public uint DecreaseScore(IPeerContext peer, int amount)
-      {
-         throw new NotImplementedException();
-      }
-
-      public uint IncreaseScore(IPeerContext peer, int amount)
       {
          throw new NotImplementedException();
       }

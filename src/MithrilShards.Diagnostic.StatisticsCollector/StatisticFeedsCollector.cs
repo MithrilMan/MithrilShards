@@ -59,24 +59,27 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
                         try
                         {
-                           string[] values = feed.Source.GetStatisticFeedValues(feedDefinition.FeedId);
-                           for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
-                           {
-                              FieldDefinition field = feedDefinition.FieldsDefinition[i];
-                              // apply formatting if needed
-                              if (field.ValueFormatter != null)
-                              {
-                                 values[i] = field.ValueFormatter(values[i]);
-                              }
-                           }
-
                            if (feed.TableBuilder == null)
                            {
                               feed.TableBuilder = this.CreateTableBuilder(feedDefinition);
                            }
 
                            feed.TableBuilder.Start(feedDefinition.Title);
-                           feed.TableBuilder.DrawRow(values);
+
+                           foreach (string[] values in feed.Source.GetStatisticFeedValues(feedDefinition.FeedId))
+                           {
+                              for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
+                              {
+                                 FieldDefinition field = feedDefinition.FieldsDefinition[i];
+                                 // apply formatting if needed
+                                 if (field.ValueFormatter != null)
+                                 {
+                                    values[i] = field.ValueFormatter(values[i]);
+                                 }
+                              }
+                              feed.TableBuilder.DrawRow(values);
+                           }
+
                            feed.TableBuilder.End();
                         }
                         catch (Exception ex)

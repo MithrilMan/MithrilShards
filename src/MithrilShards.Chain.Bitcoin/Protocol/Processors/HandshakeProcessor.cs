@@ -8,6 +8,7 @@ using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
@@ -27,7 +28,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                 IDateTimeProvider dateTimeProvider,
                                 IRandomNumberGenerator randomNumberGenerator,
                                 NodeImplementation nodeImplementation,
-                                SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus)
+                                IPeerBehaviorManager peerBehaviorManager,
+                                SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager)
       {
          this.dateTimeProvider = dateTimeProvider;
          this.randomNumberGenerator = randomNumberGenerator;
@@ -53,6 +55,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             this.logger.LogDebug("Commencing handshake with local Version.");
             await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
+            this.status.VersionSentAsync();
          }
       }
 
@@ -69,19 +72,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          // did our peer received already peer version?
          if (this.status.PeerVersion != null)
          {
-            if (this.PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V70002)
-            {
-               var rejectMessage = new RejectMessage()
-               {
-                  Code = RejectMessage.RejectCode.Duplicate
-               };
-
-               await this.SendMessageAsync(rejectMessage, cancellation).ConfigureAwait(false);
-               this.logger.LogWarning("Rejecting {MessageType}.", nameof(VersionMessage));
-            }
-            //TODO don't be so rude, apply a bad behavior score using peer score manager
             //https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1909-L1914
-            throw new ProtocolViolationException("Version message already received, disconnecting because of protocol violation.");
+            this.peerBehaviorManager.Misbehave(this.PeerContext, 1, "Version message already received, expected only one.");
+            return false;
          }
 
          if (this.VersionNotSupported(version)) throw new ProtocolViolationException("Peer version not supported.");
@@ -97,6 +90,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             this.logger.LogDebug("Responding to handshake with local Version.");
             await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
+            this.status.VersionSentAsync();
          }
 
          this.PeerContext.TimeOffset = this.dateTimeProvider.GetTimeOffset() - version.Timestamp;
@@ -112,12 +106,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public async ValueTask<bool> ProcessMessageAsync(VerackMessage verack, CancellationToken cancellation)
       {
+         if (!this.status.VersionSent)
+         {
+            this.peerBehaviorManager.Misbehave(this.PeerContext, 10, "Received verack without having sent a version.");
+            return false;
+         }
+
          if (this.status.VersionAckReceived)
          {
-            this.logger.LogDebug("Unexpected verack, already received.");
-            //TODO don't be so rude, apply a bad behavior score using peer score manager
             //https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1909-L1914
-            throw new ProtocolViolationException("Unexpected verack, already received, disconnecting because of protocol violation.");
+            this.peerBehaviorManager.Misbehave(this.PeerContext, 1, "Received additional verack, a previous one has been received.");
+            return false;
          }
 
          await this.status.VerAckReceivedAsync().ConfigureAwait(false);

@@ -11,6 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private class Status
       {
          private readonly HandshakeProcessor processor;
+         internal bool VersionSent { get; private set; } = false;
 
          internal VersionMessage PeerVersion { get; private set; } = null;
 
@@ -21,6 +22,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          public Status(HandshakeProcessor processor)
          {
             this.processor = processor;
+         }
+
+         internal void VersionSentAsync()
+         {
+            this.VersionSent = true;
          }
 
          internal async ValueTask VersionReceivedAsync(VersionMessage version)

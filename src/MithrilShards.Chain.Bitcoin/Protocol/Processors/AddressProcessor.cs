@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
@@ -14,8 +14,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<AddrMessage>
    {
 
-      public AddressProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus)
-         : base(logger, eventBus)
+      public AddressProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager)
+         : base(logger, eventBus, peerBehaviorManager)
       {
       }
 

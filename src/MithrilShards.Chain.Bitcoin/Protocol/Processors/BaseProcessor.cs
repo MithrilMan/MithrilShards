@@ -7,6 +7,7 @@ using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
@@ -16,24 +17,25 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
    {
       protected readonly ILogger<BaseProcessor> logger;
       protected readonly IEventBus eventBus;
+      protected readonly IPeerBehaviorManager peerBehaviorManager;
 
       private INetworkMessageWriter messageWriter;
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// </summary>
-      private readonly List<SubscriptionToken> eventBusSubscriptionsTokens;
+      private readonly EventSubscriptionManager eventSubscriptionManager = new EventSubscriptionManager();
 
       public BitcoinPeerContext PeerContext { get; private set; }
 
       public bool Enabled { get; private set; } = true;
 
-      public BaseProcessor(ILogger<BaseProcessor> logger, IEventBus eventBus)
+      public BaseProcessor(ILogger<BaseProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager)
       {
          this.logger = logger;
          this.eventBus = eventBus;
+         this.peerBehaviorManager = peerBehaviorManager;
 
-         this.eventBusSubscriptionsTokens = new List<SubscriptionToken>();
       }
 
       public virtual ValueTask AttachAsync(IPeerContext peerContext)
@@ -50,7 +52,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <param name="subscription">The subscription.</param>
       protected void RegisterLifeTimeSubscription(SubscriptionToken subscription)
       {
-         this.eventBusSubscriptionsTokens.Add(subscription);
+         this.eventSubscriptionManager.RegisterSubscriptions(subscription);
       }
 
       /// <summary>
@@ -80,10 +82,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public virtual void Dispose()
       {
-         foreach (SubscriptionToken token in this.eventBusSubscriptionsTokens)
-         {
-            token?.Dispose();
-         }
+         this.eventSubscriptionManager.Dispose();
 
          this.PeerContext.ConnectionCancellationTokenSource.Cancel();
       }

@@ -7,6 +7,7 @@ using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Events;
+using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
@@ -27,8 +28,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private readonly Status status = new Status();
 
-      public CompactHeaderProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, NodeImplementation nodeImplementation)
-         : base(logger, eventBus)
+      public CompactHeaderProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager)
+         : base(logger, eventBus, peerBehaviorManager)
       {
       }
 

@@ -19,7 +19,6 @@ namespace MithrilShards.Core.Network
 
       private readonly Dictionary<string, IPeerContext> inboundPeers = new Dictionary<string, IPeerContext>();
       private readonly Dictionary<string, IPeerContext> outboundPeers = new Dictionary<string, IPeerContext>();
-      private readonly object subscriptionsLock = new object();
 
       private readonly ILogger<ConnectionManager> logger;
       private readonly IEventBus eventBus;
@@ -28,8 +27,9 @@ namespace MithrilShards.Core.Network
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
+      /// Must be disposed to unregister subscriptions.
       /// </summary>
-      private readonly List<SubscriptionToken> eventBusSubscriptionsTokens = new List<SubscriptionToken>();
+      private readonly EventSubscriptionManager eventSubscriptionManager = new EventSubscriptionManager();
 
       /// <summary>
       /// Gets the connected inbound peers count.
@@ -91,11 +91,10 @@ namespace MithrilShards.Core.Network
       public Task StartAsync(CancellationToken cancellationToken)
       {
          this.RegisterStatisticFeeds();
-         lock (this.subscriptionsLock)
-         {
-            this.eventBusSubscriptionsTokens.Add(this.eventBus.Subscribe<PeerConnected>(this.AddConnectedPeer));
-            this.eventBusSubscriptionsTokens.Add(this.eventBus.Subscribe<PeerDisconnected>(this.RemoveConnectedPeer));
-         }
+         this.eventSubscriptionManager.RegisterSubscriptions(
+               this.eventBus.Subscribe<PeerConnected>(this.AddConnectedPeer),
+               this.eventBus.Subscribe<PeerDisconnected>(this.RemoveConnectedPeer)
+         );
 
          // start the task that tries to connect to other peers
          _ = this.StartOutgoingConnectionAttempts(cancellationToken);
@@ -105,27 +104,22 @@ namespace MithrilShards.Core.Network
 
       public Task StopAsync(CancellationToken cancellationToken)
       {
-         lock (this.subscriptionsLock)
-         {
-            foreach (SubscriptionToken token in this.eventBusSubscriptionsTokens)
-            {
-               token?.Dispose();
-            }
-            this.eventBusSubscriptionsTokens.Clear();
-         }
+         this.eventSubscriptionManager.Dispose();
 
          return Task.CompletedTask;
       }
 
 
-      public string[] GetStatisticFeedValues(string feedId)
+      public List<string[]> GetStatisticFeedValues(string feedId)
       {
          switch (feedId)
          {
             case FEED_CONNECTED_PEERS:
-               return new string[] {
-                  this.inboundPeers.Count.ToString(),
-                  this.outboundPeers.Count.ToString()
+               return new List<string[]> {
+                  new string[] {
+                     this.inboundPeers.Count.ToString(),
+                     this.outboundPeers.Count.ToString()
+                  }
                };
             default:
                return null;

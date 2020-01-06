@@ -8,6 +8,7 @@ using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Events;
+using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
@@ -25,8 +26,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private readonly IChainDefinition chainDefinition;
 
-      public HeaderProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, IChainDefinition chainDefinition)
-         : base(logger, eventBus)
+      public HeaderProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager, IChainDefinition chainDefinition)
+         : base(logger, eventBus, peerBehaviorManager)
       {
          this.chainDefinition = chainDefinition;
       }
@@ -67,10 +68,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public ValueTask<bool> ProcessMessageAsync(HeadersMessage headers, CancellationToken cancellation)
       {
-         if (headers.Headers?.Length > 2000)
+         //https://github.com/bitcoin/bitcoin/blob/b949ac9697a6cfe087f60a16c063ab9c5bf1e81f/src/net_processing.cpp#L2923-L2947
+         if (headers.Headers?.Length > MAX_HEADERS)
          {
-            this.logger.LogDebug("Too many headers received.");
-            throw new ProtocolViolationException($"Expected no more than {MAX_HEADERS} headers, got {headers.Headers.Length}");
+            this.peerBehaviorManager.Misbehave(this.PeerContext, 20, "Too many headers received.");
+            return new ValueTask<bool>(false);
          }
 
          return new ValueTask<bool>(true);
