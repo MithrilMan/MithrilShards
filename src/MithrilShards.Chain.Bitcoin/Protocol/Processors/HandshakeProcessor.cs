@@ -21,6 +21,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       readonly IDateTimeProvider dateTimeProvider;
       readonly IRandomNumberGenerator randomNumberGenerator;
       readonly NodeImplementation nodeImplementation;
+      private readonly IInitialBlockDownloadState initialBlockDownloadState;
       readonly SelfConnectionTracker selfConnectionTracker;
 
       public HandshakeProcessor(ILogger<HandshakeProcessor> logger,
@@ -29,11 +30,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                 IRandomNumberGenerator randomNumberGenerator,
                                 NodeImplementation nodeImplementation,
                                 IPeerBehaviorManager peerBehaviorManager,
+                                IInitialBlockDownloadState initialBlockDownloadState,
                                 SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager)
       {
          this.dateTimeProvider = dateTimeProvider;
          this.randomNumberGenerator = randomNumberGenerator;
          this.nodeImplementation = nodeImplementation;
+         this.initialBlockDownloadState = initialBlockDownloadState;
          this.selfConnectionTracker = selfConnectionTracker;
          this.status = new Status(this);
       }
@@ -77,8 +80,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return false;
          }
 
+         if (this.PeerDoesntOfferRequiredServices(version)) throw new ProtocolViolationException("Peer does not offer the expected services.");
          if (this.VersionNotSupported(version)) throw new ProtocolViolationException("Peer version not supported.");
-
          if (this.ConnectedToSelf(version)) throw new ProtocolViolationException("Connection to self detected.");
 
          // first time we receive version
@@ -102,6 +105,21 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          // will prevent to handle version messages to other Processors
          return false;
+      }
+
+      /// <summary>
+      /// Return false if peer doesn't offer required services.
+      /// </summary>
+      /// <param name="peerVersion">The peer version.</param>
+      /// <returns><see langword="false"/> if peer doesn't offer required service, <see langword="true"/> otherwise.</returns>
+      private bool PeerDoesntOfferRequiredServices(VersionMessage peerVersion)
+      {
+         NodeServices requiredServices = this.initialBlockDownloadState.isInIBD ?
+            (NodeServices.Network | NodeServices.Witness) : (NodeServices.NetworkLimited | NodeServices.Witness);
+
+         var peerServices = (NodeServices)peerVersion.Services;
+
+         return !peerServices.HasFlag(requiredServices);
       }
 
       public async ValueTask<bool> ProcessMessageAsync(VerackMessage verack, CancellationToken cancellation)
@@ -162,7 +180,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                EndPoint = this.PeerContext.PublicEndPoint ?? this.PeerContext.LocalEndPoint,
             },
             Relay = true, //this.IsRelay, TODO: it's part of the node settings
-            Services = (ulong)NodeServices.Network // TODO: it's part of the node settings and depends on the configured features/shards
+
+            /// TODO: it's part of the node settings and depends on the configured features/shards, shouldn't be hard coded
+            /// if/when pruned will be implemented, remember to remove Network service flag
+            /// ref: https://github.com/bitcoin/bitcoin/blob/99813a9745fe10a58bedd7a4cb721faf14f907a4/src/init.cpp#L1671-L1680
+            Services = (ulong)(NodeServices.Network | NodeServices.NetworkLimited)
          };
 
          return version;
