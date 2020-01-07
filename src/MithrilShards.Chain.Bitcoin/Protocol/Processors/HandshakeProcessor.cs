@@ -80,7 +80,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return false;
          }
 
-         if (this.PeerDoesntOfferRequiredServices(version)) throw new ProtocolViolationException("Peer does not offer the expected services.");
+         /// we wants to connect only to peer that have the required services.
+         /// Not enforcing the rule for other kind of connections
+         /// TODO: consider excluding from this rule the peer we manual connects to
+         /// see https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1935-L1940
+         if (this.PeerContext.Direction == PeerConnectionDirection.Outbound)
+         {
+            if (this.PeerDoesntOfferRequiredServices(version)) throw new ProtocolViolationException("Peer does not offer the expected services.");
+         }
+
          if (this.VersionNotSupported(version)) throw new ProtocolViolationException("Peer version not supported.");
          if (this.ConnectedToSelf(version)) throw new ProtocolViolationException("Connection to self detected.");
 
