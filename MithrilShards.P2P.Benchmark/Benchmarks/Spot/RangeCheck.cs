@@ -39,6 +39,28 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
+      public void AsSpanRange2()
+      {
+         byte[] arr = new byte[10];
+         Span<byte> span1 = arr;
+
+         byte[] arr2 = new byte[20];
+
+         arr2.AsSpan()[..10].CopyTo(span1);
+      }
+
+      [Benchmark]
+      public void AsSpanRange3()
+      {
+         byte[] arr = new byte[10];
+         Span<byte> span1 = arr;
+
+         byte[] arr2 = new byte[20];
+
+         ((Span<byte>)arr2)[..10].CopyTo(span1);
+      }
+
+      [Benchmark]
       public void ExplicitSlice()
       {
          byte[] arr = new byte[10];

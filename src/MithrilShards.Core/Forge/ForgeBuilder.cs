@@ -67,7 +67,8 @@ namespace MithrilShards.Core.Forge
 
             services
                .AddOptions()
-               .AddHostedService<TForgeImplementation>()
+               .AddSingleton<IForge, TForgeImplementation>()
+               .AddHostedService<TForgeImplementation>(serviceProvider => (TForgeImplementation)serviceProvider.GetRequiredService<IForge>())
                .ConfigureForge(context);
          });
 

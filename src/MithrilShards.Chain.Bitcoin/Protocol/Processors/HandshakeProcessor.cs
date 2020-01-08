@@ -18,11 +18,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<VerackMessage>
    {
       private readonly Status status;
-      readonly IDateTimeProvider dateTimeProvider;
-      readonly IRandomNumberGenerator randomNumberGenerator;
-      readonly NodeImplementation nodeImplementation;
+      private readonly IDateTimeProvider dateTimeProvider;
+      private readonly IRandomNumberGenerator randomNumberGenerator;
+      private readonly NodeImplementation nodeImplementation;
       private readonly IInitialBlockDownloadState initialBlockDownloadState;
-      readonly SelfConnectionTracker selfConnectionTracker;
+      private readonly IUserAgentBuilder userAgentBuilder;
+      private readonly SelfConnectionTracker selfConnectionTracker;
 
       public HandshakeProcessor(ILogger<HandshakeProcessor> logger,
                                 IEventBus eventBus,
@@ -31,12 +32,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                 NodeImplementation nodeImplementation,
                                 IPeerBehaviorManager peerBehaviorManager,
                                 IInitialBlockDownloadState initialBlockDownloadState,
+                                IUserAgentBuilder userAgentBuilder,
                                 SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager)
       {
          this.dateTimeProvider = dateTimeProvider;
          this.randomNumberGenerator = randomNumberGenerator;
          this.nodeImplementation = nodeImplementation;
          this.initialBlockDownloadState = initialBlockDownloadState;
+         this.userAgentBuilder = userAgentBuilder;
          this.selfConnectionTracker = selfConnectionTracker;
          this.status = new Status(this);
       }
@@ -176,7 +179,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          var version = new VersionMessage()
          {
             Nonce = this.randomNumberGenerator.GetUint64(),
-            UserAgent = "MithrilShards.Forge",
+            UserAgent = this.userAgentBuilder.GetUserAgent(),
             Version = KnownVersion.CurrentVersion,
             Timestamp = this.dateTimeProvider.GetTimeOffset(),
             ReceiverAddress = new Serialization.Types.NetworkAddress(true)
@@ -192,7 +195,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             /// TODO: it's part of the node settings and depends on the configured features/shards, shouldn't be hard coded
             /// if/when pruned will be implemented, remember to remove Network service flag
             /// ref: https://github.com/bitcoin/bitcoin/blob/99813a9745fe10a58bedd7a4cb721faf14f907a4/src/init.cpp#L1671-L1680
-            Services = (ulong)(NodeServices.Network | NodeServices.NetworkLimited)
+            Services = (ulong)(NodeServices.Network | NodeServices.NetworkLimited),
+            StartHeight = 0 //TODO fetch from a service
          };
 
          return version;

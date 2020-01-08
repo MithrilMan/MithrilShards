@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -97,6 +98,13 @@ namespace MithrilShards.Core.Forge
 
          this.logger.LogDebug("Stopping Forge instance.");
          await base.StopAsync(cancellationToken).ConfigureAwait(false);
+      }
+
+      public List<(string name, string version)> GetMeltedShardNames()
+      {
+         if (this.mithrilShards?.Count() == 0) return null;
+
+         return this.mithrilShards.Select(shard => (name: shard.GetType().Name, version: shard.GetType().Assembly.GetName().Version.ToString(3))).ToList();
       }
    }
 }
