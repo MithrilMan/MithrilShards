@@ -44,6 +44,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private async ValueTask OnPeerHandshakedAsync(PeerHandshaked @event)
       {
+         if (this.PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V70012)
+         {
+            await this.SendMessageAsync(new SendHeadersMessage()).ConfigureAwait(false);
+         }
+
          if (this.PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V70014)
          {
             /// ask for blocks
@@ -63,6 +68,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public ValueTask<bool> ProcessMessageAsync(GetHeadersMessage message, CancellationToken cancellation)
       {
+         // TODO: give back our headers
          return new ValueTask<bool>(true);
       }
 
