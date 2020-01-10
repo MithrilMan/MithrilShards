@@ -61,10 +61,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             // if we reach this point, peer completed the handshake, yay!
             this.IsHandShaked = true;
             this.processor.logger.LogDebug("Handshake successful");
-            if (this.PeerVersion.Version >= KnownVersion.V31402)
-            {
-               await this.processor.SendMessageAsync(new GetAddrMessage()).ConfigureAwait(false);
-            }
+
+            await this.processor.SendMessageAsync(minVersion: KnownVersion.V31402, new GetAddrMessage()).ConfigureAwait(false);
 
             this.processor.eventBus.Publish(new PeerHandshaked(this.processor.PeerContext));
          }

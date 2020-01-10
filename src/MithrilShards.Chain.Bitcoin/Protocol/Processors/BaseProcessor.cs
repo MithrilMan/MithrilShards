@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -96,6 +95,29 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       public async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default)
       {
          await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
+      }
+
+      /// <summary>
+      /// Sends the message asynchronously to the other peer.
+      /// </summary>
+      /// <param name="message">The message to send.</param>
+      /// <param name="minVersion">
+      /// The minimum, inclusive, negotiated version required to send this message.
+      /// Passing 0 means the message will be sent without version check.
+      /// </param>
+      /// <param name="cancellationToken">The cancellation token.</param>
+      /// <returns></returns>
+      public async ValueTask<bool> SendMessageAsync(int minVersion, INetworkMessage message, CancellationToken cancellationToken = default)
+      {
+         if (minVersion == 0 || this.PeerContext.NegotiatedProtocolVersion.Version >= minVersion)
+         {
+            await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
+            return true;
+         }
+         else
+         {
+            return false;
+         }
       }
    }
 }
