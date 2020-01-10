@@ -9,7 +9,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class Uint256_FromBytes_Fight_Finalists
    {
-      private readonly byte[] data;
+      private readonly byte[] data = new byte[32];
 
       [GlobalSetup]
       public void Setup()
@@ -39,6 +39,12 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       public void uint256_Unsafe_MithrilShardsUInt256As4Jhon_FromBytes()
       {
          _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Jhon(this.data);
+      }
+
+      [Benchmark]
+      public void uint256_Unsafe_MithrilShards_CurrentImplementation()
+      {
+         _ = new MithrilShards.Core.DataTypes.UInt256(this.data);
       }
    }
 }

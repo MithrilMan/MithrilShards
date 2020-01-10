@@ -2,19 +2,17 @@
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 {
+   /// <summary>
+   /// See BIP 152
+   /// </summary>
+   /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.Messages.NetworkMessage" />
    [NetworkMessage("sendcmpct")]
    public class SendCmpctMessage : NetworkMessage
    {
-
-      /// <summary>
-      /// A random nonce that identifies the ping request.
-      /// </summary>
-      public bool UseCmpctBlock { get; set; }
+      public bool HighBandwidthMode { get; set; }
 
       public ulong Version { get; set; }
 
-      public SendCmpctMessage() : base("sendcmpct")
-      {
-      }
+      public SendCmpctMessage() : base("sendcmpct") { }
    }
 }

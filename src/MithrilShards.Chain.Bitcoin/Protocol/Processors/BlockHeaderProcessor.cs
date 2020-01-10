@@ -52,7 +52,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       private async ValueTask OnPeerHandshakedAsync(PeerHandshaked @event)
       {
-         await this.SendMessageAsync(minVersion: KnownVersion.V70014, new SendCmpctMessage { UseCmpctBlock = true, Version = 1 }).ConfigureAwait(false);
+         await this.SendMessageAsync(minVersion: KnownVersion.V70014, new SendCmpctMessage { HighBandwidthMode = true, Version = 1 }).ConfigureAwait(false);
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
 
          /// ask for blocks
@@ -69,11 +69,32 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }).ConfigureAwait(false);
       }
 
+      /// <summary>
+      /// The other peer prefer to be announced about new block using headers
+      /// </summary>
+      public ValueTask<bool> ProcessMessageAsync(SendHeadersMessage message, CancellationToken cancellation)
+      {
+         this.status.AnnounceNewBlockUsingSendHeaders = true;
+         return new ValueTask<bool>(true);
+      }
+
+      /// <summary>
+      /// The other peer prefer to receive blocks using cmpct messages.
+      /// </summary>
       public ValueTask<bool> ProcessMessageAsync(SendCmpctMessage message, CancellationToken cancellation)
       {
-         if (message.UseCmpctBlock && message.Version == 1)
+         if (message.Version > 0 && message.Version <= 2)
          {
-            this.status.UseCompactBlocks = true;
+            if (message.Version > this.status.CompactVersion)
+            {
+               this.status.CompactVersion = message.Version;
+               this.status.UseCompactBlocks = true;
+               this.status.CompactBlocksHighBandwidthMode = message.HighBandwidthMode;
+            }
+         }
+         else
+         {
+            this.logger.LogDebug("Ignoring sendcmpct message because its version is unknown.");
          }
 
          return new ValueTask<bool>(true);
@@ -95,11 +116,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
 
          return new ValueTask<bool>(true);
-      }
-
-      public ValueTask<bool> ProcessMessageAsync(SendHeadersMessage message, CancellationToken cancellation)
-      {
-         throw new System.NotImplementedException();
       }
    }
 }

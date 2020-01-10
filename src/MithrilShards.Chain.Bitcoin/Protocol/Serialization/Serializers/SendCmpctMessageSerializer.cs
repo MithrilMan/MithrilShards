@@ -11,7 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers
 
       public override void Serialize(SendCmpctMessage message, int protocolVersion, IBufferWriter<byte> output)
       {
-         output.WriteBool(message.UseCmpctBlock);
+         output.WriteBool(message.HighBandwidthMode);
          output.WriteULong(message.Version);
       }
 
@@ -19,7 +19,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers
       {
          var message = new SendCmpctMessage
          {
-            UseCmpctBlock = reader.ReadBool(),
+            HighBandwidthMode = reader.ReadBool(),
             Version = reader.ReadULong()
          };
 
