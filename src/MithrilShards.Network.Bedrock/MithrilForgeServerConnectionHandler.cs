@@ -112,7 +112,6 @@ namespace MithrilShards.Network.Bedrock
                }
             }
 
-            this.eventBus.Publish(new PeerDisconnected(peerContext, "Client disconnected", null));
             return;
          }
       }

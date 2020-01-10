@@ -2,6 +2,7 @@
 using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network.Protocol;
 
 namespace MithrilShards.Core.Network
@@ -9,12 +10,17 @@ namespace MithrilShards.Core.Network
    public class PeerContextFactory<TPeerContext> : IPeerContextFactory where TPeerContext : IPeerContext
    {
       readonly ILogger<PeerContextFactory<TPeerContext>> logger;
+      private readonly IEventBus eventBus;
       readonly ILoggerFactory loggerFactory;
       readonly ForgeConnectivitySettings serverSettings;
 
-      public PeerContextFactory(ILogger<PeerContextFactory<TPeerContext>> logger, ILoggerFactory loggerFactory, IOptions<ForgeConnectivitySettings> serverSettings)
+      public PeerContextFactory(ILogger<PeerContextFactory<TPeerContext>> logger,
+                                IEventBus eventBus,
+                                ILoggerFactory loggerFactory,
+                                IOptions<ForgeConnectivitySettings> serverSettings)
       {
          this.logger = logger;
+         this.eventBus = eventBus;
          this.loggerFactory = loggerFactory;
          this.serverSettings = serverSettings?.Value;
       }
@@ -28,6 +34,7 @@ namespace MithrilShards.Core.Network
 
          var peerContext = (TPeerContext)System.Activator.CreateInstance(typeof(TPeerContext),
             this.loggerFactory.CreateLogger<IPeerContext>(),
+            this.eventBus,
             direction,
             peerId,
             localEndPoint,

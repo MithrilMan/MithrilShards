@@ -5,7 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
+using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
@@ -14,8 +16,9 @@ namespace MithrilShards.Core.Network
    public class PeerContext : IPeerContext
    {
       private readonly List<INetworkMessageProcessor> messageProcessors = new List<INetworkMessageProcessor>();
-      readonly ILogger logger;
-      readonly INetworkMessageWriter messageWriter;
+      protected readonly ILogger logger;
+      protected readonly IEventBus eventBus;
+      protected readonly INetworkMessageWriter messageWriter;
 
       /// <summary>
       /// Gets the direction of the peer connection.
@@ -59,6 +62,7 @@ namespace MithrilShards.Core.Network
       public CancellationTokenSource ConnectionCancellationTokenSource { get; } = new CancellationTokenSource();
 
       public PeerContext(ILogger logger,
+                         IEventBus eventBus,
                          PeerConnectionDirection direction,
                          string peerId,
                          EndPoint localEndPoint,
@@ -67,6 +71,7 @@ namespace MithrilShards.Core.Network
                          INetworkMessageWriter messageWriter)
       {
          this.logger = logger;
+         this.eventBus = eventBus;
          this.Direction = direction;
          this.PeerId = peerId;
          this.messageWriter = messageWriter;
@@ -95,8 +100,18 @@ namespace MithrilShards.Core.Network
          this.logger.LogDebug("Disposing PeerContext of {PeerId}.", this.PeerId);
          foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors)
          {
-            messageProcessor.Dispose();
+            try
+            {
+
+               messageProcessor.Dispose();
+            }
+            catch (Exception ex)
+            {
+               this.logger.LogError(ex, "Fail to dispose message processor {MessageProcessor}", messageProcessor.GetType().Name);
+            }
          }
+
+         this.eventBus.Publish(new PeerDisconnected(this, "Client disconnected", null));
       }
    }
 }
