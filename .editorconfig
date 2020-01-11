@@ -40,7 +40,7 @@ csharp_new_line_before_members_in_object_initializers             = true
 csharp_new_line_before_open_brace                                 = all
 csharp_new_line_between_query_expression_clauses                  = true
 csharp_preferred_modifier_order                                   = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async : error
-csharp_prefer_braces = when_multiline:error
+csharp_prefer_braces                                              = when_multiline : error
 csharp_prefer_simple_default_expression                           = true : suggestion
 csharp_preserve_single_line_blocks                                = true
 csharp_preserve_single_line_statements                            = true
@@ -59,7 +59,7 @@ csharp_style_conditional_delegate_call                            = true : sugge
 csharp_style_expression_bodied_accessors                          = true : silent
 csharp_style_expression_bodied_constructors                       = true : silent
 csharp_style_expression_bodied_indexers                           = true : silent
-csharp_style_expression_bodied_methods = true:silent
+csharp_style_expression_bodied_methods                            = true : silent
 csharp_style_expression_bodied_operators                          = true : silent
 csharp_style_expression_bodied_properties                         = true : silent
 csharp_style_inlined_variable_declaration                         = true : error
@@ -74,18 +74,18 @@ csharp_style_var_when_type_is_apparent                            = true : sugge
 
 
 # CA1303: Do not pass literals as localized parameters
-dotnet_diagnostic.CA1303.severity = silent
+dotnet_diagnostic.CA1303.severity                                 = silent
 
 # CA1816: Dispose methods should call SuppressFinalize
-dotnet_diagnostic.CA1816.severity = none
+dotnet_diagnostic.CA1816.severity                                 = none
 
 # CA1063: Implement IDisposable Correctly
-dotnet_diagnostic.CA1063.severity = none
+dotnet_diagnostic.CA1063.severity                                 = none
 
 # CA2007: Consider calling ConfigureAwait on the awaited task
-dotnet_diagnostic.CA2007.severity = error
+dotnet_diagnostic.CA2007.severity                                 = error
 # VSTHRD111: Consider calling ConfigureAwait on the awaited valuetask
-dotnet_diagnostic.VSTHRD111.severity = error
+dotnet_diagnostic.VSTHRD111.severity                              = error
 
 # CA1051: Do not declare visible instance fields
-dotnet_diagnostic.CA1051.severity = silent
+dotnet_diagnostic.CA1051.severity                                 = silent
