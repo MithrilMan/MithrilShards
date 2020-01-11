@@ -79,7 +79,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       private void AddConnectedPeer(PeerConnected @event)
       {
          this.connectedPeers[@event.PeerContext.PeerId] = new PeerScore(@event.PeerContext, INITIAL_SCORE);
-         this.logger.LogDebug("Added peer {PeerId} to the list of connected peers", @event.PeerContext.PeerId);
+         this.logger.LogDebug("Added peer {PeerId} to the list of PeerBehaviorManager connected peers", @event.PeerContext.PeerId);
       }
 
       /// <summary>
@@ -94,7 +94,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
          }
          else
          {
-            this.logger.LogInformation("Peer {PeerId} disconnected.", @event.PeerContext.PeerId);
+            this.logger.LogInformation("Peer {PeerId} disconnected from PeerBehaviorManager.", @event.PeerContext.PeerId);
          }
       }
 

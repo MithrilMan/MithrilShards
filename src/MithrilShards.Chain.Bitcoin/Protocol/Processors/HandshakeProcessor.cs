@@ -182,11 +182,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             UserAgent = this.userAgentBuilder.GetUserAgent(),
             Version = KnownVersion.CurrentVersion,
             Timestamp = this.dateTimeProvider.GetTimeOffset(),
-            ReceiverAddress = new Serialization.Types.NetworkAddress(true)
+            ReceiverAddress = new Types.NetworkAddressNoTime()
             {
                EndPoint = this.PeerContext.RemoteEndPoint,
             },
-            SenderAddress = new Serialization.Types.NetworkAddress(true)
+            SenderAddress = new Types.NetworkAddressNoTime()
             {
                EndPoint = this.PeerContext.PublicEndPoint ?? this.PeerContext.LocalEndPoint,
             },

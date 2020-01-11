@@ -3,8 +3,6 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
-using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
-using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
@@ -164,55 +162,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
          return value.Length;
       }
 
-      /// <summary>
-      /// Writes the array of passed <typeparamref name="TSerializableType"/> types.
-      /// Internally it writes a VarInt followed by the list of serialized items.
-      /// </summary>
-      /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
-      /// <param name="writer">The writer.</param>
-      /// <param name="items">The items.</param>
-      /// <returns></returns>
-      public static int WriteArray<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType[] items, int protocolVersion) where TSerializableType : ISerializableProtocolType, new()
-      {
-         if ((items?.Length ?? 0) == 0)
-         {
-            return writer.WriteVarInt(0);
-         }
-
-         int size = WriteVarInt(writer, (ulong)items.Length);
-
-         for (int i = 0; i < items.Length; i++)
-         {
-            size += items[i].Serialize(writer, protocolVersion);
-         }
-
-         return size;
-      }
-
-      /// <summary>
-      /// Writes the array of <typeparamref name="TItemType" />.
-      /// Internally it writes a VarInt followed by the list of serialized items.
-      /// </summary>
-      /// <typeparam name="TItemType">The type of the item type.</typeparam>
-      /// <param name="writer">The writer.</param>
-      /// <param name="items">The items.</param>
-      /// <param name="serializer">The serialization method to use to deserialize a single <typeparamref name="TItemType"/> instance.</param>
-      /// <returns></returns>
-      [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static int WriteArray<TItemType>(this IBufferWriter<byte> writer, TItemType[] items, ItemSerializer<TItemType> serializer)
-      {
-         int length = items?.Length ?? 0;
-
-         int size = WriteVarInt(writer, (ulong)length);
-
-         for (int i = 0; i < items.Length; i++)
-         {
-            size += serializer(writer, items[i]);
-         }
-
-         return size;
-      }
-
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteVarInt(this IBufferWriter<byte> writer, ulong value)
       {
@@ -254,23 +203,46 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       }
 
       /// <summary>
-      /// Reads the network address.
+      /// Writes the array of passed <typeparamref name="TSerializableType" /> types.
+      /// Internally it writes a VarInt followed by the list of serialized items.
       /// </summary>
-      /// <param name="reader">The reader.</param>
-      /// <param name="skipTimeField">if set to <c>true</c> skips time field serialization/deserialization, used by <see cref="VersionMessage"/>.</param>
+      /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
+      /// <param name="writer">The writer.</param>
+      /// <param name="items">The items.</param>
+      /// <param name="protocolVersion">The protocol version.</param>
+      /// <param name="serializer">The serializer.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static int WriteNetworkAddress(this IBufferWriter<byte> writer, NetworkAddress value, int protocolVersion)
+      public static int WriteArray<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType[] items, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer)
       {
-         return value.Serialize(writer, protocolVersion);
+         if ((items?.Length ?? 0) == 0)
+         {
+            return writer.WriteVarInt(0);
+         }
+
+         int size = WriteVarInt(writer, (ulong)items.Length);
+
+         for (int i = 0; i < items.Length; i++)
+         {
+            size += serializer.Serialize(items[i], protocolVersion, writer);
+         }
+
+         return size;
       }
 
+      /// <summary>
+      /// Writes the item of passed <typeparamref name="TSerializableType" /> type using the passed typed serializer.
+      /// </summary>
+      /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
+      /// <param name="writer">The writer.</param>
+      /// <param name="item">The item to serialize.</param>
+      /// <param name="protocolVersion">The protocol version.</param>
+      /// <param name="serializer">The serializer.</param>
+      /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static int WriteUInt256(this IBufferWriter<byte> writer, UInt256 value)
+      public static int WriteWithSerializer<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType item, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer)
       {
-         ReadOnlySpan<byte> span = value.GetBytes();
-         writer.Write(span);
-         return span.Length;
+         return serializer.Serialize(item, protocolVersion, writer);
       }
    }
 }

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
-using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol.Processors;

@@ -1,13 +1,11 @@
-﻿using System.Buffers;
-using MithrilShards.Core.DataTypes;
-using MithrilShards.Core.Network.Protocol.Serialization;
+﻿using MithrilShards.Core.DataTypes;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types
+namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 {
    /// <summary>
    /// Inventory vector (inv_vect).
    /// </summary>
-   public class InventoryVector : ISerializableProtocolType
+   public class InventoryVector
    {
       public sealed class InventoryType
       {
@@ -40,20 +38,5 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types
       public uint Type { get; set; }
 
       public UInt256 Hash { get; set; }
-
-      public void Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
-      {
-         this.Type = reader.ReadUInt();
-         this.Hash = reader.ReadUInt256();
-      }
-
-      public int Serialize(IBufferWriter<byte> writer, int protocolVersion)
-      {
-         int size = 0;
-         size += writer.WriteUInt(this.Type);
-         size += writer.WriteUInt256(this.Hash);
-
-         return size;
-      }
    }
 }

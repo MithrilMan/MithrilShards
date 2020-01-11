@@ -1,19 +1,24 @@
-﻿namespace MithrilShards.Core.Network.Protocol.Serialization
+﻿using System.Buffers;
+
+namespace MithrilShards.Core.Network.Protocol.Serialization
 {
-   public interface IProtocolTypeSerializer<TSerializableProtocolType> where TSerializableProtocolType : ISerializableProtocolType
+   public interface IProtocolTypeSerializer<TProtocolType>
    {
       /// <summary>
-      /// Serializes the specified value in a byte array.
+      /// Serializes the specified protocol data type writing it into <paramref name="writer"/>.
       /// </summary>
-      /// <param name="value">The value to serialize.</param>
-      /// <returns></returns>
-      byte[] Serialize(TSerializableProtocolType value);
+      /// <param name="typeInstance">The type to serialize.</param>
+      /// <param name="protocolVersion">The protocol version to use to serialize the message.</param>
+      /// <param name="output">The output buffer used to store data into.</param>
+      /// <returns>number of written bytes</returns>
+      int Serialize(TProtocolType typeInstance, int protocolVersion, IBufferWriter<byte> writer);
 
       /// <summary>
-      /// Deserializes the specified raw byte array value into a <see cref="TSerializableProtocolType"/> value.
+      /// Deserializes the specified message reading it from the <paramref name="reader" />.
       /// </summary>
-      /// <param name="rawValue">The raw value to Deserialize.</param>
-      /// <returns></returns>
-      TSerializableProtocolType Deserialize(byte[] rawValue);
+      /// <param name="reader">The reader.</param>
+      /// <param name="protocolVersion">The protocol version to use to deserialize the data.</param>
+      /// <returns>number of read bytes</returns>
+      TProtocolType Deserialize(ref SequenceReader<byte> reader, int protocolVersion);
    }
 }

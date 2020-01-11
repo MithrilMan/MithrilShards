@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using MithrilShards.Core.Network.Server.Guards;
-using MithrilShards.Core.Extensions;
 
 namespace MithrilShards.Network.Bedrock
 {

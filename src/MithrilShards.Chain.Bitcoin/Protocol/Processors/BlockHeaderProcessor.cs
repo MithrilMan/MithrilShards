@@ -1,8 +1,6 @@
-﻿using System.Net;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
@@ -45,7 +43,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       }
 
       /// <summary>
-      /// When the peer handshake, sends <see cref="SendCmpctMessage"/>  and <see cref="SendHeadersMessage"/> if the 
+      /// When the peer handshake, sends <see cref="SendCmpctMessage"/>  and <see cref="SendHeadersMessage"/> if the
       /// negotiated protocol allow that and as
       /// </summary>
       /// <param name="event">The event.</param>
@@ -61,7 +59,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          await this.SendMessageAsync(new GetHeadersMessage
          {
             Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-            BlockLocator = new Serialization.Types.BlockLocator
+            BlockLocator = new Types.BlockLocator
             {
                BlockLocatorHashes = new UInt256[1] { this.chainDefinition.Genesis }
             },
@@ -114,6 +112,35 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             this.peerBehaviorManager.Misbehave(this.PeerContext, 20, "Too many headers received.");
             return new ValueTask<bool>(false);
          }
+
+         //NEED TO COMPUTE BLOCK HASH
+
+         ////In the special case where the remote node is at height 0 as well as us, then the headers count will be 0
+         //if (headers.Headers.Length == 0 && this.PeerContext. PeerVersion.StartHeight == 0 && currentTip.Hash == this.chainDefinition.Genesis)
+         //   return;
+         //if (headers.Headers.Length == 1 && headers.Headers[0].ha GetHash() == currentTip.Hash)
+         //   return;
+         //foreach (var header in headers.Headers)
+         //{
+         //   var h = header.GetHash();
+         //   if (h == currentTip.Hash)
+         //      continue;
+
+         //   if (header.HashPrevBlock == currentTip.Hash)
+         //   {
+         //      isOurs = true;
+         //      currentTip = new SlimChainedBlock(h, currentTip.Hash, currentTip.Height + 1);
+         //      chain.TrySetTip(currentTip.Hash, currentTip.Previous);
+         //      if (currentTip.Hash == hashStop)
+         //         return;
+         //   }
+         //   else if (chain.TrySetTip(h, header.HashPrevBlock))
+         //   {
+         //      currentTip = chain.TipBlock;
+         //   }
+         //   else
+         //      break;
+         //}
 
          return new ValueTask<bool>(true);
       }

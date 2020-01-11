@@ -1,5 +1,5 @@
 ﻿using System;
-using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 
@@ -28,12 +28,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
       /// The network address of the node receiving this message (addr_recv)
       /// </summary>
 
-      public NetworkAddress ReceiverAddress { get; set; }
+      public NetworkAddressNoTime ReceiverAddress { get; set; }
 
       /// <summary>
       /// The network address of the node emitting this message (addr_from)
       /// </summary>
-      public NetworkAddress SenderAddress { get; set; }
+      public NetworkAddressNoTime SenderAddress { get; set; }
 
       /// <summary>
       /// Node random nonce, randomly generated every time a version packet is sent. This nonce is used to detect connections to self.

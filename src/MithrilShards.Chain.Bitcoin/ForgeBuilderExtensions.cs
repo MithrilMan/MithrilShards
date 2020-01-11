@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Network.Server.Guards;
 using MithrilShards.Chain.Bitcoin.Protocol;
-using MithrilShards.Chain.Bitcoin.Protocol.Processors;
 using MithrilShards.Core.Forge;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
@@ -34,11 +33,13 @@ namespace MithrilShards.Chain.Bitcoin
                services
                   .AddSingleton<IChainDefinition, TChainDefinition>()
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
+                  .AddSingleton<HeadersLookup>()
                   .AddSingleton<SelfConnectionTracker>()
                   .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())
                   .Replace(ServiceDescriptor.Singleton<IUserAgentBuilder, BitcoinUserAgentBuilder>())
                   .AddPeerGuards()
                   .AddMessageSerializers()
+                  .AddProtocolTypeSerializers()
                   .AddMessageProcessors();
             });
 
@@ -66,6 +67,23 @@ namespace MithrilShards.Chain.Bitcoin
 
          return services;
       }
+
+      private static IServiceCollection AddProtocolTypeSerializers(this IServiceCollection services)
+      {
+         Type protocolSerializerInterface = typeof(IProtocolTypeSerializer<>);
+         var implementations = from type in typeof(BitcoinShard).Assembly.GetTypes()
+                               from typeInterface in type.GetInterfaces()
+                               where typeInterface.IsGenericType && protocolSerializerInterface.IsAssignableFrom(typeInterface.GetGenericTypeDefinition())
+                               select new { Interface = typeInterface, ImplementationType = type };
+
+         foreach (var implementation in implementations)
+         {
+            services.AddSingleton(implementation.Interface, implementation.ImplementationType);
+         }
+
+         return services;
+      }
+
       private static IServiceCollection AddMessageProcessors(this IServiceCollection services)
       {
          // discover and register all message serializer in this assembly

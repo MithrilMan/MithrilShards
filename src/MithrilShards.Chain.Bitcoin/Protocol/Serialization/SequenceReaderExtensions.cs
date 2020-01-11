@@ -2,8 +2,6 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
-using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
-using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
@@ -137,57 +135,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
          }
       }
 
-
-      /// <summary>
-      /// Reads an array of <typeparamref name="TSerializableType"/> types.
-      /// Internally it expects a VarInt that specifies the length of items to read.
-      /// </summary>
-      /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
-      /// <param name="reader">The reader.</param>
-      /// <returns></returns>
-      [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion)
-         where TSerializableType : ISerializableProtocolType, new()
-      {
-
-         ulong itemsCount = reader.ReadVarInt();
-
-         TSerializableType[] result = new TSerializableType[itemsCount];
-
-         for (ulong i = 0; i < itemsCount; i++)
-         {
-            TSerializableType itemModel = result[i] = new TSerializableType();
-            itemModel.Deserialize(ref reader, protocolVersion);
-         }
-
-         return result;
-      }
-
-      /// <summary>
-      /// Reads an array of <typeparamref name="TItemType" /> types.
-      /// Internally it expects a VarInt that specifies the length of items to read and then for each item calls the <paramref name="deserializer" />.
-      /// </summary>
-      /// <typeparam name="TItemType">The type we want to serialize.</typeparam>
-      /// <param name="reader">The reader.</param>
-      /// <param name="deserializer">The deserialization method to use to deserialize a single <typeparamref name="TItemType"/> instance.</param>
-      /// <returns></returns>
-      [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static TItemType[] ReadArray<TItemType>(ref this SequenceReader<byte> reader, ItemDeserializer<TItemType> deserializer)
-         where TItemType : class
-      {
-
-         ulong itemsCount = reader.ReadVarInt();
-
-         TItemType[] result = new TItemType[itemsCount];
-
-         for (ulong i = 0; i < itemsCount; i++)
-         {
-            result[i] = deserializer(ref reader);
-         }
-
-         return result;
-      }
-
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static ulong ReadVarInt(ref this SequenceReader<byte> reader)
       {
@@ -212,23 +159,42 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       }
 
       /// <summary>
-      /// Reads the network address.
+      /// Reads an array of <typeparamref name="TSerializableType" /> types.
+      /// Internally it expects a VarInt that specifies the length of items to read.
       /// </summary>
+      /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
       /// <param name="reader">The reader.</param>
-      /// <param name="skipTimeField">if set to <c>true</c> skips time field serialization/deserialization, used by <see cref="VersionMessage"/>.</param>
+      /// <param name="protocolVersion">The protocol version.</param>
+      /// <param name="serializer">The serializer.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static NetworkAddress ReadNetworkAddress(ref this SequenceReader<byte> reader, bool skipTimeField, int protocolVersion)
+      public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer)
       {
-         var result = new NetworkAddress(skipTimeField);
-         result.Deserialize(ref reader, protocolVersion);
+
+         ulong itemsCount = reader.ReadVarInt();
+
+         TSerializableType[] result = new TSerializableType[itemsCount];
+
+         for (ulong i = 0; i < itemsCount; i++)
+         {
+            result[i] = serializer.Deserialize(ref reader, protocolVersion);
+         }
+
          return result;
       }
 
+      /// <summary>
+      /// Reads an item of <typeparamref name="TSerializableType" /> type using the passed typed serializer.
+      /// </summary>
+      /// <typeparam name="TSerializableType">The type of the serializable type.</typeparam>
+      /// <param name="reader">The reader.</param>
+      /// <param name="protocolVersion">The protocol version.</param>
+      /// <param name="serializer">The serializer.</param>
+      /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static UInt256 ReadUInt256(ref this SequenceReader<byte> reader)
+      public static TSerializableType ReadWithSerializer<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer)
       {
-         return new UInt256(reader.ReadBytes(32));
+         return serializer.Deserialize(ref reader, protocolVersion);
       }
    }
 }

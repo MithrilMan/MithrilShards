@@ -1,4 +1,4 @@
-﻿using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Types;
+﻿using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
