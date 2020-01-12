@@ -38,5 +38,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       public uint Nonce { get; set; }
 
       public ulong TransactionCount { get; set; }
+
+      public void ComputeHash()
+      {
+
+      }
    }
 }

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Folder Include="Encoders\" />
+    <Folder Include="Protocol\Consensus\" />
   </ItemGroup>
 
   <ItemGroup>

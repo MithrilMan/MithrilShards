@@ -112,7 +112,7 @@ namespace MithrilShards.Core.DataTypes
       /// </returns>
       public override string ToString()
       {
-         return string.Create(EXPECTED_SIZE * 3 - 1, this, (dst, src) =>
+         return string.Create(EXPECTED_SIZE * 2, this, (dst, src) =>
          {
             ReadOnlySpan<byte> rawData = MemoryMarshal.AsBytes(MemoryMarshal.CreateReadOnlySpan(ref src.part1, EXPECTED_SIZE / sizeof(ulong)));
 

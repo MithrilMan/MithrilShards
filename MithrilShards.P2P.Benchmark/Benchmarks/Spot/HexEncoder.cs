@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
@@ -24,16 +22,20 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public object Convert() => Convert(this.value);
+      public object ConvertAsMithril() => this.ConvertAsMithril(this.value);
+
+      private object ConvertAsMithril(byte[] value)
+      {
+         return Core.Encoding.HexEncoder.ToHexString(value);
+      }
 
       [Benchmark]
-      public object ConvertReverse() => ConvertReverse(this.value);
+      public string ConvertReverseAsMithril () => this.ConvertReverseAsMithril(this.value);
 
-      [Benchmark]
-      public object ConvertSpan() => ConvertSpan(this.value);
-
-      [Benchmark]
-      public object ConvertSpanReverse() => ConvertSpanReverse(this.value);
+      private string ConvertReverseAsMithril(byte[] value)
+      {
+         return Core.Encoding.HexEncoder.ToHexString(value);
+      }
 
       [Benchmark]
       public object ConvertAsNEO() => ConvertAsNEO(this.value);
@@ -68,79 +70,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
          }
 
          return string.Create(2 * data.Length + spaces, (0, data.Length, data), CreateHexString);
-      }
-
-      public static string ConvertReverse(byte[] rawData)
-      {
-         if (rawData.Length % 2 != 0)
-         {
-            throw new ArgumentException("Expected an even number of elements.", nameof(rawData));
-         }
-
-         return string.Create(rawData.Length * 2, rawData, (dst, src) =>
-         {
-            int i = rawData.Length - 1;
-            int j = 0;
-
-            while (i >= 0)
-            {
-               byte b = rawData[i--];
-               dst[j++] = HexValues[b >> 4];
-               dst[j++] = HexValues[b & 0xF];
-            }
-         });
-      }
-
-      public static string Convert(byte[] rawData)
-      {
-         return string.Create(rawData.Length * 2, rawData, (dst, src) =>
-         {
-            int i = rawData.Length - 1;
-            int j = (rawData.Length * 2) - 1;
-
-            while (i >= 0)
-            {
-               byte b = rawData[i--];
-               dst[j--] = HexValues[b >> 4];
-               dst[j--] = HexValues[b & 0xF];
-            }
-         });
-      }
-
-      public static string ConvertSpan(ReadOnlySpan<byte> rawData)
-      {
-         char[] resultBuffer = new char[rawData.Length * 2];
-
-         int i = rawData.Length - 1;
-         int j = (rawData.Length * 2) - 1;
-
-         while (i >= 0)
-         {
-            byte b = rawData[i--];
-            resultBuffer[j--] = HexValues[b >> 4];
-            resultBuffer[j--] = HexValues[b & 0xF];
-         }
-
-         MemoryMarshal.TryGetString(resultBuffer, out string text, out int _, out int _);
-         return text;
-      }
-
-      public static string ConvertSpanReverse(ReadOnlySpan<byte> rawData)
-      {
-         char[] resultBuffer = new char[rawData.Length * 2];
-
-         int i = rawData.Length - 1;
-         int j = (rawData.Length * 2) - 1;
-
-         while (i >= 0)
-         {
-            byte b = rawData[i--];
-            resultBuffer[j--] = HexValues[b >> 4];
-            resultBuffer[j--] = HexValues[b & 0xF];
-         }
-
-         MemoryMarshal.TryGetString(resultBuffer, out string text, out int _, out int _);
-         return text;
       }
    }
 }
