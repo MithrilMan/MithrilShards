@@ -8,7 +8,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
    public partial class HandshakeProcessor
    {
-      private class Status
+      public class Status
       {
          private readonly HandshakeProcessor processor;
          internal bool VersionSent { get; private set; } = false;

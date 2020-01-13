@@ -6,12 +6,13 @@
 
       private class Status
       {
+         public int PeerStartingHeight { get; internal set; } = 0;
+
          /// <summary>
          /// Gets or sets a value indicating whether the peer prefer to use compact block mode.
          /// See BIP 152 for details.
          /// </summary>
          public bool UseCompactBlocks { get; internal set; } = false;
-
 
          /// <summary>
          /// Holds the reference of the version to use to send compact messages.

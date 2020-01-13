@@ -25,11 +25,20 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private const int MAX_HEADERS = 2000;
 
       private readonly IChainDefinition chainDefinition;
+      private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
+      private readonly HeadersLookup headersLookup;
 
-      public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager, IChainDefinition chainDefinition)
+      public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
+                                  IEventBus eventBus,
+                                  IPeerBehaviorManager peerBehaviorManager,
+                                  IChainDefinition chainDefinition,
+                                  IBlockHeaderHashCalculator blockHeaderHashCalculator,
+                                  HeadersLookup headersLookup)
          : base(logger, eventBus, peerBehaviorManager)
       {
          this.chainDefinition = chainDefinition;
+         this.blockHeaderHashCalculator = blockHeaderHashCalculator;
+         this.headersLookup = headersLookup;
       }
 
       public override async ValueTask AttachAsync(IPeerContext peerContext)
@@ -50,6 +59,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       private async ValueTask OnPeerHandshakedAsync(PeerHandshaked @event)
       {
+         this.status.PeerStartingHeight = this.PeerContext.Data.Get<HandshakeProcessor.Status>().PeerVersion.StartHeight;
+
          await this.SendMessageAsync(minVersion: KnownVersion.V70014, new SendCmpctMessage { HighBandwidthMode = true, Version = 1 }).ConfigureAwait(false);
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
 
@@ -113,35 +124,31 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return new ValueTask<bool>(false);
          }
 
-         //NEED TO COMPUTE BLOCK HASH
 
-         ////In the special case where the remote node is at height 0 as well as us, then the headers count will be 0
-         //if (headers.Headers.Length == 0 && this.PeerContext. PeerVersion.StartHeight == 0 && currentTip.Hash == this.chainDefinition.Genesis)
-         //   return;
-         //if (headers.Headers.Length == 1 && headers.Headers[0].ha GetHash() == currentTip.Hash)
-         //   return;
-         //foreach (var header in headers.Headers)
-         //{
-         //   var h = header.GetHash();
-         //   if (h == currentTip.Hash)
-         //      continue;
+         //In the special case where the remote node is at height 0 as well as us, then the headers count will be 0
+         if (headers.Headers.Length == 0 && this.status.PeerStartingHeight == 0 && this.headersLookup.Tip == this.chainDefinition.Genesis)
+            return new ValueTask<bool>(true);
 
-         //   if (header.HashPrevBlock == currentTip.Hash)
-         //   {
-         //      isOurs = true;
-         //      currentTip = new SlimChainedBlock(h, currentTip.Hash, currentTip.Height + 1);
-         //      chain.TrySetTip(currentTip.Hash, currentTip.Previous);
-         //      if (currentTip.Hash == hashStop)
-         //         return;
-         //   }
-         //   else if (chain.TrySetTip(h, header.HashPrevBlock))
-         //   {
-         //      currentTip = chain.TipBlock;
-         //   }
-         //   else
-         //      break;
-         //}
+         int protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
+         foreach (Types.BlockHeader header in headers.Headers)
+         {
+            UInt256 computedHash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion);
 
+            HeaderNode currentTip = this.headersLookup.GetTipHeaderNode();
+
+            switch (this.headersLookup.TrySetTip(computedHash, currentTip.PreviousHash))
+            {
+               case ConnectHeaderResult.Connected:
+               case ConnectHeaderResult.SameTip:
+               case ConnectHeaderResult.Rewinded:
+               case ConnectHeaderResult.ResettedToGenesis:
+                  currentTip = currentTip.BuildNext(computedHash);
+                  break;
+               case ConnectHeaderResult.MissingPreviousHeader:
+                  // todo gestire il resync
+                  return new ValueTask<bool>(true);
+            }
+         }
          return new ValueTask<bool>(true);
       }
    }

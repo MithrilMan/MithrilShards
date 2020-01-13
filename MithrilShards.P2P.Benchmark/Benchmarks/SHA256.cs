@@ -24,15 +24,15 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
 
       [Benchmark]
-      public void NBitcoin_Hash256()
+      public NBitcoin.uint256 NBitcoin_Hash256()
       {
-         NBitcoin.Crypto.Hashes.Hash256(this.data);
+         return NBitcoin.Crypto.Hashes.Hash256(this.data);
       }
 
       [Benchmark]
-      public void MithrilShards_DoubleSha256()
+      public new Core.DataTypes.UInt256 MithrilShards_DoubleSha256()
       {
-         new NBitcoin.uint256(HashGenerator.DoubleSha256(this.data));
+         return new Core.DataTypes.UInt256(HashGenerator.DoubleSha256(this.data));
       }
    }
 }
