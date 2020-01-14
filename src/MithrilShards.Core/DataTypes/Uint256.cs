@@ -175,7 +175,7 @@ namespace MithrilShards.Core.DataTypes
 
       public override bool Equals(object obj)
       {
-         return ReferenceEquals(this, obj) ? true : this.Equals(obj);
+         return ReferenceEquals(this, obj) ? true : this.Equals(obj as UInt256);
       }
 
       public bool Equals(UInt256 other)
