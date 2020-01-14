@@ -19,23 +19,24 @@ namespace MithrilShards.Chain.Bitcoin
       SameTip = 2,
 
 
+
       /// <summary>
       /// The header was already in the chain.
       /// Chain has been rewound.
       /// </summary>
-      Rewinded = 3,
+      Rewinded = 4,
 
 
       /// <summary>
       /// Genesis header has been set as tip.
       /// The headers chain has been resetted to genesis.
       /// </summary>
-      ResettedToGenesis = 4,
+      ResettedToGenesis = 5,
 
 
       /// <summary>
       /// The new tip previous header is missing, cannot connect the new tip.
       /// </summary>
-      MissingPreviousHeader
+      MissingPreviousHeader = 6
    }
 }

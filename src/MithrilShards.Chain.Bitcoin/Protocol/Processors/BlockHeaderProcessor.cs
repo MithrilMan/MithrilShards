@@ -129,20 +129,21 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          if (headers.Headers.Length == 0 && this.status.PeerStartingHeight == 0 && this.headersLookup.Tip == this.chainDefinition.Genesis)
             return new ValueTask<bool>(true);
 
+         //HeaderNode currentTip = this.headersLookup.GetTipHeaderNode();
+
          int protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
          foreach (Types.BlockHeader header in headers.Headers)
          {
             UInt256 computedHash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion);
 
-            HeaderNode currentTip = this.headersLookup.GetTipHeaderNode();
 
-            switch (this.headersLookup.TrySetTip(computedHash, currentTip.PreviousHash))
+            switch (this.headersLookup.TrySetTip(computedHash, header.PreviousBlockHash))
             {
                case ConnectHeaderResult.Connected:
                case ConnectHeaderResult.SameTip:
                case ConnectHeaderResult.Rewinded:
                case ConnectHeaderResult.ResettedToGenesis:
-                  currentTip = currentTip.BuildNext(computedHash);
+                  //currentTip = currentTip.BuildNext(computedHash);
                   break;
                case ConnectHeaderResult.MissingPreviousHeader:
                   // todo gestire il resync

@@ -1,5 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
 namespace MithrilShards.Network.Benchmark
@@ -21,21 +23,18 @@ namespace MithrilShards.Network.Benchmark
          }
       }
 
+      private const string JitTieredCompilation = "COMPLUS_TieredCompilation";
+
       static void Main(string[] args)
       {
-         byte[] data = new byte[32];
-         new Random().NextBytes(data);
-
-         Console.WriteLine("MithrilShards.UInt256: " + new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256(data).ToString());
-         Console.WriteLine("MithrilShards.UInt256As4Long: " + new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Long(data).ToString());
-         Console.WriteLine("NBitcoin: " + new NBitcoin.uint256(new ReadOnlySpan<byte>(data)).ToString());
-         Console.WriteLine("NEO: " + new MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256(new ReadOnlySpan<byte>(data)).ToString());
-         Console.WriteLine("MithrilShards.UnsafeUInt256: " + new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256(data).ToString());
-         Console.WriteLine("MithrilShards.UnsafeUInt256As4Long: " + new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256As4Long(data).ToString());
-         Console.WriteLine("MithrilShards.UInt256As4Jhon: " + new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Jhon(data).ToString());
-         Console.WriteLine("MithrilShards.Core.DataTypes.UInt256: " + new MithrilShards.Core.DataTypes.UInt256(data).ToString());
-
-         Console.WriteLine("MithrilShards.Core.DataTypes.UInt256: " + new MithrilShards.Core.DataTypes.UInt256("0123456789abcdef0123456789ABCDEF0123456789abcdef0123456789ABCDEF").ToString());
+         // to disable tiered compilation, either set environment variable COMPLUS_TieredCompilation to 0 or uncomment this configuration
+         //IConfig config = DefaultConfig.Instance
+         //   .StopOnFirstError(true)
+         //   .With(Job.Default
+         //      //.With(CoreRuntime.Core31)
+         //      .WithEnvironmentVariable(JitTieredCompilation, "0")
+         //   );
+         //BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, config);
 
          BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
 

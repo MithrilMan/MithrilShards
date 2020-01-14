@@ -152,7 +152,7 @@ namespace MithrilShards.Chain.Bitcoin
 
          // now we can put the tip on top of our chain.
          this.height++;
-         this.hashesByHeight[this.height] = newTip;
+         this.hashesByHeight.Add(newTip); //[this.height] = newTip;
          this.hashesHeight.Add(newTip, this.height);
 
          return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;

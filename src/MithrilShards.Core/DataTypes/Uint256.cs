@@ -167,5 +167,25 @@ namespace MithrilShards.Core.DataTypes
       {
          return MemoryMarshal.AsBytes(MemoryMarshal.CreateReadOnlySpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
       }
+
+      public override int GetHashCode()
+      {
+         return (int)this.part1;
+      }
+
+      public override bool Equals(object obj)
+      {
+         return ReferenceEquals(this, obj) ? true : this.Equals(obj);
+      }
+
+      public bool Equals(UInt256 other)
+      {
+         if (other is null) return false;
+
+         return this.part1 == other.part1
+             && this.part2 == other.part2
+             && this.part3 == other.part3
+             && this.part4 == other.part4;
+      }
    }
 }
