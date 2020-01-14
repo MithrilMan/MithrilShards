@@ -22,7 +22,29 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<HeadersMessage>,
       INetworkMessageHandler<SendCmpctMessage>
    {
+      /// <summary>
+      /// Number of headers sent in one getheaders result.
+      /// We rely on the assumption that if a peer sends less than this number, we reached its tip.
+      /// Changing this value is a protocol upgrade.
+      /// </summary>
       private const int MAX_HEADERS = 2000;
+
+      /// <summary>
+      /// Maximum number of headers to announce when relaying blocks with headers message.
+      /// </summary>
+      private const int MAX_BLOCKS_TO_ANNOUNCE = 8;
+
+      /// <summary>
+      /// Maximum number of unconnecting headers before triggering a peer Misbehave action.
+      /// </summary>
+      private const int MAX_UNCONNECTING_HEADERS = 10;
+
+      /// <summary>
+      /// Maximum number of block hashes allowed in the BlockLocator.</summary>
+      /// <seealso cref="https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2018-August/016285.html"/>
+      /// <seealso cref="https://github.com/bitcoin/bitcoin/pull/13907"
+      /// </summary>
+      private const int MAX_LOCATOR_HASHES = 101;
 
       private readonly IChainDefinition chainDefinition;
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
@@ -111,23 +133,55 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public ValueTask<bool> ProcessMessageAsync(GetHeadersMessage message, CancellationToken cancellation)
       {
+         if (message.BlockLocator.BlockLocatorHashes.Length > MAX_LOCATOR_HASHES)
+         {
+            //this.logger
+         }
          // TODO: give back our headers
          return new ValueTask<bool>(true);
       }
 
       public ValueTask<bool> ProcessMessageAsync(HeadersMessage headers, CancellationToken cancellation)
       {
+         int headersCount = headers.Headers.Length;
          //https://github.com/bitcoin/bitcoin/blob/b949ac9697a6cfe087f60a16c063ab9c5bf1e81f/src/net_processing.cpp#L2923-L2947
-         if (headers.Headers?.Length > MAX_HEADERS)
+         if (headersCount > MAX_HEADERS)
          {
             this.peerBehaviorManager.Misbehave(this.PeerContext, 20, "Too many headers received.");
             return new ValueTask<bool>(false);
          }
 
+            ///// If this looks like it could be a block announcement (headersCount < MAX_BLOCKS_TO_ANNOUNCE),
+            ///// use special logic for handling headers that don't connect:
+            ///// - Send a getheaders message in response to try to connect the chain.
+            ///// - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that don't connect before giving DoS points
+            ///// - Once a headers message is received that is valid and does connect, nUnconnectingHeaders gets reset back to 0.
+            ///// see https://github.com/bitcoin/bitcoin/blob/ceb789cf3a9075729efa07f5114ce0369d8606c3/src/net_processing.cpp#L1658-L1683
+            //if (!LookupBlockIndex(headers[0].hashPrevBlock) && nCount < MAX_BLOCKS_TO_ANNOUNCE)
+            //{
+            //   nodestate->nUnconnectingHeaders++;
+            //   connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, ::ChainActive().GetLocator(pindexBestHeader), uint256()));
+            //   LogPrint(BCLog::NET, "received header %s: missing prev block %s, sending getheaders (%d) to end (peer=%d, nUnconnectingHeaders=%d)\n",
+            //           headers[0].GetHash().ToString(),
+            //           headers[0].hashPrevBlock.ToString(),
+            //           pindexBestHeader->nHeight,
+            //           pfrom->GetId(), nodestate->nUnconnectingHeaders);
+            //   // Set hashLastUnknownBlock for this peer, so that if we
+            //   // eventually get the headers - even from a different peer -
+            //   // we can use this peer to download.
+            //   UpdateBlockAvailability(pfrom->GetId(), headers.back().GetHash());
+
+            //   if (nodestate->nUnconnectingHeaders % MAX_UNCONNECTING_HEADERS == 0)
+            //   {
+            //      Misbehaving(pfrom->GetId(), 20);
+            //   }
+            //   return true;
+            //}
+
 
          //In the special case where the remote node is at height 0 as well as us, then the headers count will be 0
          if (headers.Headers.Length == 0 && this.status.PeerStartingHeight == 0 && this.headersLookup.Tip == this.chainDefinition.Genesis)
-            return new ValueTask<bool>(true);
+               return new ValueTask<bool>(true);
 
          //HeaderNode currentTip = this.headersLookup.GetTipHeaderNode();
 
