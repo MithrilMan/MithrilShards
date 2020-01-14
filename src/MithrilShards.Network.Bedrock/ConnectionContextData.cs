@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 
 namespace MithrilShards.Network.Bedrock
 {
    public class ConnectionContextData
    {
+      /// <summary>
+      /// The default maximum protocol message length.
+      /// </summary>
+      const uint DEFAULT_MAX_PROTOCOL_MESSAGE_LENGTH = 4_000_000;
+
       public const int SIZE_MAGIC = 4;
       public const int SIZE_COMMAND = 12;
       public const int SIZE_PAYLOAD_LENGTH = 4;
@@ -29,6 +35,11 @@ namespace MithrilShards.Network.Bedrock
       public readonly byte FirstMagicNumberByte;
 
       /// <summary>
+      /// The maximum allowed protocol message length.
+      /// </summary>
+      private readonly uint maximumProtocolMessageLength;
+
+      /// <summary>
       /// Gets or sets the length of the last parsed INetworkMessage payload (message length - header length).
       /// Sets PayloadRead to true.
       /// </summary>
@@ -40,6 +51,10 @@ namespace MithrilShards.Network.Bedrock
          get => this.payloadLength;
          set
          {
+            if (value > this.maximumProtocolMessageLength)
+            {
+               throw new ProtocolViolationException($"Message size exceeds the maximum value {this.maximumProtocolMessageLength}.");
+            }
             this.payloadLength = value;
             this.PayloadLengthRead = true;
          }
@@ -79,9 +94,10 @@ namespace MithrilShards.Network.Bedrock
          }
       }
 
-      public ConnectionContextData(byte[] magicNumberBytesmagicBytes)
+      public ConnectionContextData(byte[] magicNumberBytesmagicBytes, uint maximumProtocolMessageLength = DEFAULT_MAX_PROTOCOL_MESSAGE_LENGTH)
       {
          this.MagicNumberBytes = magicNumberBytesmagicBytes;
+         this.maximumProtocolMessageLength = maximumProtocolMessageLength;
          this.MagicNumber = BitConverter.ToInt32(magicNumberBytesmagicBytes);
          this.FirstMagicNumberByte = magicNumberBytesmagicBytes[0];
 
