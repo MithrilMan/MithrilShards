@@ -6,7 +6,7 @@
       "Listeners": [
          {
             "IsWhitelistingEndpoint": false,
-            "Endpoint": "127.0.0.1:45010"
+            "Endpoint": "192.168.2.18:45010"
          },
          {
             "IsWhitelistingEndpoint": true,

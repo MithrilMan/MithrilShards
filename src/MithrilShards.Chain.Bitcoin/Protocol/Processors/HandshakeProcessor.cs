@@ -8,6 +8,7 @@ using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol.Processors;
 
@@ -17,6 +18,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<VersionMessage>,
       INetworkMessageHandler<VerackMessage>
    {
+      const int HANDSHAKE_TIMEOUT_SECONDS = 5;
       private readonly Status status;
       private readonly IDateTimeProvider dateTimeProvider;
       private readonly IRandomNumberGenerator randomNumberGenerator;
@@ -33,7 +35,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                 IPeerBehaviorManager peerBehaviorManager,
                                 IInitialBlockDownloadState initialBlockDownloadState,
                                 IUserAgentBuilder userAgentBuilder,
-                                SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager)
+                                SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.dateTimeProvider = dateTimeProvider;
          this.randomNumberGenerator = randomNumberGenerator;
@@ -44,27 +46,24 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.status = new Status(this);
       }
 
-      public override async ValueTask AttachAsync(IPeerContext peerContext)
+      protected override async ValueTask OnPeerAttached()
       {
-         await base.AttachAsync(peerContext).ConfigureAwait(false);
-
          //add the status to the PeerContext, this way other processors may query the status
          this.PeerContext.Data.Set(this.status);
 
          // ensures the handshake is performed timely
-         this.DisconnectIfAsync(() =>
+         _ = this.DisconnectIfAsync(() =>
          {
-            return this.status.IsHandShaked == false;
-         }, TimeSpan.FromSeconds(5), "Handshake not performed in time");//this.PeerContext.Disconnected);
+            return new ValueTask<bool>(this.status.IsHandShaked == false);
+         }, TimeSpan.FromSeconds(HANDSHAKE_TIMEOUT_SECONDS), "Handshake not performed in time");
 
-         if (peerContext.Direction == PeerConnectionDirection.Outbound)
+         if (this.PeerContext.Direction == PeerConnectionDirection.Outbound)
          {
             this.logger.LogDebug("Commencing handshake with local Version.");
             await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
             this.status.VersionSentAsync();
          }
       }
-
 
       public async ValueTask<bool> ProcessMessageAsync(VersionMessage version, CancellationToken cancellation)
       {
@@ -98,14 +97,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          // first time we receive version
          await this.status.VersionReceivedAsync(version).ConfigureAwait(false);
 
-         await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
-
          if (this.PeerContext.Direction == PeerConnectionDirection.Inbound)
          {
             this.logger.LogDebug("Responding to handshake with local Version.");
             await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
             this.status.VersionSentAsync();
          }
+
+         await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
 
          this.PeerContext.TimeOffset = this.dateTimeProvider.GetTimeOffset() - version.Timestamp;
          if ((version.Services & (ulong)NodeServices.Witness) != 0)

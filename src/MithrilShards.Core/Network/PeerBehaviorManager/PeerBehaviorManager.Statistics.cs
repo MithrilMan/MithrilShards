@@ -35,7 +35,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
                "Peers Score",
                new List<FieldDefinition>{
                   new FieldDefinition("Peer Id", "Peer unique identifier.", 38),
-                  new FieldDefinition("EndPoint","Peer End Point.", 26),
+                  new FieldDefinition("EndPoint","Peer End Point.", 30),
                   new FieldDefinition("Score","Peer Score.", 15)
                },
                TimeSpan.FromSeconds(STATISTIC_REFRESH_RATE)

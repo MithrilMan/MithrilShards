@@ -4,17 +4,18 @@ using System.Runtime.InteropServices;
 namespace MithrilShards.Core.DataTypes
 {
    [StructLayout(LayoutKind.Sequential)]
-   public class UInt256
+   public class UInt256 : IEquatable<UInt256>
    {
       private const int EXPECTED_SIZE = 32;
 
-      public static UInt256 Zero = new UInt256("0".PadRight(EXPECTED_SIZE * 2, '0'));
+      public static UInt256 Zero { get; } = new UInt256("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
 #pragma warning disable IDE0044 // Add readonly modifier
       private ulong part1;
       private ulong part2;
       private ulong part3;
       private ulong part4;
+
 #pragma warning restore IDE0044 // Add readonly modifier
 
       /// <summary>
@@ -186,6 +187,16 @@ namespace MithrilShards.Core.DataTypes
              && this.part2 == other.part2
              && this.part3 == other.part3
              && this.part4 == other.part4;
+      }
+
+      public static bool operator !=(UInt256 a, UInt256 b)
+      {
+         return !(a == b);
+      }
+
+      public static bool operator ==(UInt256 a, UInt256 b)
+      {
+         return a?.Equals(b) ?? false;
       }
    }
 }
