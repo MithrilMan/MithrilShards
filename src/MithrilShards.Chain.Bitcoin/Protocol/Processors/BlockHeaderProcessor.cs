@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
+using MithrilShards.Core;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
@@ -47,18 +48,21 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private const int MAX_LOCATOR_HASHES = 101;
 
       private readonly IChainDefinition chainDefinition;
+      private readonly IInitialBlockDownloadState ibdState;
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
-      private readonly HeadersLookup headersLookup;
+      private readonly HeadersTree headersLookup;
 
       public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
                                   IEventBus eventBus,
                                   IPeerBehaviorManager peerBehaviorManager,
                                   IChainDefinition chainDefinition,
+                                  IInitialBlockDownloadState ibdState,
                                   IBlockHeaderHashCalculator blockHeaderHashCalculator,
-                                  HeadersLookup headersLookup)
+                                  HeadersTree headersLookup)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.chainDefinition = chainDefinition;
+         this.ibdState = ibdState;
          this.blockHeaderHashCalculator = blockHeaderHashCalculator;
          this.headersLookup = headersLookup;
       }
@@ -125,9 +129,33 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (message.BlockLocator.BlockLocatorHashes.Length > MAX_LOCATOR_HASHES)
          {
-            //this.logger
+            this.logger.LogDebug("Exceeded maximum number of block hashes for getheaders message.");
+            this.Misbehave(10, "Exceeded maximum getheaders block hashes length", true);
          }
-         // TODO: give back our headers
+
+         if (this.ibdState.isInIBD)
+         {
+            this.logger.LogDebug("Ignoring getheaders from {PeerId} because node is in initial block download state.", this.PeerContext.PeerId);
+            return new ValueTask<bool>(true);
+         }
+
+         HeaderNode startingNode;
+         // If block locator is null, return the hashStop block
+         if ((message.BlockLocator.BlockLocatorHashes?.Length ?? 0) == 0)
+         {
+            if (!this.headersLookup.TryGetNode(message.HashStop, true, out startingNode))
+            {
+               this.logger.LogDebug("Empty block locator and HashStop not found");
+               return new ValueTask<bool>(true);
+            }
+         }
+         else
+         {
+            startingNode = this.headersLookup.GetHighestNodeInBestChain(message.BlockLocator);
+         }
+
+         this.logger.LogDebug("Serving headers from {StartingNodeHeight}:{StartingNodeHash}", startingNode.Height, startingNode.Hash);
+
          return new ValueTask<bool>(true);
       }
 
@@ -139,7 +167,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// bitcoin does this before deserialize the message but I don't think would be a big problem, we could ban the peer in case we find this being a vector attack.
          if (headersCount > MAX_HEADERS)
          {
-            this.peerBehaviorManager.Misbehave(this.PeerContext, 20, "Too many headers received.");
+            this.Misbehave(20, "Too many headers received.");
             return new ValueTask<bool>(false);
          }
 

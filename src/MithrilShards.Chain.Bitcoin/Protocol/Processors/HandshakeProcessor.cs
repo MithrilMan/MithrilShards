@@ -78,7 +78,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          if (this.status.PeerVersion != null)
          {
             //https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1909-L1914
-            this.peerBehaviorManager.Misbehave(this.PeerContext, 1, "Version message already received, expected only one.");
+            this.Misbehave(1, "Version message already received, expected only one.");
             return false;
          }
 
@@ -136,14 +136,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (!this.status.VersionSent)
          {
-            this.peerBehaviorManager.Misbehave(this.PeerContext, 10, "Received verack without having sent a version.");
+            this.Misbehave(10, "Received verack without having sent a version.");
             return false;
          }
 
          if (this.status.VersionAckReceived)
          {
             //https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1909-L1914
-            this.peerBehaviorManager.Misbehave(this.PeerContext, 1, "Received additional verack, a previous one has been received.");
+            this.Misbehave(1, "Received additional verack, a previous one has been received.");
             return false;
          }
 

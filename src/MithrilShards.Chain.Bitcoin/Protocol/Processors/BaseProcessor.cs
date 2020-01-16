@@ -17,8 +17,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
    {
       protected readonly ILogger<BaseProcessor> logger;
       protected readonly IEventBus eventBus;
-      protected readonly IPeerBehaviorManager peerBehaviorManager;
-      protected readonly bool isHandshakeAware;
+      private readonly IPeerBehaviorManager peerBehaviorManager;
+      private readonly bool isHandshakeAware;
       private INetworkMessageWriter messageWriter;
 
       /// <summary>
@@ -172,6 +172,22 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                await action().ConfigureAwait(false);
             }
          });
+      }
+
+      /// <summary>
+      /// Punish the peer because of his misbehaves.
+      /// </summary>
+      /// <param name="penalty">The penalty.</param>
+      /// <param name="reason">The reason.</param>
+      /// <param name="disconnect">if set to <c>true</c> [disconnect].</param>
+      protected void Misbehave(uint penalty, string reason, bool disconnect = false)
+      {
+         this.peerBehaviorManager.Misbehave(this.PeerContext, penalty, reason);
+         if (disconnect)
+         {
+            this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
+            this.PeerContext.ConnectionCancellationTokenSource.Cancel();
+         }
       }
 
       public virtual void Dispose()
