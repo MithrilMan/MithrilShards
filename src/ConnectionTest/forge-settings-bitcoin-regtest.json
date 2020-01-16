@@ -6,7 +6,7 @@
       "Listeners": [
          {
             "IsWhitelistingEndpoint": false,
-            "Endpoint": "192.168.2.18:45010"
+            "Endpoint": "0.0.0.0:45010"
          },
          {
             "IsWhitelistingEndpoint": true,
@@ -19,5 +19,8 @@
             "Endpoint": "127.0.0.1:19000"
          }
       ]
+   },
+   "DevControllerSettings": {
+      "EndPoint": "127.0.0.1:45011"
    }
 }

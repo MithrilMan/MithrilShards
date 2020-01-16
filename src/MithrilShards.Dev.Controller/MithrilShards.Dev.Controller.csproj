@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -9,11 +9,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
   </ItemGroup>
+
+   <ItemGroup>
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
-    <ProjectReference Include="..\MithrilShards.Logging.ConsoleTableFormatter\MithrilShards.Logging.ConsoleTableFormatter.csproj" />
   </ItemGroup>
 
 </Project>

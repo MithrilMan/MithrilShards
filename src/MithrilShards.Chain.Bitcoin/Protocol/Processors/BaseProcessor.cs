@@ -178,7 +178,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          this.eventSubscriptionManager.Dispose();
 
-         this.PeerContext.ConnectionCancellationTokenSource.Cancel();
+         this.PeerContext?.ConnectionCancellationTokenSource.Cancel();
       }
 
    }

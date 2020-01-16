@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -23,11 +24,13 @@ namespace MithrilShards.Core.Forge
          this.hostBuilder = new HostBuilder();
 
          // Add a new service provider configuration
-         this.hostBuilder.UseDefaultServiceProvider((context, options) =>
-         {
-            options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
-            options.ValidateOnBuild = true;
-         });
+         this.hostBuilder
+            .UseContentRoot(Directory.GetCurrentDirectory())
+            .UseDefaultServiceProvider((context, options) =>
+            {
+               options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
+               options.ValidateOnBuild = true;
+            });
       }
 
       /// <summary>

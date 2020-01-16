@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MithrilShards.Chain.Bitcoin;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Core.Forge;
+using MithrilShards.Dev.Controller;
 using MithrilShards.Diagnostic.StatisticsCollector;
 using MithrilShards.Logging.Serilog;
 using MithrilShards.Network.Bedrock;
@@ -27,6 +28,7 @@ namespace ConnectionTest
             .UseSerilog("log-settings-with-seq.json")
             .UseBedrockForgeServer()
             .UseStatisticsCollector()
+         //   .UseDevController()
             .RunConsoleAsync()
             .ConfigureAwait(false);
       }

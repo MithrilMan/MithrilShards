@@ -1,0 +1,54 @@
+﻿using System;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
+using NBitcoin;
+
+namespace MithrilShards.Network.Benchmark.Benchmarks
+{
+   [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+   [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
+   public class AllocationSize
+   {
+      [Params(1, 100, 1000)]
+      public int size;
+
+      [GlobalSetup]
+      public void Setup()
+      {
+      }
+
+      [Benchmark]
+      public NBitcoin.BlockHeader[] HeadersNoInstances() => new NBitcoin.BlockHeader[this.size];
+
+      [Benchmark]
+      public NBitcoin.Target[] TargetsNoInstances() => new NBitcoin.Target[this.size];
+
+      [Benchmark]
+      public NBitcoin.BlockHeader[] HeadersWithInstances() => this.CreateHeaders(this.size);
+
+      private BlockHeader[] CreateHeaders(int size)
+      {
+         var array = new NBitcoin.BlockHeader[this.size];
+         for (int i = 0; i < array.Length; i++)
+         {
+            array[i] = new BlockHeader();
+         }
+
+         return array;
+      }
+
+      [Benchmark]
+      public NBitcoin.Target[] TargetsWithInstances() => this.CreateTargets(this.size);
+
+      private Target[] CreateTargets(int size)
+      {
+         var array = new NBitcoin.Target[this.size];
+         for (int i = 0; i < array.Length; i++)
+         {
+            array[i] = new Target(1);
+         }
+
+         return array;
+      }
+   }
+}

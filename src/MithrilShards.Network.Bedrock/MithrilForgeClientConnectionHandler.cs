@@ -55,7 +55,7 @@ namespace MithrilShards.Network.Bedrock
             throw new ArgumentNullException(nameof(connection));
          }
 
-         using IDisposable logScope = this.logger.BeginScope("Peer {PeerId} connected to server {ServerEndpoint}", connection.LocalEndPoint);
+         using IDisposable logScope = this.logger.BeginScope("Peer {PeerId} connected to server {ServerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
          var contextData = new ConnectionContextData(this.chainDefinition.MagicBytes);
          var protocol = new NetworkMessageProtocol(this.loggerFactory.CreateLogger<NetworkMessageProtocol>(),
                                                    this.chainDefinition,
