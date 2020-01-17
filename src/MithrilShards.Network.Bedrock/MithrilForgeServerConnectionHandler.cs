@@ -99,7 +99,7 @@ namespace MithrilShards.Network.Bedrock
                      break;
                   }
 
-                  await this.ProcessMessage(result.Message, connection, contextData, peerContext, connection.ConnectionClosed).ConfigureAwait(false);
+                  await this.ProcessMessageAsync(result.Message, contextData, peerContext, connection.ConnectionClosed).ConfigureAwait(false);
                }
                catch (Exception ex)
                {
@@ -147,8 +147,7 @@ namespace MithrilShards.Network.Bedrock
          return true;
       }
 
-      private async Task ProcessMessage(INetworkMessage message,
-                                        ConnectionContext connection,
+      private async Task ProcessMessageAsync(INetworkMessage message,
                                         ConnectionContextData contextData,
                                         IPeerContext peerContext,
                                         CancellationToken cancellation)

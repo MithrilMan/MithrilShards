@@ -27,7 +27,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       [Benchmark]
       public void UInt256_Neo_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256(this.data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(this.data);
       }
 
       [Benchmark]
@@ -39,13 +39,13 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       [Benchmark]
       public void uint256_Stratis_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.Stratis.uint256(this.data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.Stratis.STRATIS_uint256(this.data);
       }
 
       [Benchmark]
       public void uint256_MithrilShards_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256(this.data);
+         _ = new Core.DataTypes.UInt256(this.data);
       }
 
       [Benchmark]

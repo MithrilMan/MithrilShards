@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+     <LangVersion>8.0</LangVersion>
+     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,7 +11,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.4.43" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.5.124-alpha" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
   </ItemGroup>

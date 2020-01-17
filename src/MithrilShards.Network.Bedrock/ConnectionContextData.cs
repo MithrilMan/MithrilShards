@@ -18,7 +18,7 @@ namespace MithrilShards.Network.Bedrock
       public const int HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
 
       private uint payloadLength;
-      private byte[] command;
+      private byte[]? command;
       private uint checksum;
 
       public bool ChecksumRead { get; private set; }
@@ -67,7 +67,7 @@ namespace MithrilShards.Network.Bedrock
       /// <value>
       /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
       /// </value>
-      public byte[] Command
+      public byte[]? Command
       {
          get => this.command;
          set

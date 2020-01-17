@@ -12,8 +12,6 @@ using System.Text;
 
 namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 {
-   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
-   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0011:Add braces", Justification = "<Pending>")]
    public static class Helper
    {
       private static readonly DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

@@ -3,10 +3,7 @@ using System.Linq;
 
 namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis
 {
-   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0009:Member access should be qualified.", Justification = "<Pending>")]
-   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0008:Use explicit type", Justification = "<Pending>")]
-   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0011:Add braces", Justification = "<Pending>")]
-   public class uint256
+   public class STRATIS_uint256
    {
       private const int WIDTH_BYTE = 256 / 8;
       internal readonly UInt32 pn0;
@@ -19,7 +16,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis
       internal readonly UInt32 pn7;
 
 
-      public uint256(byte[] vch, bool lendian = true)
+      public STRATIS_uint256(byte[] vch, bool lendian = true)
       {
          if (vch.Length != WIDTH_BYTE)
          {
@@ -40,7 +37,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis
 
       }
 
-      public uint256(byte[] vch)
+      public STRATIS_uint256(byte[] vch)
           : this(vch, true)
       {
       }

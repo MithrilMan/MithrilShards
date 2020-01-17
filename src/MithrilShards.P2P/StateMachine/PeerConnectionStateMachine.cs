@@ -25,7 +25,6 @@ namespace MithrilShards.Network.Legacy.StateMachine
       readonly PeerConnection peerConnection;
       readonly NetworkMessageDecoder networkMessageDecoder;
       private readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
-      readonly PeerConnectionDirection peerDirection;
       private SequencePosition examined;
       private SequencePosition consumed;
 
@@ -37,12 +36,12 @@ namespace MithrilShards.Network.Legacy.StateMachine
       /// <summary>
       /// Triggers a disconnection caused by our server, specifying the reason.
       /// </summary>
-      private readonly StateMachine<PeerConnectionState, PeerConnectionTrigger>.TriggerWithParameters<(string reason, Exception ex)> disconnectFromPeerTrigger;
+      private readonly StateMachine<PeerConnectionState, PeerConnectionTrigger>.TriggerWithParameters<string, Exception?> disconnectFromPeerTrigger;
 
       /// <summary>
       /// Triggers a disconnection caused by the other peer, specifying the reason.
       /// </summary>
-      private readonly StateMachine<PeerConnectionState, PeerConnectionTrigger>.TriggerWithParameters<(string reason, Exception ex)> peerDroppedTrigger;
+      private readonly StateMachine<PeerConnectionState, PeerConnectionTrigger>.TriggerWithParameters<string, Exception?> peerDroppedTrigger;
 
       public PeerConnectionState Status { get => this.stateMachine.State; }
 
@@ -62,8 +61,8 @@ namespace MithrilShards.Network.Legacy.StateMachine
          this.stateMachine = new StateMachine<PeerConnectionState, PeerConnectionTrigger>(PeerConnectionState.Initializing, FiringMode.Immediate);
 
          this.processMessageTrigger = this.stateMachine.SetTriggerParameters<INetworkMessage>(PeerConnectionTrigger.ProcessMessage);
-         this.disconnectFromPeerTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.DisconnectFromPeer);
-         this.peerDroppedTrigger = this.stateMachine.SetTriggerParameters<(string reason, Exception ex)>(PeerConnectionTrigger.PeerDropped);
+         this.disconnectFromPeerTrigger = this.stateMachine.SetTriggerParameters<string, Exception?>(PeerConnectionTrigger.DisconnectFromPeer);
+         this.peerDroppedTrigger = this.stateMachine.SetTriggerParameters<string, Exception?>(PeerConnectionTrigger.PeerDropped);
 
          if (this.peerConnection.Direction == PeerConnectionDirection.Inbound)
          {
@@ -81,7 +80,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
       {
          if (this.stateMachine.IsInState(PeerConnectionState.Connected))
          {
-            this.stateMachine.FireAsync(this.disconnectFromPeerTrigger, (reason: "Unexpected state transition.", ex: (Exception)null));
+            _ = this.stateMachine.FireAsync(this.disconnectFromPeerTrigger, "Unexpected state transition.", null);
          }
       }
 
@@ -98,7 +97,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
 
             this.stateMachine.Configure(PeerConnectionState.Connected)
                .SubstateOf(PeerConnectionState.Disconnectable)
-               .OnEntryAsync(async () => await this.StartReceivingMessages(cancellationToken).ConfigureAwait(false))
+               .OnEntryAsync(async () => await this.StartReceivingMessagesAsync(cancellationToken).ConfigureAwait(false))
                .Permit(PeerConnectionTrigger.WaitMessage, PeerConnectionState.WaitingMessage);
 
             this.stateMachine.Configure(PeerConnectionState.WaitingMessage)
@@ -113,9 +112,9 @@ namespace MithrilShards.Network.Legacy.StateMachine
 
             this.stateMachine.Configure(PeerConnectionState.Disconnecting)
                .OnEntryFromAsync(this.peerDroppedTrigger,
-                                 async (why) => await this.DisconnectingAsync(why.reason, why.ex, cancellationToken).ConfigureAwait(false))
+                                 async (reason, ex) => await this.DisconnectingAsync(reason, ex).ConfigureAwait(false))
                .OnEntryFromAsync(this.disconnectFromPeerTrigger,
-                                 async (why) => await this.DisconnectingAsync(why.reason, why.ex, cancellationToken).ConfigureAwait(false))
+                                 async (reason, ex) => await this.DisconnectingAsync(reason, ex).ConfigureAwait(false))
                .Permit(PeerConnectionTrigger.PeerDisconnected, PeerConnectionState.Disconnected);
 
             this.stateMachine.Configure(PeerConnectionState.Disconnected)
@@ -130,7 +129,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
 
       }
 
-      public async Task AcceptIncomingConnection()
+      public async Task AcceptIncomingConnectionAsync()
       {
          await this.stateMachine.FireAsync(PeerConnectionTrigger.AcceptConnection).ConfigureAwait(false);
       }
@@ -138,24 +137,22 @@ namespace MithrilShards.Network.Legacy.StateMachine
       /// <summary>
       /// Reads messages from the connection stream.
       /// </summary>
-      private async Task StartReceivingMessages(CancellationToken cancellationToken)
+      private async Task StartReceivingMessagesAsync(CancellationToken cancellationToken)
       {
          try
          {
             await this.stateMachine.FireAsync(PeerConnectionTrigger.WaitMessage).ConfigureAwait(false);
 
-            await this.ProcessNetworkMessages(this.peerConnection.ConnectedClient.Client, cancellationToken).ConfigureAwait(false);
+            await this.ProcessNetworkMessagesAsync(this.peerConnection.ConnectedClient.Client, cancellationToken).ConfigureAwait(false);
          }
          catch (Exception ex) when (ex is IOException || ex is OperationCanceledException || ex is ObjectDisposedException)
          {
-            await this.stateMachine.FireAsync(this.peerDroppedTrigger,
-                                              (reason: "The node stopped receiving messages.", ex)).ConfigureAwait(false);
+            await this.stateMachine.FireAsync(this.peerDroppedTrigger, "The node stopped receiving messages.", ex).ConfigureAwait(false);
             return;
          }
          catch (Exception ex)
          {
-            await this.stateMachine.FireAsync(this.peerDroppedTrigger,
-                                              (reason: "Unexpected failure whilst receiving messages.", ex)).ConfigureAwait(false);
+            await this.stateMachine.FireAsync(this.peerDroppedTrigger, "Unexpected failure whilst receiving messages.", ex).ConfigureAwait(false);
             return;
          }
          finally
@@ -164,7 +161,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
          }
       }
 
-      private async Task ProcessNetworkMessages(Socket socket, CancellationToken cancellationToken)
+      private async Task ProcessNetworkMessagesAsync(Socket socket, CancellationToken cancellationToken)
       {
          var pipe = new Pipe();
 
@@ -173,7 +170,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
 
          await Task.WhenAll(writer, reader).ConfigureAwait(false);
 
-         await this.stateMachine.FireAsync(this.disconnectFromPeerTrigger, (reason: "Peer Disconnected", ex: (Exception)null)).ConfigureAwait(false);
+         await this.stateMachine.FireAsync(this.disconnectFromPeerTrigger, "Peer Disconnected", null).ConfigureAwait(false);
       }
 
 
@@ -288,7 +285,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
          }
 
 
-         this.stateMachine.Fire(PeerConnectionTrigger.WaitMessage);
+         await this.stateMachine.FireAsync(PeerConnectionTrigger.WaitMessage).ConfigureAwait(false);
       }
 
       private void Disconnected()
@@ -296,13 +293,12 @@ namespace MithrilShards.Network.Legacy.StateMachine
          this.logger.LogDebug("Peer {PeerConnectionId} Disconnected", this.peerConnection.PeerContext);
       }
 
-      private Task DisconnectingAsync(string reason, Exception ex, CancellationToken cancellationToken)
+      private async Task DisconnectingAsync(string reason, Exception? ex)
       {
          this.logger.LogDebug(ex, "Disconnecting {PeerConnectionId}: {Reason}", this.peerConnection.PeerContext, reason);
          this.peerConnection.ConnectedClient.Close();
          this.eventBus.Publish(new PeerDisconnected(this.peerConnection.PeerContext, reason, ex));
-         this.stateMachine.Fire(PeerConnectionTrigger.PeerDisconnected);
-         return Task.CompletedTask;
+         await this.stateMachine.FireAsync(PeerConnectionTrigger.PeerDisconnected).ConfigureAwait(false);
       }
 
 

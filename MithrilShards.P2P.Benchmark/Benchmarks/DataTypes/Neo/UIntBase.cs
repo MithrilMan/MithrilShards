@@ -1,12 +1,8 @@
 ﻿using System;
 using System.IO;
 
-#pragma warning disable IDE0044 // Add readonly modifier
-#pragma warning disable IDE0009 // Member access should be qualified.
-
 namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 {
-   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0011:Add braces", Justification = "<Pending>")]
    /// <summary>
    /// Base class for little-endian unsigned integers. Two classes inherit from this: UInt160 and UInt256.
    /// Only basic comparison/serialization are proposed for these classes. For arithmetic purposes, use BigInteger class.
@@ -37,7 +33,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
          if (s.Length == 40 || s.Length == 42)
             return UInt160.Parse(s);
          else if (s.Length == 64 || s.Length == 66)
-            return UInt256.Parse(s);
+            return NEO_UInt256.Parse(s);
          else
             throw new FormatException();
       }
@@ -61,7 +57,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
          int size;
          if (typeof(T) == typeof(UInt160))
             size = 20;
-         else if (typeof(T) == typeof(UInt256))
+         else if (typeof(T) == typeof(NEO_UInt256))
             size = 32;
          else if (s.Length == 40 || s.Length == 42)
             size = 20;
@@ -79,7 +75,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
          }
          else if (size == 32)
          {
-            if (UInt256.TryParse(s, out UInt256 r))
+            if (NEO_UInt256.TryParse(s, out NEO_UInt256 r))
             {
                result = (T)(UIntBase)r;
                return true;

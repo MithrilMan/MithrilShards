@@ -22,15 +22,9 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       }
 
       [Benchmark]
-      public void UInt256_BigInteger_Parse()
-      {
-         _ = BigInteger.Parse(this.data, System.Globalization.NumberStyles.HexNumber);
-      }
-
-      [Benchmark]
       public void UInt256_Neo_Parse()
       {
-         _ = P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256.Parse(this.data);
+         _ = P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256.Parse(this.data);
       }
 
       [Benchmark]

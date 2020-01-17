@@ -23,7 +23,6 @@ namespace MithrilShards.Network.Bedrock
       readonly ILoggerFactory loggerFactory;
       readonly IEventBus eventBus;
       private readonly IChainDefinition chainDefinition;
-      readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
       readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
       readonly IPeerContextFactory peerContextFactory;
@@ -45,7 +44,7 @@ namespace MithrilShards.Network.Bedrock
          this.networkMessageSerializerManager = networkMessageSerializerManager;
          this.networkMessageProcessorFactory = networkMessageProcessorFactory;
          this.peerContextFactory = peerContextFactory;
-         this.connectivitySettings = connectivitySettings?.Value;
+         this.connectivitySettings = connectivitySettings.Value;
       }
 
       public override async Task OnConnectedAsync(ConnectionContext connection)
@@ -100,7 +99,7 @@ namespace MithrilShards.Network.Bedrock
                   .WithCancellationAsync(connection.ConnectionClosed)
                   .ConfigureAwait(false);
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
                break;
             }

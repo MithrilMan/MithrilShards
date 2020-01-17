@@ -17,7 +17,7 @@ namespace MithrilShards.Core.Forge
       public readonly HostBuilder hostBuilder;
       private bool isForgeSet = false;
       private bool createDefaultConfigurationFileNeeded = false;
-      public string ConfigurationFileName { get; private set; }
+      public string ConfigurationFileName { get; private set; } = null!; //set to something meaningful during initialization
 
       public ForgeBuilder()
       {
@@ -37,13 +37,13 @@ namespace MithrilShards.Core.Forge
       /// Creates the default configuration file if it's missing.
       /// </summary>
       /// <returns></returns>
-      private void CreateDefaultConfigurationFile(HostBuilderContext hostingContext, FileLoadExceptionContext context)
+      private void CreateDefaultConfigurationFile(FileLoadExceptionContext fileContext)
       {
          this.createDefaultConfigurationFileNeeded = true;
-         this.ConfigurationFileName = context.Provider.Source.Path;
+         this.ConfigurationFileName = fileContext.Provider.Source.Path;
 
          //default file created, no need to throw error
-         context.Ignore = true;
+         fileContext.Ignore = true;
       }
 
       public IForgeBuilder UseForge<TForgeImplementation>(string[] commandLineArgs, string configurationFile = "forge-settings.json") where TForgeImplementation : class, IForge
@@ -207,7 +207,7 @@ namespace MithrilShards.Core.Forge
                config.AddCommandLine(commandLineArgs);
             }
 
-            config.SetFileLoadExceptionHandler(context => this.CreateDefaultConfigurationFile(hostingContext, context));
+            config.SetFileLoadExceptionHandler(context => this.CreateDefaultConfigurationFile(context));
          });
 
          return this;

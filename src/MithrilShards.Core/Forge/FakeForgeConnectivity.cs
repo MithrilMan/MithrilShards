@@ -14,7 +14,7 @@ namespace MithrilShards.Core.Forge
    {
       const string error = "A valid concrete implementation of IForgeConnectivity must be registered on a IForgeBuilder.";
 
-      public Task AttemptConnection(EndPoint remoteEndPoint, CancellationToken cancellation)
+      public Task AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
       {
          throw new NotImplementedException();
       }

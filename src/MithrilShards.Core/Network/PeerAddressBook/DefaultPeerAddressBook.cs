@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MithrilShards.Core.Network.PeerAddressBook
 {
-   public class PeerAddressBook : IPeerAddressBook
+   public class DefaultPeerAddressBook : IPeerAddressBook
    {
       public void AddAddress(IPeerContext peer)
       {

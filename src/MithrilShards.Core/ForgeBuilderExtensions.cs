@@ -51,10 +51,10 @@ namespace MithrilShards.Core
             .AddSingleton<IConnector, RequiredConnection>()
 
             //peer address book
-            .AddSingleton<IPeerAddressBook, PeerAddressBook>()
+            .AddSingleton<IPeerAddressBook, DefaultPeerAddressBook>()
 
             //with peer behavior manager
-            .AddSingleton<IPeerBehaviorManager, PeerBehaviorManager>()
+            .AddSingleton<IPeerBehaviorManager, DefaultPeerBehaviorManager>()
             .AddHostedService(serviceProvider => serviceProvider.GetRequiredService<IPeerBehaviorManager>())
             ;
 

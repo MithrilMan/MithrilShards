@@ -2,7 +2,7 @@
 {
    public interface IForgeDataFolderLock
    {
-      bool TryLockNodeFolder();
-      void UnlockNodeFolder();
+      bool TryLockDataFolder();
+      void UnlockDataFolder();
    }
 }

@@ -1,4 +1,5 @@
-﻿using MithrilShards.Core.DataTypes;
+﻿using System;
+using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 {
@@ -9,5 +10,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// Newest back to genesis block (dense to start, but then sparse)
       /// </summary>
       public UInt256[] BlockLocatorHashes { get; set; }
+
+      public BlockLocator()
+      {
+         this.BlockLocatorHashes = Array.Empty<UInt256>();
+      }
    }
 }

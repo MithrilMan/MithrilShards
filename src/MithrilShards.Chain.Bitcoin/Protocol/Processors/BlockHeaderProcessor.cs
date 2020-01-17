@@ -75,7 +75,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       protected override async ValueTask OnPeerHandshakedAsync()
       {
-         this.status.PeerStartingHeight = this.PeerContext.Data.Get<HandshakeProcessor.Status>().PeerVersion.StartHeight;
+         this.status.PeerStartingHeight = this.PeerContext.Data.Get<HandshakeProcessor.HandshakeProcessorStatus>().PeerVersion.StartHeight;
 
          await this.SendMessageAsync(minVersion: KnownVersion.V70014, new SendCmpctMessage { HighBandwidthMode = true, Version = 1 }).ConfigureAwait(false);
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
@@ -108,6 +108,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// </summary>
       public ValueTask<bool> ProcessMessageAsync(SendCmpctMessage message, CancellationToken cancellation)
       {
+         if (message is null) throw new System.ArgumentNullException(nameof(message));
+
          if (message.Version > 0 && message.Version <= 2)
          {
             if (message.Version > this.status.CompactVersion)
@@ -127,6 +129,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public ValueTask<bool> ProcessMessageAsync(GetHeadersMessage message, CancellationToken cancellation)
       {
+         if (message is null) throw new System.ArgumentNullException(nameof(message));
+
          if (message.BlockLocator.BlockLocatorHashes.Length > MAX_LOCATOR_HASHES)
          {
             this.logger.LogDebug("Exceeded maximum number of block hashes for getheaders message.");

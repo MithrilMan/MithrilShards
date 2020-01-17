@@ -48,7 +48,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
 
       public async ValueTask ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
       {
-         await peerContext.Data.Get<PeerNetworkMessageProcessorContainer>().ProcessMessage(message, cancellation).ConfigureAwait(false);
+         await peerContext.Data.Get<PeerNetworkMessageProcessorContainer>().ProcessMessageAsync(message, cancellation).ConfigureAwait(false);
       }
    }
 }

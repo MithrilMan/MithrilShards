@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace MithrilShards.Logging.ConsoleTableFormatter
@@ -107,7 +108,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
          {
             this.DrawTopBorder();
             this.DrawLeftBorder();
-            int availableSpace = this.Width - (this.TableStyle.Left == null ? 0 : 1) - (this.TableStyle.Right == null ? 0 : 1);
+            int availableSpace = this.Width - (this.TableStyle.Left == char.MinValue ? 0 : 1) - (this.TableStyle.Right == char.MinValue ? 0 : 1);
             this.writer.Write(title.Center(availableSpace));
             this.DrawRightBorder();
          }
@@ -117,16 +118,13 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
          }
       }
 
-      public TableBuilder DrawRow(params string[] values)
+      public TableBuilder DrawRow(string?[] values)
       {
-         if (values is null)
-         {
-            throw new ArgumentNullException(nameof(values));
-         }
+         if (values is null) throw new ArgumentNullException(nameof(values));
 
          if (values.Length > this.ColumnDefinitions.Count)
          {
-            throw new ArgumentOutOfRangeException("values length is greater than column lengths.");
+            throw new ArgumentOutOfRangeException(nameof(values), "values length is greater than column lengths.");
          }
 
          this.DrawLeftBorder();
@@ -134,7 +132,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
          {
             if (i < values.Length)
             {
-               this.DrawColumn(i, values[i]);
+               this.DrawColumn(i, values[i] ?? string.Empty);
             }
             else
             {
@@ -157,16 +155,16 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       private void ComputeTableWidth()
       {
          this.Width =
-             (this.TableStyle.Left == null ? 0 : 1) // length of the left border
+             (this.TableStyle.Left == char.MinValue ? 0 : 1) // length of the left border
              + this.ColumnDefinitions.Sum(cd => cd.Width) //sum of the column widths
              + ((this.ColumnDefinitions.Count - 1) * this.TableStyle.Separator.Length) // sum of the space occupied by column separators;
-             + (this.TableStyle.Right == null ? 0 : 1)// length of the right border
+             + (this.TableStyle.Right == char.MinValue ? 0 : 1)// length of the right border
              ;
       }
 
       private void DrawTopBorder()
       {
-         if (this.TableStyle.Top != null)
+         if (this.TableStyle.Top != char.MinValue)
          {
             this.writer.DrawLine(this.TableStyle.Top, this.Width);
          }
@@ -174,9 +172,9 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
 
       private void DrawLeftBorder()
       {
-         if (this.TableStyle.Left != null)
+         if (this.TableStyle.Left != char.MinValue)
          {
-            this.writer.Write(this.TableStyle.Left.ToString());
+            this.writer.Write(this.TableStyle.Left.ToString(CultureInfo.InvariantCulture));
          }
       }
 
@@ -210,15 +208,15 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       {
          if (this.TableStyle.Separator.Length > 0)
          {
-            this.writer.Write(this.TableStyle.Separator.ToString());
+            this.writer.Write(this.TableStyle.Separator);
          }
       }
 
       private void DrawRightBorder()
       {
-         if (this.TableStyle.Right != null)
+         if (this.TableStyle.Right != char.MinValue)
          {
-            this.writer.WriteLine(this.TableStyle.Right.ToString());
+            this.writer.WriteLine(this.TableStyle.Right.ToString(CultureInfo.InvariantCulture));
          }
          else
          {
@@ -228,7 +226,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
 
       private void DrawBottomBorder()
       {
-         if (this.TableStyle.Bottom != null)
+         if (this.TableStyle.Bottom != char.MinValue)
          {
             this.writer.DrawLine(this.TableStyle.Bottom, this.Width);
          }

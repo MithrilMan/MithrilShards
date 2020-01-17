@@ -27,6 +27,8 @@ namespace MithrilShards.Chain.Bitcoin
                                                                     int minimumSupportedVersion,
                                                                     int currentVersion) where TChainDefinition : class, IChainDefinition
       {
+         if (forgeBuilder is null) throw new ArgumentNullException(nameof(forgeBuilder));
+
          forgeBuilder.AddShard<BitcoinShard, BitcoinSettings>(
             (hostBuildContext, services) =>
             {

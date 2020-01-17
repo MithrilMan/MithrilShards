@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 namespace MithrilShards.Core.Network.Server
 {
@@ -8,9 +9,9 @@ namespace MithrilShards.Core.Network.Server
    public class ClientPeerBinding
    {
       /// <summary>IP address and port number of the peer we wants to connect to.</summary>
-      public string EndPoint { get; set; }
+      public string? EndPoint { get; set; }
 
-      public bool TryGetIPEndPoint(out IPEndPoint endPoint)
+      public bool TryGetIPEndPoint([MaybeNullWhen(false)]out IPEndPoint endPoint)
       {
          return IPEndPoint.TryParse(this.EndPoint, out endPoint);
       }

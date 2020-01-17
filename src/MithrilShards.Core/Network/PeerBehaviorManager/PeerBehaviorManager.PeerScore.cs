@@ -1,6 +1,6 @@
 ﻿namespace MithrilShards.Core.Network.PeerBehaviorManager
 {
-   public partial class PeerBehaviorManager
+   public partial class DefaultPeerBehaviorManager
    {
       private class PeerScore
       {

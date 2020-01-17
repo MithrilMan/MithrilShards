@@ -22,12 +22,14 @@ namespace MithrilShards.Core.EventBus
 
       public void Publish(EventBase eventItem)
       {
+         if (eventItem is null) throw new ArgumentNullException(nameof(eventItem));
+
          if (!(eventItem is TEventBase))
          {
             throw new ArgumentException("Event Item is not the correct type.");
          }
 
-         this.action.Invoke(eventItem as TEventBase);
+         this.action.Invoke((TEventBase)eventItem);
       }
    }
 }

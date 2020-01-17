@@ -73,7 +73,7 @@ namespace MithrilShards.Core.Extensions
       {
          var tcs = new TaskCompletionSource<bool>();
 
-         using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs))
+         using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s!).TrySetResult(true), tcs))
          {
             if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
             {
@@ -81,7 +81,9 @@ namespace MithrilShards.Core.Extensions
             }
          }
 
+#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
          return await task.ConfigureAwait(false);
+#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
       }
 
       /// <summary>
@@ -96,7 +98,7 @@ namespace MithrilShards.Core.Extensions
       {
          var tcs = new TaskCompletionSource<bool>();
 
-         using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs))
+         using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s!).TrySetResult(true), tcs))
          {
             if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
             {
@@ -104,7 +106,9 @@ namespace MithrilShards.Core.Extensions
             }
          }
 
+#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
          await task.ConfigureAwait(false); // This is needed to re-throw eventual task exception.
+#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
       }
    }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Bedrock.Framework.Protocols;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,8 @@ namespace MithrilShards.Network.Bedrock
          this.chainDefinition = chainDefinition;
          this.networkMessageSerializerManager = networkMessageSerializerManager;
          this.contextData = contextData;
+
+         this.peerContext = null!; //initialized by SetPeerContext
       }
 
       internal void SetPeerContext(IPeerContext peerContext)
@@ -44,7 +47,7 @@ namespace MithrilShards.Network.Bedrock
          this.peerContext = peerContext;
       }
 
-      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, out INetworkMessage message)
+      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, [MaybeNullWhen(false)] out INetworkMessage message)
       {
          var reader = new SequenceReader<byte>(input);
 
@@ -86,7 +89,7 @@ namespace MithrilShards.Network.Bedrock
          // not enough data do read the full payload, so mark as examined the whole reader but let consumed just consume the expected payload length.
          consumed = reader.Position;
          examined = input.End;
-         message = default;
+         message = default!;
          return false;
       }
 

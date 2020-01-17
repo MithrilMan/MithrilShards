@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
@@ -22,7 +23,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       public async ValueTask<bool> ProcessMessageAsync(GetAddrMessage message, CancellationToken cancellation)
       {
          this.logger.LogDebug("Peer requiring addresses from us.");
-         NetworkAddress[] fetchedAddresses = null; //here fetch addresses from addressmananager
+         NetworkAddress[] fetchedAddresses = Array.Empty<NetworkAddress>(); //TODO fetch addresses from addressmananager
          await this.SendMessageAsync(new AddrMessage { Addresses = fetchedAddresses }).ConfigureAwait(false);
          return true;
       }

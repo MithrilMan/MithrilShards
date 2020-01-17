@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,10 +44,10 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
       public async Task StartAsync(CancellationToken cancellationToken)
       {
-         _ = this.StartFetchingLoop(cancellationToken);
+         _ = this.StartFetchingLoopAsync(cancellationToken);
       }
 
-      public async Task StartFetchingLoop(CancellationToken cancellationToken)
+      public async Task StartFetchingLoopAsync(CancellationToken cancellationToken)
       {
          try
          {
@@ -71,7 +72,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
                            feed.TableBuilder.Start(feedDefinition.Title);
 
-                           foreach (string[] values in feed.Source.GetStatisticFeedValues(feedDefinition.FeedId))
+                           foreach (object[] values in feed.Source.GetStatisticFeedValues(feedDefinition.FeedId))
                            {
                               for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
                               {
@@ -82,7 +83,13 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
                                     values[i] = field.ValueFormatter(values[i]);
                                  }
                               }
-                              feed.TableBuilder.DrawRow(values);
+
+                              string?[] formattedValues = feedDefinition.FieldsDefinition
+                                 .Select((field, index) => field.ValueFormatter == null ? values[index].ToString() : field.ValueFormatter(values[index]))
+                                 .ToArray();
+
+
+                              feed.TableBuilder.DrawRow(formattedValues);
                            }
 
                            feed.TableBuilder.End();

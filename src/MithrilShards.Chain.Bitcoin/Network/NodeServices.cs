@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Bitcoin.Network
    // BIP process.
    /// </summary>
    [Flags]
-   public enum NodeServices : ulong
+   public enum NodeServices : uint
    {
       /// <summary>
       /// NODE_NETWORK means that the node is capable of serving the block chain. It is currently

@@ -9,10 +9,10 @@ using MithrilShards.Core.Statistics;
 
 namespace MithrilShards.Core.Network.PeerBehaviorManager
 {
-   public partial class PeerBehaviorManager : IPeerBehaviorManager, IDisposable
+   public partial class DefaultPeerBehaviorManager : IPeerBehaviorManager, IDisposable
    {
       private const int INITIAL_SCORE = 0;
-      private readonly ILogger<PeerBehaviorManager> logger;
+      private readonly ILogger<DefaultPeerBehaviorManager> logger;
       private readonly IEventBus eventBus;
       private readonly Dictionary<string, PeerScore> connectedPeers = new Dictionary<string, PeerScore>();
 
@@ -21,7 +21,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       /// </summary>
       private readonly EventSubscriptionManager eventSubscriptionManager = new EventSubscriptionManager();
 
-      public PeerBehaviorManager(ILogger<PeerBehaviorManager> logger, IEventBus eventBus, IStatisticFeedsCollector statisticFeedsCollector)
+      public DefaultPeerBehaviorManager(ILogger<DefaultPeerBehaviorManager> logger, IEventBus eventBus, IStatisticFeedsCollector statisticFeedsCollector)
       {
          this.logger = logger;
          this.eventBus = eventBus;

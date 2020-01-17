@@ -11,7 +11,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class HexEncoder
    {
-      const string HexValues = "0123456789ABCDEF";
       private byte[] value;
 
 

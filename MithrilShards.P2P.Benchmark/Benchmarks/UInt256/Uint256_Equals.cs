@@ -12,7 +12,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
    {
       private NBitcoin.uint256 NBitcoinData, NBitcoinData2;
       private MithrilShards.Core.DataTypes.UInt256 MithrilShardsData, MithrilShardsData2;
-      private MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256 NeoData, NeoData2;
+      private MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256 NeoData, NeoData2;
 
       [GlobalSetup]
       public void Setup()
@@ -22,13 +22,13 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
 
          this.NBitcoinData = new uint256(value.ToArray());
          this.MithrilShardsData = new Core.DataTypes.UInt256(value);
-         this.NeoData = new P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256(value);
+         this.NeoData = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(value);
 
          new Random().NextBytes(value);
 
          this.NBitcoinData2 = new uint256(value.ToArray());
          this.MithrilShardsData2 = new Core.DataTypes.UInt256(value);
-         this.NeoData2 = new P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256(value);
+         this.NeoData2 = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(value);
       }
 
       [Benchmark(Baseline = true)]

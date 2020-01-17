@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using MithrilShards.Core.Extensions;
 
 namespace MithrilShards.Core.Network.Server
@@ -39,7 +40,7 @@ namespace MithrilShards.Core.Network.Server
          }
       }
 
-      public bool IsValidEndpoint(out IPEndPoint parsedEndpoint)
+      public bool IsValidEndpoint([NotNullWhen(true)] out IPEndPoint? parsedEndpoint)
       {
          parsedEndpoint = null;
          return this.EndPoint != null && IPEndPoint.TryParse(this.EndPoint, out parsedEndpoint);

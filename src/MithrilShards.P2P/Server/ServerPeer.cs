@@ -141,10 +141,10 @@ namespace MithrilShards.Network.Legacy.Server
                this.connectedPeers[connectingPeer.PeerContext.PeerId] = connectingPeer;
 
                //spawn a new task to manage the peer connection
-               Task.Run(async () =>
-               {
-                  await this.EstablishConnection(connectingPeer, cancellationToken).ConfigureAwait(false);
-               });
+               _ = Task.Run(async () =>
+                 {
+                    await this.EstablishConnectionAsync(connectingPeer, cancellationToken).ConfigureAwait(false);
+                 });
             }
          }
          catch (OperationCanceledException)
@@ -161,11 +161,11 @@ namespace MithrilShards.Network.Legacy.Server
          }
       }
 
-      private async Task EstablishConnection(IPeerConnection connectingPeer, CancellationToken cancellationToken)
+      private async Task EstablishConnectionAsync(IPeerConnection connectingPeer, CancellationToken cancellationToken)
       {
          try
          {
-            await connectingPeer.IncomingConnectionAccepted(cancellationToken).ConfigureAwait(false);
+            await connectingPeer.IncomingConnectionAcceptedAsync(cancellationToken).ConfigureAwait(false);
          }
          catch (Exception ex)
          {

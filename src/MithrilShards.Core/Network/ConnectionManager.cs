@@ -97,7 +97,7 @@ namespace MithrilShards.Core.Network
          );
 
          // start the task that tries to connect to other peers
-         _ = this.StartOutgoingConnectionAttempts(cancellationToken);
+         _ = this.StartOutgoingConnectionAttemptsAsync(cancellationToken);
 
          return Task.CompletedTask;
       }
@@ -110,15 +110,15 @@ namespace MithrilShards.Core.Network
       }
 
 
-      public List<string[]> GetStatisticFeedValues(string feedId)
+      public List<object[]> GetStatisticFeedValues(string feedId)
       {
          switch (feedId)
          {
             case FEED_CONNECTED_PEERS:
-               return new List<string[]> {
-                  new string[] {
-                     this.inboundPeers.Count.ToString(),
-                     this.outboundPeers.Count.ToString()
+               return new List<object[]> {
+                  new object[] {
+                     this.inboundPeers.Count,
+                     this.outboundPeers.Count
                   }
                };
             default:
@@ -137,13 +137,13 @@ namespace MithrilShards.Core.Network
                      "Inbound",
                      "Number of inbound peers currently connected to one of the Forge listener",
                      15,
-                     String.Empty
+                     string.Empty
                      ),
                   new FieldDefinition(
                      "Outbound",
                      "Number of outbound peers our forge is currently connected to",
                      15,
-                     String.Empty
+                     string.Empty
                      )
                },
                TimeSpan.FromSeconds(15)
@@ -151,7 +151,7 @@ namespace MithrilShards.Core.Network
          );
       }
 
-      protected virtual async Task StartOutgoingConnectionAttempts(CancellationToken cancellation)
+      protected virtual async Task StartOutgoingConnectionAttemptsAsync(CancellationToken cancellation)
       {
          using IDisposable logger = this.logger.BeginScope("Starting Connectors");
          if (this.connectors == null)
@@ -163,9 +163,9 @@ namespace MithrilShards.Core.Network
          {
             try
             {
-               connector.StartConnectionLoopAsync(this, cancellation);
+               _ = connector.StartConnectionLoopAsync(this, cancellation);
             }
-            catch (OperationCanceledException Exception)
+            catch (OperationCanceledException)
             {
                this.logger.LogDebug("Connector {Connector} canceled.", connector.GetType().Name);
             }

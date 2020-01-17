@@ -37,7 +37,7 @@ namespace MithrilShards.Network.Legacy
 
       public TimeSpan? TimeOffset { get; private set; }
 
-      public PeerDisconnectionReason DisconnectReason { get; private set; }
+      public PeerDisconnectionReason? DisconnectReason { get; private set; }
 
       public PeerConnection(ILogger<PeerConnection> logger,
                             IEventBus eventBus,
@@ -72,11 +72,11 @@ namespace MithrilShards.Network.Legacy
       }
 
       /// <inheritdoc/>
-      public async Task IncomingConnectionAccepted(CancellationToken cancellation = default(CancellationToken))
+      public async Task IncomingConnectionAcceptedAsync(CancellationToken cancellation = default(CancellationToken))
       {
          try
          {
-            await this.connectionStateMachine.AcceptIncomingConnection().ConfigureAwait(false);
+            await this.connectionStateMachine.AcceptIncomingConnectionAsync().ConfigureAwait(false);
          }
          catch (Exception ex)
          {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -95,21 +96,27 @@ namespace MithrilShards.Chain.Bitcoin
       /// <param name="onlyBestChain">if set to <c>true</c> check only headers that belong to the best chain.</param>
       /// <param name="height">The height if found, -1 otherwise.</param>
       /// <returns><c>true</c> if the result has been found, <see langword="false"/> otherwise.</returns>
-      public bool TryGetNode(UInt256 blockHash, bool onlyBestChain, out HeaderNode node)
+      public bool TryGetNode(UInt256 blockHash, bool onlyBestChain, [MaybeNullWhen(false)] out HeaderNode node)
       {
          using (new ReadLock(this.@lock))
          {
-            return onlyBestChain ? this.knownHeaders.TryGetValue(blockHash, out node) : this.TryGetNodeOnBestChainNoLock(blockHash, out node);
+            return onlyBestChain ? this.knownHeaders.TryGetValue(blockHash, out node!) : this.TryGetNodeOnBestChainNoLock(blockHash, out node!);
          }
       }
 
-      public bool TryGetHash(int height, out UInt256 blockHash)
+      /// <summary>
+      /// Tries the get hash of a block at the specified height.
+      /// </summary>
+      /// <param name="height">The height.</param>
+      /// <param name="blockHash">The block hash.</param>
+      /// <returns></returns>
+      public bool TryGetHash(int height, [MaybeNullWhen(false)]out UInt256 blockHash)
       {
          using (new ReadLock(this.@lock))
          {
             if (height > this.height || height < 0)
             {
-               blockHash = UInt256.Zero;
+               blockHash = null!;
                return false;
             }
 
@@ -140,26 +147,19 @@ namespace MithrilShards.Chain.Bitcoin
          }
       }
 
-      public BlockLocator GetLocator(int height)
+      public BlockLocator? GetLocator(int height)
       {
          using (new ReadLock(this.@lock))
          {
-            if (height > this.height || height < 0)
-               return null;
-            return this.GetLocatorNoLock(height);
+            return (height > this.height || height < 0) ? null : this.GetLocatorNoLock(height);
          }
       }
 
-      public BlockLocator GetLocator(UInt256 blockHash)
+      public BlockLocator? GetLocator(UInt256 blockHash)
       {
          using (new ReadLock(this.@lock))
          {
-            if (!this.knownHeaders.TryGetValue(blockHash, out HeaderNode node))
-            {
-               return null;
-            }
-
-            return this.GetLocatorNoLock(node.Height);
+            return (!this.knownHeaders.TryGetValue(blockHash, out HeaderNode? node)) ? null : this.GetLocatorNoLock(node.Height);
          }
       }
 
@@ -205,7 +205,7 @@ namespace MithrilShards.Chain.Bitcoin
             foreach (UInt256 hash in blockLocator.BlockLocatorHashes)
             {
                // ensure that any header we have in common belong to the main chain.
-               if (this.TryGetNodeOnBestChainNoLock(hash, out HeaderNode node))
+               if (this.TryGetNodeOnBestChainNoLock(hash, out HeaderNode? node))
                {
                   return node;
                }
@@ -251,23 +251,21 @@ namespace MithrilShards.Chain.Bitcoin
       /// <param name="height">The height.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      private bool TryGetNodeOnBestChainNoLock(UInt256 blockHash, out HeaderNode node)
+      private bool TryGetNodeOnBestChainNoLock(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         if (this.knownHeaders.TryGetValue(blockHash, out node) && this.height > node.Height && this.bestChain[node.Height] == blockHash)
+         if (this.knownHeaders.TryGetValue(blockHash, out node!) && this.height > node.Height && this.bestChain[node.Height] == blockHash)
          {
             return true;
          }
          else
          {
-            node = null;
+            node = null!;
             return false;
          }
       }
 
-      private ConnectHeaderResult TrySetTipNoLock(in UInt256 newTip, in UInt256 newTipPreviousHash)
+      private ConnectHeaderResult TrySetTipNoLock(in UInt256 newTip, in UInt256? newTipPreviousHash)
       {
-         if (newTip == null) throw new ArgumentNullException(nameof(newTip));
-
          if (newTip == this.Genesis)
          {
             if (newTipPreviousHash != null)
@@ -279,9 +277,16 @@ namespace MithrilShards.Chain.Bitcoin
 
             return ConnectHeaderResult.ResettedToGenesis;
          }
+         else
+         {
+            if (newTipPreviousHash == null)
+            {
+               throw new ArgumentNullException(nameof(newTipPreviousHash), "Previous hash null allowed only on genesis block.");
+            }
+         }
 
          // check if the tip we want to set is already into our chain
-         if (this.knownHeaders.TryGetValue(newTip, out HeaderNode tipNode))
+         if (this.knownHeaders.TryGetValue(newTip, out HeaderNode? tipNode))
          {
             if (this.bestChain[tipNode.Height - 1] != newTipPreviousHash)
             {
@@ -292,7 +297,7 @@ namespace MithrilShards.Chain.Bitcoin
          }
 
          // ensures tip previous header is present.
-         if (!this.knownHeaders.TryGetValue(newTipPreviousHash, out HeaderNode newTipPreviousHeader))
+         if (!this.knownHeaders.TryGetValue(newTipPreviousHash, out HeaderNode? newTipPreviousHeader))
          {
             //previous tip header not found, abort.
             this.logger.LogDebug("New Tip previous header not found, can't connect headers.");
@@ -307,7 +312,7 @@ namespace MithrilShards.Chain.Bitcoin
             while (rollingBackHeight > newTipPreviousHeader.Height)
             {
                this.knownHeaders.Remove(this.bestChain[rollingBackHeight]);
-               this.bestChain[rollingBackHeight] = null;
+               this.bestChain.RemoveAt(rollingBackHeight);
                rollingBackHeight--;
             }
             this.height = rollingBackHeight;

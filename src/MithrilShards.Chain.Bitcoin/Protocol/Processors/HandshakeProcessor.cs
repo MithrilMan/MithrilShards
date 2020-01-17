@@ -19,7 +19,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<VerackMessage>
    {
       const int HANDSHAKE_TIMEOUT_SECONDS = 5;
-      private readonly Status status;
+      private readonly HandshakeProcessorStatus status;
       private readonly IDateTimeProvider dateTimeProvider;
       private readonly IRandomNumberGenerator randomNumberGenerator;
       private readonly NodeImplementation nodeImplementation;
@@ -43,10 +43,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.initialBlockDownloadState = initialBlockDownloadState;
          this.userAgentBuilder = userAgentBuilder;
          this.selfConnectionTracker = selfConnectionTracker;
-         this.status = new Status(this);
+         this.status = new HandshakeProcessorStatus(this);
       }
 
-      protected override async ValueTask OnPeerAttached()
+      protected override async ValueTask OnPeerAttachedAsync()
       {
          //add the status to the PeerContext, this way other processors may query the status
          this.PeerContext.Data.Set(this.status);
@@ -61,7 +61,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             this.logger.LogDebug("Commencing handshake with local Version.");
             await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
-            this.status.VersionSentAsync();
+            this.status.VersionSent();
          }
       }
 
@@ -101,7 +101,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             this.logger.LogDebug("Responding to handshake with local Version.");
             await this.SendMessageAsync(this.CreateVersionMessage()).ConfigureAwait(false);
-            this.status.VersionSentAsync();
+            this.status.VersionSent();
          }
 
          await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
@@ -134,7 +134,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public async ValueTask<bool> ProcessMessageAsync(VerackMessage verack, CancellationToken cancellation)
       {
-         if (!this.status.VersionSent)
+         if (!this.status.IsVersionSent)
          {
             this.Misbehave(10, "Received verack without having sent a version.");
             return false;

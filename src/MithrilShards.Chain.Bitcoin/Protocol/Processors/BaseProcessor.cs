@@ -41,6 +41,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.eventBus = eventBus;
          this.peerBehaviorManager = peerBehaviorManager;
          this.isHandshakeAware = isHandshakeAware;
+
+         this.PeerContext = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
+         this.messageWriter = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
       }
 
       public async ValueTask AttachAsync(IPeerContext peerContext)
@@ -48,21 +51,23 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.PeerContext = peerContext as BitcoinPeerContext ?? throw new ArgumentException("Expected BitcoinPeerContext", nameof(peerContext));
          this.messageWriter = this.PeerContext.GetMessageWriter();
 
-         await this.OnPeerAttached().ConfigureAwait(false);
+         await this.OnPeerAttachedAsync().ConfigureAwait(false);
       }
 
       /// <summary>
       /// Called when a peer has been attached and <see cref="PeerContext"/> assigned.
       /// </summary>
       /// <returns></returns>
-      protected virtual ValueTask OnPeerAttached()
+      protected virtual ValueTask OnPeerAttachedAsync()
       {
          if (this.isHandshakeAware)
          {
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
             this.RegisterLifeTimeSubscription(this.eventBus.Subscribe<PeerHandshaked>(async (receivedEvent) =>
             {
                await this.OnPeerHandshakedAsync().ConfigureAwait(false);
             }));
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
          }
 
          return default;

@@ -2,12 +2,8 @@
 using System.Globalization;
 using System.IO;
 
-#pragma warning disable IDE0044 // Add readonly modifier
-#pragma warning disable IDE0009 // Member access should be qualified.
-
 namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 {
-   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0011:Add braces", Justification = "<Pending>")]
    /// <summary>
    /// This class stores a 160 bit unsigned int, represented as a 20-byte little-endian byte array
    /// </summary>

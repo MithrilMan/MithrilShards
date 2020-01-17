@@ -30,7 +30,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public new Core.DataTypes.UInt256 MithrilShards_DoubleSha256()
+      public Core.DataTypes.UInt256 MithrilShards_DoubleSha256()
       {
          return new Core.DataTypes.UInt256(HashGenerator.DoubleSha256(this.data));
       }

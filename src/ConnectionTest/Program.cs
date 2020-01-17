@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using MithrilShards.Chain.Bitcoin;
@@ -18,11 +19,11 @@ namespace ConnectionTest
       static async Task Main(string[] args)
       {
 
-         await StartBedrockForgeServer(args).ConfigureAwait(false);
+         await StartBedrockForgeServerAsync(args).ConfigureAwait(false);
          //await StartP2PForgeServer(args).ConfigureAwait(false);
       }
 
-      private static async Task StartBedrockForgeServer(string[] args)
+      private static async Task StartBedrockForgeServerAsync(string[] args)
       {
          await BuildForge(args)
             .UseSerilog("log-settings-with-seq.json")
@@ -33,7 +34,7 @@ namespace ConnectionTest
             .ConfigureAwait(false);
       }
 
-      private static async Task StartP2PForgeServer(string[] args)
+      private static async Task StartP2PForgeServerAsync(string[] args)
       {
          await BuildForge(args)
             .UseSerilog("log-settings.json")
@@ -47,8 +48,8 @@ namespace ConnectionTest
       {
          string network = args
             .DefaultIfEmpty("--network=bitcoin-main")
-            .Where(arg => arg.StartsWith("--network"))
-            .Select(arg => arg.ToLower().Replace("--network=", ""))
+            .Where(arg => arg.StartsWith("--network", ignoreCase: true, CultureInfo.InvariantCulture))
+            .Select(arg => arg.Replace("--network=", string.Empty, ignoreCase: true, CultureInfo.InvariantCulture))
             .FirstOrDefault();
 
          Console.WriteLine($"Building {network} forge...");
@@ -57,11 +58,11 @@ namespace ConnectionTest
          {
             case "bitcoin-main":
                return new ForgeBuilder()
-                  .UseForge<Forge>(args)
+                  .UseForge<DefaultForge>(args)
                   .UseBitcoinChain<BitcoinMainDefinition>(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion);
             case "bitcoin-regtest":
                return new ForgeBuilder()
-                  .UseForge<Forge>(args, "forge-settings-bitcoin-regtest.json")
+                  .UseForge<DefaultForge>(args, "forge-settings-bitcoin-regtest.json")
                   .UseBitcoinChain<BitcoinRegtestDefinition>(minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion);
             default:
                Console.WriteLine($"UNKNOWN NETWORK specified in -network argument: {network}. Fallback to Bitcoin-Main");

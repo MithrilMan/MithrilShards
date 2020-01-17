@@ -20,9 +20,9 @@ namespace MithrilShards.Core.EventBus
       }
 
       /// <inheritdoc />
-      public void Handle(EventBase @event, Exception exception, ISubscription subscription)
+      public void Handle(EventBase theEvent, Exception exception, ISubscription subscription)
       {
-         this.logger.LogError(exception, "Error handling the event {0}", @event.GetType().Name);
+         this.logger.LogError(exception, "Error handling the event {0}", theEvent.GetType().Name);
          throw exception;
       }
    }

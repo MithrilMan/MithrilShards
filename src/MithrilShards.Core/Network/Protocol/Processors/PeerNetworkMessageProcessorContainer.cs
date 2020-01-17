@@ -28,8 +28,6 @@ namespace MithrilShards.Core.Network.Protocol.Processors
          }
       }
 
-      private delegate ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation);
-
       /// <summary>
       /// The mapping between MessageType and which processor instance is able to handle the request.
       /// </summary>
@@ -77,7 +75,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       /// </summary>
       /// <param name="message">The message.</param>
       /// <returns><see langword="true"/> if message has been processed, <see langword="false"/> otherwise.</returns>
-      public async ValueTask<bool> ProcessMessage(INetworkMessage message, CancellationToken cancellation)
+      public async ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation)
       {
          if (!this.mapping.TryGetValue(message.GetType(), out List<ProcessorHandler> handlers)) return false;
 

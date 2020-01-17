@@ -25,9 +25,9 @@ namespace MithrilShards.Chain.Bitcoin
       /// <value>
       /// The previous header identifier.
       /// </value>
-      public UInt256 PreviousHash { get; }
+      public UInt256? PreviousHash { get; }
 
-      public HeaderNode(int height, UInt256 hash, UInt256 previousHash)
+      public HeaderNode(int height, UInt256 hash, UInt256? previousHash)
       {
          this.Height = height < 0 ? throw new ArgumentOutOfRangeException(nameof(height)) : height;
          this.Hash = hash ?? throw new ArgumentNullException(nameof(hash));

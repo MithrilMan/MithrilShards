@@ -20,7 +20,7 @@ namespace MithrilShards.Network.Legacy.Server
          this.serverPeers = new List<IServerPeer>();
       }
 
-      public Task AttemptConnection(EndPoint remoteEndPoint, CancellationToken cancellation)
+      public Task AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
       {
          this.logger.LogWarning("AttemptConnection not implemented.");
          return Task.CompletedTask;

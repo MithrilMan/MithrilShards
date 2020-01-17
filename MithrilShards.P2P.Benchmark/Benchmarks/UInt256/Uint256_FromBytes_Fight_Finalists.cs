@@ -20,7 +20,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       [Benchmark]
       public void UInt256_Neo_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.UInt256(this.data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(this.data);
       }
 
       [Benchmark]

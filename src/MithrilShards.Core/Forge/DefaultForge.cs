@@ -9,17 +9,19 @@ using MithrilShards.Core.MithrilShards;
 
 namespace MithrilShards.Core.Forge
 {
-   public class Forge : BackgroundService, IForge
+   public class DefaultForge : BackgroundService, IForge
    {
       private readonly IForgeDataFolderLock forgeDataFolderLock;
       readonly IForgeConnectivity forgeServer;
       readonly IEnumerable<IMithrilShard> mithrilShards;
-      readonly DefaultConfigurationWriter defaultConfigurationManager;
+      readonly DefaultConfigurationWriter? defaultConfigurationManager;
       private readonly ILogger logger;
 
-      public IServiceProvider Services => throw new NotImplementedException();
-
-      public Forge(ILogger<Forge> logger, IForgeDataFolderLock forgeDataFolderLock, IForgeConnectivity forgeServer, IEnumerable<IMithrilShard> mithrilShards, DefaultConfigurationWriter defaultConfigurationManager = null)
+      public DefaultForge(ILogger<DefaultForge> logger,
+                   IForgeDataFolderLock forgeDataFolderLock,
+                   IForgeConnectivity forgeServer,
+                   IEnumerable<IMithrilShard> mithrilShards,
+                   DefaultConfigurationWriter? defaultConfigurationManager = null)
       {
          this.forgeDataFolderLock = forgeDataFolderLock;
          this.forgeServer = forgeServer;
@@ -58,13 +60,10 @@ namespace MithrilShards.Core.Forge
 
       protected override async Task ExecuteAsync(CancellationToken stoppingToken)
       {
-         using (this.logger.BeginScope("Locking Data Folder"))
+         if (!this.forgeDataFolderLock.TryLockDataFolder())
          {
-            if (!this.forgeDataFolderLock.TryLockNodeFolder())
-            {
-               this.logger.LogCritical("Node folder is being used by another instance of the application!");
-               throw new Exception("Node folder is being used!");
-            }
+            this.logger.LogCritical("Node folder is being used by another instance of the application!");
+            throw new Exception("Node folder is being used!");
          }
 
          await this.InitializeShardsAsync(stoppingToken).ConfigureAwait(false);
@@ -73,10 +72,7 @@ namespace MithrilShards.Core.Forge
 
          await this.forgeServer.StartAsync(stoppingToken).ConfigureAwait(false);
 
-         using (this.logger.BeginScope("Unlocking Data Folder"))
-         {
-            this.forgeDataFolderLock.UnlockNodeFolder();
-         }
+         this.forgeDataFolderLock.UnlockDataFolder();
       }
 
       public override async Task StopAsync(CancellationToken cancellationToken)

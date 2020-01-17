@@ -11,14 +11,14 @@ namespace MithrilShards.Core.Forge
       private const string LOCK_FILE_NAME = "lockfile";
       private readonly string lockFileName;
 
-      private FileStream fileStream;
+      private FileStream? fileStream;
 
       public ForgeDataFolderLock(IDataFolders dataFolders)
       {
          this.lockFileName = Path.Combine(dataFolders.RootPath, LOCK_FILE_NAME);
       }
 
-      public bool TryLockNodeFolder()
+      public bool TryLockDataFolder()
       {
          try
          {
@@ -31,10 +31,14 @@ namespace MithrilShards.Core.Forge
          }
       }
 
-      public void UnlockNodeFolder()
+      public void UnlockDataFolder()
       {
-         this.fileStream.Close();
-         File.Delete(this.lockFileName);
+         this.fileStream?.Close();
+         try
+         {
+            File.Delete(this.lockFileName);
+         }
+         finally { }
       }
    }
 }

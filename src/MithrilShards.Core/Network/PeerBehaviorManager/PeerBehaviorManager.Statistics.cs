@@ -5,23 +5,23 @@ using MithrilShards.Core.Statistics;
 
 namespace MithrilShards.Core.Network.PeerBehaviorManager
 {
-   public partial class PeerBehaviorManager : IStatisticFeedsProvider
+   public partial class DefaultPeerBehaviorManager : IStatisticFeedsProvider
    {
       private const string FEED_PEERS_SCORE = "ConnectedPeers";
       private const int STATISTIC_REFRESH_RATE = 15;
       private readonly IStatisticFeedsCollector statisticFeedsCollector;
 
-      public List<string[]> GetStatisticFeedValues(string feedId)
+      public List<object[]> GetStatisticFeedValues(string feedId)
       {
          return feedId switch
          {
             FEED_PEERS_SCORE => (
                from peerScore in this.connectedPeers.Values.ToList()
                orderby peerScore.Score descending
-               select new string[] {
+               select new object[] {
                   peerScore.PeerContext.PeerId,
-                  peerScore.PeerContext.RemoteEndPoint.ToString(),
-                  peerScore.Score.ToString(),
+                  peerScore.PeerContext.RemoteEndPoint,
+                  peerScore.Score,
                }).ToList(),
             _ => null
          };

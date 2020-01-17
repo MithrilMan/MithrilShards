@@ -138,18 +138,19 @@ namespace MithrilShards.Core.DataTypes
       /// <returns>
       /// A <see cref="System.String" /> that represents this instance.
       /// </returns>
-      public static bool TryParse(string hexString, out UInt256 result)
+      public static bool TryParse(string hexString, out UInt256? result)
       {
          try
          {
             result = new UInt256(hexString);
             return true;
          }
-         catch
+         catch (Exception)
          {
             result = null;
-            return false;
          }
+
+         return false;
       }
 
       /// <summary>
@@ -174,12 +175,13 @@ namespace MithrilShards.Core.DataTypes
          return (int)this.part1;
       }
 
-      public override bool Equals(object obj)
-      {
-         return ReferenceEquals(this, obj) ? true : this.Equals(obj as UInt256);
-      }
+      public override bool Equals(object? obj) => ReferenceEquals(this, obj) ? true : this.Equals(obj as UInt256);
 
-      public bool Equals(UInt256 other)
+      public static bool operator !=(UInt256? a, UInt256? b) => !(a == b);
+
+      public static bool operator ==(UInt256? a, UInt256? b) => a == null ? false : a.Equals(b);
+
+      public bool Equals(UInt256? other)
       {
          if (other is null) return false;
 
@@ -187,16 +189,6 @@ namespace MithrilShards.Core.DataTypes
              && this.part2 == other.part2
              && this.part3 == other.part3
              && this.part4 == other.part4;
-      }
-
-      public static bool operator !=(UInt256 a, UInt256 b)
-      {
-         return !(a == b);
-      }
-
-      public static bool operator ==(UInt256 a, UInt256 b)
-      {
-         return a?.Equals(b) ?? false;
       }
    }
 }

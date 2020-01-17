@@ -8,25 +8,25 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
    public partial class HandshakeProcessor
    {
-      public class Status
+      internal class HandshakeProcessorStatus
       {
          private readonly HandshakeProcessor processor;
-         internal bool VersionSent { get; private set; } = false;
+         internal bool IsVersionSent { get; private set; } = false;
 
-         internal VersionMessage PeerVersion { get; private set; } = null;
+         internal VersionMessage? PeerVersion { get; private set; } = null;
 
          public bool IsHandShaked { get; private set; } = false;
 
          internal bool VersionAckReceived { get; private set; } = false;
 
-         public Status(HandshakeProcessor processor)
+         public HandshakeProcessorStatus(HandshakeProcessor processor)
          {
             this.processor = processor;
          }
 
-         internal void VersionSentAsync()
+         internal void VersionSent()
          {
-            this.VersionSent = true;
+            this.IsVersionSent = true;
          }
 
          internal async ValueTask VersionReceivedAsync(VersionMessage version)

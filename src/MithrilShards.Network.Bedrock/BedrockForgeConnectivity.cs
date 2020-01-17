@@ -150,7 +150,7 @@ namespace MithrilShards.Network.Bedrock
                                     .Build();
       }
 
-      public async Task AttemptConnection(EndPoint remoteEndPoint, CancellationToken cancellation)
+      public async Task AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
       {
          using IDisposable logScope = this.logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
          this.eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.AsIPEndPoint()));

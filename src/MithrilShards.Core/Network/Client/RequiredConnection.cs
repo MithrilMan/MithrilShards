@@ -83,7 +83,7 @@ namespace MithrilShards.Core.Network.Client
             {
                /// note that AttemptConnection is not blocking because it returns when the peer fails to connect or when one
                /// of the parties disconnect
-               this.forgeConnectivity.AttemptConnection(endPoint, cancellation).ConfigureAwait(false);
+               this.forgeConnectivity.AttemptConnectionAsync(endPoint, cancellation).ConfigureAwait(false);
 
                /// apply a delay between attempts to prevent too many connection attempt in a row
                await Task.Delay(INNER_DELAY).ConfigureAwait(false);
