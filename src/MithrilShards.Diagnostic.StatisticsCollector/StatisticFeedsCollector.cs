@@ -43,6 +43,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
       public async Task StartAsync(CancellationToken cancellationToken)
       {
+         _ = this.StartFetchingLoop(cancellationToken);
+      }
+
+      public async Task StartFetchingLoop(CancellationToken cancellationToken)
+      {
          try
          {
             while (!cancellationToken.IsCancellationRequested)

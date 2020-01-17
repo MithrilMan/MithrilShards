@@ -28,7 +28,7 @@ namespace ConnectionTest
             .UseSerilog("log-settings-with-seq.json")
             .UseBedrockForgeServer()
             .UseStatisticsCollector()
-         //   .UseDevController()
+            .UseDevController()
             .RunConsoleAsync()
             .ConfigureAwait(false);
       }

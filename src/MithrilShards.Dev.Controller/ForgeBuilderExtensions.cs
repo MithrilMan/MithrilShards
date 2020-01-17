@@ -1,13 +1,14 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MithrilShards.Core.Forge;
-using MithrilShards.Core.Statistics;
 
 namespace MithrilShards.Dev.Controller
 {
@@ -47,33 +48,18 @@ namespace MithrilShards.Dev.Controller
                throw new ArgumentException($"Wrong configuration parameter for {nameof(settings.EndPoint)}");
             }
 
-            builder.ConfigureWebHost(webBuilder =>
+            builder
+            .UseContentRoot(Directory.GetCurrentDirectory())
+            .ConfigureWebHost(webBuilder =>
             {
                webBuilder
-                  .CaptureStartupErrors(true)
-                  .UseKestrel((context, serverOptions) =>
+                  .UseKestrel(serverOptions =>
                   {
                      serverOptions.Listen(iPEndPoint);
-                  // Set properties and call methods on options
-               })
-                  .Configure(app => app
-                     //.UseMvc()
-                     .UseSwagger()
-                     .UseSwaggerUI(setup => setup.SwaggerEndpoint("/swagger/v1/swagger.json", "Dev Controller"))
-                     .UseRouting()
-                     .UseEndpoints(endpoints =>
-                     {
-                        endpoints.MapControllers();
-                     })
-                     )
-                     .ConfigureServices(services =>
-                     {
-                        services.AddControllers();
-                        services.AddSwaggerGen(setup => setup.SwaggerDoc("v1", new OpenApiInfo { Title = "Dev Controller", Version = "v1" }));
-                     });
+                  })
+                  .UseStartup<Startup>();
             });
          });
-
 
          return forgeBuilder;
       }
