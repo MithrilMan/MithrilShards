@@ -32,14 +32,12 @@ namespace MithrilShards.Core.Network.Client
                                 IConnectivityPeerStats serverPeerStats,
                                 IForgeConnectivity forgeConnectivity) : base(logger, eventBus, options, serverPeerStats)
       {
-
          this.connectionsToAttempt.AddRange(
-            this.settings.Connections.Select(connection =>
-            {
-               connection.TryGetIPEndPoint(out IPEndPoint endPoint);
-               return endPoint;
-            })
-            .Where(endpoint => endpoint != null));
+            from connection in this.settings.Connections
+            let endPoint = connection.TryGetIPEndPoint(out IPEndPoint? endPoint) ? endPoint : null
+            where endPoint != null
+            select endPoint
+            );
          this.forgeConnectivity = forgeConnectivity;
       }
 
@@ -75,19 +73,19 @@ namespace MithrilShards.Core.Network.Client
       }
 
 
-      protected override async IAsyncEnumerable<Task> AttemptConnectionAsync(IConnectionManager connectionManager, [EnumeratorCancellation] CancellationToken cancellation)
+      protected override async ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation)
       {
          foreach (IPEndPoint endPoint in this.connectionsToAttempt)
          {
+            if (cancellation.IsCancellationRequested) break;
+
             if (connectionManager.CanConnectTo(endPoint))
             {
-               /// note that AttemptConnection is not blocking because it returns when the peer fails to connect or when one
-               /// of the parties disconnect
-               this.forgeConnectivity.AttemptConnectionAsync(endPoint, cancellation).ConfigureAwait(false);
+               // note that AttemptConnection is not blocking because it returns when the peer fails to connect or when one of the parties disconnect
+               _ = this.forgeConnectivity.AttemptConnectionAsync(endPoint, cancellation).ConfigureAwait(false);
 
-               /// apply a delay between attempts to prevent too many connection attempt in a row
+               // apply a delay between attempts to prevent too many connection attempt in a row
                await Task.Delay(INNER_DELAY).ConfigureAwait(false);
-               yield return default;
             }
          }
       }

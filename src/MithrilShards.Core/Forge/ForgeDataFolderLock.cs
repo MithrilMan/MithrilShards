@@ -38,7 +38,7 @@ namespace MithrilShards.Core.Forge
          {
             File.Delete(this.lockFileName);
          }
-         finally { }
+         catch { }
       }
    }
 }

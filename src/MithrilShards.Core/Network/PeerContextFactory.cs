@@ -22,7 +22,7 @@ namespace MithrilShards.Core.Network
          this.logger = logger;
          this.eventBus = eventBus;
          this.loggerFactory = loggerFactory;
-         this.serverSettings = serverSettings?.Value;
+         this.serverSettings = serverSettings.Value;
       }
 
       public virtual IPeerContext Create(PeerConnectionDirection direction,
@@ -41,7 +41,7 @@ namespace MithrilShards.Core.Network
             this.GetPublicEndPoint(localEndPoint),
             remoteEndPoint,
             messageWriter
-            );
+            )!;
 
          return peerContext;
       }

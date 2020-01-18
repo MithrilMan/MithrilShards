@@ -15,12 +15,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// <summary>
       /// The hash value of the previous block this particular block references.
       /// </summary>
-      public UInt256 PreviousBlockHash { get; set; }
+      public UInt256? PreviousBlockHash { get; set; }
 
       /// <summary>
       /// The reference to a Merkle tree collection which is a hash of all transactions related to this block.
       /// </summary>
-      public UInt256 MerkleRoot { get; set; }
+      public UInt256? MerkleRoot { get; set; }
 
       /// <summary>
       /// A timestamp recording when this block was created (Will overflow in 2106).

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using MithrilShards.Chain.Bitcoin;
+using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Core.Forge;
 using MithrilShards.Dev.Controller;

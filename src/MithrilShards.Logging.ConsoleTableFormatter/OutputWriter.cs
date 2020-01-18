@@ -14,7 +14,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
 
       private readonly Writer writer;
 
-      public OutputWriter(Writer writer = null)
+      public OutputWriter(Writer? writer = null)
       {
          this.writer = writer ?? Console.Write;
       }
@@ -26,9 +26,9 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
          return this;
       }
 
-      public OutputWriter WriteLine(string text = null)
+      public OutputWriter WriteLine(string? text = null)
       {
-         this.writer(text + '\n');
+         this.writer((text ?? string.Empty) + '\n');
 
          return this;
       }

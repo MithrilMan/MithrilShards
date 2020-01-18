@@ -23,8 +23,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
       public override void Serialize(GetHeadersMessage message, int protocolVersion, IBufferWriter<byte> output)
       {
          output.WriteUInt(message.Version);
-         output.WriteWithSerializer(message.BlockLocator, protocolVersion, this.blockLocatorSerializer);
-         output.WriteWithSerializer(message.HashStop, protocolVersion, this.uint256Serializer);
+         output.WriteWithSerializer(message.BlockLocator!, protocolVersion, this.blockLocatorSerializer);
+         output.WriteWithSerializer(message.HashStop!, protocolVersion, this.uint256Serializer);
       }
 
       public override GetHeadersMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)

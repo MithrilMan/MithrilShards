@@ -11,7 +11,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       private const int STATISTIC_REFRESH_RATE = 15;
       private readonly IStatisticFeedsCollector statisticFeedsCollector;
 
-      public List<object[]> GetStatisticFeedValues(string feedId)
+      public List<object[]>? GetStatisticFeedValues(string feedId)
       {
          return feedId switch
          {

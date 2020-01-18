@@ -1,16 +1,15 @@
 ﻿using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 {
-   [NetworkMessage("addr")]
-   public class AddrMessage : NetworkMessage
+   [NetworkMessage(COMMAND)]
+   public sealed class AddrMessage : INetworkMessage
    {
+      private const string COMMAND = "addr";
+      string INetworkMessage.Command => COMMAND;
 
-      public NetworkAddress[] Addresses { get; set; }
-
-      public AddrMessage() : base("addr")
-      {
-      }
+      public NetworkAddress[]? Addresses { get; set; }
    }
 }

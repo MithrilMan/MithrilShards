@@ -42,9 +42,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          }
       }
 
-      public async Task StartAsync(CancellationToken cancellationToken)
+      public Task StartAsync(CancellationToken cancellationToken)
       {
          _ = this.StartFetchingLoopAsync(cancellationToken);
+
+         return Task.CompletedTask;
       }
 
       public async Task StartFetchingLoopAsync(CancellationToken cancellationToken)
@@ -72,24 +74,28 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
                            feed.TableBuilder.Start(feedDefinition.Title);
 
-                           foreach (object[] values in feed.Source.GetStatisticFeedValues(feedDefinition.FeedId))
+                           List<object[]>? statisticValues = feed.Source.GetStatisticFeedValues(feedDefinition.FeedId);
+                           if (statisticValues != null)
                            {
-                              for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
+                              foreach (object[] values in statisticValues)
                               {
-                                 FieldDefinition field = feedDefinition.FieldsDefinition[i];
-                                 // apply formatting if needed
-                                 if (field.ValueFormatter != null)
+                                 for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
                                  {
-                                    values[i] = field.ValueFormatter(values[i]);
+                                    FieldDefinition field = feedDefinition.FieldsDefinition[i];
+                                    // apply formatting if needed
+                                    if (field.ValueFormatter != null)
+                                    {
+                                       values[i] = field.ValueFormatter(values[i]);
+                                    }
                                  }
+
+                                 string?[] formattedValues = feedDefinition.FieldsDefinition
+                                    .Select((field, index) => field.ValueFormatter == null ? values[index].ToString() : field.ValueFormatter(values[index]))
+                                    .ToArray();
+
+
+                                 feed.TableBuilder.DrawRow(formattedValues);
                               }
-
-                              string?[] formattedValues = feedDefinition.FieldsDefinition
-                                 .Select((field, index) => field.ValueFormatter == null ? values[index].ToString() : field.ValueFormatter(values[index]))
-                                 .ToArray();
-
-
-                              feed.TableBuilder.DrawRow(formattedValues);
                            }
 
                            feed.TableBuilder.End();
@@ -112,7 +118,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
                await Task.Delay(TimeSpan.FromSeconds(5)).WithCancellationAsync(cancellationToken).ConfigureAwait(false);
             }
          }
-         catch (OperationCanceledException ex)
+         catch (OperationCanceledException)
          {
             //Task cancelled, legit, ignoring exception.
          }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -96,11 +97,14 @@ namespace MithrilShards.Core.Forge
          await base.StopAsync(cancellationToken).ConfigureAwait(false);
       }
 
-      public List<(string name, string version)> GetMeltedShardNames()
+      public List<(string name, string version)> GetMeltedShardsNames()
       {
-         if (this.mithrilShards?.Count() == 0) return null;
+         if (this.mithrilShards?.Count() == 0) return new List<(string name, string version)>();
 
-         return this.mithrilShards.Select(shard => (name: shard.GetType().Name, version: shard.GetType().Assembly.GetName().Version.ToString(3))).ToList();
+         return this.mithrilShards.Select(shard => (
+            name: shard.GetType().Name,
+            version: shard.GetType().Assembly.GetName().Version?.ToString(3) ?? "-"
+            )).ToList();
       }
    }
 }

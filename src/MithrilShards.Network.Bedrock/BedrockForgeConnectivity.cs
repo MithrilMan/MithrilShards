@@ -15,7 +15,6 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
-using BF = Bedrock.Framework;
 
 namespace MithrilShards.Network.Bedrock
 {
@@ -27,8 +26,8 @@ namespace MithrilShards.Network.Bedrock
       private readonly IServiceProvider serviceProvider;
       readonly MithrilForgeClientConnectionHandler clientConnectionHandler;
       private readonly ForgeConnectivitySettings settings;
-      private readonly List<BF.Server> serverPeers;
-      private Client client;
+      private readonly List<Server> serverPeers;
+      private Client client = null!;//initialized by InitializeAsync
 
       public BedrockForgeConnectivity(ILogger<BedrockForgeConnectivity> logger,
                                 IEventBus eventBus,
@@ -43,29 +42,34 @@ namespace MithrilShards.Network.Bedrock
          this.serviceProvider = serviceProvider;
          this.clientConnectionHandler = clientConnectionHandler;
          this.settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
-         this.serverPeers = new List<BF.Server>();
+         this.serverPeers = new List<Server>();
       }
 
-      public async Task InitializeAsync(CancellationToken cancellationToken)
+      public ValueTask InitializeAsync(CancellationToken cancellationToken)
       {
          this.CreateServerInstances();
          this.CreateClientBuilder();
+         return default;
       }
 
-      public async Task StartAsync(CancellationToken cancellationToken)
+      public ValueTask StartAsync(CancellationToken cancellationToken)
       {
-         foreach (BF.Server serverPeer in this.serverPeers)
+         foreach (Server serverPeer in this.serverPeers)
          {
-            serverPeer.StartAsync(cancellationToken);
+            _ = serverPeer.StartAsync(cancellationToken);
          }
+
+         return default;
       }
 
-      public async Task StopAsync(CancellationToken cancellationToken)
+      public ValueTask StopAsync(CancellationToken cancellationToken)
       {
-         foreach (BF.Server serverPeer in this.serverPeers)
+         foreach (Server serverPeer in this.serverPeers)
          {
-            serverPeer.StopAsync();
+            _ = serverPeer.StopAsync();
          }
+
+         return default;
       }
 
       private void CreateServerInstances()
@@ -98,7 +102,7 @@ namespace MithrilShards.Network.Bedrock
 
                      foreach (ServerPeerBinding binding in this.settings.Listeners)
                      {
-                        if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint))
+                        if (!binding.IsValidEndpoint(out IPEndPoint? parsedEndpoint))
                         {
                            throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
                         }
@@ -150,7 +154,7 @@ namespace MithrilShards.Network.Bedrock
                                     .Build();
       }
 
-      public async Task AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
+      public async ValueTask AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
       {
          using IDisposable logScope = this.logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
          this.eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.AsIPEndPoint()));
@@ -161,7 +165,7 @@ namespace MithrilShards.Network.Bedrock
             this.logger.LogDebug("Connected to {RemoteEndPoint}", connection.RemoteEndPoint);
             await this.clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
          }
-         catch (OperationCanceledException ex)
+         catch (OperationCanceledException)
          {
             this.logger.LogDebug("Operation cancelled.");
          }

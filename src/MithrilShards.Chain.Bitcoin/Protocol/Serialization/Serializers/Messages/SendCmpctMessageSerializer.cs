@@ -17,13 +17,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public override SendCmpctMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
       {
-         var message = new SendCmpctMessage
-         {
-            HighBandwidthMode = reader.ReadBool(),
-            Version = reader.ReadULong()
-         };
-
-         return message;
+         return new SendCmpctMessage { HighBandwidthMode = reader.ReadBool(), Version = reader.ReadULong() };
       }
    }
 }

@@ -110,7 +110,7 @@ namespace MithrilShards.Core.Network
       }
 
 
-      public List<object[]> GetStatisticFeedValues(string feedId)
+      public List<object[]>? GetStatisticFeedValues(string feedId)
       {
          switch (feedId)
          {
@@ -151,13 +151,13 @@ namespace MithrilShards.Core.Network
          );
       }
 
-      protected virtual async Task StartOutgoingConnectionAttemptsAsync(CancellationToken cancellation)
+      protected virtual Task StartOutgoingConnectionAttemptsAsync(CancellationToken cancellation)
       {
          using IDisposable logger = this.logger.BeginScope("Starting Connectors");
          if (this.connectors == null)
          {
             this.logger.LogWarning("No Connectors found, the Forge will not try to connect to any peer.");
-            return;
+            return Task.CompletedTask;
          }
          foreach (IConnector connector in this.connectors)
          {
@@ -174,6 +174,8 @@ namespace MithrilShards.Core.Network
                this.logger.LogError(ex, "Connector {Connector} failure, it has been stopped, node may have connection problems.", connector.GetType().Name);
             }
          }
+
+         return Task.CompletedTask;
       }
 
       public bool CanConnectTo(IPEndPoint endPoint)

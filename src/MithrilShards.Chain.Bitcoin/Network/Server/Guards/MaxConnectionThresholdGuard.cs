@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
          this.peerStats = serverPeerStats;
       }
 
-      internal override string TryGetDenyReason(IPeerContext peerContext)
+      internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
          if (this.peerStats.ConnectedInboundPeersCount >= this.settings.MaxInboundConnections)
          {

@@ -44,18 +44,18 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             await this.OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
          }
 
-         private async ValueTask OnHandshakeStatusUpdatedAsync()
+         private ValueTask OnHandshakeStatusUpdatedAsync()
          {
             if (!this.VersionAckReceived)
             {
                this.processor.logger.LogDebug("Waiting verack...");
-               return;
+               return default;
             }
 
             if (this.PeerVersion == null)
             {
                this.processor.logger.LogDebug("Waiting version message...");
-               return;
+               return default;
             }
 
             // if we reach this point, peer completed the handshake, yay!
@@ -63,6 +63,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             this.processor.logger.LogDebug("Handshake successful");
 
             this.processor.eventBus.Publish(new PeerHandshaked(this.processor.PeerContext));
+
+            return default;
          }
       }
    }

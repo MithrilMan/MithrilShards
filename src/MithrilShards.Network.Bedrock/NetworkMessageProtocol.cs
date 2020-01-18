@@ -69,8 +69,7 @@ namespace MithrilShards.Network.Bedrock
                examined = consumed = payload.End;
                this.contextData.ResetFlags();
 
-               string commandName = this.contextData.GetCommandName();
-
+               string commandName = this.contextData.CommandName!;
                if (this.networkMessageSerializerManager
                   .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message))
                {
@@ -184,7 +183,7 @@ namespace MithrilShards.Network.Bedrock
          if (reader.Remaining >= ConnectionContextData.SIZE_COMMAND)
          {
             ReadOnlySequence<byte> commandReader = reader.Sequence.Slice(reader.Position, ConnectionContextData.SIZE_COMMAND);
-            this.contextData.Command = commandReader.ToArray();
+            this.contextData.SetCommand(ref commandReader);
             reader.Advance(ConnectionContextData.SIZE_COMMAND);
             return true;
          }

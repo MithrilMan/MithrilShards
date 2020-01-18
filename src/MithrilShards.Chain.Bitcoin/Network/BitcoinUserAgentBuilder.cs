@@ -11,9 +11,9 @@ namespace MithrilShards.Chain.Bitcoin.Network
    {
       private readonly string bitcoinShardVersion;
 
-      public BitcoinUserAgentBuilder(IForge forge, IForgeConnectivity forgeConnectivity) : base(forge, forgeConnectivity)
+      public BitcoinUserAgentBuilder(IForge forge) : base(forge)
       {
-         this.bitcoinShardVersion = $"BitcoinShard:{typeof(BitcoinShard).Assembly.GetName().Version.ToString(3)}";
+         this.bitcoinShardVersion = $"BitcoinShard:{typeof(BitcoinShard).Assembly.GetName().Version?.ToString(3) ?? "-"}";
       }
 
       public override string GetUserAgent()

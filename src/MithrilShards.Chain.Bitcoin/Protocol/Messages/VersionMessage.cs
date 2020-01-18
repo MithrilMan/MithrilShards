@@ -1,13 +1,16 @@
 ﻿using System;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 {
-   [NetworkMessage("version")]
-   public class VersionMessage : NetworkMessage
+   [NetworkMessage(COMMAND)]
+   public sealed class VersionMessage : INetworkMessage
    {
+      private const string COMMAND = "version";
+      string INetworkMessage.Command => COMMAND;
 
       /// <summary>
       /// Identifies protocol version being used by the node
@@ -28,12 +31,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
       /// The network address of the node receiving this message (addr_recv)
       /// </summary>
 
-      public NetworkAddressNoTime ReceiverAddress { get; set; }
+      public NetworkAddressNoTime? ReceiverAddress { get; set; }
 
       /// <summary>
       /// The network address of the node emitting this message (addr_from)
       /// </summary>
-      public NetworkAddressNoTime SenderAddress { get; set; }
+      public NetworkAddressNoTime? SenderAddress { get; set; }
 
       /// <summary>
       /// Node random nonce, randomly generated every time a version packet is sent. This nonce is used to detect connections to self.
@@ -43,7 +46,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
       /// <summary>
       /// User Agent (0x00 if string is 0 bytes long)
       /// </summary>
-      public string UserAgent { get; set; }
+      public string? UserAgent { get; set; }
 
       /// <summary>
       /// The last block received by the emitting node
@@ -54,9 +57,5 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
       /// Whether the remote peer should announce relayed transactions or not, see BIP 0037.
       /// </summary>
       public bool Relay { get; set; }
-
-      public VersionMessage() : base("version")
-      {
-      }
    }
 }

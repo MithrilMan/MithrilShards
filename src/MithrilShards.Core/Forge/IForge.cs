@@ -9,6 +9,6 @@ namespace MithrilShards.Core.Forge
       /// Gets the melted shards names and version list.
       /// </summary>
       /// <returns></returns>
-      List<(string name, string version)> GetMeltedShardNames();
+      List<(string name, string version)> GetMeltedShardsNames();
    }
 }

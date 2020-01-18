@@ -16,12 +16,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public override PingMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
       {
-         var message = new PingMessage
-         {
-            Nonce = reader.ReadULong()
-         };
-
-         return message;
+         return new PingMessage { Nonce = reader.ReadULong() };
       }
    }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.Network.Protocol;
@@ -24,16 +25,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
          output.WriteInt(message.Version);
          output.WriteULong(message.Services);
          output.WriteLong(message.Timestamp.ToUnixTimeSeconds());
-         output.WriteWithSerializer(message.ReceiverAddress, protocolVersion, this.networkAddressNoTimeSerializer);
+         output.WriteWithSerializer(message.ReceiverAddress!, protocolVersion, this.networkAddressNoTimeSerializer);
 
          if (protocolVersion < KnownVersion.V106)
          {
             return;
          }
 
-         output.WriteWithSerializer(message.SenderAddress, protocolVersion, this.networkAddressNoTimeSerializer);
+         output.WriteWithSerializer(message.SenderAddress!, protocolVersion, this.networkAddressNoTimeSerializer);
          output.WriteULong(message.Nonce);
-         output.WriteVarString(message.UserAgent);
+         output.WriteVarString(message.UserAgent!);
          output.WriteInt(message.StartHeight);
 
          if (protocolVersion < KnownVersion.V70001)

@@ -58,7 +58,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
                   .Where(method => method.Name == nameof(INetworkMessageHandler<INetworkMessage>.ProcessMessageAsync))
                   .First();
 
-               if (!this.mapping.TryGetValue(handledMessageType, out List<ProcessorHandler> handlers))
+               if (!this.mapping.TryGetValue(handledMessageType, out List<ProcessorHandler>? handlers))
                {
                   handlers = new List<ProcessorHandler>();
                   this.mapping[handledMessageType] = handlers;
@@ -77,7 +77,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       /// <returns><see langword="true"/> if message has been processed, <see langword="false"/> otherwise.</returns>
       public async ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation)
       {
-         if (!this.mapping.TryGetValue(message.GetType(), out List<ProcessorHandler> handlers)) return false;
+         if (!this.mapping.TryGetValue(message.GetType(), out List<ProcessorHandler>? handlers)) return false;
 
          for (int i = 0; i < handlers.Count; i++)
          {

@@ -21,7 +21,7 @@ namespace MithrilShards.Dev.Controller
       /// <param name="minimumSupportedVersion">The minimum version local nodes requires in order to connect to other peers.</param>
       /// <param name="currentVersion">The current version local peer aim to use with connected peers.</param>
       /// <returns></returns>
-      public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder, string configurationFile = null)
+      public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder, string? configurationFile = null)
       {
          forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>(
             (hostBuildContext, services) =>

@@ -48,7 +48,7 @@ namespace MithrilShards.Network.Bedrock
          this.networkMessageSerializerManager = networkMessageSerializerManager;
          this.networkMessageProcessorFactory = networkMessageProcessorFactory;
          this.peerContextFactory = peerContextFactory;
-         this.connectivitySettings = connectivitySettings?.Value;
+         this.connectivitySettings = connectivitySettings.Value;
       }
 
       public override async Task OnConnectedAsync(ConnectionContext connection)

@@ -131,7 +131,7 @@ namespace MithrilShards.Chain.Bitcoin
       /// </summary>
       /// <param name="newTip">The new tip</param>
       /// <param name="newTipPreviousHash">The block hash before the new tip</param>
-      public ConnectHeaderResult TrySetTip(in UInt256 newTip, in UInt256 newTipPreviousHash)
+      public ConnectHeaderResult TrySetTip(in UInt256 newTip, in UInt256? newTipPreviousHash)
       {
          using (new WriteLock(this.@lock))
          {

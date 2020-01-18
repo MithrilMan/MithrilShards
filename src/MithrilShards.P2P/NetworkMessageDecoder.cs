@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Crypto;
@@ -24,7 +25,7 @@ namespace MithrilShards.Network.Legacy
       readonly ILogger<NetworkMessageDecoder> logger;
       readonly IChainDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
-      private IPeerContext peerContext;
+      private IPeerContext peerContext = null!;//set by SetPeerContext
       public ConnectionContextData ContextData { get; }
 
       public NetworkMessageDecoder(ILogger<NetworkMessageDecoder> logger,
@@ -43,7 +44,7 @@ namespace MithrilShards.Network.Legacy
          this.peerContext = peerContext;
       }
 
-      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, out INetworkMessage message)
+      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, [MaybeNullWhen(false)] out INetworkMessage message)
       {
          var reader = new SequenceReader<byte>(input);
 
@@ -85,7 +86,7 @@ namespace MithrilShards.Network.Legacy
          // not enough data do read the full payload, so mark as examined the whole reader but let consumed just consume the expected payload length.
          consumed = reader.Position;
          examined = input.End;
-         message = default;
+         message = default!;
          return false;
       }
 
@@ -180,7 +181,7 @@ namespace MithrilShards.Network.Legacy
          if (reader.Remaining >= ConnectionContextData.SIZE_COMMAND)
          {
             ReadOnlySequence<byte> commandReader = reader.Sequence.Slice(reader.Position, ConnectionContextData.SIZE_COMMAND);
-            this.ContextData.Command = commandReader.ToArray();
+            this.ContextData.SetCommand(commandReader.ToArray());
             reader.Advance(ConnectionContextData.SIZE_COMMAND);
             return true;
          }

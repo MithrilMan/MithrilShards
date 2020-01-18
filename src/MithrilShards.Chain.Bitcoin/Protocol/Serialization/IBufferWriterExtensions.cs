@@ -220,7 +220,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
             return writer.WriteVarInt(0);
          }
 
-         int size = WriteVarInt(writer, (ulong)items.Length);
+         int size = WriteVarInt(writer, (ulong)items!.Length);
 
          for (int i = 0; i < items.Length; i++)
          {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 
@@ -18,7 +20,6 @@ namespace MithrilShards.Network.Bedrock
       public const int HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
 
       private uint payloadLength;
-      private byte[]? command;
       private uint checksum;
 
       public bool ChecksumRead { get; private set; }
@@ -31,6 +32,9 @@ namespace MithrilShards.Network.Bedrock
       public bool PayloadLengthRead { get; private set; }
 
       public bool CommandRead { get; private set; }
+
+      [DisallowNull]
+      public string? CommandName { get; private set; }
 
       public readonly byte FirstMagicNumberByte;
 
@@ -57,23 +61,6 @@ namespace MithrilShards.Network.Bedrock
             }
             this.payloadLength = value;
             this.PayloadLengthRead = true;
-         }
-      }
-
-      /// <summary>
-      /// Gets or sets the command that will instruct how to parse the INetworkMessage payload.
-      /// Sets CommandRead to true.
-      /// </summary>
-      /// <value>
-      /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
-      /// </value>
-      public byte[]? Command
-      {
-         get => this.command;
-         set
-         {
-            this.command = value;
-            this.CommandRead = true;
          }
       }
 
@@ -112,9 +99,17 @@ namespace MithrilShards.Network.Bedrock
          this.ChecksumRead = false;
       }
 
-      public string GetCommandName()
+      /// <summary>
+      /// Gets or sets the command that will instruct how to parse the INetworkMessage payload.
+      /// Sets CommandRead to true.
+      /// </summary>
+      /// <value>
+      /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
+      /// </value>
+      public void SetCommand(ref ReadOnlySequence<byte> command)
       {
-         return Encoding.ASCII.GetString(this.command.AsSpan().Trim((byte)'\0'));
+         this.CommandName = Encoding.ASCII.GetString((command.IsSingleSegment ? command.FirstSpan : command.ToArray()).Trim((byte)'\0'));
+         this.CommandRead = true;
       }
 
       public int GetTotalMessageLength()

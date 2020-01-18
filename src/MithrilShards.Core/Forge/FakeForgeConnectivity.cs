@@ -14,22 +14,22 @@ namespace MithrilShards.Core.Forge
    {
       const string error = "A valid concrete implementation of IForgeConnectivity must be registered on a IForgeBuilder.";
 
-      public Task AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
+      public ValueTask AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
       {
          throw new NotImplementedException();
       }
 
-      public Task InitializeAsync(CancellationToken cancellationToken)
+      public ValueTask InitializeAsync(CancellationToken cancellationToken)
       {
          throw new NotImplementedException(error);
       }
 
-      public Task StartAsync(CancellationToken cancellationToken)
+      public ValueTask StartAsync(CancellationToken cancellationToken)
       {
          throw new NotImplementedException(error);
       }
 
-      public Task StopAsync(CancellationToken cancellationToken)
+      public ValueTask StopAsync(CancellationToken cancellationToken)
       {
          throw new NotImplementedException(error);
       }

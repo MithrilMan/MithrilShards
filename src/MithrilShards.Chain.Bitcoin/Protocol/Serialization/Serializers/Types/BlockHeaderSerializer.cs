@@ -32,8 +32,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
       {
          int size = 0;
          size += writer.WriteInt(typeInstance.Version);
-         size += writer.WriteWithSerializer(typeInstance.PreviousBlockHash, protocolVersion, this.uInt256Serializator);
-         size += writer.WriteWithSerializer(typeInstance.MerkleRoot, protocolVersion, this.uInt256Serializator);
+         size += writer.WriteWithSerializer(typeInstance.PreviousBlockHash!, protocolVersion, this.uInt256Serializator);
+         size += writer.WriteWithSerializer(typeInstance.MerkleRoot!, protocolVersion, this.uInt256Serializator);
          size += writer.WriteUInt(typeInstance.TimeStamp);
          size += writer.WriteUInt(typeInstance.Bits);
          size += writer.WriteUInt(typeInstance.Nonce);

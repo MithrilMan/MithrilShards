@@ -2,7 +2,7 @@
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol
+namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 {
    public class BitcoinRegtestDefinition : IChainDefinition
    {

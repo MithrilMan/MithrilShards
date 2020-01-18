@@ -10,11 +10,11 @@ namespace MithrilShards.Core.Network.Server
    public class ServerPeerBinding
    {
       /// <summary>IP address and port number on which the node server listens.</summary>
-      public string EndPoint { get; set; }
+      public string? EndPoint { get; set; }
 
       /// <summary>External IP address and port number used to access the node from external network.</summary>
       /// <remarks>Used to announce to external peers the address they connect to in order to reach our Forge server.</remarks>
-      public string PublicEndPoint { get; set; }
+      public string? PublicEndPoint { get; set; }
 
       /// <summary>
       /// If <c>true</c>, peers that connect to this interface are white-listed.

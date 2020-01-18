@@ -15,15 +15,15 @@ namespace MithrilShards.Core.Network
       protected readonly string forgeVersion;
       protected readonly string shards;
 
-      public UserAgentBuilder(IForge forge, IForgeConnectivity forgeConnectivity)
+      public UserAgentBuilder(IForge forge)
       {
          Type forgeType = forge.GetType();
-         string coreVersion = typeof(IForge).Assembly.GetName().Version.ToString(3);
-         string forgeVersion = $"{ forgeType.Name }:{ forgeType.Assembly.GetName().Version.ToString(3)}";
+         string coreVersion = typeof(IForge).Assembly.GetName().Version?.ToString(3) ?? "-";
+         string forgeVersion = $"{ forgeType.Name }:{ forgeType.Assembly.GetName().Version?.ToString(3) ?? "-"}";
          this.forgeVersion = $"MithrilShards:{coreVersion}({forgeVersion})";
 
-         List<(string name, string version)> shardsInfo = forge.GetMeltedShardNames();
-         this.shards = shardsInfo?.Count == 0 ? string.Empty : $"({string.Join("; ", forge.GetMeltedShardNames().Select(shard => $"{shard.name}:{shard.version}"))})";
+         List<(string name, string version)> shardsInfo = forge.GetMeltedShardsNames();
+         this.shards = shardsInfo?.Count == 0 ? string.Empty : $"({string.Join("; ", forge.GetMeltedShardsNames().Select(shard => $"{shard.name}:{shard.version}"))})";
       }
 
       /// <summary>

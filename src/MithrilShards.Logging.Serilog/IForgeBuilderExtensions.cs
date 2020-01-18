@@ -6,7 +6,7 @@ namespace MithrilShards.Logging.Serilog
 {
    public static class IForgeBuilderExtension
    {
-      public static IForgeBuilder UseSerilog(this IForgeBuilder forgeBuilder, string configurationFile = null)
+      public static IForgeBuilder UseSerilog(this IForgeBuilder forgeBuilder, string? configurationFile = null)
       {
          forgeBuilder
             .ExtendInnerHostBuilder(builder =>

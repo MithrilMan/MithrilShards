@@ -18,7 +18,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// However, the IPv4 address is written into the message as a 16 byte IPv4-mapped IPv6 address
       /// (12 bytes 00 00 00 00 00 00 00 00 00 00 FF FF, followed by the 4 bytes of the IPv4 address).
       /// </summary>
-      public byte[] IP { get; set; }
+      public byte[]? IP { get; set; }
 
       /// <summary>
       /// Port number, network byte order.

@@ -23,6 +23,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       [ProducesResponseType(StatusCodes.Status400BadRequest)]
       public ActionResult<bool> Test()
       {
+         this.logger.LogDebug("Test invoked");
          return true;
       }
    }

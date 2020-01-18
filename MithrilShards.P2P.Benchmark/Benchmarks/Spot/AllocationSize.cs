@@ -31,7 +31,9 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
          var array = new NBitcoin.BlockHeader[this.size];
          for (int i = 0; i < array.Length; i++)
          {
+#pragma warning disable CS0618 // Type or member is obsolete
             array[i] = new BlockHeader();
+#pragma warning restore CS0618 // Type or member is obsolete
          }
 
          return array;

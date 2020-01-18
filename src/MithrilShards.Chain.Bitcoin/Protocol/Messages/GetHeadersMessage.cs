@@ -1,5 +1,6 @@
 ﻿using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
+using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
@@ -10,10 +11,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
    /// needs to issue getheaders again with a new block locator object.
    /// Keep in mind that some clients may provide headers of blocks which are invalid if the block locator object contains a hash on the invalid branch.
    /// </summary>
-   /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.Messages.NetworkMessage" />
-   [NetworkMessage("getheaders")]
-   public class GetHeadersMessage : NetworkMessage
+   /// <seealso cref="INetworkMessage" />
+   [NetworkMessage(COMMAND)]
+   public sealed class GetHeadersMessage : INetworkMessage
    {
+      private const string COMMAND = "getheaders";
+      string INetworkMessage.Command => COMMAND;
 
       /// <summary>
       /// The protocol version.
@@ -24,14 +27,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
       /// Block locator objects.
       /// Newest back to genesis block (dense to start, but then sparse)
       /// </summary>
-      public BlockLocator BlockLocator { get; set; }
+      public BlockLocator? BlockLocator { get; set; }
 
       /// <summary>
       /// Hash of the last desired block header
       /// Set to zero to get as many blocks as possible (2000 by default)
       /// </summary>
-      public UInt256 HashStop { get; set; }
-
-      public GetHeadersMessage() : base("getheaders") { }
+      public UInt256? HashStop { get; set; }
    }
 }

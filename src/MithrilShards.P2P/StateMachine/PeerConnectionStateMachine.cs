@@ -119,14 +119,12 @@ namespace MithrilShards.Network.Legacy.StateMachine
 
             this.stateMachine.Configure(PeerConnectionState.Disconnected)
                .OnEntry(this.Disconnected);
-
-            string graph = Stateless.Graph.UmlDotGraph.Format(this.stateMachine.GetInfo());
          }
       }
 
       private void ConfigureOutboundStateMachine(CancellationToken cancellationToken)
       {
-
+         throw new NotImplementedException();
       }
 
       public async Task AcceptIncomingConnectionAsync()
@@ -165,7 +163,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
       {
          var pipe = new Pipe();
 
-         Task writer = this.FillPipeAsync(socket, pipe.Writer, cancellationToken);
+         Task writer = FillPipeAsync(socket, pipe.Writer, cancellationToken);
          Task reader = this.ProcessMessagesAsync(pipe.Reader, cancellationToken);
 
          await Task.WhenAll(writer, reader).ConfigureAwait(false);
@@ -174,7 +172,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
       }
 
 
-      private async Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken cancellationToken)
+      private static async Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken cancellationToken)
       {
          const int minimumBufferSize = 512;
 
@@ -215,7 +213,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
                try
                {
                   // Process one message from the buffer, modifying the input buffer on each iteration.
-                  if (this.networkMessageDecoder.TryParseMessage(in buffer, out this.consumed, out this.examined, out INetworkMessage message))
+                  if (this.networkMessageDecoder.TryParseMessage(in buffer, out this.consumed, out this.examined, out INetworkMessage? message))
                   {
                      await this.stateMachine.FireAsync(this.processMessageTrigger, message).ConfigureAwait(false);
                   }
@@ -231,7 +229,7 @@ namespace MithrilShards.Network.Legacy.StateMachine
                      break;
                   }
                }
-               catch (InvalidNetworkMessageException ex)
+               catch (InvalidNetworkMessageException)
                {
                   throw;
                }

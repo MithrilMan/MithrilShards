@@ -95,7 +95,7 @@ namespace MithrilShards.Network.Bedrock
                   break;
                }
 
-               await this.ProcessMessage(result.Message, connection, contextData, peerContext, connection.ConnectionClosed)
+               await this.ProcessMessage(result.Message, contextData, peerContext, connection.ConnectionClosed)
                   .WithCancellationAsync(connection.ConnectionClosed)
                   .ConfigureAwait(false);
             }
@@ -113,12 +113,11 @@ namespace MithrilShards.Network.Bedrock
       }
 
       private async Task ProcessMessage(INetworkMessage message,
-                                        ConnectionContext connection,
                                         ConnectionContextData contextData,
                                         IPeerContext peerContext,
                                         CancellationToken cancellation)
       {
-         using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", message.Command);
+         using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", contextData.CommandName);
          this.logger.LogDebug("Parsing message '{Command}' with size of {PayloadSize}", message.Command, contextData.PayloadLength);
 
          if (!(message is UnknownMessage))

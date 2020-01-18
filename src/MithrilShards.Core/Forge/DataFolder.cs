@@ -19,7 +19,7 @@ namespace MithrilShards.Core.Forge
                throw new ArgumentNullException(nameof(featureKey));
             }
 
-            if (this.paths.TryGetValue(featureKey.ToLowerInvariant(), out string path))
+            if (this.paths.TryGetValue(featureKey.ToLowerInvariant(), out string? path))
             {
                return path;
             }

@@ -11,7 +11,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       private bool prepared;
 
       public List<ColumnDefinition> ColumnDefinitions { get; }
-      public TableStyle TableStyle { get; private set; }
+      public TableStyle TableStyle { get; private set; } = null!;
       public int Width { get; private set; }
 
       public TableBuilder(OutputWriter writer)
@@ -76,7 +76,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
          return this;
       }
 
-      public TableBuilder Start(string title = null)
+      public TableBuilder Start(string? title = null)
       {
          if (!this.prepared)
          {

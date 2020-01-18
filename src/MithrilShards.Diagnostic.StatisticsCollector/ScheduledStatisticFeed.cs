@@ -12,7 +12,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
       public DateTimeOffset NextPlannedExecution { get; set; }
 
-      public TableBuilder TableBuilder { get; set; } = null;
+      public TableBuilder? TableBuilder { get; set; } = null;
 
       public ScheduledStatisticFeed(IStatisticFeedsProvider source, StatisticFeedDefinition statisticFeedDefinition)
       {

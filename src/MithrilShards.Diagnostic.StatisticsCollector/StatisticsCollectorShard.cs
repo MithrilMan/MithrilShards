@@ -1,32 +1,26 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using MithrilShards.Core.MithrilShards;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector
 {
    public class StatisticsCollectorShard : IMithrilShard
    {
-      readonly ILogger<StatisticsCollectorShard> logger;
+      public StatisticsCollectorShard() { }
 
-      public StatisticsCollectorShard(ILogger<StatisticsCollectorShard> logger)
+      public ValueTask InitializeAsync(CancellationToken cancellationToken)
       {
-         this.logger = logger;
+         return default;
       }
 
-      public Task InitializeAsync(CancellationToken cancellationToken)
+      public ValueTask StartAsync(CancellationToken cancellationToken)
       {
-         return Task.CompletedTask;
+         return default;
       }
 
-      public Task StartAsync(CancellationToken cancellationToken)
+      public ValueTask StopAsync(CancellationToken cancellationToken)
       {
-         return Task.CompletedTask;
-      }
-
-      public Task StopAsync(CancellationToken cancellationToken)
-      {
-         return Task.CompletedTask;
+         return default;
       }
    }
 }

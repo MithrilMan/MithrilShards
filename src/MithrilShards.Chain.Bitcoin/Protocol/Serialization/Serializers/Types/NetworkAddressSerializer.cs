@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          size += writer.WriteUInt((uint)typeInstance.Time.ToUnixTimeSeconds());
 
          size += writer.WriteULong(typeInstance.Services);
-         size += writer.WriteBytes(typeInstance.IP);
+         size += writer.WriteBytes(typeInstance.IP!);
          size += writer.WriteUShort(typeInstance.Port);
 
          return size;

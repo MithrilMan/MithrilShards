@@ -61,7 +61,7 @@ namespace MithrilShards.Network.Legacy.Server
 
                foreach (ServerPeerBinding binding in this.settings.Listeners)
                {
-                  if (!binding.IsValidEndpoint(out IPEndPoint parsedEndpoint))
+                  if (!binding.IsValidEndpoint(out IPEndPoint? parsedEndpoint))
                   {
                      throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
                   }

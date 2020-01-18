@@ -22,7 +22,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
          this.initialBlockDownloadState = initialBlockDownloadState;
       }
 
-      internal override string TryGetDenyReason(IPeerContext peerContext)
+      internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
          if (this.initialBlockDownloadState.isInIBD)
          {

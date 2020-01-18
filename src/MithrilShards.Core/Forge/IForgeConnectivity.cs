@@ -11,6 +11,6 @@ namespace MithrilShards.Core.Forge
    /// <seealso cref="System.IDisposable" />
    public interface IForgeConnectivity : IMithrilShard
    {
-      Task AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation);
+      ValueTask AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation);
    }
 }

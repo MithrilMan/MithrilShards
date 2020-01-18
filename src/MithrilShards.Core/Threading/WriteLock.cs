@@ -7,7 +7,7 @@ namespace MithrilShards.Core.Threading
    /// Helper class to enter a Write Lock over a <see cref="ReaderWriterLockSlim"/> with an using pattern.
    /// </summary>
    /// <seealso cref="System.IDisposable" />
-   public readonly struct WriteLock : IDisposable
+   public class WriteLock : IDisposable
    {
       private readonly ReaderWriterLockSlim theLock;
 

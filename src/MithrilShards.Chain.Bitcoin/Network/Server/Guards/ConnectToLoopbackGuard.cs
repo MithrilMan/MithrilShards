@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MithrilShards.Core;
 using MithrilShards.Core.Network;
 
 namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
@@ -13,14 +12,11 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
    public class ConnectToLoopbackGuard : ServerPeerConnectionGuardBase
    {
 
-      public ConnectToLoopbackGuard(ILogger<InitialBlockDownloadStateGuard> logger,
-                                            IOptions<ForgeConnectivitySettings> settings,
-                                            IInitialBlockDownloadState initialBlockDownloadState
-                                            ) : base(logger, settings)
+      public ConnectToLoopbackGuard(ILogger<InitialBlockDownloadStateGuard> logger, IOptions<ForgeConnectivitySettings> settings) : base(logger, settings)
       {
       }
 
-      internal override string TryGetDenyReason(IPeerContext peerContext)
+      internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
          if (!this.settings.AllowLoopbackConnection && IPAddress.IsLoopback(peerContext.RemoteEndPoint.Address))
          {

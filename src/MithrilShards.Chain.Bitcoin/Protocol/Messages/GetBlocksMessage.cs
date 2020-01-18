@@ -1,5 +1,6 @@
 ﻿using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
+using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
@@ -13,10 +14,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
    /// To receive the next blocks hashes, one needs to issue getblocks again with a new block locator object.
    /// Keep in mind that some clients may provide blocks which are invalid if the block locator object contains a hash on the invalid branch.
    /// </summary>
-   /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.Messages.NetworkMessage" />
-   [NetworkMessage("getblocks")]
-   public class GetBlocksMessage : NetworkMessage
+   /// <seealso cref="INetworkMessage" />
+   [NetworkMessage(COMMAND)]
+   public sealed class GetBlocksMessage : INetworkMessage
    {
+      private const string COMMAND = "getblocks";
+      string INetworkMessage.Command => COMMAND;
 
       /// <summary>
       /// The protocol version.
@@ -27,14 +30,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
       /// Block locator objects.
       /// Newest back to genesis block (dense to start, but then sparse)
       /// </summary>
-      public BlockLocator BlockLocator { get; set; }
+      public BlockLocator? BlockLocator { get; set; }
 
       /// <summary>
       /// Hash of the last desired block.
       /// Set to zero to get as many blocks as possible (500 by default)
       /// </summary>
-      public UInt256 HashStop { get; set; }
-
-      public GetBlocksMessage() : base("getblocks") { }
+      public UInt256? HashStop { get; set; }
    }
 }

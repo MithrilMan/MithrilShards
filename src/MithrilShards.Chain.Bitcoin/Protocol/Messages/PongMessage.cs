@@ -1,15 +1,17 @@
-﻿using MithrilShards.Core.Network.Protocol.Serialization;
+﻿using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 {
-   [NetworkMessage("pong")]
-   public class PongMessage : NetworkMessage
+   [NetworkMessage(COMMAND)]
+   public sealed class PongMessage : INetworkMessage
    {
+      private const string COMMAND = "pong";
+      string INetworkMessage.Command => COMMAND;
+
       /// <summary>
       /// A random nonce that identifies the ping request.
       /// </summary>
       public ulong Nonce { get; set; }
-
-      public PongMessage() : base("pong") { }
    }
 }

@@ -75,7 +75,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       protected override async ValueTask OnPeerHandshakedAsync()
       {
-         this.status.PeerStartingHeight = this.PeerContext.Data.Get<HandshakeProcessor.HandshakeProcessorStatus>().PeerVersion.StartHeight;
+         this.status.PeerStartingHeight = this.PeerContext.Data.Get<HandshakeProcessor.HandshakeProcessorStatus>()?.PeerVersion?.StartHeight ?? 0;
 
          await this.SendMessageAsync(minVersion: KnownVersion.V70014, new SendCmpctMessage { HighBandwidthMode = true, Version = 1 }).ConfigureAwait(false);
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
@@ -131,7 +131,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (message is null) throw new System.ArgumentNullException(nameof(message));
 
-         if (message.BlockLocator.BlockLocatorHashes.Length > MAX_LOCATOR_HASHES)
+         if (message.BlockLocator!.BlockLocatorHashes.Length > MAX_LOCATOR_HASHES)
          {
             this.logger.LogDebug("Exceeded maximum number of block hashes for getheaders message.");
             this.Misbehave(10, "Exceeded maximum getheaders block hashes length", true);
@@ -147,7 +147,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          // If block locator is null, return the hashStop block
          if ((message.BlockLocator.BlockLocatorHashes?.Length ?? 0) == 0)
          {
-            if (!this.headersLookup.TryGetNode(message.HashStop, true, out startingNode))
+            if (!this.headersLookup.TryGetNode(message.HashStop!, true, out startingNode!))
             {
                this.logger.LogDebug("Empty block locator and HashStop not found");
                return new ValueTask<bool>(true);
@@ -165,7 +165,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public ValueTask<bool> ProcessMessageAsync(HeadersMessage headers, CancellationToken cancellation)
       {
-         int headersCount = headers.Headers.Length;
+         int headersCount = headers.Headers!.Length;
 
          /// https://github.com/bitcoin/bitcoin/blob/b949ac9697a6cfe087f60a16c063ab9c5bf1e81f/src/net_processing.cpp#L2923-L2947
          /// bitcoin does this before deserialize the message but I don't think would be a big problem, we could ban the peer in case we find this being a vector attack.

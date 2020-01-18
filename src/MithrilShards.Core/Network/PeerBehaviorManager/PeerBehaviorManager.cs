@@ -48,7 +48,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
 
       public void Misbehave(IPeerContext peerContext, uint penality, string reason)
       {
-         if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore score))
+         if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
          {
             this.logger.LogWarning("Cannot attribute bad behavior to the peer {PeerId} because the peer isn't connected.", peerContext.PeerId);
          }
@@ -61,7 +61,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
 
       public void AddBonus(IPeerContext peerContext, uint bonus, string reason)
       {
-         if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore score))
+         if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
          {
             this.logger.LogWarning("Cannot attribute positive points to the peer {PeerId} because the peer isn't connected.", peerContext.PeerId);
          }

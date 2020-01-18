@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace MithrilShards.Network.Legacy
@@ -12,11 +13,12 @@ namespace MithrilShards.Network.Legacy
       public const int HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
 
       private uint payloadLength;
-      private byte[] command;
+      private byte[]? command;
       private uint checksum;
 
       public bool ChecksumRead { get; private set; }
-      public byte[] MagicNumberBytes { get; }
+
+      private readonly byte[] magicNumberBytes;
 
       public int MagicNumber { get; }
 
@@ -52,23 +54,6 @@ namespace MithrilShards.Network.Legacy
       /// <value>
       /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
       /// </value>
-      public byte[] Command
-      {
-         get => this.command;
-         set
-         {
-            this.command = value;
-            this.CommandRead = true;
-         }
-      }
-
-      /// <summary>
-      /// Gets or sets the command that will instruct how to parse the INetworkMessage payload.
-      /// Sets CommandRead to true.
-      /// </summary>
-      /// <value>
-      /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
-      /// </value>
       public uint Checksum
       {
          get => this.checksum;
@@ -81,7 +66,7 @@ namespace MithrilShards.Network.Legacy
 
       public ConnectionContextData(byte[] magicNumberBytesmagicBytes)
       {
-         this.MagicNumberBytes = magicNumberBytesmagicBytes;
+         this.magicNumberBytes = magicNumberBytesmagicBytes;
          this.MagicNumber = BitConverter.ToInt32(magicNumberBytesmagicBytes);
          this.FirstMagicNumberByte = magicNumberBytesmagicBytes[0];
 
@@ -95,6 +80,29 @@ namespace MithrilShards.Network.Legacy
          this.CommandRead = false;
          this.ChecksumRead = false;
       }
+
+      /// <summary>
+      /// Gets the command that will instruct how to parse the INetworkMessage payload.
+      /// </summary>
+      /// <returns>
+      /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
+      /// </returns>
+      public byte[]? GetCommand() => this.command;
+
+      /// <summary>
+      /// Sets the command that will instruct how to parse the INetworkMessage payload.
+      /// Sets CommandRead to true.
+      /// </summary>
+      /// <param name="value">
+      /// The raw byte of command part of the message header (expected 12 chars right padded with '\0').
+      /// </param>
+      public void SetCommand(byte[] value)
+      {
+         this.command = value;
+         this.CommandRead = true;
+      }
+
+      public byte[] GetMagicNumberBytes() => this.magicNumberBytes;
 
       public string GetCommandName()
       {

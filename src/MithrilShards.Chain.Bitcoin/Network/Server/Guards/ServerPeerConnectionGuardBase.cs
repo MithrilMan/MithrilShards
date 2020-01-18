@@ -18,7 +18,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
 
       public ServerPeerConnectionGuardResult Check(IPeerContext peerContext)
       {
-         string denyReason = this.TryGetDenyReason(peerContext);
+         string? denyReason = this.TryGetDenyReason(peerContext);
          if (!string.IsNullOrEmpty(denyReason))
          {
             this.logger.LogDebug("Peer connection guard not passed: {denyReason}", denyReason);
@@ -28,6 +28,6 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
          return ServerPeerConnectionGuardResult.Allow();
       }
 
-      internal abstract string TryGetDenyReason(IPeerContext peerContext);
+      internal abstract string? TryGetDenyReason(IPeerContext peerContext);
    }
 }

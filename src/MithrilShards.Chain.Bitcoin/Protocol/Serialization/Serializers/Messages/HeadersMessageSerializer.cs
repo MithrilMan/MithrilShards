@@ -17,7 +17,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public override void Serialize(HeadersMessage message, int protocolVersion, IBufferWriter<byte> output)
       {
-         output.WriteArray(message.Headers, protocolVersion, this.blockHeaderSerializer);
+         output.WriteArray(message.Headers!, protocolVersion, this.blockHeaderSerializer);
       }
 
       public override HeadersMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)

@@ -20,31 +20,34 @@ namespace MithrilShards.Network.Legacy.Server
          this.serverPeers = new List<IServerPeer>();
       }
 
-      public Task AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
+      public ValueTask AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
       {
          this.logger.LogWarning("AttemptConnection not implemented.");
-         return Task.CompletedTask;
+         return default;
       }
 
-      public async Task InitializeAsync(CancellationToken cancellationToken)
+      public ValueTask InitializeAsync(CancellationToken cancellationToken)
       {
          this.serverPeers.AddRange(this.serverPeerFactory.CreateServerInstances());
+         return default;
       }
 
-      public async Task StartAsync(CancellationToken cancellationToken)
+      public ValueTask StartAsync(CancellationToken cancellationToken)
       {
          foreach (IServerPeer serverPeer in this.serverPeers)
          {
             _ = serverPeer.ListenAsync(cancellationToken);
          }
+         return default;
       }
 
-      public async Task StopAsync(CancellationToken cancellationToken)
+      public ValueTask StopAsync(CancellationToken cancellationToken)
       {
          foreach (IServerPeer serverPeer in this.serverPeers)
          {
             serverPeer.StopListening();
          }
+         return default;
       }
    }
 }

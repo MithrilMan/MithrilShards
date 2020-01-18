@@ -1,18 +1,20 @@
-﻿using MithrilShards.Core.Network.Protocol.Serialization;
+﻿using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 {
    /// <summary>
    /// See BIP 152
    /// </summary>
-   /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.Messages.NetworkMessage" />
-   [NetworkMessage("sendcmpct")]
-   public class SendCmpctMessage : NetworkMessage
+   /// <seealso cref="INetworkMessage" />
+   [NetworkMessage(COMMAND)]
+   public sealed class SendCmpctMessage : INetworkMessage
    {
+      private const string COMMAND = "sendcmpct";
+      string INetworkMessage.Command => COMMAND;
+
       public bool HighBandwidthMode { get; set; }
 
       public ulong Version { get; set; }
-
-      public SendCmpctMessage() : base("sendcmpct") { }
    }
 }

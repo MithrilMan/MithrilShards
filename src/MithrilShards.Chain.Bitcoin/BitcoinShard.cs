@@ -18,21 +18,19 @@ namespace MithrilShards.Chain.Bitcoin
          this.settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
       }
 
-      public Task InitializeAsync(CancellationToken cancellationToken)
+      public ValueTask InitializeAsync(CancellationToken cancellationToken)
       {
-         return Task.CompletedTask;
+         return default;
       }
 
-      public Task StartAsync(CancellationToken cancellationToken)
+      public ValueTask StartAsync(CancellationToken cancellationToken)
       {
-         // NOP
-         return Task.CompletedTask;
+         return default;
       }
 
-      public Task StopAsync(CancellationToken cancellationToken)
+      public ValueTask StopAsync(CancellationToken cancellationToken)
       {
-         // NOP
-         return Task.CompletedTask;
+         return default;
       }
    }
 }

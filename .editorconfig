@@ -1,3 +1,4 @@
+# Suppress: EC112 EC114
 [*]
 end_of_line = crlf
 indent_size = 3
@@ -27,7 +28,7 @@ dotnet_style_qualification_for_field                              = true : error
 dotnet_style_qualification_for_method                             = true : error
 dotnet_style_qualification_for_property                           = true : error
 dotnet_style_readonly_field                                       = true : error
-dotnet_style_require_accessibility_modifiers                      = always : silent
+dotnet_style_require_accessibility_modifiers                      = never : silent
 
 csharp_indent_case_contents                                       = true
 csharp_indent_case_contents_when_block                            = true
@@ -103,10 +104,22 @@ dotnet_diagnostic.CA1001.severity                                 = suggestion
 dotnet_diagnostic.CA1028.severity                                 = suggestion
 
 # CA1062: Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity = suggestion
+dotnet_diagnostic.CA1062.severity                                 = suggestion
 
 # CA1308: Normalize strings to uppercase
-dotnet_diagnostic.CA1308.severity = silent
+dotnet_diagnostic.CA1308.severity                                 = silent
 
 # VSTHRD200: Use "Async" suffix for async methods
-dotnet_diagnostic.VSTHRD200.severity = suggestion
+dotnet_diagnostic.VSTHRD200.severity                              = suggestion
+
+# CA1812: DevControllerShard is an internal class that is apparently never instantiated. If so, remove the code from the assembly. If this class is intended to contain only static members, make it static (Shared in Visual Basic).
+dotnet_diagnostic.CA1812.severity                                 = none
+
+# CA1819: Properties should not return arrays
+dotnet_diagnostic.CA1819.severity                                 = suggestion
+
+# CA1040: Avoid empty interfaces
+dotnet_diagnostic.CA1040.severity                                 = suggestion
+
+# CA1801: Review Unused Parameters
+dotnet_diagnostic.CA1801.severity                                 = suggestion

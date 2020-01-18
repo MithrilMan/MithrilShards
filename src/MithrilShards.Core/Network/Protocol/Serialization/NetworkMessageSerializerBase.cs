@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Buffers.Binary;
+using System.Reflection;
 using MithrilShards.Core.Crypto;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization
@@ -21,12 +22,21 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
       {
          this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
 
+         Type messageType = typeof(TMessageType);
+         NetworkMessageAttribute? networkMessageAttribute = messageType.GetCustomAttribute<NetworkMessageAttribute>();
+         if (networkMessageAttribute == null)
+         {
+            throw new InvalidOperationException($"{messageType.Name} must be decorated with {nameof(NetworkMessageAttribute)} to specify the protocol command it represents.");
+         }
+
          #region build precooked Magic and Command header part
          // this block get executed only once because the serializer is singleton
          this.precookedMagciAndCommand = new byte[SIZE_MAGIC + SIZE_COMMAND];
          this.chainDefinition.MagicBytes.CopyTo(this.precookedMagciAndCommand, 0);
+
+         //read the command name from the NetworkMessageAttribute
          var commandSpan = new Span<byte>(this.precookedMagciAndCommand, SIZE_MAGIC, SIZE_COMMAND);
-         System.Text.Encoding.ASCII.GetBytes(new TMessageType().Command.PadRight(12, '\0'), commandSpan);
+         System.Text.Encoding.ASCII.GetBytes(networkMessageAttribute.Command, commandSpan);
          #endregion
       }
 

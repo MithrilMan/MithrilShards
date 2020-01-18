@@ -25,6 +25,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private readonly NodeImplementation nodeImplementation;
       private readonly IInitialBlockDownloadState initialBlockDownloadState;
       private readonly IUserAgentBuilder userAgentBuilder;
+      readonly HeadersTree headersTree;
       private readonly SelfConnectionTracker selfConnectionTracker;
 
       public HandshakeProcessor(ILogger<HandshakeProcessor> logger,
@@ -35,6 +36,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                 IPeerBehaviorManager peerBehaviorManager,
                                 IInitialBlockDownloadState initialBlockDownloadState,
                                 IUserAgentBuilder userAgentBuilder,
+                                HeadersTree headersTree,
                                 SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.dateTimeProvider = dateTimeProvider;
@@ -42,6 +44,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.nodeImplementation = nodeImplementation;
          this.initialBlockDownloadState = initialBlockDownloadState;
          this.userAgentBuilder = userAgentBuilder;
+         this.headersTree = headersTree;
          this.selfConnectionTracker = selfConnectionTracker;
          this.status = new HandshakeProcessorStatus(this);
       }
@@ -175,27 +178,20 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private VersionMessage CreateVersionMessage()
       {
-         var version = new VersionMessage()
+         var version = new VersionMessage
          {
-            Nonce = this.randomNumberGenerator.GetUint64(),
-            UserAgent = this.userAgentBuilder.GetUserAgent(),
             Version = KnownVersion.CurrentVersion,
-            Timestamp = this.dateTimeProvider.GetTimeOffset(),
-            ReceiverAddress = new Types.NetworkAddressNoTime()
-            {
-               EndPoint = this.PeerContext.RemoteEndPoint,
-            },
-            SenderAddress = new Types.NetworkAddressNoTime()
-            {
-               EndPoint = this.PeerContext.PublicEndPoint ?? this.PeerContext.LocalEndPoint,
-            },
-            Relay = true, //this.IsRelay, TODO: it's part of the node settings
-
             /// TODO: it's part of the node settings and depends on the configured features/shards, shouldn't be hard coded
             /// if/when pruned will be implemented, remember to remove Network service flag
             /// ref: https://github.com/bitcoin/bitcoin/blob/99813a9745fe10a58bedd7a4cb721faf14f907a4/src/init.cpp#L1671-L1680
             Services = (ulong)(NodeServices.Network | NodeServices.NetworkLimited),
-            StartHeight = 0 //TODO fetch from a service
+            Timestamp = this.dateTimeProvider.GetTimeOffset(),
+            ReceiverAddress = new Types.NetworkAddressNoTime { EndPoint = this.PeerContext.RemoteEndPoint },
+            SenderAddress = new Types.NetworkAddressNoTime { EndPoint = this.PeerContext.PublicEndPoint ?? this.PeerContext.LocalEndPoint },
+            Nonce = this.randomNumberGenerator.GetUint64(),
+            UserAgent = this.userAgentBuilder.GetUserAgent(),
+            StartHeight = this.headersTree.GetTipHeaderNode().Height,
+            Relay = true //this.IsRelay, TODO: it's part of the node settings
          };
 
          return version;

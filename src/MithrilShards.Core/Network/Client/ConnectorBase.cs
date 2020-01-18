@@ -48,13 +48,10 @@ namespace MithrilShards.Core.Network.Client
          {
             try
             {
-               await foreach (Task item in this.AttemptConnectionAsync(connectionManager, cancellation).ConfigureAwait(false))
-               {
-                  await Task.Delay(this.ComputeDelayAdjustment(), cancellation).ConfigureAwait(false);
-               }
+               await this.AttemptConnectionsAsync(connectionManager, cancellation).ConfigureAwait(false);
                await Task.Delay(this.ComputeDelayAdjustment(), cancellation).ConfigureAwait(false);
             }
-            catch (OperationCanceledException Exception)
+            catch (OperationCanceledException)
             {
                this.logger.LogDebug("Connector {Connector} canceled.", this.GetType().Name);
                break;
@@ -68,6 +65,12 @@ namespace MithrilShards.Core.Network.Client
       }
 
 
-      protected abstract IAsyncEnumerable<Task> AttemptConnectionAsync(IConnectionManager connectionManager, CancellationToken cancellation);
+      /// <summary>
+      /// Attempts to perform connections to peers applying implementation logic.
+      /// </summary>
+      /// <param name="connectionManager">The connection manager.</param>
+      /// <param name="cancellation">The cancellation.</param>
+      /// <returns></returns>
+      protected abstract ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation);
    }
 }

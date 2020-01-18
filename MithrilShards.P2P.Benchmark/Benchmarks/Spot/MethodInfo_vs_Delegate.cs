@@ -37,10 +37,10 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
       private Foo classInstance;
       private MethodInfo method;
-      //private Func<IMessage, CancellationToken, ValueTask<bool>> computedDelegate;
       private Delegate computedDelegate;
       private Func<object, object[], object> lambdaWrapper;
       private readonly Message1 messageInstance = new Message1();
+      private readonly Message2 messageInstance2 = new Message2();
 
 
 
@@ -66,7 +66,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
          Type delegateType = Expression.GetFuncType(handledMessageType, typeof(CancellationToken), typeof(ValueTask<bool>));
          this.method = method;
-         //this.computedDelegate = (Func<IMessage, CancellationToken, ValueTask<bool>>)Delegate.CreateDelegate(delegateType, this.classInstance, method);
          this.computedDelegate = Delegate.CreateDelegate(delegateType, this.classInstance, method);
 
          this.lambdaWrapper = createWrapperFunc(this.method);
@@ -76,7 +75,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public object DirectCall()
       {
-         //this.computedDelegate(null, default);
          return this.classInstance.ProcessMessageAsync(this.messageInstance, default);
       }
 
@@ -89,14 +87,12 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public void UsingDelegate()
       {
-         //this.computedDelegate(null, default);
          this.computedDelegate.DynamicInvoke(this.messageInstance, default);
       }
 
       [Benchmark]
       public void UsingDelegateMethod()
       {
-         //this.computedDelegate(null, default);
          this.computedDelegate.Method.Invoke(this.classInstance, new object[] { this.messageInstance, default });
       }
 
@@ -105,7 +101,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       {
          this.lambdaWrapper.Invoke(this.classInstance, new object[] { this.messageInstance, (CancellationToken)default });
       }
-
 
       private static Func<object, object[], object> createWrapperFunc(MethodInfo method)
       {

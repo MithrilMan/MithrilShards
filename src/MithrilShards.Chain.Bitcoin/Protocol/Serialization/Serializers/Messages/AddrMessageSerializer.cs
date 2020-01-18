@@ -17,7 +17,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public override void Serialize(AddrMessage message, int protocolVersion, IBufferWriter<byte> output)
       {
-         output.WriteArray(message.Addresses, protocolVersion, this.networkAddressSerializer);
+         output.WriteArray(message.Addresses!, protocolVersion, this.networkAddressSerializer);
       }
 
       public override AddrMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
