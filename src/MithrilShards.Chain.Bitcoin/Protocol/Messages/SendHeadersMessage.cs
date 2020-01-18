@@ -12,7 +12,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
    /// </summary>
    /// <seealso cref="INetworkMessage" />
    [NetworkMessage(COMMAND)]
-   public sealed class SendHeadersMessage : INetworkMessage {
+   public sealed class SendHeadersMessage : INetworkMessage
+   {
       private const string COMMAND = "sendheaders";
       string INetworkMessage.Command => COMMAND;
    }

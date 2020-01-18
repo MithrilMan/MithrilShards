@@ -52,7 +52,10 @@ namespace MithrilShards.Core.EventBus
                this.subscriptions.Add(typeof(TEvent), new List<ISubscription>());
             }
 
+#pragma warning disable CA2000 // Dispose objects before losing scope
             var subscriptionToken = new SubscriptionToken(this, typeof(TEvent));
+#pragma warning restore CA2000 // Dispose objects before losing scope
+
             this.subscriptions[typeof(TEvent)].Add(new Subscription<TEvent>(handler, subscriptionToken));
 
             return subscriptionToken;

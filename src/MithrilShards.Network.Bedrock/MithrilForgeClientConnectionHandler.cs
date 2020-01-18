@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Bedrock.Framework.Protocols;
@@ -13,7 +12,6 @@ using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
-using MithrilShards.Core.Network.Server.Guards;
 
 namespace MithrilShards.Network.Bedrock
 {

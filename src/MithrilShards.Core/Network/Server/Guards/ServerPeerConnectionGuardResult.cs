@@ -2,18 +2,17 @@
 {
    public class ServerPeerConnectionGuardResult
    {
-      private static readonly ServerPeerConnectionGuardResult success = Allow();
       /// <summary>
       /// Returns a successful guard check.
       /// </summary>
       /// <remarks>
       /// The value returned by this property corresponds to a passed guard execution.
       /// </remarks>
-      public static ServerPeerConnectionGuardResult Success => success;
+      public static ServerPeerConnectionGuardResult Success { get; } = new ServerPeerConnectionGuardResult { IsDenied = false };
 
       public bool IsDenied { get; private set; }
 
-      public string? DenyReason { get; private set; }
+      public string DenyReason { get; private set; } = string.Empty;
 
       public static ServerPeerConnectionGuardResult Allow() => Success;
 
@@ -22,7 +21,7 @@
          return new ServerPeerConnectionGuardResult
          {
             IsDenied = true,
-            DenyReason = denyReason
+            DenyReason = denyReason ?? string.Empty
          };
       }
    }

@@ -1,7 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo;
 using NBitcoin;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256

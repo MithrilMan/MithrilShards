@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo;

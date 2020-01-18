@@ -29,7 +29,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public string ConvertReverseAsMithril () => this.ConvertReverseAsMithril(this.value);
+      public string ConvertReverseAsMithril() => this.ConvertReverseAsMithril(this.value);
 
       private string ConvertReverseAsMithril(byte[] value)
       {

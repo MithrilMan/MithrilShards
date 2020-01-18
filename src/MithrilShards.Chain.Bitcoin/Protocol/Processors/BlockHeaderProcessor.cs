@@ -5,8 +5,6 @@ using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Core.Network;
-using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
