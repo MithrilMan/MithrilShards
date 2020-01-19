@@ -17,3 +17,24 @@ If everything is going as expected and you ran the Forge within bitcoin-testnet 
 ![img](https://cdn.discordapp.com/attachments/662122241190002699/662122563270475776/unknown.png)
 
 At the time of the screenshot (2nd of January 2020) only the handshake implementation was ready, this is why of warnings following the successful handshake.
+
+
+
+## Troubleshooting
+
+##### System.Net.Sockets.SocketException (10013)
+
+In case you receive this error while trying to open some port for listening, the reason may be your OS is reserving some port range for some reason.
+To check if the port is reserved, you can use the command
+
+`netsh interface ipv4 show excludedportrange tcp`
+
+you'll see a list of port ranges that may include the port you are trying to open.
+To fix that your best bet is to just change the port you want to use in your configuration file, otherwise you need to understand why a specific port range is being reserved and eventually change it.
+
+You can delete the excludedportrange if you want and you know what you are doing, using commands like
+
+`netsh int ipv4 delete excludedportrange protocol=tcp startport=45000 numberofports=100`
+
+and add new ones with 
+`netsh int ipv4 add excludedportrange protocol=tcp startport=45000 numberofports=100`
