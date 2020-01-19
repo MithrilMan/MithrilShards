@@ -1,13 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using MithrilShards.Core.Forge;
 
 namespace MithrilShards.Dev.Controller
@@ -37,10 +34,16 @@ namespace MithrilShards.Dev.Controller
          forgeBuilder.ExtendInnerHostBuilder(builder =>
          {
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                  .AddJsonFile(configurationFile ?? forgeBuilder.ConfigurationFileName)
+                  .AddJsonFile(configurationFile ?? forgeBuilder.ConfigurationFileName, true)
                   .Build();
 
             var settings = new DevControllerSettings();
+
+            if (!configuration.GetSection(settings.ConfigurationSection).Exists())
+            {
+               return; //skipping host creation but can't log anything at this stage...
+            }
+
             configuration.Bind(settings.ConfigurationSection, settings);
 
             if (!IPEndPoint.TryParse(settings.EndPoint, out IPEndPoint iPEndPoint))

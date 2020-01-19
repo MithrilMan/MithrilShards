@@ -74,6 +74,8 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
                            feed.TableBuilder.Start(feedDefinition.Title);
 
+                           var newValues = new List<string?[]>();
+
                            List<object[]>? statisticValues = feed.Source.GetStatisticFeedValues(feedDefinition.FeedId);
                            if (statisticValues != null)
                            {
@@ -93,12 +95,15 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
                                     .Select((field, index) => field.ValueFormatter == null ? values[index].ToString() : field.ValueFormatter(values[index]))
                                     .ToArray();
 
+                                 newValues.Add(formattedValues);
 
                                  feed.TableBuilder.DrawRow(formattedValues);
                               }
                            }
-
                            feed.TableBuilder.End();
+
+                           feed.LastResults.Clear();
+                           feed.LastResults.AddRange(newValues);
                         }
                         catch (Exception ex)
                         {
@@ -148,6 +153,24 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       public Task StopAsync(CancellationToken cancellationToken)
       {
          return Task.CompletedTask;
+      }
+
+      /// <summary>
+      /// Gets an anonymous object containing the feeds dump.
+      /// </summary>
+      /// <returns></returns>
+      public object GetFeedsDump()
+      {
+         return System.Text.Json.JsonSerializer.Serialize(
+            from feed in this.registeredfeedDefinitions
+               //from feedRows in feed.LastResults
+            select new
+            {
+               Title = feed.StatisticFeedDefinition.Title,
+               Labels = from fieldDefinition in feed.StatisticFeedDefinition.FieldsDefinition select fieldDefinition.Label,
+               Values = feed.LastResults
+            }//, new System.Text.Json.JsonSerializerOptions {  WriteIndented=}
+         );
       }
    }
 }
