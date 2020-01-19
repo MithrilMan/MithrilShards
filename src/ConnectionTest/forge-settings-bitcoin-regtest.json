@@ -15,12 +15,14 @@
          }
       ],
       "Connections": [
-         {
-            "Endpoint": "127.0.0.1:19000"
-         }
+         { "Endpoint": "127.0.0.1:19000" }
       ]
    },
+   "StatisticsCollector": {
+      "ContinuousConsoleDisplay": true,
+      "ContinuousConsoleDisplayRate": 5
+   },
    "DevController": {
-      "EndPoint": "127.0.0.1:45050"
+      "EndPoint": "127.0.0.1:45018"
    }
 }

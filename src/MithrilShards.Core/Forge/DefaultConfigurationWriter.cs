@@ -24,7 +24,7 @@ namespace MithrilShards.Core.Forge
 
 
       /// <summary>
-      /// Generates the default configuration file populating it with default <see cref="IMithrilShardSettings"/> 
+      /// Generates the default configuration file populating it with default <see cref="IMithrilShardSettings"/>
       /// values discovered in current Forge instance.
       /// </summary>
       public void GenerateDefaultFile()

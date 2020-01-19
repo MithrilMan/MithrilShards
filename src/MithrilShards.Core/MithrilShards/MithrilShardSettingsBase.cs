@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text.Json.Serialization;
 using MithrilShards.Core.Forge;
 
 namespace MithrilShards.Core.MithrilShards
@@ -9,6 +10,7 @@ namespace MithrilShards.Core.MithrilShards
    /// </summary>
    public abstract class MithrilShardSettingsBase : IMithrilShardSettings
    {
+      [JsonIgnore]
       public virtual string ConfigurationSection
       {
          get

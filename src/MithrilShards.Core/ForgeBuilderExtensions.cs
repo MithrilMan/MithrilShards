@@ -8,6 +8,7 @@ using MithrilShards.Core.Network.PeerAddressBook;
 using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
+using MithrilShards.Core.Statistics;
 
 namespace MithrilShards.Core
 {
@@ -31,6 +32,9 @@ namespace MithrilShards.Core
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IUserAgentBuilder, UserAgentBuilder>()
 
+               //fake or null miscellaneous implementations
+               .AddSingleton<IStatisticFeedsCollector, StatisticFeedsCollectorNullImplementation>()
+
                .ConfigureNetwork()
                ;
 
@@ -40,7 +44,9 @@ namespace MithrilShards.Core
       private static IServiceCollection ConfigureNetwork(this IServiceCollection services)
       {
          services
+            //fake or null implementations
             .AddSingleton<IForgeConnectivity, FakeForgeConnectivity>()
+
             .AddSingleton<INetworkMessageSerializerManager, NetworkMessageSerializerManager>()
             .AddSingleton<INetworkMessageProcessorFactory, NetworkMessageProcessorFactory>()
             .AddSingleton<IPeerContextFactory, PeerContextFactory<PeerContext>>()

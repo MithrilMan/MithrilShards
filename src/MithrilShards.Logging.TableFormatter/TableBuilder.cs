@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
-namespace MithrilShards.Logging.ConsoleTableFormatter
+namespace MithrilShards.Logging.TableFormatter
 {
    public class TableBuilder
    {
-      private readonly OutputWriter writer;
+      private readonly StringBuilder stringBuilder;
       private bool prepared;
 
       public List<ColumnDefinition> ColumnDefinitions { get; }
       public TableStyle TableStyle { get; private set; } = null!;
       public int Width { get; private set; }
 
-      public TableBuilder(OutputWriter writer)
+      public TableBuilder(StringBuilder builder)
       {
-         this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
+         this.stringBuilder = builder ?? new StringBuilder();
 
          this.ColumnDefinitions = new List<ColumnDefinition>();
       }
@@ -109,12 +110,18 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
             this.DrawTopBorder();
             this.DrawLeftBorder();
             int availableSpace = this.Width - (this.TableStyle.Left == char.MinValue ? 0 : 1) - (this.TableStyle.Right == char.MinValue ? 0 : 1);
-            this.writer.Write(title.Center(availableSpace));
+            this.stringBuilder.Append(this.TableStyle.TitleAlignment switch
+            {
+               ColumnAlignment.Left => title.AlignLeft(availableSpace),
+               ColumnAlignment.Right => title.AlignRight(availableSpace),
+               ColumnAlignment.Center => title.Center(availableSpace),
+               _ => string.Empty
+            });
             this.DrawRightBorder();
          }
          else
          {
-            this.writer.WriteLine(title.Center(this.Width));
+            this.stringBuilder.AppendLine(title.Center(this.Width));
          }
       }
 
@@ -147,8 +154,6 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       public TableBuilder End()
       {
          this.DrawBottomBorder();
-         this.writer.WriteLine();
-
          return this;
       }
 
@@ -166,7 +171,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       {
          if (this.TableStyle.Top != char.MinValue)
          {
-            this.writer.DrawLine(this.TableStyle.Top, this.Width);
+            this.DrawLine(this.TableStyle.Top, this.Width);
          }
       }
 
@@ -174,7 +179,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       {
          if (this.TableStyle.Left != char.MinValue)
          {
-            this.writer.Write(this.TableStyle.Left.ToString(CultureInfo.InvariantCulture));
+            this.stringBuilder.Append(this.TableStyle.Left.ToString(CultureInfo.InvariantCulture));
          }
       }
 
@@ -185,13 +190,13 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
          switch (columnDefinition.Alignment)
          {
             case ColumnAlignment.Left:
-               this.writer.Write(value.AlignLeft(columnDefinition.Width));
+               this.stringBuilder.Append(value.AlignLeft(columnDefinition.Width));
                break;
             case ColumnAlignment.Right:
-               this.writer.Write(value.AlignRight(columnDefinition.Width));
+               this.stringBuilder.Append(value.AlignRight(columnDefinition.Width));
                break;
             case ColumnAlignment.Center:
-               this.writer.Write(value.Center(columnDefinition.Width));
+               this.stringBuilder.Append(value.Center(columnDefinition.Width));
                break;
             default:
                throw new NotImplementedException(columnDefinition.Alignment.ToString());
@@ -208,7 +213,7 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       {
          if (this.TableStyle.Separator.Length > 0)
          {
-            this.writer.Write(this.TableStyle.Separator);
+            this.stringBuilder.Append(this.TableStyle.Separator);
          }
       }
 
@@ -216,11 +221,11 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       {
          if (this.TableStyle.Right != char.MinValue)
          {
-            this.writer.WriteLine(this.TableStyle.Right.ToString(CultureInfo.InvariantCulture));
+            this.stringBuilder.AppendLine(this.TableStyle.Right.ToString(CultureInfo.InvariantCulture));
          }
          else
          {
-            this.writer.WriteLine();
+            this.stringBuilder.AppendLine();
          }
       }
 
@@ -228,8 +233,13 @@ namespace MithrilShards.Logging.ConsoleTableFormatter
       {
          if (this.TableStyle.Bottom != char.MinValue)
          {
-            this.writer.DrawLine(this.TableStyle.Bottom, this.Width);
+            this.DrawLine(this.TableStyle.Bottom, this.Width);
          }
+      }
+
+      public void DrawLine(char character, int width)
+      {
+         this.stringBuilder.AppendLine(string.Empty.PadRight(width, character));
       }
    }
 }

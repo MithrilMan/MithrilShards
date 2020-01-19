@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MithrilShards.Logging.ConsoleTableFormatter
+namespace MithrilShards.Logging.TableFormatter
 {
    public class ColumnDefinition
    {

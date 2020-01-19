@@ -24,7 +24,7 @@ At the time of the screenshot (2nd of January 2020) only the handshake implement
 
 ##### System.Net.Sockets.SocketException (10013)
 
-In case you receive this error while trying to open some port for listening, the reason may be your OS is reserving some port range for some reason.
+In case you receive this error while trying to open some port for listening, the reason may be your OS is excluding some port ranges for some reason.
 To check if the port is reserved, you can use the command
 
 `netsh interface ipv4 show excludedportrange tcp`

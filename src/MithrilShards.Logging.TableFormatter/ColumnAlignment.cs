@@ -1,4 +1,4 @@
-﻿namespace MithrilShards.Logging.ConsoleTableFormatter
+﻿namespace MithrilShards.Logging.TableFormatter
 {
    public enum ColumnAlignment
    {

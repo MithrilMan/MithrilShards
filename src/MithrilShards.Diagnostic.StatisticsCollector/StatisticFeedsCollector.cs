@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Statistics;
-using MithrilShards.Logging.ConsoleTableFormatter;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector
 {
@@ -16,16 +16,15 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
    {
       readonly List<ScheduledStatisticFeed> registeredfeedDefinitions = new List<ScheduledStatisticFeed>();
       readonly ILogger<StatisticFeedsCollector> logger;
-      readonly OutputWriter writer;
       private readonly object statisticsFeedsLock = new object();
       private readonly StringBuilder logStringBuilder;
+      private readonly StatisticsCollectorSettings settings;
 
-      public StatisticFeedsCollector(ILogger<StatisticFeedsCollector> logger)
+      public StatisticFeedsCollector(ILogger<StatisticFeedsCollector> logger, IOptions<StatisticsCollectorSettings> options)
       {
          this.logger = logger;
-         this.writer = new OutputWriter(text => this.logStringBuilder.Append(text)); // writer;
-
          this.logStringBuilder = new StringBuilder();
+         this.settings = options.Value;
       }
 
       public void RegisterStatisticFeeds(IStatisticFeedsProvider statisticSource, params StatisticFeedDefinition[] statisticfeeds)
@@ -42,77 +41,41 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          }
       }
 
+      /// <summary>
+      /// Triggered when the application host is ready to start the service.
+      /// If <see cref="settings.ContinuousConsoleDisplay"/> is true, statistics will be collected
+      /// every <see cref="settings.ContinuousConsoleDisplayRate"/>, otherwise no statistics will be fetched automatically.
+      /// </summary>
+      /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+      /// <remarks>Changing <see cref="settings.ContinuousConsoleDisplay"/> at runtime won't affect automatically this behavior.</remarks>
+      /// <returns></returns>
       public Task StartAsync(CancellationToken cancellationToken)
       {
-         _ = this.StartFetchingLoopAsync(cancellationToken);
+         if (this.settings.ContinuousConsoleDisplay)
+         {
+            this.logger.LogDebug("Starting automatic feed collection every {ContinuousConsoleDisplayRate} seconds.", this.settings.ContinuousConsoleDisplayRate);
+            _ = this.StartFetchingLoopAsync(cancellationToken);
+         }
+         else
+         {
+            this.logger.LogDebug("Automatic feed collection is disabled, no console output will happens.");
+         }
 
          return Task.CompletedTask;
       }
 
+      /// <summary>
+      /// Starts the asynchronous fetching loop and console display of statistic feeds.
+      /// </summary>
+      /// <remarks>Use</remarks>
+      /// <param name="cancellationToken">The cancellation token.</param>
       public async Task StartFetchingLoopAsync(CancellationToken cancellationToken)
       {
          try
          {
             while (!cancellationToken.IsCancellationRequested)
             {
-               lock (this.statisticsFeedsLock)
-               {
-                  DateTimeOffset currentTime = DateTimeOffset.Now;
-                  foreach (ScheduledStatisticFeed feed in this.registeredfeedDefinitions)
-                  {
-                     if (feed.NextPlannedExecution <= currentTime)
-                     {
-                        StatisticFeedDefinition feedDefinition = feed.StatisticFeedDefinition;
-                        feed.NextPlannedExecution += feedDefinition.FrequencyTarget;
-
-                        try
-                        {
-                           if (feed.TableBuilder == null)
-                           {
-                              feed.TableBuilder = this.CreateTableBuilder(feedDefinition);
-                           }
-
-                           feed.TableBuilder.Start(feedDefinition.Title);
-
-                           var newValues = new List<string?[]>();
-
-                           List<object[]>? statisticValues = feed.Source.GetStatisticFeedValues(feedDefinition.FeedId);
-                           if (statisticValues != null)
-                           {
-                              foreach (object[] values in statisticValues)
-                              {
-                                 for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
-                                 {
-                                    FieldDefinition field = feedDefinition.FieldsDefinition[i];
-                                    // apply formatting if needed
-                                    if (field.ValueFormatter != null)
-                                    {
-                                       values[i] = field.ValueFormatter(values[i]);
-                                    }
-                                 }
-
-                                 string?[] formattedValues = feedDefinition.FieldsDefinition
-                                    .Select((field, index) => field.ValueFormatter == null ? values[index].ToString() : field.ValueFormatter(values[index]))
-                                    .ToArray();
-
-                                 newValues.Add(formattedValues);
-
-                                 feed.TableBuilder.DrawRow(formattedValues);
-                              }
-                           }
-                           feed.TableBuilder.End();
-
-                           feed.LastResults.Clear();
-                           feed.LastResults.AddRange(newValues);
-                        }
-                        catch (Exception ex)
-                        {
-                           this.logger.LogDebug(ex, "Error generating statistics for {IStatisticFeedsProvider}", feed.Source.GetType().Name);
-                           throw;
-                        }
-                     }
-                  }
-               }
+               this.FetchAllStatistics(false, true);
 
                if (this.logStringBuilder.Length > 0)
                {
@@ -120,12 +83,12 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
                   this.logStringBuilder.Clear();
                }
 
-               await Task.Delay(TimeSpan.FromSeconds(5)).WithCancellationAsync(cancellationToken).ConfigureAwait(false);
+               await Task.Delay(TimeSpan.FromSeconds(this.settings.ContinuousConsoleDisplayRate)).WithCancellationAsync(cancellationToken).ConfigureAwait(false);
             }
          }
          catch (OperationCanceledException)
          {
-            //Task cancelled, legit, ignoring exception.
+            // Task canceled, legit, ignoring exception.
          }
          catch (Exception)
          {
@@ -134,20 +97,77 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       }
 
       /// <summary>
-      /// Creates the table builder for a specific <see cref="StatisticFeedDefinition" />.
+      /// Fetches the statistics.
       /// </summary>
-      /// <param name="definition">The definition.</param>
-      /// <returns></returns>
-      private TableBuilder CreateTableBuilder(StatisticFeedDefinition definition)
+      /// <param name="forceFetch">
+      /// If set to <c>true</c> forces fetching statistic even if the request is ahead of <see cref="ScheduledStatisticFeed.NextPlannedExecution"/>.
+      /// </param>
+      /// <param name="useTableBuilder">If set to <c>true</c> use the feed tableBuilder to build an human readable output.</param>
+      private void FetchAllStatistics(bool forceFetch, bool useTableBuilder)
       {
-         var builder = new TableBuilder(this.writer);
-
-         foreach (FieldDefinition field in definition.FieldsDefinition)
+         lock (this.statisticsFeedsLock)
          {
-            builder.AddColumn(new ColumnDefinition { Label = field.Label, Width = field.WidthHint, Alignment = ColumnAlignment.Left });
-         }
+            DateTimeOffset currentTime = DateTimeOffset.Now;
+            foreach (ScheduledStatisticFeed feed in this.registeredfeedDefinitions)
+            {
+               if (forceFetch || feed.NextPlannedExecution <= currentTime)
+               {
+                  feed.NextPlannedExecution += feed.StatisticFeedDefinition.FrequencyTarget;
 
-         return builder.Prepare();
+                  this.FetchFeedStatisticNoLock(feed, useTableBuilder);
+               }
+            }
+         }
+      }
+
+      /// <summary>
+      /// Fetches the feed statistic of a specific feed.
+      /// </summary>
+      /// <param name="feed">The feed.</param>
+      /// <param name="feedDefinition">The feed definition.</param>
+      /// <param name="useTableBuilder">If set to <c>true</c> use the feed tableBuilder to build an human readable output.</param>
+      private void FetchFeedStatisticNoLock(ScheduledStatisticFeed feed, bool useTableBuilder)
+      {
+         StatisticFeedDefinition feedDefinition = feed.StatisticFeedDefinition;
+
+         try
+         {
+            var newValues = new List<string?[]>();
+
+            List<object[]>? statisticValues = feed.Source.GetStatisticFeedValues(feedDefinition.FeedId);
+            if (statisticValues != null)
+            {
+               foreach (object[] values in statisticValues)
+               {
+                  for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
+                  {
+                     FieldDefinition field = feedDefinition.FieldsDefinition[i];
+                     // apply formatting if needed
+                     if (field.ValueFormatter != null)
+                     {
+                        values[i] = field.ValueFormatter(values[i]);
+                     }
+                  }
+
+                  newValues.Add(feedDefinition.FieldsDefinition
+                     .Select((field, index) => field.ValueFormatter == null ? values[index].ToString() : field.ValueFormatter(values[index]))
+                     .ToArray()
+                     );
+               }
+            }
+
+            if (useTableBuilder)
+            {
+               this.logStringBuilder.AppendLine(feed.GetHumanReadableFeed());
+            }
+
+            feed.SetLastResults(newValues);
+         }
+         catch (Exception ex)
+         {
+            this.logger.LogDebug(ex, "Error generating statistics for {IStatisticFeedsProvider}", feed.Source.GetType().Name);
+            throw;
+         }
       }
 
       public Task StopAsync(CancellationToken cancellationToken)
@@ -161,16 +181,44 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public object GetFeedsDump()
       {
-         return System.Text.Json.JsonSerializer.Serialize(
-            from feed in this.registeredfeedDefinitions
-               //from feedRows in feed.LastResults
-            select new
+         this.FetchAllStatistics(true, false);
+
+         lock (this.statisticsFeedsLock)
+         {
+            return this.registeredfeedDefinitions.Select(feed => feed.GetLastResultsDump());
+         }
+      }
+
+      /// <summary>
+      /// Gets the specified feed dump.
+      /// </summary>
+      /// <param name="feedId">The feed identifier.</param>
+      /// <param name="humanReadable">If set to <c>true</c> returns a human readable dump representation.</param>
+      /// <returns></returns>
+      public object GetFeedDump(string feedId, bool humanReadable)
+      {
+         ScheduledStatisticFeed feed = this.registeredfeedDefinitions.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
+         if (feed == null)
+         {
+            throw new ArgumentException("feedId not found");
+         }
+
+         lock (this.statisticsFeedsLock)
+         {
+            this.FetchFeedStatisticNoLock(feed, humanReadable);
+            if (humanReadable)
             {
-               Title = feed.StatisticFeedDefinition.Title,
-               Labels = from fieldDefinition in feed.StatisticFeedDefinition.FieldsDefinition select fieldDefinition.Label,
-               Values = feed.LastResults
-            }//, new System.Text.Json.JsonSerializerOptions {  WriteIndented=}
-         );
+               return new
+               {
+                  Time = feed.LastResultDate,
+                  Result = feed.GetHumanReadableFeed()
+               };
+            }
+            else
+            {
+               return feed.GetLastResultsDump();
+            }
+         }
       }
    }
 }

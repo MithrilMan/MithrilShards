@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
-    <ProjectReference Include="..\MithrilShards.Logging.ConsoleTableFormatter\MithrilShards.Logging.ConsoleTableFormatter.csproj" />
+    <ProjectReference Include="..\MithrilShards.Logging.TableFormatter\MithrilShards.Logging.TableFormatter.csproj" />
   </ItemGroup>
 
 </Project>

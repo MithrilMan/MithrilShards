@@ -16,7 +16,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public static IForgeBuilder UseStatisticsCollector(this IForgeBuilder forgeBuilder)
       {
-         forgeBuilder.AddShard<StatisticsCollectorShard>(
+         forgeBuilder.AddShard<StatisticsCollectorShard, StatisticsCollectorSettings>(
             (hostBuildContext, services) =>
             {
                services
