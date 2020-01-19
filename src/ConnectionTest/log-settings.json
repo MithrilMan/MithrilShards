@@ -13,7 +13,9 @@
       "MinimumLevel": {
          "Default": "Debug",
          "Override": {
-            "Microsoft": "Information",
+            "MithrilShards.Core.Network.ConnectionManager": "Warning",
+            "Bedrock.Framework": "Warning",
+            "Microsoft": "Warning",
             "System": "Warning"
          }
       }

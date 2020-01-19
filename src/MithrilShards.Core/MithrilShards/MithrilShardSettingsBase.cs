@@ -1,4 +1,5 @@
-﻿using MithrilShards.Core.Forge;
+﻿using System.Globalization;
+using MithrilShards.Core.Forge;
 
 namespace MithrilShards.Core.MithrilShards
 {
@@ -8,6 +9,18 @@ namespace MithrilShards.Core.MithrilShards
    /// </summary>
    public abstract class MithrilShardSettingsBase : IMithrilShardSettings
    {
-      public virtual string ConfigurationSection => this.GetType().Name;
+      public virtual string ConfigurationSection
+      {
+         get
+         {
+            const string partToRemove = "settings";
+            string name = this.GetType().Name;
+            if (name.EndsWith(partToRemove, true, CultureInfo.InvariantCulture))
+            {
+               name = name.Substring(0, name.Length - partToRemove.Length);
+            }
+            return name;
+         }
+      }
    }
 }

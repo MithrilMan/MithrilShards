@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Forge;
 
 namespace MithrilShards.Core.Network.Client
@@ -87,6 +88,39 @@ namespace MithrilShards.Core.Network.Client
                await Task.Delay(INNER_DELAY).ConfigureAwait(false);
             }
          }
+      }
+
+      /// <summary>
+      /// Tries the add end point.
+      ///
+      /// </summary>
+      /// <param name="endPoint">The end point.</param>
+      /// <returns><see langword="true"/> if the endpoint has been added, <see langword="false"/> if the endpoint was already listed.</returns>
+      public bool TryAddEndPoint(IPEndPoint endPoint)
+      {
+         endPoint = endPoint.EnsureIPv6();
+         if (this.connectionsToAttempt.Exists(ip => ip.Equals(endPoint)))
+         {
+            this.logger.LogDebug("EndPoint {RemoteEndPoint} already in the list of connections attempt.", endPoint);
+            return false;
+         }
+         else
+         {
+            this.connectionsToAttempt.Add(endPoint);
+            this.logger.LogDebug("EndPoint {RemoteEndPoint} added to the list of connections attempt.", endPoint);
+            return true;
+         }
+      }
+
+
+      /// <summary>
+      /// Tries the remove end point from the list of connection attempts.
+      /// </summary>
+      /// <param name="endPoint">The end point to remove.</param>
+      /// <returns><see langword="true"/> if the endpoint has been removed, <see langword="false"/> if the endpoint has not been found.</returns>
+      public bool TryRemoveEndPoint(IPEndPoint endPoint)
+      {
+         return this.connectionsToAttempt.Remove(endPoint);
       }
    }
 }

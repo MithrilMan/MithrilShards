@@ -1,5 +1,5 @@
 ﻿{
-   "ForgeConnectivitySettings": {
+   "ForgeConnectivity": {
       "ForceShutdownAfter": 300,
       "MaxInboundConnections": 25,
       "AllowLoopbackConnection": false,
@@ -20,7 +20,7 @@
          }
       ]
    },
-   "DevControllerSettings": {
+   "DevController": {
       "EndPoint": "127.0.0.1:45050"
    }
 }

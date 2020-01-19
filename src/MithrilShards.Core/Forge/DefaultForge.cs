@@ -41,19 +41,18 @@ namespace MithrilShards.Core.Forge
             {
                if (!(shard is IForgeConnectivity))
                {
+                  this.logger.LogDebug("Initializing Shard {ShardType}", shard.GetType().Name);
                   await shard.InitializeAsync(stoppingToken).ConfigureAwait(false);
                }
             }
          }
 
-         using (this.logger.BeginScope("Starting Shards"))
+         foreach (IMithrilShard shard in this.mithrilShards)
          {
-            foreach (IMithrilShard shard in this.mithrilShards)
+            if (!(shard is IForgeConnectivity))
             {
-               if (!(shard is IForgeConnectivity))
-               {
-                  _ = shard.StartAsync(stoppingToken);
-               }
+               this.logger.LogDebug("Starting Shard {ShardType}", shard.GetType().Name);
+               _ = shard.StartAsync(stoppingToken);
             }
          }
       }

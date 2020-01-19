@@ -93,7 +93,8 @@ namespace MithrilShards.Core.Network
          this.RegisterStatisticFeeds();
          this.eventSubscriptionManager.RegisterSubscriptions(
                this.eventBus.Subscribe<PeerConnected>(this.AddConnectedPeer),
-               this.eventBus.Subscribe<PeerDisconnected>(this.RemoveConnectedPeer)
+               this.eventBus.Subscribe<PeerDisconnected>(this.RemoveConnectedPeer),
+               this.eventBus.Subscribe<PeerDisconnectionRequired>(this.OnPeerDisconnectionRequested)
          );
 
          // start the task that tries to connect to other peers
@@ -190,6 +191,24 @@ namespace MithrilShards.Core.Network
 
          //TODO enhance this logic using a similar approach to IServerPeerConnectionGuards, but for clients
          return true;
+      }
+
+      protected void OnPeerDisconnectionRequested(PeerDisconnectionRequired @event)
+      {
+         IPEndPoint endPoint = @event.EndPoint.AsIPEndPoint().EnsureIPv6();
+         IPeerContext peerContext = this.inboundPeers.Values
+            .Concat(this.outboundPeers.Values.ToList())
+            .FirstOrDefault(peer => peer.RemoteEndPoint.Equals(endPoint));
+
+         if (peerContext != null)
+         {
+            this.logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection because: {DisconnectionReason}", endPoint, @event.Reason);
+            peerContext.ConnectionCancellationTokenSource.Cancel();
+         }
+         else
+         {
+            this.logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection failed, endpoint not matching with any connected peer.", endPoint);
+         }
       }
    }
 }

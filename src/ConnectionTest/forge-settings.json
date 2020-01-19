@@ -1,5 +1,5 @@
 ﻿{
-   "ForgeConnectivitySettings": {
+   "ForgeConnectivity": {
       "MaxInboundConnections": 25,
       "AllowLoopbackConnection": false,
       "Listeners": [

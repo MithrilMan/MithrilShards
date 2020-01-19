@@ -198,6 +198,7 @@ namespace MithrilShards.Core.Forge
          _ = this.hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
          {
 
+            // do not change optional to true, because there is SetFileLoadExceptionHandler that will create a default file if missing.
             config.AddJsonFile(this.ConfigurationFileName, optional: false, reloadOnChange: true);
 
             config.AddEnvironmentVariables("FORGE_");
