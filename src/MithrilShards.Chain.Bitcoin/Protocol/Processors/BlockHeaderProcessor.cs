@@ -1,7 +1,10 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
@@ -79,15 +82,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
 
          /// ask for blocks
-         /// TODO: BloclLocator creation have to be demanded to a BlockLocatorProvider
-         /// TODO: This logic should be moved probably elsewhere because it's not BIP-0152 related
          await this.SendMessageAsync(new GetHeadersMessage
          {
             Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-            BlockLocator = new Types.BlockLocator
-            {
-               BlockLocatorHashes = new UInt256[1] { this.chainDefinition.Genesis }
-            },
+            BlockLocator = this.headersLookup.GetTipLocator(),
             HashStop = UInt256.Zero
          }).ConfigureAwait(false);
       }
@@ -153,7 +151,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
          else
          {
-            startingNode = this.headersLookup.GetHighestNodeInBestChain(message.BlockLocator);
+            startingNode = this.headersLookup.GetHighestNodeInBestChainFromBlockLocator(message.BlockLocator);
          }
 
          this.logger.LogDebug("Serving headers from {StartingNodeHeight}:{StartingNodeHash}", startingNode.Height, startingNode.Hash);
@@ -161,59 +159,85 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return new ValueTask<bool>(true);
       }
 
-      public ValueTask<bool> ProcessMessageAsync(HeadersMessage headers, CancellationToken cancellation)
+      public async ValueTask<bool> ProcessMessageAsync(HeadersMessage headersMessage, CancellationToken cancellation)
       {
-         int headersCount = headers.Headers!.Length;
+         int protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
+         BlockHeader[]? headers = headersMessage.Headers;
+         int headersCount = headers!.Length;
 
          /// https://github.com/bitcoin/bitcoin/blob/b949ac9697a6cfe087f60a16c063ab9c5bf1e81f/src/net_processing.cpp#L2923-L2947
          /// bitcoin does this before deserialize the message but I don't think would be a big problem, we could ban the peer in case we find this being a vector attack.
          if (headersCount > MAX_HEADERS)
          {
             this.Misbehave(20, "Too many headers received.");
-            return new ValueTask<bool>(false);
+            return false;
+         }
+         if (headersCount == 0)
+         {
+            this.logger.LogDebug("Peer didn't returned any headers, let's assume we reached its tip.");
+            return false;
          }
 
-         ///// If this looks like it could be a block announcement (headersCount < MAX_BLOCKS_TO_ANNOUNCE),
-         ///// use special logic for handling headers that don't connect:
-         ///// - Send a getheaders message in response to try to connect the chain.
-         ///// - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that don't connect before giving DoS points
-         ///// - Once a headers message is received that is valid and does connect, nUnconnectingHeaders gets reset back to 0.
-         ///// see https://github.com/bitcoin/bitcoin/blob/ceb789cf3a9075729efa07f5114ce0369d8606c3/src/net_processing.cpp#L1658-L1683
-         //if (!LookupBlockIndex(headers[0].hashPrevBlock) && nCount < MAX_BLOCKS_TO_ANNOUNCE)
-         //{
-         //   nodestate->nUnconnectingHeaders++;
-         //   connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, ::ChainActive().GetLocator(pindexBestHeader), uint256()));
-         //   LogPrint(BCLog::NET, "received header %s: missing prev block %s, sending getheaders (%d) to end (peer=%d, nUnconnectingHeaders=%d)\n",
-         //           headers[0].GetHash().ToString(),
-         //           headers[0].hashPrevBlock.ToString(),
-         //           pindexBestHeader->nHeight,
-         //           pfrom->GetId(), nodestate->nUnconnectingHeaders);
-         //   // Set hashLastUnknownBlock for this peer, so that if we
-         //   // eventually get the headers - even from a different peer -
-         //   // we can use this peer to download.
-         //   UpdateBlockAvailability(pfrom->GetId(), headers.back().GetHash());
-
-         //   if (nodestate->nUnconnectingHeaders % MAX_UNCONNECTING_HEADERS == 0)
-         //   {
-         //      Misbehaving(pfrom->GetId(), 20);
-         //   }
-         //   return true;
-         //}
-
-
-         //In the special case where the remote node is at height 0 as well as us, then the headers count will be 0
-         if (headers.Headers.Length == 0 && this.status.PeerStartingHeight == 0 && this.headersLookup.Tip == this.chainDefinition.Genesis)
-            return new ValueTask<bool>(true);
-
-         //HeaderNode currentTip = this.headersLookup.GetTipHeaderNode();
-
-         int protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
-         foreach (Types.BlockHeader header in headers.Headers)
+         /// If this looks like it could be a block announcement (headersCount < MAX_BLOCKS_TO_ANNOUNCE),
+         /// use special logic for handling headers that don't connect:
+         /// - Send a getheaders message in response to try to connect the chain.
+         /// - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that don't connect before giving DoS points
+         /// - Once a headers message is received that is valid and does connect, nUnconnectingHeaders gets reset back to 0.
+         /// see https://github.com/bitcoin/bitcoin/blob/ceb789cf3a9075729efa07f5114ce0369d8606c3/src/net_processing.cpp#L1658-L1683
+         if (!this.headersLookup.IsKnown(headers[0].PreviousBlockHash) && headersCount < MAX_BLOCKS_TO_ANNOUNCE)
          {
-            UInt256 computedHash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion);
+            if (++this.status.UnconnectingHeaderReceived >= MAX_UNCONNECTING_HEADERS)
+            {
+               this.Misbehave(20, "Exceeded maximum number of received unconnecting headers.");
+            }
+
+            // ask again for headers starting from current tip
+            var newGetHeaderRequest = new GetHeadersMessage
+            {
+               Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
+               BlockLocator = this.headersLookup.GetTipLocator(),
+               HashStop = UInt256.Zero
+            };
+            await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
+
+            this.logger.LogDebug("received an unconnecting header, missing {PrevBlock}. Request again headers from {BlockLocator}",
+                                 headers[0].PreviousBlockHash,
+                                 newGetHeaderRequest.BlockLocator.BlockLocatorHashes[0]);
+
+            this.status.LastUnknownBlockHash = this.blockHeaderHashCalculator.ComputeHash(headers[^1], protocolVersion);
+            return true;
+         }
 
 
-            switch (this.headersLookup.TrySetTip(computedHash, header.PreviousBlockHash))
+         // in the special case where the remote node is at height 0 as well as us, then the headers count will be 0
+         if (headers.Length == 0 && this.status.PeerStartingHeight == 0 && this.headersLookup.Tip == this.chainDefinition.Genesis)
+            return true;
+
+         // compute hashes in parallel to speed up the operation and check sent headers are sequential.
+         Parallel.ForEach(headers, header => header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion));
+
+         // Ensure headers are consecutive.
+         for (int i = 1; i < headers.Length; i++)
+         {
+            if (headers[i].PreviousBlockHash != headers[i - 1].Hash)
+            {
+               this.Misbehave(20, "Non continuous headers sequence.");
+               return false;
+            }
+         }
+
+         bool newHeaderReceived = false;
+         // If we don't have the last header, then they'll have given us something new (if these headers are valid).
+         if (!this.headersLookup.IsKnown(headers.Last().Hash))
+         {
+            newHeaderReceived = true;
+         }
+
+         //TODO: continue from here https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1700
+
+         foreach (Types.BlockHeader header in headers)
+         {
+            switch (this.headersLookup.TrySetTip(header.Hash!, header.PreviousBlockHash))
             {
                case ConnectHeaderResult.Connected:
                case ConnectHeaderResult.SameTip:
@@ -223,10 +247,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                   break;
                case ConnectHeaderResult.MissingPreviousHeader:
                   // todo gestire il resync
-                  return new ValueTask<bool>(true);
+                  return true;
             }
          }
-         return new ValueTask<bool>(true);
+         return true;
       }
    }
 }

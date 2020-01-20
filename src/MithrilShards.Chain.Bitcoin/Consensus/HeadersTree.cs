@@ -9,7 +9,7 @@ using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Threading;
 
-namespace MithrilShards.Chain.Bitcoin
+namespace MithrilShards.Chain.Bitcoin.Consensus
 {
    /// <summary>
    /// A thread safe headers tree that tracks current best chain and known headers on forks.
@@ -105,6 +105,26 @@ namespace MithrilShards.Chain.Bitcoin
       }
 
       /// <summary>
+      /// Tries to get the node on best chain at a specified height.
+      /// </summary>
+      /// <param name="height">The height.</param>
+      /// <returns></returns>
+      public bool TryGetNodeOnBestChain(int height, [MaybeNullWhen(false)] out HeaderNode node)
+      {
+         using (new ReadLock(this.@lock))
+         {
+            if (height > this.height)
+            {
+               node = null!;
+               return false;
+            }
+
+            node = this.GetHeaderNodeNoLock(height);
+            return true;
+         }
+      }
+
+      /// <summary>
       /// Tries the get hash of a block at the specified height.
       /// </summary>
       /// <param name="height">The height.</param>
@@ -196,7 +216,7 @@ namespace MithrilShards.Chain.Bitcoin
       /// </summary>
       /// <param name="hashes">Hash to search for</param>
       /// <returns>First found block or genesis</returns>
-      public HeaderNode GetHighestNodeInBestChain(BlockLocator blockLocator)
+      public HeaderNode GetHighestNodeInBestChainFromBlockLocator(BlockLocator blockLocator)
       {
          if (blockLocator == null) throw new ArgumentNullException(nameof(blockLocator));
 
@@ -215,20 +235,33 @@ namespace MithrilShards.Chain.Bitcoin
          return this.genesisNode;
       }
 
+      /// <summary>
+      /// Gets the current tip header node.
+      /// </summary>
+      /// <returns></returns>
       public HeaderNode GetTipHeaderNode()
       {
          using (new ReadLock(this.@lock))
          {
-            int height = this.height;
-            return this.GetHeaderNodeNoLock(height);
+            return this.GetHeaderNodeNoLock(this.height);
          }
       }
 
-      public HeaderNode GetHeaderNode(int height)
+      /// <summary>
+      /// Determines whether the specified hash is a known hash.
+      /// May be present on best chain or on a fork.
+      /// </summary>
+      /// <param name="hash">The hash.</param>
+      /// <returns>
+      ///   <c>true</c> if the specified hash is known; otherwise, <c>false</c>.
+      /// </returns>
+      public bool IsKnown(UInt256? hash)
       {
+         if (hash == null) return false;
+
          using (new ReadLock(this.@lock))
          {
-            return this.GetHeaderNodeNoLock(height);
+            return this.knownHeaders.ContainsKey(hash);
          }
       }
 

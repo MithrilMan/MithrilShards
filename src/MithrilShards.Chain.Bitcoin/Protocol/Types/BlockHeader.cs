@@ -38,5 +38,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       public uint Nonce { get; set; }
 
       public ulong TransactionCount { get; set; }
+
+      /// <summary>
+      /// Not part of the protocol message, this property represents the block hash.
+      /// Not used during serialization, it's computed externally when received from other peers.
+      /// </summary>
+      public UInt256? Hash { get; set; }
    }
 }

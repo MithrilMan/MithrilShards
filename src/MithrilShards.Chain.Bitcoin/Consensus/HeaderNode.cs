@@ -1,7 +1,7 @@
 ﻿using System;
 using MithrilShards.Core.DataTypes;
 
-namespace MithrilShards.Chain.Bitcoin
+namespace MithrilShards.Chain.Bitcoin.Consensus
 {
    /// <summary>
    /// Represents a node in a linked list (tree) of headers.
