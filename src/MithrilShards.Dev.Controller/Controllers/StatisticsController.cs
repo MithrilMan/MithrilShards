@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Core.Statistics;
+using MithrilShards.Dev.Controller.Models.Responses;
 using MithrilShards.Diagnostic.StatisticsCollector;
+using MithrilShards.Diagnostic.StatisticsCollector.Models;
 
 namespace MithrilShards.Dev.Controller.Controllers
 {
@@ -32,18 +37,36 @@ namespace MithrilShards.Dev.Controller.Controllers
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status404NotFound)]
       [Route("{feedId}")]
-      public IActionResult GetStats(string feedId, bool humanReadable)
+      public IActionResult GetFeedStats(string feedId, bool humanReadable)
       {
-         return this.Ok(this.statisticFeedsCollector.GetFeedDump(feedId, humanReadable));
+         try
+         {
+            return this.statisticFeedsCollector.GetFeedDump(feedId, humanReadable) switch
+            {
+               RawStatisticFeedResult result => this.Ok(result),
+               TabularStatisticFeedResult result => this.Content(result.Content, "text/plain"),
+               IStatisticFeedResult result => this.Ok(result)
+            };
+         }
+         catch (System.ArgumentException)
+         {
+            return this.NotFound($"Feed {feedId} not found!");
+         }
       }
 
-      //[HttpGet]
-      //[ProducesResponseType(StatusCodes.Status200OK)]
-      //[ProducesResponseType(StatusCodes.Status404NotFound)]
-      //[Route("AvailableFeeds")]
-      //public IActionResult GetAvailableFeeds()
-      //{
-      //   return this.Ok(this.statisticFeedsCollector.GetFeedDump(feedId, humanReadable));
-      //}
+      [HttpGet]
+      [ProducesResponseType(StatusCodes.Status200OK)]
+      [ProducesResponseType(StatusCodes.Status404NotFound)]
+      [Route("AvailableFeeds")]
+      public IEnumerable<StatisticsGetAvailableFeeds> GetAvailableFeeds()
+      {
+         return this.statisticFeedsCollector.GetAvailableFeeds()
+            .Select(feed => new StatisticsGetAvailableFeeds
+            {
+               FeedId = feed.FeedId,
+               Title = feed.Title,
+               Fields = feed.Fields.Select(field => new KeyValuePair<string, string>(field.label, field.description)).ToList()
+            });
+      }
    }
 }

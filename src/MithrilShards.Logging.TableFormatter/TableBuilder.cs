@@ -105,23 +105,25 @@ namespace MithrilShards.Logging.TableFormatter
 
       private void DrawTitle(string title)
       {
+         string alignTitle(ColumnAlignment alignment, int availableSpace) => alignment switch
+         {
+            ColumnAlignment.Left => title.AlignLeft(availableSpace),
+            ColumnAlignment.Right => title.AlignRight(availableSpace),
+            ColumnAlignment.Center => title.Center(availableSpace),
+            _ => string.Empty
+         };
+
          if (this.TableStyle.TitleBorder)
          {
             this.DrawTopBorder();
             this.DrawLeftBorder();
             int availableSpace = this.Width - (this.TableStyle.Left == char.MinValue ? 0 : 1) - (this.TableStyle.Right == char.MinValue ? 0 : 1);
-            this.stringBuilder.Append(this.TableStyle.TitleAlignment switch
-            {
-               ColumnAlignment.Left => title.AlignLeft(availableSpace),
-               ColumnAlignment.Right => title.AlignRight(availableSpace),
-               ColumnAlignment.Center => title.Center(availableSpace),
-               _ => string.Empty
-            });
+            this.stringBuilder.AppendLine(alignTitle(this.TableStyle.TitleAlignment, availableSpace));
             this.DrawRightBorder();
          }
          else
          {
-            this.stringBuilder.AppendLine(title.Center(this.Width));
+            this.stringBuilder.AppendLine(alignTitle(this.TableStyle.TitleAlignment, this.Width));
          }
       }
 

@@ -7,7 +7,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
 {
    public partial class DefaultPeerBehaviorManager : IStatisticFeedsProvider
    {
-      private const string FEED_PEERS_SCORE = "ConnectedPeers";
+      private const string FEED_PEERS_SCORE = "PeersScore";
       private const int STATISTIC_REFRESH_RATE = 15;
       private readonly IStatisticFeedsCollector statisticFeedsCollector;
 

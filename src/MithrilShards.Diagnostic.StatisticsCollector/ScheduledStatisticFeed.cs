@@ -56,7 +56,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <value>
       /// The last result date.
       /// </value>
-      public DateTimeOffset LastResultDate { get; internal set; }
+      public DateTimeOffset LastResultsDate { get; internal set; }
 
       public ScheduledStatisticFeed(IStatisticFeedsProvider source, StatisticFeedDefinition statisticFeedDefinition)
       {
@@ -95,7 +95,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          return System.Text.Json.JsonSerializer.Serialize(new
          {
             Title = this.StatisticFeedDefinition.Title,
-            Time = this.LastResultDate,
+            Time = this.LastResultsDate,
             Labels = from fieldDefinition in this.StatisticFeedDefinition.FieldsDefinition select fieldDefinition.Label,
             Values = this.lastResults
          });
@@ -105,17 +105,18 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       {
          this.lastResults.Clear();
          this.lastResults.AddRange(results);
-         this.LastResultDate = DateTime.Now;
+         this.LastResultsDate = DateTime.Now;
       }
 
+
       /// <summary>
-      /// Updates the table builder using last fetched results.
+      /// Gets the feed in a textual tabular format.
       /// </summary>
-      /// <exception cref="NotImplementedException"></exception>
-      public string GetHumanReadableFeed()
+      /// <returns></returns>
+      public string GetTabularFeed()
       {
          this.stringBuilder.Clear();
-         this.tableBuilder.Start($"{this.LastResultDate.TimeOfDay} - {this.StatisticFeedDefinition.Title}");
+         this.tableBuilder.Start($"{this.LastResultsDate.LocalDateTime} - {this.StatisticFeedDefinition.Title}");
          this.lastResults.ForEach(row => this.tableBuilder.DrawRow(row));
          this.tableBuilder.End();
          return this.stringBuilder.ToString();

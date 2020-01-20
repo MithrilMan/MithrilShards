@@ -24,8 +24,4 @@
     <ProjectReference Include="..\MithrilShards.Diagnostic.StatisticsCollector\MithrilShards.Diagnostic.StatisticsCollector.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Responses\" />
-  </ItemGroup>
-
 </Project>

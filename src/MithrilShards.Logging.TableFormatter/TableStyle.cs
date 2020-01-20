@@ -16,7 +16,7 @@
                         char left = '|',
                         string separator = " | ",
                         bool titleBorder = false,
-                        ColumnAlignment titleAlignment = ColumnAlignment.Center)
+                        ColumnAlignment titleAlignment = ColumnAlignment.Left)
       {
          this.Top = top;
          this.Right = right;

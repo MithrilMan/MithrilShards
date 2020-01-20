@@ -19,7 +19,7 @@
       ]
    },
    "StatisticsCollector": {
-      "ContinuousConsoleDisplay": true,
+      "ContinuousConsoleDisplay": false,
       "ContinuousConsoleDisplayRate": 5
    },
    "DevController": {

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Statistics;
+using MithrilShards.Diagnostic.StatisticsCollector.Models;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector
 {
@@ -39,6 +40,19 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
                }
             }
          }
+      }
+
+      public IEnumerable<(string FeedId, string Title, IEnumerable<(string label, string description)> Fields)> GetAvailableFeeds()
+      {
+         return this.registeredfeedDefinitions.Select(registeredFeed =>
+         {
+            StatisticFeedDefinition feedDefinition = registeredFeed.StatisticFeedDefinition;
+            return (
+               FeedId: feedDefinition.FeedId,
+               Title: feedDefinition.Title,
+               Fields: feedDefinition.FieldsDefinition.Select(field => (field.Label, field.Description))
+               );
+         });
       }
 
       /// <summary>
@@ -158,7 +172,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
             if (useTableBuilder)
             {
-               this.logStringBuilder.AppendLine(feed.GetHumanReadableFeed());
+               this.logStringBuilder.AppendLine(feed.GetTabularFeed());
             }
 
             feed.SetLastResults(newValues);
@@ -195,7 +209,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <param name="feedId">The feed identifier.</param>
       /// <param name="humanReadable">If set to <c>true</c> returns a human readable dump representation.</param>
       /// <returns></returns>
-      public object GetFeedDump(string feedId, bool humanReadable)
+      public IStatisticFeedResult GetFeedDump(string feedId, bool humanReadable)
       {
          ScheduledStatisticFeed feed = this.registeredfeedDefinitions.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
          if (feed == null)
@@ -208,15 +222,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
             this.FetchFeedStatisticNoLock(feed, humanReadable);
             if (humanReadable)
             {
-               return new
-               {
-                  Time = feed.LastResultDate,
-                  Result = feed.GetHumanReadableFeed()
-               };
+               return new TabularStatisticFeedResult(feed);
             }
             else
             {
-               return feed.GetLastResultsDump();
+               return new RawStatisticFeedResult(feed);
             }
          }
       }
