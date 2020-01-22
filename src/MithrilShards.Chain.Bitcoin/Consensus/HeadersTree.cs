@@ -151,11 +151,68 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       /// <param name="newTip">The new tip</param>
       /// <param name="newTipPreviousHash">The block hash before the new tip</param>
-      public ConnectHeaderResult TrySetTip(in UInt256 newTip, in UInt256? newTipPreviousHash)
+      public ConnectHeaderResult TrySetTip(in UInt256 newTip, in UInt256? newTipPreviousHash, out BlockValidationState blockValidationState)
       {
          using (new WriteLock(this.@lock))
          {
-            return this.TrySetTipNoLock(newTip, newTipPreviousHash);
+            if (newTip == this.Genesis)
+            {
+               if (newTipPreviousHash != null)
+               {
+                  throw new ArgumentException("Genesis block should not have previous block", nameof(newTipPreviousHash));
+               }
+
+               this.ResetToGenesis();
+
+               return ConnectHeaderResult.ResettedToGenesis;
+            }
+            else
+            {
+               if (newTipPreviousHash == null)
+               {
+                  throw new ArgumentNullException(nameof(newTipPreviousHash), "Previous hash null allowed only on genesis block.");
+               }
+            }
+
+            // check if the tip we want to set is already into our chain
+            if (this.knownHeaders.TryGetValue(newTip, out HeaderNode? tipNode))
+            {
+               if (this.bestChain[tipNode.Height - 1] != newTipPreviousHash)
+               {
+                  throw new ArgumentException("The new tip is already inserted with a different previous block.");
+               }
+
+               this.logger.LogDebug("The tip we want to set is already in our headers chain.");
+            }
+
+            // ensures tip previous header is present.
+            if (!this.knownHeaders.TryGetValue(newTipPreviousHash, out HeaderNode? newTipPreviousHeader))
+            {
+               //previous tip header not found, abort.
+               this.logger.LogDebug("New Tip previous header not found, can't connect headers.");
+               return ConnectHeaderResult.MissingPreviousHeader;
+            }
+
+            // if newTipPreviousHash isn't current tip, means we need to rollback
+            bool needRewind = this.height != newTipPreviousHeader.Height;
+            if (needRewind)
+            {
+               int rollingBackHeight = this.height;
+               while (rollingBackHeight > newTipPreviousHeader.Height)
+               {
+                  this.knownHeaders.Remove(this.bestChain[rollingBackHeight]);
+                  this.bestChain.RemoveAt(rollingBackHeight);
+                  rollingBackHeight--;
+               }
+               this.height = rollingBackHeight;
+            }
+
+            // now we can put the tip on top of our chain.
+            this.height++;
+            this.bestChain.Add(newTip); //[this.height] = newTip;
+            this.knownHeaders.Add(newTip, new HeaderNode(this.height, newTip, newTipPreviousHash));
+
+            return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
          }
       }
 
@@ -295,68 +352,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             node = null!;
             return false;
          }
-      }
-
-      private ConnectHeaderResult TrySetTipNoLock(in UInt256 newTip, in UInt256? newTipPreviousHash)
-      {
-         if (newTip == this.Genesis)
-         {
-            if (newTipPreviousHash != null)
-            {
-               throw new ArgumentException("Genesis block should not have previous block", nameof(newTipPreviousHash));
-            }
-
-            this.ResetToGenesis();
-
-            return ConnectHeaderResult.ResettedToGenesis;
-         }
-         else
-         {
-            if (newTipPreviousHash == null)
-            {
-               throw new ArgumentNullException(nameof(newTipPreviousHash), "Previous hash null allowed only on genesis block.");
-            }
-         }
-
-         // check if the tip we want to set is already into our chain
-         if (this.knownHeaders.TryGetValue(newTip, out HeaderNode? tipNode))
-         {
-            if (this.bestChain[tipNode.Height - 1] != newTipPreviousHash)
-            {
-               throw new ArgumentException("The new tip is already inserted with a different previous block.");
-            }
-
-            this.logger.LogDebug("The tip we want to set is already in our headers chain.");
-         }
-
-         // ensures tip previous header is present.
-         if (!this.knownHeaders.TryGetValue(newTipPreviousHash, out HeaderNode? newTipPreviousHeader))
-         {
-            //previous tip header not found, abort.
-            this.logger.LogDebug("New Tip previous header not found, can't connect headers.");
-            return ConnectHeaderResult.MissingPreviousHeader;
-         }
-
-         // if newTipPreviousHash isn't current tip, means we need to rollback
-         bool needRewind = this.height != newTipPreviousHeader.Height;
-         if (needRewind)
-         {
-            int rollingBackHeight = this.height;
-            while (rollingBackHeight > newTipPreviousHeader.Height)
-            {
-               this.knownHeaders.Remove(this.bestChain[rollingBackHeight]);
-               this.bestChain.RemoveAt(rollingBackHeight);
-               rollingBackHeight--;
-            }
-            this.height = rollingBackHeight;
-         }
-
-         // now we can put the tip on top of our chain.
-         this.height++;
-         this.bestChain.Add(newTip); //[this.height] = newTip;
-         this.knownHeaders.Add(newTip, new HeaderNode(this.height, newTip, newTipPreviousHash));
-
-         return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
       }
    }
 }
