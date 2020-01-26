@@ -20,13 +20,13 @@ namespace MithrilShards.Core.Crypto
          using var sha = new SHA256Managed();
          Span<byte> result = new byte[32];
 
-         if (!sha.TryComputeHash(data, result, out _)) throw new HashGeneratorException($"Failed to perform {nameof(Sha256)}");
-         if (!sha.TryComputeHash(result, result, out _)) throw new HashGeneratorException($"Failed to perform {nameof(Sha256)}");
+         if (!sha.TryComputeHash(data, result, out _)) throw new HashGeneratorException($"Failed to perform {nameof(DoubleSha256)}");
+         if (!sha.TryComputeHash(result, result, out _)) throw new HashGeneratorException($"Failed to perform {nameof(DoubleSha256)}");
 
          return result;
       }
 
-      public static ReadOnlySpan<byte> DoubleSha512AsBytes(ReadOnlySpan<byte> data)
+      public static ReadOnlySpan<byte> DoubleSha512(ReadOnlySpan<byte> data)
       {
          using var sha = new SHA512Managed();
          Span<byte> result = new byte[64];

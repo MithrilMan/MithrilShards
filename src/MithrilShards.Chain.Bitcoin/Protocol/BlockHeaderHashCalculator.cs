@@ -21,7 +21,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
          this.blockHeaderSerializer.Serialize(header, protocolVersion, buffer);
 
          //slicing first 80 bytes because the header includes the tx varint value that doesn't need to be included to compute the hash
-         return new UInt256(HashGenerator.DoubleSha256(buffer.WrittenSpan.Slice(0, 80)));
+         return HashGenerator.DoubleSha256AsUInt256(buffer.WrittenSpan.Slice(0, 80));
       }
    }
 }
