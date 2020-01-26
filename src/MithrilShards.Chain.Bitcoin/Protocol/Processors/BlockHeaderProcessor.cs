@@ -182,11 +182,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// use special logic for handling headers that don't connect:
          /// - Send a getheaders message in response to try to connect the chain.
          /// - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that don't connect before giving DoS points
-         /// - Once a headers message is received that is valid and does connect, nUnconnectingHeaders gets reset back to 0.
+         /// - Once a headers message is received that is valid and does connect, unconnecting header counter gets reset back to 0.
          /// see https://github.com/bitcoin/bitcoin/blob/ceb789cf3a9075729efa07f5114ce0369d8606c3/src/net_processing.cpp#L1658-L1683
          if (!this.headersLookup.IsKnown(headers[0].PreviousBlockHash) && headersCount < MAX_BLOCKS_TO_ANNOUNCE)
          {
-            if (++this.status.UnconnectingHeaderReceived >= MAX_UNCONNECTING_HEADERS)
+            if (++this.status.UnconnectingHeaderReceived % MAX_UNCONNECTING_HEADERS == 0)
             {
                this.Misbehave(20, "Exceeded maximum number of received unconnecting headers.");
             }
@@ -207,11 +207,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             this.status.LastUnknownBlockHash = this.blockHeaderHashCalculator.ComputeHash(headers[^1], protocolVersion);
             return true;
          }
-
-
-         // in the special case where the remote node is at height 0 as well as us, then the headers count will be 0
-         if (headers.Length == 0 && this.status.PeerStartingHeight == 0 && this.headersLookup.Tip == this.chainDefinition.Genesis)
-            return true;
 
          // compute hashes in parallel to speed up the operation and check sent headers are sequential.
          Parallel.ForEach(headers, header => header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion));
@@ -235,7 +230,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          //TODO: continue from here https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1700
 
-         foreach (Types.BlockHeader header in headers)
+         foreach (BlockHeader header in headers)
          {
             switch (this.headersLookup.TrySetTip(header.Hash!, header.PreviousBlockHash))
             {
@@ -246,7 +241,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                   //currentTip = currentTip.BuildNext(computedHash);
                   break;
                case ConnectHeaderResult.MissingPreviousHeader:
-                  // todo gestire il resync
+                  // TODO manage re-sync
                   return true;
             }
          }
