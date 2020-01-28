@@ -12,12 +12,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.ValidationRules.Header
 
       public override void Check(IHeaderValidationContext context)
       {
-         BlockHeader header = context.Header;
-         var bits = header.Bits.ToBigInteger();
-         if (bits.CompareTo(BigInteger.Zero) <= 0 || bits.CompareTo(Pow256) >= 0)
-            return false;
+         //BlockHeader header = context.Header;
+         //var bits = header.Bits.ToBigInteger();
+         //if (bits.CompareTo(BigInteger.Zero) <= 0 || bits.CompareTo(Pow256) >= 0)
+         //   return false;
 
-         return GetPoWHash() <= this.Bits.ToUInt256();
+         //return GetPoWHash() <= this.Bits.ToUInt256();
 
          //TODO
 

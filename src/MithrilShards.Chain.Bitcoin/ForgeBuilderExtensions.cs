@@ -37,6 +37,7 @@ namespace MithrilShards.Chain.Bitcoin
                   .AddSingleton<IChainDefinition, TChainDefinition>()
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
                   .AddSingleton<HeadersTree>()
+                  .AddSingleton<IBlockHeaderRepository, InMemoryBlockHeaderRepository>()
                   .AddSingleton<SelfConnectionTracker>()
                   .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())
                   .Replace(ServiceDescriptor.Singleton<IUserAgentBuilder, BitcoinUserAgentBuilder>())

@@ -23,10 +23,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    {
       private const int INITIAL_ITEMS_ALLOCATED = 16 ^ 2; //this parameter may go into settings, better to be multiple of 2
 
-      private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim();
+      private readonly ReaderWriterLockSlim theLock = new ReaderWriterLockSlim();
 
       private readonly ILogger<HeadersTree> logger;
       private readonly IChainDefinition chainDefinition;
+      readonly IBlockHeaderRepository blockHeaderRepository;
 
       /// <summary>
       /// Known set of hashes, both on forks and on best chains.
@@ -54,14 +55,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          get
          {
-            using (new ReadLock(this.@lock)) return this.bestChain[this.height];
+            using (new ReadLock(this.theLock)) return this.bestChain[this.height];
          }
       }
 
-      public HeadersTree(ILogger<HeadersTree> logger, IChainDefinition chainDefinition)
+      public HeadersTree(ILogger<HeadersTree> logger, IChainDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository)
       {
          this.logger = logger;
          this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
+         this.blockHeaderRepository = blockHeaderRepository;
 
          this.genesisNode = new HeaderNode(0, this.chainDefinition.Genesis, null);
 
@@ -70,7 +72,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       private void ResetToGenesis()
       {
-         using (new WriteLock(this.@lock))
+         using (new WriteLock(this.theLock))
          {
             this.height = 0;
             this.bestChain.Clear();
@@ -83,7 +85,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public bool Contains(UInt256 blockHash)
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             return this.knownHeaders.ContainsKey(blockHash);
          }
@@ -98,7 +100,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns><c>true</c> if the result has been found, <see langword="false"/> otherwise.</returns>
       public bool TryGetNode(UInt256 blockHash, bool onlyBestChain, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             return onlyBestChain ? this.knownHeaders.TryGetValue(blockHash, out node!) : this.TryGetNodeOnBestChainNoLock(blockHash, out node!);
          }
@@ -111,7 +113,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns></returns>
       public bool TryGetNodeOnBestChain(int height, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             if (height > this.height)
             {
@@ -132,7 +134,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns></returns>
       public bool TryGetHash(int height, [MaybeNullWhen(false)]out UInt256 blockHash)
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             if (height > this.height || height < 0)
             {
@@ -156,7 +158,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          UInt256 newTipHash = newTip.Hash!;
          UInt256? newTipPreviousHash = newTip.PreviousBlockHash;
 
-         using (new WriteLock(this.@lock))
+         using (new WriteLock(this.theLock))
          {
             if (newTipHash == this.Genesis)
             {
@@ -221,8 +223,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
             // now we can put the tip on top of our chain.
             this.height++;
-            this.bestChain.Add(newTipHash); //[this.height] = newTip;
-            this.knownHeaders.Add(newTip, new HeaderNode(this.height, newTipHash, newTipPreviousHash));
+            this.bestChain.Add(newTipHash);
+            this.knownHeaders.Add(newTipHash, new HeaderNode(this.height, newTipHash, newTipPreviousHash));
+            this.blockHeaderRepository.TryAdd(newTip);
 
             return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
          }
@@ -230,7 +233,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockLocator GetTipLocator()
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             return this.GetLocatorNoLock(this.height);
          }
@@ -238,7 +241,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockLocator? GetLocator(int height)
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             return (height > this.height || height < 0) ? null : this.GetLocatorNoLock(height);
          }
@@ -246,7 +249,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockLocator? GetLocator(UInt256 blockHash)
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             return (!this.knownHeaders.TryGetValue(blockHash, out HeaderNode? node)) ? null : this.GetLocatorNoLock(node.Height);
          }
@@ -289,7 +292,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          if (blockLocator == null) throw new ArgumentNullException(nameof(blockLocator));
 
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             foreach (UInt256 hash in blockLocator.BlockLocatorHashes)
             {
@@ -310,7 +313,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns></returns>
       public HeaderNode GetTipHeaderNode()
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             return this.GetHeaderNodeNoLock(this.height);
          }
@@ -328,7 +331,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          if (hash == null) return false;
 
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             return this.knownHeaders.ContainsKey(hash);
          }
