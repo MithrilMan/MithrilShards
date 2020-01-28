@@ -151,15 +151,19 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       /// <param name="newTip">The new tip</param>
       /// <param name="newTipPreviousHash">The block hash before the new tip</param>
-      public ConnectHeaderResult TrySetTip(in UInt256 newTip, in UInt256? newTipPreviousHash, out BlockValidationState blockValidationState)
+      public ConnectHeaderResult TrySetTip(in BlockHeader newTip, ref BlockValidationState validationState)
       {
+         UInt256 newTipHash = newTip.Hash!;
+         UInt256? newTipPreviousHash = newTip.PreviousBlockHash;
+
          using (new WriteLock(this.@lock))
          {
-            if (newTip == this.Genesis)
+            if (newTipHash == this.Genesis)
             {
                if (newTipPreviousHash != null)
                {
-                  throw new ArgumentException("Genesis block should not have previous block", nameof(newTipPreviousHash));
+                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "Genesis block should not have previous block.");
+                  return ConnectHeaderResult.Invalid;
                }
 
                this.ResetToGenesis();
@@ -170,13 +174,21 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             {
                if (newTipPreviousHash == null)
                {
-                  throw new ArgumentNullException(nameof(newTipPreviousHash), "Previous hash null allowed only on genesis block.");
+                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "Previous hash null allowed only on genesis block.");
+                  return ConnectHeaderResult.Invalid;
                }
             }
 
             // check if the tip we want to set is already into our chain
-            if (this.knownHeaders.TryGetValue(newTip, out HeaderNode? tipNode))
+            if (this.knownHeaders.TryGetValue(newTipHash, out HeaderNode? tipNode))
             {
+               if (tipNode.Validity.HasFlag(HeaderValidityStatus.FailedMask))
+               {
+                  this.logger.LogDebug("Error: block {0} is marked invalid.", newTip.Hash);
+                  validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate");
+                  return ConnectHeaderResult.Invalid;
+               }
+
                if (this.bestChain[tipNode.Height - 1] != newTipPreviousHash)
                {
                   throw new ArgumentException("The new tip is already inserted with a different previous block.");
@@ -209,8 +221,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
             // now we can put the tip on top of our chain.
             this.height++;
-            this.bestChain.Add(newTip); //[this.height] = newTip;
-            this.knownHeaders.Add(newTip, new HeaderNode(this.height, newTip, newTipPreviousHash));
+            this.bestChain.Add(newTipHash); //[this.height] = newTip;
+            this.knownHeaders.Add(newTip, new HeaderNode(this.height, newTipHash, newTipPreviousHash));
 
             return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
          }
