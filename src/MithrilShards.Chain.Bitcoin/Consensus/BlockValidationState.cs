@@ -4,10 +4,10 @@
    {
       public BlockValidationFailureContext FailureContext { get; private set; } = BlockValidationFailureContext.Unset;
 
-      public void Invalid(BlockValidationFailureContext failureContext, string reason = "")
+      public void Invalid(BlockValidationFailureContext failureContext, string reason, string debugMessage)
       {
          this.FailureContext = failureContext;
-         this.Invalid(reason);
+         base.Invalid(reason, debugMessage);
       }
    }
 }

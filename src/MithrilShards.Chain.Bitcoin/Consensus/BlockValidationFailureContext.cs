@@ -43,12 +43,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <summary>
       /// We don't have the previous block the checked one is built on.
       /// </summary>
-      BlockMissingPrev,
+      BlockMissingPreviousHeader,
 
       /// <summary>
       /// A block this one builds on is invalid.
       /// </summary>
-      BlockInvalidPrev,
+      BlockInvalidPreviousHeader,
 
       /// <summary>
       /// Block timestamp was > 2 hours in the future (or our clock is bad).

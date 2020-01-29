@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Configs;
+﻿using System;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
 namespace MithrilShards.Network.Benchmark
@@ -26,7 +28,7 @@ namespace MithrilShards.Network.Benchmark
 
       static void Main(string[] args)
       {
-         // to disable tiered compilation, either set environment variable COMPLUS_TieredCompilation to 0 or uncomment this configuration
+         //// to disable tiered compilation, either set environment variable COMPLUS_TieredCompilation to 0 or uncomment this configuration
          //IConfig config = DefaultConfig.Instance
          //   .StopOnFirstError(true)
          //   .With(Job.Default

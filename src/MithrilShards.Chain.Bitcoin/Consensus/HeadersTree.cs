@@ -173,8 +173,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             {
                if (newTipPreviousHash != null)
                {
-                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "Genesis block should not have previous block.");
-                  return ConnectHeaderResult.Invalid;
+                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "invalid genesis", "genesis block should not have previous block.");
+                  return this.ValidationFailure(validationState);
                }
 
                this.ResetToGenesis();
@@ -185,8 +185,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             {
                if (newTipPreviousHash == null)
                {
-                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "Previous hash null allowed only on genesis block.");
-                  return ConnectHeaderResult.Invalid;
+                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "null previous header", "previous hash null allowed only on genesis block");
+                  return this.ValidationFailure(validationState);
                }
             }
 
@@ -195,29 +195,35 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             {
                if (tipNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
                {
-                  this.logger.LogDebug("Error: block {0} is marked invalid.", newTip.Hash);
-                  validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate");
-                  return ConnectHeaderResult.Invalid;
+                  validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
+                  return this.ValidationFailure(validationState);
                }
 
-               //if (this.bestChain[tipNode.Height - 1] != newTipPreviousHash)
-               //{
-               //   throw new ArgumentException("The new tip is already inserted with a different previous block.");
-               //}
-
-               if (!this.checkProofOfWorkRule.Check(new HeaderValidationContext(newTip))
-                  return error("%s: Consensus::CheckBlockHeader: %s, %s", __func__, hash.ToString(), FormatStateMessage(state));
+               if (!this.checkProofOfWorkRule.Check(new HeaderValidationContext(newTip)))
+               {
+                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "high-hash", "invalid proof of work");
+                  return this.ValidationFailure(validationState);
+               }
 
                this.logger.LogDebug("The tip we want to set is already in our headers chain.");
+               return ConnectHeaderResult.Connected;
             }
 
             // ensures tip previous header is present.
             if (!this.knownHeaders.TryGetValue(newTipPreviousHash, out HeaderNode? newTipPreviousHeader))
             {
                //previous tip header not found, abort.
-               this.logger.LogDebug("New Tip previous header not found, can't connect headers.");
-               return ConnectHeaderResult.MissingPreviousHeader;
+               validationState.Invalid(BlockValidationFailureContext.BlockMissingPreviousHeader, "prev-blk-not-found", "previous header not found, can't connect headers");
+               return this.ValidationFailure(validationState);
             }
+
+            if (newTipPreviousHeader.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
+            {
+               validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "bad-prevblk", "previous block invalid");
+               return this.ValidationFailure(validationState);
+            }
+
+            continue L3612 validation.cpp
 
             // if newTipPreviousHash isn't current tip, means we need to rollback
             bool needRewind = this.height != newTipPreviousHeader.Height;
@@ -379,6 +385,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             node = null!;
             return false;
          }
+      }
+
+      /// <summary>
+      /// Logs the validation failure reason and return a <see cref="ConnectHeaderResult.Invalid"/>.
+      /// </summary>
+      /// <param name="validationState">Validation state containing failing reason.</param>
+      /// <returns></returns>
+      private ConnectHeaderResult ValidationFailure(BlockValidationState validationState)
+      {
+         this.logger.LogDebug("Header validation failure: {0}", validationState.ToString());
+         return ConnectHeaderResult.Invalid;
       }
    }
 }

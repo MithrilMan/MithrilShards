@@ -28,13 +28,19 @@
 
 
       public string? RejectReason { get; private set; }
+
+      public string? DebugMessage { get; private set; }
+
       public bool IsValid() => this.mode == InnerState.Valid;
+
       public bool IsInvalid() => this.mode == InnerState.Invalid;
+
       public bool IsError() => this.mode == InnerState.Error;
 
-      protected void Invalid(string reason)
+      protected void Invalid(string reason, string debugMessage)
       {
          this.RejectReason = reason;
+         this.DebugMessage = debugMessage;
       }
 
       public void Error(string reason)
@@ -45,6 +51,19 @@
          }
 
          this.mode = InnerState.Error;
+      }
+
+
+      public override string ToString()
+      {
+         if (this.IsValid())
+         {
+            return "Valid";
+         }
+         else
+         {
+            return $"{this.RejectReason ?? string.Empty} ({this.DebugMessage ?? string.Empty})";
+         }
       }
    }
 }

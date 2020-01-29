@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 
 namespace MithrilShards.Core.Crypto
@@ -10,7 +11,7 @@ namespace MithrilShards.Core.Crypto
          using var sha = new SHA256Managed();
          Span<byte> result = new byte[32];
 
-         if (!sha.TryComputeHash(data, result, out _)) throw new HashGeneratorException($"Failed to perform {nameof(Sha256)}");
+         if (!sha.TryComputeHash(data, result, out _)) ThrowHashGeneratorException($"Failed to perform {nameof(Sha256)}");
 
          return result;
       }
@@ -20,8 +21,10 @@ namespace MithrilShards.Core.Crypto
          using var sha = new SHA256Managed();
          Span<byte> result = new byte[32];
 
-         if (!sha.TryComputeHash(data, result, out _)) throw new HashGeneratorException($"Failed to perform {nameof(DoubleSha256)}");
-         if (!sha.TryComputeHash(result, result, out _)) throw new HashGeneratorException($"Failed to perform {nameof(DoubleSha256)}");
+         if (!sha.TryComputeHash(data, result, out _) || !sha.TryComputeHash(result, result, out _))
+         {
+            ThrowHashGeneratorException($"Failed to perform {nameof(DoubleSha256)}");
+         }
 
          return result;
       }
@@ -33,6 +36,13 @@ namespace MithrilShards.Core.Crypto
          sha.TryComputeHash(data, result, out _);
          sha.TryComputeHash(result, result, out _);
          return result.Slice(0, 32);
+      }
+
+
+      [DoesNotReturn]
+      public static void ThrowHashGeneratorException(string message)
+      {
+         throw new HashGeneratorException(message);
       }
    }
 }
