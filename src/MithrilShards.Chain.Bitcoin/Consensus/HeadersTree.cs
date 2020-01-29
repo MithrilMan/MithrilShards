@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Bitcoin.Consensus.ValidationRules;
+using MithrilShards.Chain.Bitcoin.Consensus.ValidationRules.Header;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol;
@@ -28,6 +31,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       private readonly ILogger<HeadersTree> logger;
       private readonly IChainDefinition chainDefinition;
       readonly IBlockHeaderRepository blockHeaderRepository;
+      readonly IEnumerable<IHeaderValidationRule> headerValidationRules;
 
       /// <summary>
       /// Known set of hashes, both on forks and on best chains.
@@ -45,6 +49,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// The genesis node.
       /// </summary>
       private readonly HeaderNode genesisNode;
+      private readonly CheckProofOfWork checkProofOfWorkRule;
 
       public UInt256 Genesis => this.chainDefinition.Genesis;
 
@@ -59,13 +64,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
-      public HeadersTree(ILogger<HeadersTree> logger, IChainDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository)
+      public HeadersTree(ILogger<HeadersTree> logger, IChainDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository, IEnumerable<IHeaderValidationRule> headerValidationRules)
       {
          this.logger = logger;
          this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
          this.blockHeaderRepository = blockHeaderRepository;
+         this.headerValidationRules = headerValidationRules;
 
          this.genesisNode = new HeaderNode(0, this.chainDefinition.Genesis, null);
+
+         this.checkProofOfWorkRule = this.headerValidationRules.OfType<CheckProofOfWork>().FirstOrDefault();
+         if (this.checkProofOfWorkRule == null) throw new NullReferenceException("CheckProofOfWork header validation rule not found.");
 
          this.ResetToGenesis();
       }
@@ -184,17 +193,20 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             // check if the tip we want to set is already into our chain
             if (this.knownHeaders.TryGetValue(newTipHash, out HeaderNode? tipNode))
             {
-               if (tipNode.Validity.HasFlag(HeaderValidityStatus.FailedMask))
+               if (tipNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
                {
                   this.logger.LogDebug("Error: block {0} is marked invalid.", newTip.Hash);
                   validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate");
                   return ConnectHeaderResult.Invalid;
                }
 
-               if (this.bestChain[tipNode.Height - 1] != newTipPreviousHash)
-               {
-                  throw new ArgumentException("The new tip is already inserted with a different previous block.");
-               }
+               //if (this.bestChain[tipNode.Height - 1] != newTipPreviousHash)
+               //{
+               //   throw new ArgumentException("The new tip is already inserted with a different previous block.");
+               //}
+
+               if (!this.checkProofOfWorkRule.Check(new HeaderValidationContext(newTip))
+                  return error("%s: Consensus::CheckBlockHeader: %s, %s", __func__, hash.ToString(), FormatStateMessage(state));
 
                this.logger.LogDebug("The tip we want to set is already in our headers chain.");
             }

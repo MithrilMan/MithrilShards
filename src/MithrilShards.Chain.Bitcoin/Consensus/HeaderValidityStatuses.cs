@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
 {
    [Flags]
-   public enum HeaderValidityStatus
+   public enum HeaderValidityStatuses
    {
       Unset= 0,
 

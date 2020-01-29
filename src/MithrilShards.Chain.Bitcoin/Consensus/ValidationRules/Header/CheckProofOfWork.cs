@@ -10,9 +10,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.ValidationRules.Header
    {
       public CheckProofOfWork(ILogger<CheckProofOfWork> logger) : base(logger) { }
 
-      public override void Check(IHeaderValidationContext context)
+      public override bool Check(IHeaderValidationContext context)
       {
-         //BlockHeader header = context.Header;
+         BlockHeader header = context.Header;
+
+
+         return true; //TODO implement the rule properly
+
          //var bits = header.Bits.ToBigInteger();
          //if (bits.CompareTo(BigInteger.Zero) <= 0 || bits.CompareTo(Pow256) >= 0)
          //   return false;

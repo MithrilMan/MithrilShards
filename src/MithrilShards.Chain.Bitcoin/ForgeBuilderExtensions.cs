@@ -3,6 +3,8 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Chain.Bitcoin.Consensus;
+using MithrilShards.Chain.Bitcoin.Consensus.ValidationRules;
+using MithrilShards.Chain.Bitcoin.Consensus.ValidationRules.Header;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Network.Server.Guards;
 using MithrilShards.Chain.Bitcoin.Protocol;
@@ -45,10 +47,20 @@ namespace MithrilShards.Chain.Bitcoin
                   .AddPeerGuards()
                   .AddMessageSerializers()
                   .AddProtocolTypeSerializers()
+                  .AddValidationRules()
                   .AddMessageProcessors();
             });
 
          return forgeBuilder;
+      }
+      private static IServiceCollection AddValidationRules(this IServiceCollection services)
+      {
+         services
+            .AddSingleton<IHeaderValidationRule, CheckProofOfWork>()
+            .AddSingleton<IServerPeerConnectionGuard, MaxConnectionThresholdGuard>()
+            ;
+
+         return services;
       }
 
       private static IServiceCollection AddPeerGuards(this IServiceCollection services)

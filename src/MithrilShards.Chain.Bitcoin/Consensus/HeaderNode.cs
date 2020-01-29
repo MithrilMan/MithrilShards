@@ -12,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <summary>
       /// Gets the validity of the header.
       /// </summary>
-      public HeaderValidityStatus Validity { get; private set; }
+      public HeaderValidityStatuses Validity { get; private set; }
 
       /// <summary>
       /// Gets the height this node takes in the tree representation of the whole hierarchy of headers.

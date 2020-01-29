@@ -232,7 +232,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          foreach (BlockHeader header in headers)
          {
-            switch (this.headersLookup.TrySetTip(header.Hash!, header.PreviousBlockHash))
+            BlockValidationState state=new BlockValidationState();
+            switch (this.headersLookup.TrySetTip(header, ref state))
             {
                case ConnectHeaderResult.Connected:
                case ConnectHeaderResult.SameTip:

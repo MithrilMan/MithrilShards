@@ -4,19 +4,25 @@ using System.Runtime.InteropServices;
 namespace MithrilShards.Core.DataTypes
 {
    [StructLayout(LayoutKind.Sequential)]
-   public class UInt256 : IEquatable<UInt256>
+   public partial class UInt256 : IEquatable<UInt256>
    {
-      private const int EXPECTED_SIZE = 32;
+      protected const int EXPECTED_SIZE = 32;
 
       public static UInt256 Zero { get; } = new UInt256("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
 #pragma warning disable IDE0044 // Add readonly modifier
-      private ulong part1;
-      private ulong part2;
-      private ulong part3;
-      private ulong part4;
+      protected ulong part1;
+      protected ulong part2;
+      protected ulong part3;
+      protected ulong part4;
 
 #pragma warning restore IDE0044 // Add readonly modifier
+
+      /// <summary>
+      /// Initializes a new instance of the <see cref="UInt256"/> class.
+      /// Used by derived classes.
+      /// </summary>
+      protected UInt256() { }
 
       /// <summary>
       /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
@@ -173,22 +179,6 @@ namespace MithrilShards.Core.DataTypes
       public override int GetHashCode()
       {
          return (int)this.part1;
-      }
-
-      public override bool Equals(object? obj) => ReferenceEquals(this, obj) ? true : this.Equals(obj as UInt256);
-
-      public static bool operator !=(UInt256? a, UInt256? b) => !(a == b);
-
-      public static bool operator ==(UInt256? a, UInt256? b) => a == null ? false : a.Equals(b);
-
-      public bool Equals(UInt256? other)
-      {
-         if (other is null) return false;
-
-         return this.part1 == other.part1
-             && this.part2 == other.part2
-             && this.part3 == other.part3
-             && this.part4 == other.part4;
       }
    }
 }
