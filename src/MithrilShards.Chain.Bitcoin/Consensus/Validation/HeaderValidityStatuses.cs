@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MithrilShards.Chain.Bitcoin.Consensus
+namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 {
    [Flags]
    public enum HeaderValidityStatuses

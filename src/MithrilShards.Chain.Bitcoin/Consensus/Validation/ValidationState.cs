@@ -1,4 +1,4 @@
-﻿namespace MithrilShards.Chain.Bitcoin.Consensus
+﻿namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 {
    /// <summary>
    /// Base class for capturing information about block/transaction validation.

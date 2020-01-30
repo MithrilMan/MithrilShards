@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.Consensus.ValidationRules;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.EventBus;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
 {
-   public class ConsensusValidator
+   public class ConsensusValidator : IConsensusValidator
    {
       /// <summary>
       /// The logger
@@ -24,30 +25,41 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// The known header validation rules.
       /// </summary>
       readonly IEnumerable<IHeaderValidationRule> headerValidationRules;
+      readonly IHeaderValidationContextFactory headerValidationContextFactory;
 
-      public ConsensusValidator(ILogger<ConsensusValidator> logger, IEventBus eventBus, IEnumerable<IHeaderValidationRule> headerValidationRules)
+      private readonly object headerValidationLock = new object();
+
+      public ConsensusValidator(ILogger<ConsensusValidator> logger,
+                                IEventBus eventBus,
+                                IEnumerable<IHeaderValidationRule> headerValidationRules,
+                                IHeaderValidationContextFactory headerValidationContextFactory)
       {
          this.logger = logger;
          this.eventBus = eventBus;
          this.headerValidationRules = headerValidationRules;
+         this.headerValidationContextFactory = headerValidationContextFactory;
 
          this.VerifyValidationRules(this.headerValidationRules);
       }
 
       /// <summary>
-      /// Verifies that all registered header validation rules have all dependent rules registered too and order rules based on their dependency graph.
+      /// Verifies that all registered validation rules have all dependent rules registered too and order rules based on their dependency graph.
       /// </summary>
-      /// <exception cref="NotImplementedException"></exception>
-      private void VerifyValidationRules<TValidationRuleContext>(IEnumerable<TValidationRuleContext> rules)
+      /// <typeparam name="TValidationRule">The type of the validation rules.</typeparam>
+      /// <param name="rules">The rules to verify.</param>
+      private void VerifyValidationRules<TValidationRule>(IEnumerable<TValidationRule> rules)
       {
-         foreach (TValidationRuleContext rule in rules)
+         Type validationRulesType = typeof(TValidationRule);
+
+         using IDisposable logScope = this.logger.BeginScope("Verifying validation rules for {ValidationRuleType}", validationRulesType.Name);
+         foreach (TValidationRule rule in rules)
          {
             Type ruleType = rule!.GetType();
             foreach (Type requiredRule in this.GetRequiredRules(ruleType))
             {
-               if (!typeof(TValidationRuleContext).IsAssignableFrom(requiredRule))
+               if (!validationRulesType.IsAssignableFrom(requiredRule))
                {
-                  throw new ArgumentException($"{nameof(ruleType)} must implement {typeof(TValidationRuleContext).Name}.");
+                  throw new ArgumentException($"{nameof(ruleType)} must implement {validationRulesType.Name}.");
                }
 
                if (!rules.Any(rule => requiredRule.IsAssignableFrom(requiredRule)))
@@ -58,11 +70,46 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
-      private List<Type> GetRequiredRules(Type fromType)
+      /// <summary>
+      /// Gets the required rules defined using <see cref="RequiresRuleAttribute" /> for the rule of <paramref name="ruleType" /> type.
+      /// </summary>
+      /// <param name="ruleType">Type of the rule that need to get required rules.</param>
+      /// <returns></returns>
+      private List<Type> GetRequiredRules(Type ruleType)
       {
-         return fromType.GetCustomAttributes(typeof(RequiresRuleAttribute), true)
+         return ruleType.GetCustomAttributes(typeof(RequiresRuleAttribute), true)
             .Select(req => ((RequiresRuleAttribute)req).RequiredRuleType)
             .ToList();
+      }
+
+      /// <summary>
+      /// Validates the header performing checks for every <see cref="IHeaderValidationRule"/> known rule.
+      /// </summary>
+      /// <param name="header">The header to validate.</param>
+      /// <param name="validationState">The resulting state of the validation.</param>
+      /// <returns>
+      /// <see langword="true"/> if the validation succeed, <see langword="false"/> otherwise and the reason of the fault
+      /// can be found in <paramref name="validationState"/>.
+      /// </returns>
+      public bool ValidateHeader(BlockHeader header, out BlockValidationState validationState)
+      {
+         lock (this.headerValidationLock)
+         {
+            IHeaderValidationContext context = this.headerValidationContextFactory.Create(header);
+
+            validationState = new BlockValidationState();
+            foreach (IHeaderValidationRule rule in this.headerValidationRules)
+            {
+               if (!rule.Check(context, ref validationState))
+               {
+                  this.logger.LogDebug("Header validation failed: {HeaderValidationState}", validationState.ToString());
+                  return false;
+               }
+            }
+
+            validationState.IsValid();
+            return true;
+         }
       }
    }
 }

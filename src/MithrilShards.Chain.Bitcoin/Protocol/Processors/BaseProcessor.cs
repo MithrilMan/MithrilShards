@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
@@ -193,6 +194,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
             this.PeerContext.ConnectionCancellationTokenSource.Cancel();
          }
+      }
+
+     
+      protected void MisbehaveDuringHeaderValidation(BlockValidationState state, string reason)
+      {
+         //TODO 
       }
 
       public virtual void Dispose()

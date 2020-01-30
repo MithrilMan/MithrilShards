@@ -8,7 +8,12 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
 {
    public partial class Target : UInt256
    {
+      public static new Target Zero { get; } = new Target("0".PadRight(EXPECTED_SIZE * 2, '0'));
+
+      private Target(string hexString) : base(hexString) { }
+
       public Target(ReadOnlySpan<byte> input) : base(input) { }
+
 
       //public Target(uint compactValue)
       //{
@@ -22,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
 
       //   if (exponent <= 3)
       //   {
-            
+
       //      mantissa >>= 8 * (3 - exponent);
       //      *this = mantissa;
       //   }

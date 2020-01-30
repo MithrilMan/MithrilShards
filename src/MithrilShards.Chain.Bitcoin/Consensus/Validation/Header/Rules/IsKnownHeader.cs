@@ -4,13 +4,17 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 
-namespace MithrilShards.Chain.Bitcoin.Consensus.ValidationRules.Header
+namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
 {
-   public class CheckProofOfWork : HeaderValidationRuleBase
+   /// <summary>
+   /// Check if the header is a known header
+   /// </summary>
+   /// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.HeaderValidationRuleBase" />
+   public class IsKnownHeader : HeaderValidationRuleBase
    {
-      public CheckProofOfWork(ILogger<CheckProofOfWork> logger) : base(logger) { }
+      public IsKnownHeader(ILogger<CheckDuplicate> logger) : base(logger) { }
 
-      public override bool Check(IHeaderValidationContext context)
+      public override bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
       {
          BlockHeader header = context.Header;
 

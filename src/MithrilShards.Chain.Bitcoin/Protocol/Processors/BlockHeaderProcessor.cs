@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core;
@@ -51,6 +54,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private readonly IChainDefinition chainDefinition;
       private readonly IInitialBlockDownloadState ibdState;
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
+      readonly IConsensusValidator consensusValidator;
       private readonly HeadersTree headersLookup;
 
       public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
@@ -65,6 +69,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.chainDefinition = chainDefinition;
          this.ibdState = ibdState;
          this.blockHeaderHashCalculator = blockHeaderHashCalculator;
+         this.consensusValidator = consensusValidator;
          this.headersLookup = headersLookup;
       }
 
@@ -204,7 +209,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                  headers[0].PreviousBlockHash,
                                  newGetHeaderRequest.BlockLocator.BlockLocatorHashes[0]);
 
-            this.status.LastUnknownBlockHash = this.blockHeaderHashCalculator.ComputeHash(headers[^1], protocolVersion);
+            this.UpdateBlockAvailability(headers[^1].Hash);
             return true;
          }
 
@@ -228,25 +233,63 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             newHeaderReceived = true;
          }
 
-         //TODO: continue from here https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1700
-
-         foreach (BlockHeader header in headers)
+         if (!this.ProcessNewBlockHeaders(headers, out BlockValidationState state, out HeaderNode? lastHeader))
          {
-            BlockValidationState state=new BlockValidationState();
-            switch (this.headersLookup.TrySetTip(header, ref state))
+            if (state.IsInvalid())
             {
-               case ConnectHeaderResult.Connected:
-               case ConnectHeaderResult.SameTip:
-               case ConnectHeaderResult.Rewinded:
-               case ConnectHeaderResult.ResettedToGenesis:
-                  //currentTip = currentTip.BuildNext(computedHash);
-                  break;
-               case ConnectHeaderResult.MissingPreviousHeader:
-                  // TODO manage re-sync
-                  return true;
+               this.MisbehaveDuringHeaderValidation(state, "invalid header received");
+               return false;
             }
          }
+
+         if (this.status.UnconnectingHeaderReceived > 0)
+         {
+            this.logger.LogDebug("Resetting UnconnectingHeaderReceived, was {UnconnectingHeaderReceived}.", this.status.UnconnectingHeaderReceived);
+         }
+         this.status.UnconnectingHeaderReceived = 0;
+
+         this.UpdateBlockAvailability(lastHeader!.Hash);
+
+         //TODO: continue from here https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1709
          return true;
+      }
+
+
+
+      /// <summary>
+      /// Updates tracking information about which blocks a peer is assumed to have.
+      /// </summary>
+      /// <param name="headerHash">The header hash.</param>
+      private void UpdateBlockAvailability(UInt256? headerHash)
+      {
+         if (headerHash == null) ThrowHelper.ThrowArgumentNullException(nameof(headerHash));
+
+         if (this.headersLookup.TryGetNode(headerHash, false, out HeaderNode? node) && node.ChainWork)
+
+            this.status.LastUnknownBlockHash = headerHash;
+
+         this.ProcessBlockAvailability();
+      }
+
+      private void ProcessBlockAvailability()
+      {
+         throw new NotImplementedException();
+      }
+
+      private bool ProcessNewBlockHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastHeader)
+      {
+         if(this.headersLookup.TryAddHeaders(headers, out state, out lastHeader))
+         {
+            //validation.cpp L3681
+
+            //if (NotifyHeaderTip())
+            //{
+            //   if (::ChainstateActive().IsInitialBlockDownload() && ppindex && *ppindex)
+            //   {
+            //      LogPrintf("Synchronizing blockheaders, height: %d (~%.2f%%)\n", (*ppindex)->nHeight, 100.0 / ((*ppindex)->nHeight + (GetAdjustedTime() - (*ppindex)->GetBlockTime()) / Params().GetConsensus().nPowTargetSpacing) * (*ppindex)->nHeight);
+            //   }
+            //}
+         }
       }
    }
 }

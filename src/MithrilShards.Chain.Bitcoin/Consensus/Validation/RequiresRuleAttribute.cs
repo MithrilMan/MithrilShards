@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MithrilShards.Chain.Bitcoin.Consensus.ValidationRules
+namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 {
    /// <summary>
    /// Allow to define validation rule dependencies.

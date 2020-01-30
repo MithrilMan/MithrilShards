@@ -5,8 +5,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.Consensus.ValidationRules;
-using MithrilShards.Chain.Bitcoin.Consensus.ValidationRules.Header;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
+using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol;
@@ -31,7 +32,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       private readonly ILogger<HeadersTree> logger;
       private readonly IChainDefinition chainDefinition;
       readonly IBlockHeaderRepository blockHeaderRepository;
-      readonly IEnumerable<IHeaderValidationRule> headerValidationRules;
+      readonly IConsensusValidator consensusValidator;
 
       /// <summary>
       /// Known set of hashes, both on forks and on best chains.
@@ -49,7 +50,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// The genesis node.
       /// </summary>
       private readonly HeaderNode genesisNode;
-      private readonly CheckProofOfWork checkProofOfWorkRule;
 
       public UInt256 Genesis => this.chainDefinition.Genesis;
 
@@ -64,17 +64,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
-      public HeadersTree(ILogger<HeadersTree> logger, IChainDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository, IEnumerable<IHeaderValidationRule> headerValidationRules)
+      public HeadersTree(ILogger<HeadersTree> logger, IChainDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository, IConsensusValidator consensusValidator)
       {
          this.logger = logger;
          this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
          this.blockHeaderRepository = blockHeaderRepository;
-         this.headerValidationRules = headerValidationRules;
+         this.consensusValidator = consensusValidator;
 
-         this.genesisNode = new HeaderNode(0, this.chainDefinition.Genesis, null);
-
-         this.checkProofOfWorkRule = this.headerValidationRules.OfType<CheckProofOfWork>().FirstOrDefault();
-         if (this.checkProofOfWorkRule == null) throw new NullReferenceException("CheckProofOfWork header validation rule not found.");
+         this.genesisNode = new HeaderNode(0, this.chainDefinition.Genesis, null, Target.Zero);
 
          this.ResetToGenesis();
       }
@@ -337,6 +334,25 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
+      public bool TryAddHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastHeader)
+      {
+         lastHeader = null;
+
+         using (new WriteLock(this.theLock))
+         {
+            foreach (BlockHeader header in headers)
+            {
+               bool accepted = this.consensusValidator.ValidateHeader(header, out state);
+
+               //::ChainstateActive().CheckBlockIndex(chainparams.GetConsensus());
+
+               if (!accepted) return false;
+
+               lastHeader=header
+            }
+         }
+      }
+
       /// <summary>
       /// Determines whether the specified hash is a known hash.
       /// May be present on best chain or on a fork.
@@ -358,13 +374,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       private HeaderNode GetHeaderNodeNoLock(int height)
       {
-         return new HeaderNode(height, this.bestChain[height], height == 0 ? null : this.bestChain[height - 1]);
-      }
-
-      [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      private HeaderNode GetHeaderNodeNoLock(int height, UInt256 currentHeader)
-      {
-         return new HeaderNode(height, currentHeader, height == 0 ? null : this.bestChain[height - 1]);
+         return this.knownHeaders[this.bestChain[height]];
       }
 
       /// <summary>

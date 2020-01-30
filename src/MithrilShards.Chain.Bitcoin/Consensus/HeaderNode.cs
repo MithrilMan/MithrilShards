@@ -1,4 +1,5 @@
 ﻿using System;
+using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -32,21 +33,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </value>
       public UInt256? PreviousHash { get; }
 
-      public HeaderNode(int height, UInt256 hash, UInt256? previousHash)
+      /// <summary>
+      /// Total amount of work (expected number of hashes) in the chain up to and including this block.
+      /// </summary>
+      /// <remarks>It's an in-memory value only that get computed during the header tree building.</remarks>
+      public Target ChainWork { get; internal set; }
+
+      public HeaderNode(int height, UInt256 hash, UInt256? previousHash, Target previousChainWork)
       {
          this.Height = height < 0 ? throw new ArgumentOutOfRangeException(nameof(height)) : height;
          this.Hash = hash ?? throw new ArgumentNullException(nameof(hash));
          this.PreviousHash = previousHash;
       }
 
-      /// <summary>
-      /// Builds a new node that's logically after current node.
-      /// </summary>
-      /// <param name="newHash">The hash of the new header.</param>
-      /// <returns></returns>
-      public HeaderNode BuildNext(UInt256 newHash)
+      public HeaderNode(HeaderNode previousHeader int height, UInt256 hash, UInt256? previousHash, Target previousChainWork)
       {
-         return new HeaderNode(this.Height + 1, newHash, this.Hash);
+         this.Height = height < 0 ? throw new ArgumentOutOfRangeException(nameof(height)) : height;
+         this.Hash = hash ?? throw new ArgumentNullException(nameof(hash));
+         this.PreviousHash = previousHash;
       }
    }
 }
