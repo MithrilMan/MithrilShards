@@ -8,17 +8,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.ValidationRules
    /// will throw during startup complaining about missing rule.
    /// </summary>
    /// <seealso cref="System.Attribute" />
-   [System.AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
-   sealed class ValidationRuleDependencyAttribute : Attribute
+   [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
+   sealed class RequiresRuleAttribute : Attribute
    {
       /// <summary>
-      /// Gets the rule dependencies.
+      /// Gets the required rule type.
       /// </summary>
-      public Type[] RuleDependencies { get; }
+      public Type RequiredRuleType { get; }
 
-      public ValidationRuleDependencyAttribute(Type[] ruleDependencies)
+      public RequiresRuleAttribute(Type requiredRuleType)
       {
-         this.RuleDependencies = ruleDependencies;
+         this.RequiredRuleType = requiredRuleType;
       }
    }
 }
