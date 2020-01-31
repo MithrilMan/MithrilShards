@@ -1,6 +1,7 @@
 ﻿using System;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.DataTypes;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -27,12 +28,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       public UInt256 Hash { get; }
 
       /// <summary>
-      /// Gets the previous header identifier.
+      /// Gets the previous header node.
       /// </summary>
       /// <value>
-      /// The previous header identifier.
+      /// The previous <see cref="HeaderNode"/>.
       /// </value>
-      public UInt256? PreviousHash { get; }
+      public HeaderNode? Previous { get; }
 
       /// <summary>
       /// Total amount of work (expected number of hashes) in the chain up to and including this block.
@@ -40,12 +41,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <remarks>It's an in-memory value only that get computed during the header tree building.</remarks>
       public Target ChainWork { get; internal set; }
 
-      public HeaderNode(int height, UInt256 hash, UInt256? previousHash, Target previousChainWork)
+      public HeaderNode(int height, BlockHeader header, HeaderNode previous)
       {
-         this.Height = height < 0 ? throw new ArgumentOutOfRangeException(nameof(height)) : height;
-         this.Hash = hash ?? throw new ArgumentNullException(nameof(hash));
-         this.PreviousHash = previousHash;
-         this.ChainWork = previousChainWork + qualcosa;
+         if (height < 0) ThrowHelper.ThrowArgumentException($"{nameof(height)} must be greater or equal to 0.");
+         if (header == null) ThrowHelper.ThrowArgumentNullException(nameof(header));
+         if (header.Hash == null) ThrowHelper.ThrowArgumentException($"{nameof(header)} hash cannot be null.");
+
+         this.Height = height;
+         this.Hash = header.Hash;
+         this.Previous = previous;
+
+         this.ChainWork = previous == null ? Target.Zero : (previous.ChainWork + new Target(header.Bits));
       }
 
 
@@ -67,6 +73,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             return false;
 
          return (this.Validity & HeaderValidityStatuses.ValidMask) >= nUpTo;
+      }
+
+      public override string ToString()
+      {
+         return $"{this.Hash} ({this.Height})";
       }
    }
 }

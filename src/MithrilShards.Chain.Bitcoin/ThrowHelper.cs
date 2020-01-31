@@ -24,9 +24,9 @@ namespace MithrilShards.Chain.Bitcoin
       }
 
       [DoesNotReturn]
-      public static void ThrowArgumentNullException(string fieldName)
+      public static void ThrowArgumentNullException(string fieldName, string? message = null)
       {
-         throw new ArgumentNullException(fieldName);
+         throw new ArgumentNullException(fieldName, message);
       }
 
       [DoesNotReturn]

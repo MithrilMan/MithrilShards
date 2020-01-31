@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -7,11 +8,13 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.DataTypes;
+using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
@@ -46,6 +49,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private const int MAX_UNCONNECTING_HEADERS = 10;
 
       /// <summary>
+      /// The maximum number of blocks that can be requested from a single peer.
+      /// </summary>
+      private const int MAX_BLOCKS_IN_TRANSIT_PER_PEER = 16;
+
+      /// <summary>
       /// Maximum number of block hashes allowed in the BlockLocator.</summary>
       /// <seealso cref="https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2018-August/016285.html"/>
       /// <seealso cref="https://github.com/bitcoin/bitcoin/pull/13907"
@@ -55,6 +63,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private readonly IChainDefinition chainDefinition;
       private readonly IInitialBlockDownloadState ibdState;
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
+      readonly IBlockDownloader blockDownloader;
+      readonly ILocalServiceProvider localServiceProvider;
       private readonly HeadersTree headersTree;
 
       public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
@@ -64,6 +74,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IChainDefinition chainDefinition,
                                   IInitialBlockDownloadState ibdState,
                                   IBlockHeaderHashCalculator blockHeaderHashCalculator,
+                                  IBlockDownloader blockDownloader,
+                                  ILocalServiceProvider localServiceProvider,
                                   HeadersTree headersLookup)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
@@ -71,6 +83,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.chainDefinition = chainDefinition;
          this.ibdState = ibdState;
          this.blockHeaderHashCalculator = blockHeaderHashCalculator;
+         this.blockDownloader = blockDownloader;
+         this.localServiceProvider = localServiceProvider;
          this.headersTree = headersLookup;
       }
 
@@ -278,9 +292,94 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          // If this set of headers is valid and ends in a block with at least as much work as our tip, download as much as possible.
          if (fCanDirectFetch && lastHeader.IsValid(HeaderValidityStatuses.ValidTree) && this.headersTree.GetTipHeaderNode().ChainWork <= lastHeader.ChainWork)
          {
-            continuare da net_processing L1736
-            return true;
+            List<HeaderNode> blocksToDownload = new List<HeaderNode>();
+            HeaderNode? pIndexWalk = lastHeader;
+
+            while (pIndexWalk != null && !this.headersTree.IsInBestChain(pIndexWalk) && blocksToDownload.Count <= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
+            {
+               if (!pIndexWalk.Validity.HasFlag(HeaderValidityStatuses.HasBlockData)  // we don't have data for this block
+                  && this.blockDownloader.Equals(pIndexWalk.Hash) // it's not already in download
+                                                                  // todo understand this //&& !IsWitnessEnabled(pindexWalk->pprev, chainparams.GetConsensus()) || State(pfrom->GetId())->fHaveWitness)) 
+                  )
+               {
+                  blocksToDownload.Add(pIndexWalk);
+               }
+               pIndexWalk = pIndexWalk.Previous;
+            }
+
+            /// If pindexWalk still isn't on our main chain, we're looking at a very large reorg at a time we think we're close to caught
+            /// up to the main chain -- this shouldn't really happen. 
+            /// Bail out on the direct fetch and rely on parallel download instead.
+
+            if (!this.headersTree.IsInBestChain(pIndexWalk))
+            {
+               this.logger.LogDebug("Large reorg, won't direct fetch to {HeaderNode}", lastHeader);
+            }
+            else
+            {
+               List<InventoryVector> vGetData = new List<InventoryVector>();
+               // Download as much as possible, from earliest to latest.
+               blocksToDownload.Reverse();
+               foreach (HeaderNode blockToDownload in blocksToDownload)
+               {
+                  UInt256 blockHash = blockToDownload.Hash;
+
+                  if (this.status.BlocksInDownload >= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
+                  {
+                     // Can't download any more from this peer
+                     break;
+                  }
+                  uint fetchFlags = this.GetFetchFlags();
+                  vGetData.Add(new InventoryVector { Type = InventoryType.MSG_BLOCK | fetchFlags, Hash = blockHash });
+
+                  if (this.blockDownloader.TryDownloadBlock(this.PeerContext, blockToDownload, out QueuedBlock? queuedBlock))
+                  {
+                     this.status.BlocksInDownload++;
+                     if (this.status.BlocksInDownload == 1)
+                     {
+                        // We're starting a block download (batch) from this peer.
+                        this.status.DownloadingSince = this.dateTimeProvider.GetTime();
+                     }
+                  }
+
+                  this.logger.LogDebug("Requesting block {BlockHash}", blockHash);
+               }
+
+               if (vGetData.Count > 0)
+               {
+                  if (vGetData.Count > 1)
+                  {
+                     this.logger.LogDebug("Downloading blocks toward {HeaderNode}", lastHeader);
+                  }
+                  else if (
+                     this.status.UseCompactBlocks 
+                     && this.blockDownloader.BlocksInDownload == 1 
+                     && lastHeader.Previous?.IsValid(HeaderValidityStatuses.ValidChain) == true)
+                  {
+                     // In any case, we want to download using a compact block, not a regular one
+                     vGetData[0].Type = InventoryType.MSG_CMPCT_BLOCK;
+                  }
+                  await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
+               }
+            }
          }
+
+         net_processing L1787
+      }
+
+      /// <summary>
+      /// Gets the fetch flags.
+      /// </summary>
+      /// <returns></returns>
+      private uint GetFetchFlags()
+      {
+         uint nFetchFlags = 0;
+         if (this.localServiceProvider.HasServices(NodeServices.Witness) && this.status.CanServeWitness)
+         {
+            nFetchFlags |= InventoryType.MSG_WITNESS_FLAG;
+         }
+
+         return nFetchFlags;
       }
 
       private bool CanDirectFetch()

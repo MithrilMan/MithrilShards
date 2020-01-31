@@ -67,6 +67,31 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// The last block announcement time (epoch).
          /// </value>
          public long LastBlockAnnouncement { get; internal set; }
+
+         /// <summary>
+         /// Gets the blocks in download.
+         /// </summary>
+         /// <value>
+         /// The blocks in download.
+         /// </value>
+         public int BlocksInDownload { get; internal set; }
+
+         /// <summary>
+         /// Gets a value indicating whether this peer can give us witnesses.
+         /// </summary>
+         /// <value>
+         ///   <c>true</c> if the peer can serve witness; otherwise, <c>false</c>.
+         /// </value>
+         public bool CanServeWitness { get; internal set; }
+
+
+         /// <summary>
+         /// Gets the date when the peer started to download blocks.
+         /// </summary>
+         /// <value>
+         /// The date when the peer started to download blocks.
+         /// </value>
+         public long DownloadingSince { get; internal set; }
       }
    }
 }

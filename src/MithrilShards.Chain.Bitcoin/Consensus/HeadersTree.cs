@@ -371,6 +371,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
+      public bool IsInBestChain(HeaderNode? headerNode)
+      {
+         if (headerNode == null) return false;
+
+         using (new ReadLock(this.theLock))
+         {
+            int headerHeight = headerNode.Height;
+            return this.bestChain.Count < headerHeight && this.bestChain[headerHeight] == headerNode.Hash;
+         }
+      }
+
       /// <summary>
       /// Determines whether the specified hash is a known hash.
       /// May be present on best chain or on a fork.
