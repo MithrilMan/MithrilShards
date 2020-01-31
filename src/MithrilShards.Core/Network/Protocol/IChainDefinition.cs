@@ -30,5 +30,13 @@ namespace MithrilShards.Core.Network.Protocol
       /// This is considered a default value but some implementation may override this value.
       /// </summary>
       int DefaultMaxPayloadSize { get; }
+
+      /// <summary>
+      /// Gets or sets the pow target spacing.
+      /// </summary>
+      /// <value>
+      /// The pow target spacing.
+      /// </value>
+      long PowTargetSpacing { get; }
    }
 }

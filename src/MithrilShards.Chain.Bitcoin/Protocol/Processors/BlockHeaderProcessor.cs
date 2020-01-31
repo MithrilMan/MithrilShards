@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
+using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core;
@@ -50,15 +51,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <seealso cref="https://github.com/bitcoin/bitcoin/pull/13907"
       /// </summary>
       private const int MAX_LOCATOR_HASHES = 101;
-
+      readonly IDateTimeProvider dateTimeProvider;
       private readonly IChainDefinition chainDefinition;
       private readonly IInitialBlockDownloadState ibdState;
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
-      readonly IConsensusValidator consensusValidator;
-      private readonly HeadersTree headersLookup;
+      private readonly HeadersTree headersTree;
 
       public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
                                   IEventBus eventBus,
+                                  IDateTimeProvider dateTimeProvider,
                                   IPeerBehaviorManager peerBehaviorManager,
                                   IChainDefinition chainDefinition,
                                   IInitialBlockDownloadState ibdState,
@@ -66,11 +67,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   HeadersTree headersLookup)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
+         this.dateTimeProvider = dateTimeProvider;
          this.chainDefinition = chainDefinition;
          this.ibdState = ibdState;
          this.blockHeaderHashCalculator = blockHeaderHashCalculator;
-         this.consensusValidator = consensusValidator;
-         this.headersLookup = headersLookup;
+         this.headersTree = headersLookup;
       }
 
       /// <summary>
@@ -90,7 +91,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          await this.SendMessageAsync(new GetHeadersMessage
          {
             Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-            BlockLocator = this.headersLookup.GetTipLocator(),
+            BlockLocator = this.headersTree.GetTipLocator(),
             HashStop = UInt256.Zero
          }).ConfigureAwait(false);
       }
@@ -148,7 +149,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          // If block locator is null, return the hashStop block
          if ((message.BlockLocator.BlockLocatorHashes?.Length ?? 0) == 0)
          {
-            if (!this.headersLookup.TryGetNode(message.HashStop!, true, out startingNode!))
+            if (!this.headersTree.TryGetNode(message.HashStop!, true, out startingNode!))
             {
                this.logger.LogDebug("Empty block locator and HashStop not found");
                return new ValueTask<bool>(true);
@@ -156,7 +157,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
          else
          {
-            startingNode = this.headersLookup.GetHighestNodeInBestChainFromBlockLocator(message.BlockLocator);
+            startingNode = this.headersTree.GetHighestNodeInBestChainFromBlockLocator(message.BlockLocator);
          }
 
          this.logger.LogDebug("Serving headers from {StartingNodeHeight}:{StartingNodeHash}", startingNode.Height, startingNode.Hash);
@@ -189,7 +190,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that don't connect before giving DoS points
          /// - Once a headers message is received that is valid and does connect, unconnecting header counter gets reset back to 0.
          /// see https://github.com/bitcoin/bitcoin/blob/ceb789cf3a9075729efa07f5114ce0369d8606c3/src/net_processing.cpp#L1658-L1683
-         if (!this.headersLookup.IsKnown(headers[0].PreviousBlockHash) && headersCount < MAX_BLOCKS_TO_ANNOUNCE)
+         if (!this.headersTree.IsKnown(headers[0].PreviousBlockHash) && headersCount < MAX_BLOCKS_TO_ANNOUNCE)
          {
             if (++this.status.UnconnectingHeaderReceived % MAX_UNCONNECTING_HEADERS == 0)
             {
@@ -200,7 +201,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             var newGetHeaderRequest = new GetHeadersMessage
             {
                Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-               BlockLocator = this.headersLookup.GetTipLocator(),
+               BlockLocator = this.headersTree.GetTipLocator(),
                HashStop = UInt256.Zero
             };
             await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
@@ -217,7 +218,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          Parallel.ForEach(headers, header => header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion));
 
          // Ensure headers are consecutive.
-         for (int i = 1; i < headers.Length; i++)
+         for (int i = 1; i < headersCount; i++)
          {
             if (headers[i].PreviousBlockHash != headers[i - 1].Hash)
             {
@@ -228,7 +229,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          bool newHeaderReceived = false;
          // If we don't have the last header, then they'll have given us something new (if these headers are valid).
-         if (!this.headersLookup.IsKnown(headers.Last().Hash))
+         if (!this.headersTree.IsKnown(headers.Last().Hash))
          {
             newHeaderReceived = true;
          }
@@ -251,34 +252,91 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.UpdateBlockAvailability(lastHeader!.Hash);
 
          //TODO: continue from here https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1709
-         return true;
+
+         if (newHeaderReceived && lastHeader.ChainWork > this.headersTree.GetTipHeaderNode().ChainWork)
+         {
+            // we received the new tip of the chain
+            this.status.LastBlockAnnouncement = this.dateTimeProvider.GetTime();
+         }
+
+         if (headersCount == MAX_HEADERS)
+         {
+            // We received the maximum number of headers per protocol definition, the peer may have more headers.
+            // TODO: optimize: if pindexLast is an ancestor of ::ChainActive().Tip or pindexBestHeader, continue
+            // from there instead.
+            this.logger.LogDebug("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastHeader.Height, this.status.PeerStartingHeight);
+            var newGetHeaderRequest = new GetHeadersMessage
+            {
+               Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
+               BlockLocator = this.headersTree.GetLocator(lastHeader.Hash),
+               HashStop = UInt256.Zero
+            };
+            await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
+         }
+
+         bool fCanDirectFetch = this.CanDirectFetch();
+         // If this set of headers is valid and ends in a block with at least as much work as our tip, download as much as possible.
+         if (fCanDirectFetch && lastHeader.IsValid(HeaderValidityStatuses.ValidTree) && this.headersTree.GetTipHeaderNode().ChainWork <= lastHeader.ChainWork)
+         {
+            continuare da net_processing L1736
+            return true;
+         }
       }
 
-
+      private bool CanDirectFetch()
+      {
+         return this.headersTree.GetTip().TimeStamp > this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() - this.chainDefinition.PowTargetSpacing * 20;
+      }
 
       /// <summary>
       /// Updates tracking information about which blocks a peer is assumed to have.
+      /// After calling this method, status.BestKnownHeader is guaranteed to be non null.
       /// </summary>
       /// <param name="headerHash">The header hash.</param>
       private void UpdateBlockAvailability(UInt256? headerHash)
       {
          if (headerHash == null) ThrowHelper.ThrowArgumentNullException(nameof(headerHash));
 
-         if (this.headersLookup.TryGetNode(headerHash, false, out HeaderNode? node) && node.ChainWork)
-
-            this.status.LastUnknownBlockHash = headerHash;
-
          this.ProcessBlockAvailability();
+
+         this.headersTree.TryGetNode(headerHash, false, out HeaderNode? headerNode);
+         // A better block header was announced.
+         if (this.status.BestKnownHeader == null || headerNode!.ChainWork >= this.status.BestKnownHeader.ChainWork)
+         {
+            this.status.BestKnownHeader = headerNode;
+         }
+         else
+         {
+            // An unknown block header was announced, assuming it's the best one.
+            this.status.LastUnknownBlockHash = headerHash;
+         }
       }
 
+      /// <summary>
+      /// Check whether the last unknown block header a peer advertised is finally known.
+      /// </summary>
+      /// <remarks>
+      /// If <see cref="status.LastUnknownBlockHash"/> is finally found in the headers tree, it means
+      /// it's no longer unknown and we set to null the status property.
+      /// </remarks>
       private void ProcessBlockAvailability()
       {
-         throw new NotImplementedException();
+         if (this.status.LastUnknownBlockHash != null)
+         {
+            if (this.headersTree.TryGetNode(this.status.LastUnknownBlockHash, false, out HeaderNode? headerNode) && headerNode.ChainWork > Target.Zero)
+            {
+               if (this.status.BestKnownHeader == null || headerNode.ChainWork >= this.status.BestKnownHeader.ChainWork)
+               {
+                  this.status.BestKnownHeader = headerNode;
+               }
+               this.status.LastUnknownBlockHash = null;
+            }
+         }
       }
 
       private bool ProcessNewBlockHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastHeader)
       {
-         if(this.headersLookup.TryAddHeaders(headers, out state, out lastHeader))
+         if (this.headersTree.TryAddHeaders(headers, out state, out lastHeader))
          {
             //validation.cpp L3681
 

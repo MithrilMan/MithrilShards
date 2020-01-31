@@ -1,4 +1,5 @@
 ﻿using System;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Core.DataTypes;
 
@@ -44,13 +45,28 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.Height = height < 0 ? throw new ArgumentOutOfRangeException(nameof(height)) : height;
          this.Hash = hash ?? throw new ArgumentNullException(nameof(hash));
          this.PreviousHash = previousHash;
+         this.ChainWork = previousChainWork + qualcosa;
       }
 
-      public HeaderNode(HeaderNode previousHeader int height, UInt256 hash, UInt256? previousHash, Target previousChainWork)
+
+      /// <summary>
+      /// Check whether this block index entry is valid up to the passed validity level.
+      /// </summary>
+      /// <returns>
+      ///   <c>true</c> if this instance is valid; otherwise, <c>false</c>.
+      /// </returns>
+      public bool IsValid(HeaderValidityStatuses nUpTo = HeaderValidityStatuses.ValidTransactions)
       {
-         this.Height = height < 0 ? throw new ArgumentOutOfRangeException(nameof(height)) : height;
-         this.Hash = hash ?? throw new ArgumentNullException(nameof(hash));
-         this.PreviousHash = previousHash;
+         // Only validity flags allowed.
+         if ((nUpTo & HeaderValidityStatuses.ValidMask) != nUpTo)
+         {
+            ThrowHelper.ThrowArgumentException("Only validity flags are allowed");
+         }
+
+         if (this.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
+            return false;
+
+         return (this.Validity & HeaderValidityStatuses.ValidMask) >= nUpTo;
       }
    }
 }

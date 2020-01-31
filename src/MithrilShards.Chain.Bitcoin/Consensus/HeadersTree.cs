@@ -254,6 +254,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
+
+      /// <summary>
+      /// Gets the full block header tip.
+      /// </summary>
+      /// <returns></returns>
+      public BlockHeader GetTip()
+      {
+         using (new ReadLock(this.theLock))
+         {
+            if (!this.blockHeaderRepository.TryGet(this.bestChain[this.height], out BlockHeader? header))
+            {
+               ThrowHelper.ThrowBlockHeaderRepositoryException($"Unexpected error, cannot fetch the tip at height {this.height}.");
+            }
+
+            return header!;
+         }
+      }
+
       public BlockLocator? GetLocator(int height)
       {
          using (new ReadLock(this.theLock))
@@ -348,7 +366,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
                if (!accepted) return false;
 
-               lastHeader=header
+               lastHeader = header
             }
          }
       }

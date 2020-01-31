@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
+using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
    public partial class BlockHeaderProcessor
    {
-      private readonly Status status = new Status();
+      private readonly BlockHeaderProcessorStatus status = new BlockHeaderProcessorStatus();
 
-      private class Status
+      public class BlockHeaderProcessorStatus
       {
          public int PeerStartingHeight { get; internal set; } = 0;
 
@@ -51,6 +51,22 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// The last unknown block hash.
          /// </value>
          public UInt256? LastUnknownBlockHash { get; internal set; } = null;
+
+         /// <summary>
+         /// Gets or sets the best known block we know this peer has announced.
+         /// </summary>
+         /// <value>
+         /// The best known header.
+         /// </value>
+         public HeaderNode? BestKnownHeader { get; internal set; }
+
+         /// <summary>
+         /// Gets the time of last new block announcement.
+         /// </summary>
+         /// <value>
+         /// The last block announcement time (epoch).
+         /// </value>
+         public long LastBlockAnnouncement { get; internal set; }
       }
    }
 }

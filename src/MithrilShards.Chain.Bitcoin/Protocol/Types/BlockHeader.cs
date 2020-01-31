@@ -1,4 +1,5 @@
-﻿using MithrilShards.Core.DataTypes;
+﻿using System;
+using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 {
@@ -43,6 +44,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// Not part of the protocol message, this property represents the block hash.
       /// Not used during serialization, it's computed externally when received from other peers.
       /// </summary>
+      /// <remarks>
+      /// This property is set when a header is received from a peer (or when it's mined).
+      /// It's not part of the protocol message and doesn't participate to serialization.
+      /// </remarks>
       public UInt256? Hash { get; set; }
    }
 }
