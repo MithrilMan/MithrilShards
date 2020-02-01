@@ -148,8 +148,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             // if cancellation was requested, return without doing anything
             if (!cancellation.IsCancellationRequested && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
             {
-               this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
-               this.PeerContext.ConnectionCancellationTokenSource.Cancel();
+               this.PeerContext.Disconnect(reason);
             }
          });
       }
@@ -191,23 +190,21 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.peerBehaviorManager.Misbehave(this.PeerContext, penalty, reason);
          if (disconnect)
          {
-            this.logger.LogDebug("Request peer disconnection because {DisconnectionRequestReason}", reason);
-            this.PeerContext.ConnectionCancellationTokenSource.Cancel();
+            this.PeerContext.Disconnect(reason);
          }
       }
 
-     
+
       protected void MisbehaveDuringHeaderValidation(BlockValidationState state, string reason)
       {
-         //TODO 
+         //TODO
       }
 
       public virtual void Dispose()
       {
          this.eventSubscriptionManager.Dispose();
 
-         this.PeerContext?.ConnectionCancellationTokenSource.Cancel();
+         //not sure it's needed this.PeerContext?.ConnectionCancellationTokenSource.Cancel();
       }
-
    }
 }

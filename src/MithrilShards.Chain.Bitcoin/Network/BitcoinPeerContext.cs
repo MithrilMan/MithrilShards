@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
@@ -28,6 +29,11 @@ namespace MithrilShards.Chain.Bitcoin.Network
       public override void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor)
       {
          base.AttachNetworkMessageProcessor(messageProcessor);
+      }
+
+      public void Disconnect(string reason)
+      {
+         this.eventBus.Publish(new PeerDisconnectionRequired(this.RemoteEndPoint, reason));
       }
    }
 }

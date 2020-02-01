@@ -8,7 +8,7 @@ using MithrilShards.Core.Network;
 namespace MithrilShards.Chain.Bitcoin.Network
 {
    /// <summary>
-   /// Manage the download blocking 
+   /// Manage the download blocking
    /// </summary>
    public class BlockDownloader : IBlockDownloader
    {
@@ -23,6 +23,11 @@ namespace MithrilShards.Chain.Bitcoin.Network
       public BlockDownloader(ILogger<BlockDownloader> logger)
       {
          this.logger = logger;
+      }
+
+      public bool IsDownloading(HeaderNode header)
+      {
+         return this.downloadingBlocks.ContainsKey(header.Hash);
       }
 
       public bool TryDownloadBlock(PeerContext peerContext, HeaderNode headerNode, [MaybeNullWhen(false)] out QueuedBlock queuedBlock)

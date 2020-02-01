@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.DataTypes;
@@ -60,8 +61,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// </summary>
       private const int MAX_LOCATOR_HASHES = 101;
       readonly IDateTimeProvider dateTimeProvider;
-      private readonly INetworkDefinition chainDefinition;
-      private readonly IInitialBlockDownloadState ibdState;
+      private readonly IConsensusParameters consensusParameters;
+      private readonly IInitialBlockDownloadTracker ibdState;
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
       readonly IBlockDownloader blockDownloader;
       readonly ILocalServiceProvider localServiceProvider;
@@ -71,8 +72,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IEventBus eventBus,
                                   IDateTimeProvider dateTimeProvider,
                                   IPeerBehaviorManager peerBehaviorManager,
-                                  INetworkDefinition chainDefinition,
-                                  IInitialBlockDownloadState ibdState,
+                                  IConsensusParameters consensusParameters,
+                                  IInitialBlockDownloadTracker ibdState,
                                   IBlockHeaderHashCalculator blockHeaderHashCalculator,
                                   IBlockDownloader blockDownloader,
                                   ILocalServiceProvider localServiceProvider,
@@ -80,7 +81,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.dateTimeProvider = dateTimeProvider;
-         this.chainDefinition = chainDefinition;
+         this.consensusParameters = consensusParameters;
          this.ibdState = ibdState;
          this.blockHeaderHashCalculator = blockHeaderHashCalculator;
          this.blockDownloader = blockDownloader;
@@ -153,7 +154,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             this.Misbehave(10, "Exceeded maximum getheaders block hashes length", true);
          }
 
-         if (this.ibdState.isInIBD)
+         if (this.ibdState.IsDownloadingBlocks())
          {
             this.logger.LogDebug("Ignoring getheaders from {PeerId} because node is in initial block download state.", this.PeerContext.PeerId);
             return new ValueTask<bool>(true);
@@ -181,7 +182,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public async ValueTask<bool> ProcessMessageAsync(HeadersMessage headersMessage, CancellationToken cancellation)
       {
-         int protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
          BlockHeader[]? headers = headersMessage.Headers;
          int headersCount = headers!.Length;
 
@@ -192,19 +192,206 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             this.Misbehave(20, "Too many headers received.");
             return false;
          }
+
+         return await this.ProcessHeaders(headers).ConfigureAwait(false);
+      }
+
+      /// <summary>
+      /// Processes the headers.
+      /// It's invoked because of "headers" or "cmpctblock" message
+      /// </summary>
+      /// <param name="headers">The headers.</param>
+      /// <returns></returns>
+      private async Task<bool> ProcessHeaders(BlockHeader[] headers)
+      {
+         int protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
+         int headersCount = headers.Length;
+
          if (headersCount == 0)
          {
             this.logger.LogDebug("Peer didn't returned any headers, let's assume we reached its tip.");
             return false;
          }
 
-         /// If this looks like it could be a block announcement (headersCount < MAX_BLOCKS_TO_ANNOUNCE),
-         /// use special logic for handling headers that don't connect:
-         /// - Send a getheaders message in response to try to connect the chain.
-         /// - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that don't connect before giving DoS points
-         /// - Once a headers message is received that is valid and does connect, unconnecting header counter gets reset back to 0.
-         /// see https://github.com/bitcoin/bitcoin/blob/ceb789cf3a9075729efa07f5114ce0369d8606c3/src/net_processing.cpp#L1658-L1683
-         if (!this.headersTree.IsKnown(headers[0].PreviousBlockHash) && headersCount < MAX_BLOCKS_TO_ANNOUNCE)
+         if (await this.HandleAsNotConnectingAnnouncement(headers).ConfigureAwait(false))
+         {
+            // fully handled as non connecting announcement
+            return true;
+         }
+
+         // compute hashes in parallel to speed up the operation and check sent headers are sequential.
+         Parallel.ForEach(headers, header => header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion));
+
+         // Ensure headers are consecutive.
+         for (int i = 1; i < headersCount; i++)
+         {
+            if (headers[i].PreviousBlockHash != headers[i - 1].Hash)
+            {
+               this.Misbehave(20, "Non continuous headers sequence.");
+               return false;
+            }
+         }
+
+         // If we don't have the last header, then the peer gave us something new (if these headers are valid).
+         bool newHeaderReceived = !this.headersTree.IsKnown(headers.Last().Hash);
+
+         if (!this.ProcessNewBlockHeaders(headers, out BlockValidationState state, out HeaderNode? lastHeader))
+         {
+            if (state.IsInvalid())
+            {
+               this.MisbehaveDuringHeaderValidation(state, "invalid header received");
+               return false;
+            }
+         }
+
+         if (this.status.UnconnectingHeaderReceived > 0)
+         {
+            this.logger.LogDebug("Resetting UnconnectingHeaderReceived, was {UnconnectingHeaderReceived}.", this.status.UnconnectingHeaderReceived);
+            this.status.UnconnectingHeaderReceived = 0;
+         }
+
+         this.UpdateBlockAvailability(lastHeader!.Hash);
+
+         if (newHeaderReceived && lastHeader.ChainWork > this.headersTree.GetTip().ChainWork)
+         {
+            // we received the new tip of the chain
+            this.status.LastBlockAnnouncement = this.dateTimeProvider.GetTime();
+         }
+
+         if (headersCount == MAX_HEADERS)
+         {
+            // We received the maximum number of headers per protocol definition, the peer may have more headers.
+            // TODO: optimize: if pindexLast is an ancestor of ::ChainActive().Tip or pindexBestHeader, continue
+            // from there instead.
+            this.logger.LogDebug("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastHeader.Height, this.status.PeerStartingHeight);
+            var newGetHeaderRequest = new GetHeadersMessage
+            {
+               Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
+               BlockLocator = this.headersTree.GetLocator(lastHeader.Hash),
+               HashStop = UInt256.Zero
+            };
+            await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
+         }
+
+         bool fCanDirectFetch = this.CanDirectFetch();
+         // If this set of headers is valid and ends in a block with at least as much work as our tip, download as much as possible.
+         if (fCanDirectFetch && lastHeader.IsValid(HeaderValidityStatuses.ValidTree) && this.headersTree.GetTip().ChainWork <= lastHeader.ChainWork)
+         {
+            List<HeaderNode> blocksToDownload = new List<HeaderNode>();
+            HeaderNode? currentHeader = lastHeader;
+
+            while (currentHeader != null && !this.headersTree.IsInBestChain(currentHeader) && blocksToDownload.Count <= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
+            {
+               if (!currentHeader.Validity.HasFlag(HeaderValidityStatuses.HasBlockData)  // we don't have data for this block
+                  && this.blockDownloader.Equals(currentHeader.Hash) // it's not already in download
+                  && (!this.IsWitnessEnabled(currentHeader.Previous) || this.status.CanServeWitness) //witness isn't enabled or the other peer can't serve witness
+                  )
+               {
+                  blocksToDownload.Add(currentHeader);
+               }
+               currentHeader = currentHeader.Previous;
+            }
+
+            /// If currentHeader still isn't on our main chain, we're looking at a very large reorg at a time we think we're close to caught
+            /// up to the main chain -- this shouldn't really happen.
+            /// Bail out on the direct fetch and rely on parallel download instead.
+            if (!this.headersTree.IsInBestChain(currentHeader))
+            {
+               this.logger.LogDebug("Large reorg, won't direct fetch to {HeaderNode}", lastHeader);
+            }
+            else
+            {
+               var vGetData = new List<InventoryVector>();
+               // Download as much as possible, from earliest to latest.
+               for (int i = blocksToDownload.Count - 1; i >= 0; i--)
+               {
+                  HeaderNode blockToDownload = blocksToDownload[i];
+                  UInt256 blockHash = blockToDownload.Hash;
+
+                  if (this.status.BlocksInDownload >= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
+                  {
+                     break; // Can't download any more from this peer
+                  }
+
+                  uint fetchFlags = this.GetFetchFlags();
+                  vGetData.Add(new InventoryVector { Type = InventoryType.MSG_BLOCK | fetchFlags, Hash = blockHash });
+
+                  if (this.blockDownloader.TryDownloadBlock(this.PeerContext, blockToDownload, out QueuedBlock? queuedBlock))
+                  {
+                     this.status.BlocksInDownload++;
+                     if (this.status.BlocksInDownload == 1)
+                     {
+                        // We're starting a block download (batch) from this peer.
+                        this.status.DownloadingSince = this.dateTimeProvider.GetTime();
+                     }
+                  }
+
+                  this.logger.LogDebug("Requesting block {BlockHash}", blockHash);
+               }
+
+               if (vGetData.Count > 0)
+               {
+                  if (vGetData.Count > 1)
+                  {
+                     this.logger.LogDebug("Downloading blocks toward {HeaderNode}", lastHeader);
+                  }
+
+                  if (this.status.UseCompactBlocks
+                     && this.blockDownloader.BlocksInDownload == 1
+                     && lastHeader.Previous?.IsValid(HeaderValidityStatuses.ValidChain) == true)
+                  {
+                     // In any case, we want to download using a compact block, not a regular one
+                     vGetData[0].Type = InventoryType.MSG_CMPCT_BLOCK;
+                  }
+                  await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
+               }
+
+               this.DisconnectPeerIfNotUseful();
+            }
+         }
+      }
+
+      private void DisconnectPeerIfNotUseful(int headersCount)
+      {
+         /// If we're in IBD, we want outbound peers that will serve us a useful chain.
+         /// Disconnect peers that are on chains with insufficient work.
+         if (this.ibdState.IsDownloadingBlocks() && headersCount != MAX_HEADERS)
+         {
+            // When nCount < MAX_HEADERS_RESULTS, we know we have no more headers to fetch from this peer.
+            if (this.status.BestKnownHeader && this.status.BestKnownHeader!.ChainWork < this.consensusParameters.MinimumChainWork)
+            {
+               /// This peer has too little work on their headers chain to help us sync so disconnect if it's using an outbound
+               /// slot, unless the peer is whitelisted or addnode.
+               /// Note: We compare their tip to nMinimumChainWork (rather than current chain tip) because we won't start block
+               /// download until we have a headers chain that has at least nMinimumChainWork, even if a peer has a chain past
+               /// our tip, as an anti-DoS measure.
+               if (this.IsOutboundDisconnectionCandidate())
+               {
+                  this.PeerContext.Disconnect("Outbound peer headers chain has insufficient work.");
+               }
+            }
+         }
+      }
+
+      private bool IsOutboundDisconnectionCandidate()
+      {
+         // return !(node->fInbound || node->m_manual_connection || node->fFeeler || node->fOneShot);
+         //TODO improve, this is wrong because only check if it's outbound actually, see proper check above
+         return this.PeerContext.Direction == PeerConnectionDirection.Outbound;
+      }
+
+      /// <summary>
+      /// If this looks like it could be a block announcement (headersCount < MAX_BLOCKS_TO_ANNOUNCE),
+      /// use special logic for handling headers that don't connect:
+      /// - Send a getheaders message in response to try to connect the chain.
+      /// - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that don't connect before giving DoS points
+      /// - Once a headers message is received that is valid and does connect, unconnecting header counter gets reset back to 0.
+      /// see https://github.com/bitcoin/bitcoin/blob/ceb789cf3a9075729efa07f5114ce0369d8606c3/src/net_processing.cpp#L1658-L1683
+      /// </summary>
+      /// <returns><see langword="true"/> if it has been fully handled like a block announcement.</returns>
+      private async Task<bool> HandleAsNotConnectingAnnouncement(BlockHeader[] headers)
+      {
+         if (!this.headersTree.IsKnown(headers[0].PreviousBlockHash) && headers.Length < MAX_BLOCKS_TO_ANNOUNCE)
          {
             if (++this.status.UnconnectingHeaderReceived % MAX_UNCONNECTING_HEADERS == 0)
             {
@@ -228,141 +415,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return true;
          }
 
-         // compute hashes in parallel to speed up the operation and check sent headers are sequential.
-         Parallel.ForEach(headers, header => header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion));
-
-         // Ensure headers are consecutive.
-         for (int i = 1; i < headersCount; i++)
-         {
-            if (headers[i].PreviousBlockHash != headers[i - 1].Hash)
-            {
-               this.Misbehave(20, "Non continuous headers sequence.");
-               return false;
-            }
-         }
-
-         bool newHeaderReceived = false;
-         // If we don't have the last header, then they'll have given us something new (if these headers are valid).
-         if (!this.headersTree.IsKnown(headers.Last().Hash))
-         {
-            newHeaderReceived = true;
-         }
-
-         if (!this.ProcessNewBlockHeaders(headers, out BlockValidationState state, out HeaderNode? lastHeader))
-         {
-            if (state.IsInvalid())
-            {
-               this.MisbehaveDuringHeaderValidation(state, "invalid header received");
-               return false;
-            }
-         }
-
-         if (this.status.UnconnectingHeaderReceived > 0)
-         {
-            this.logger.LogDebug("Resetting UnconnectingHeaderReceived, was {UnconnectingHeaderReceived}.", this.status.UnconnectingHeaderReceived);
-         }
-         this.status.UnconnectingHeaderReceived = 0;
-
-         this.UpdateBlockAvailability(lastHeader!.Hash);
-
-         //TODO: continue from here https://github.com/bitcoin/bitcoin/blob/d9a45500018fa4fd52c9c9326f79521d93d99abb/src/net_processing.cpp#L1709
-
-         if (newHeaderReceived && lastHeader.ChainWork > this.headersTree.GetTipHeaderNode().ChainWork)
-         {
-            // we received the new tip of the chain
-            this.status.LastBlockAnnouncement = this.dateTimeProvider.GetTime();
-         }
-
-         if (headersCount == MAX_HEADERS)
-         {
-            // We received the maximum number of headers per protocol definition, the peer may have more headers.
-            // TODO: optimize: if pindexLast is an ancestor of ::ChainActive().Tip or pindexBestHeader, continue
-            // from there instead.
-            this.logger.LogDebug("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastHeader.Height, this.status.PeerStartingHeight);
-            var newGetHeaderRequest = new GetHeadersMessage
-            {
-               Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-               BlockLocator = this.headersTree.GetLocator(lastHeader.Hash),
-               HashStop = UInt256.Zero
-            };
-            await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
-         }
-
-         bool fCanDirectFetch = this.CanDirectFetch();
-         // If this set of headers is valid and ends in a block with at least as much work as our tip, download as much as possible.
-         if (fCanDirectFetch && lastHeader.IsValid(HeaderValidityStatuses.ValidTree) && this.headersTree.GetTipHeaderNode().ChainWork <= lastHeader.ChainWork)
-         {
-            List<HeaderNode> blocksToDownload = new List<HeaderNode>();
-            HeaderNode? pIndexWalk = lastHeader;
-
-            while (pIndexWalk != null && !this.headersTree.IsInBestChain(pIndexWalk) && blocksToDownload.Count <= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
-            {
-               if (!pIndexWalk.Validity.HasFlag(HeaderValidityStatuses.HasBlockData)  // we don't have data for this block
-                  && this.blockDownloader.Equals(pIndexWalk.Hash) // it's not already in download
-                                                                  // todo understand this //&& !IsWitnessEnabled(pindexWalk->pprev, chainparams.GetConsensus()) || State(pfrom->GetId())->fHaveWitness))
-                  )
-               {
-                  blocksToDownload.Add(pIndexWalk);
-               }
-               pIndexWalk = pIndexWalk.Previous;
-            }
-
-            /// If pindexWalk still isn't on our main chain, we're looking at a very large reorg at a time we think we're close to caught
-            /// up to the main chain -- this shouldn't really happen.
-            /// Bail out on the direct fetch and rely on parallel download instead.
-
-            if (!this.headersTree.IsInBestChain(pIndexWalk))
-            {
-               this.logger.LogDebug("Large reorg, won't direct fetch to {HeaderNode}", lastHeader);
-            }
-            else
-            {
-               List<InventoryVector> vGetData = new List<InventoryVector>();
-               // Download as much as possible, from earliest to latest.
-               blocksToDownload.Reverse();
-               foreach (HeaderNode blockToDownload in blocksToDownload)
-               {
-                  UInt256 blockHash = blockToDownload.Hash;
-
-                  if (this.status.BlocksInDownload >= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
-                  {
-                     // Can't download any more from this peer
-                     break;
-                  }
-                  uint fetchFlags = this.GetFetchFlags();
-                  vGetData.Add(new InventoryVector { Type = InventoryType.MSG_BLOCK | fetchFlags, Hash = blockHash });
-
-                  if (this.blockDownloader.TryDownloadBlock(this.PeerContext, blockToDownload, out QueuedBlock? queuedBlock))
-                  {
-                     this.status.BlocksInDownload++;
-                     if (this.status.BlocksInDownload == 1)
-                     {
-                        // We're starting a block download (batch) from this peer.
-                        this.status.DownloadingSince = this.dateTimeProvider.GetTime();
-                     }
-                  }
-
-                  this.logger.LogDebug("Requesting block {BlockHash}", blockHash);
-               }
-
-               if (vGetData.Count > 0)
-               {
-                  if (vGetData.Count > 1)
-                  {
-                     this.logger.LogDebug("Downloading blocks toward {HeaderNode}", lastHeader);
-                  }
-                  else if (
-                     this.status.UseCompactBlocks
-                     && this.blockDownloader.BlocksInDownload == 1
-                     && lastHeader.Previous?.IsValid(HeaderValidityStatuses.ValidChain) == true)
-                  {
-                     // In any case, we want to download using a compact block, not a regular one
-                     vGetData[0].Type = InventoryType.MSG_CMPCT_BLOCK;
-                  }
-                  await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
-               }
-            }
-         }
+         return false;
       }
 
       /// <summary>
@@ -382,7 +435,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private bool CanDirectFetch()
       {
-         return this.headersTree.GetTip().TimeStamp > this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() - this.chainDefinition.PowTargetSpacing * 20;
+         return this.headersTree.GetTipAsBlockHeader().TimeStamp > this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() - this.consensusParameters.PowTargetSpacing * 20;
       }
 
       /// <summary>
@@ -445,6 +498,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             //   }
             //}
          }
+      }
+
+      private bool IsWitnessEnabled(HeaderNode? headerNode)
+      {
+         return (headerNode?.Height ?? 0) + 1 >= this.consensusParameters.SegwitHeight;
       }
    }
 }

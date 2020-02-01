@@ -56,14 +56,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       private int height;
       public int Height => this.height;
 
-      public UInt256 Tip
-      {
-         get
-         {
-            using (new ReadLock(this.theLock)) return this.bestChain[this.height];
-         }
-      }
-
       public HeadersTree(ILogger<HeadersTree> logger, INetworkDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository, IConsensusValidator consensusValidator)
       {
          this.logger = logger;
@@ -259,7 +251,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Gets the full block header tip.
       /// </summary>
       /// <returns></returns>
-      public BlockHeader GetTip()
+      public BlockHeader GetTipAsBlockHeader()
       {
          using (new ReadLock(this.theLock))
          {
@@ -344,7 +336,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Gets the current tip header node.
       /// </summary>
       /// <returns></returns>
-      public HeaderNode GetTipHeaderNode()
+      public HeaderNode GetTip()
       {
          using (new ReadLock(this.theLock))
          {
