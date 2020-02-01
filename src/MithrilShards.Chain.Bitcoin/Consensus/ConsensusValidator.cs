@@ -111,5 +111,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             return true;
          }
       }
+
+      public void CheckBlockIndex()
+      {
+         // not sure it's needed
+      }
    }
 }

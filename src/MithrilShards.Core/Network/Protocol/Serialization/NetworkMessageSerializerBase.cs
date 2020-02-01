@@ -16,9 +16,9 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
 
       private readonly byte[] precookedMagciAndCommand;
 
-      protected readonly IChainDefinition chainDefinition;
+      protected readonly INetworkDefinition chainDefinition;
 
-      public NetworkMessageSerializerBase(IChainDefinition chainDefinition)
+      public NetworkMessageSerializerBase(INetworkDefinition chainDefinition)
       {
          this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
 

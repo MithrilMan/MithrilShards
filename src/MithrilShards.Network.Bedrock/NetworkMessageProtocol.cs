@@ -24,13 +24,13 @@ namespace MithrilShards.Network.Bedrock
    public class NetworkMessageProtocol : IMessageReader<INetworkMessage>, IMessageWriter<INetworkMessage>
    {
       readonly ILogger<NetworkMessageProtocol> logger;
-      private readonly IChainDefinition chainDefinition;
+      private readonly INetworkDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
       readonly ConnectionContextData contextData;
       private IPeerContext peerContext;
 
       public NetworkMessageProtocol(ILogger<NetworkMessageProtocol> logger,
-                                    IChainDefinition chainDefinition,
+                                    INetworkDefinition chainDefinition,
                                     INetworkMessageSerializerManager networkMessageSerializerManager,
                                     ConnectionContextData contextData)
       {

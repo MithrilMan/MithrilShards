@@ -11,7 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
       private static readonly GetDataMessage instance = new GetDataMessage();
       readonly IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer;
 
-      public GetDataMessageSerializer(IChainDefinition chainDefinition, IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer) : base(chainDefinition) {
+      public GetDataMessageSerializer(INetworkDefinition chainDefinition, IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer) : base(chainDefinition) {
          this.inventoryVectorSerializer = inventoryVectorSerializer;
       }
 

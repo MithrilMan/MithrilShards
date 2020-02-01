@@ -12,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
       private readonly IProtocolTypeSerializer<BlockLocator> blockLocatorSerializer;
       private readonly IProtocolTypeSerializer<UInt256> uint256Serializer;
 
-      public GetHeadersMessageSerializer(IChainDefinition chainDefinition,
+      public GetHeadersMessageSerializer(INetworkDefinition chainDefinition,
                                          IProtocolTypeSerializer<BlockLocator> blockLocatorSerializer,
                                          IProtocolTypeSerializer<UInt256> uint256Serializer) : base(chainDefinition)
       {

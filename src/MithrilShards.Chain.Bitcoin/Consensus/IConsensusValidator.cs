@@ -6,5 +6,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    public interface IConsensusValidator
    {
       bool ValidateHeader(BlockHeader header, out BlockValidationState validationState);
+
+      void CheckBlockIndex();
    }
 }

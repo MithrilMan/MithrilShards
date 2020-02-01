@@ -1,28 +1,30 @@
 ﻿using System;
+using MithrilShards.Chain.Bitcoin.Consensus;
+using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Core.DataTypes;
-using MithrilShards.Core.Network.Protocol;
 
 namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 {
-   public class BitcoinTestnetDefinition : IChainDefinition
+   public class BitcoinTestnetDefinition : BitcoinChain
    {
-      public string Name { get; }
-
-      public byte[] MagicBytes { get; }
-
-      public UInt256 Genesis { get; }
-
-      public uint Magic { get; }
-
-      public int DefaultMaxPayloadSize { get; }
-
-      public BitcoinTestnetDefinition()
+      public override BitcoinNetworkDefinition ConfigureNetwork()
       {
-         this.Name = "Bitcoin Testnet";
-         this.Magic = 0xDAB5BFFA;
-         this.MagicBytes = BitConverter.GetBytes(0x0709110B);
-         this.Genesis = new UInt256("000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943");
-         this.DefaultMaxPayloadSize = 32_000_000;
+         return new BitcoinNetworkDefinition
+         {
+            Name = "Bitcoin Testnet",
+            Magic = 0x0709110B,
+            MagicBytes = BitConverter.GetBytes(0x0709110B),
+            DefaultMaxPayloadSize = 32_000_000
+         };
+      }
+
+      public override ConsensusParameters ConfigureConsensus()
+      {
+         return new ConsensusParameters
+         {
+            Genesis = new UInt256("000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"),
+            PowTargetSpacing = (long)TimeSpan.FromMinutes(10).TotalSeconds,
+         };
       }
    }
 }

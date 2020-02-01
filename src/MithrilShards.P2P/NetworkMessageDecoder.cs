@@ -23,13 +23,13 @@ namespace MithrilShards.Network.Legacy
    public class NetworkMessageDecoder
    {
       readonly ILogger<NetworkMessageDecoder> logger;
-      readonly IChainDefinition chainDefinition;
+      readonly INetworkDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
       private IPeerContext peerContext = null!;//set by SetPeerContext
       public ConnectionContextData ContextData { get; }
 
       public NetworkMessageDecoder(ILogger<NetworkMessageDecoder> logger,
-                                   IChainDefinition chainDefinition,
+                                   INetworkDefinition chainDefinition,
                                    INetworkMessageSerializerManager networkMessageSerializerManager,
                                    ConnectionContextData contextData)
       {

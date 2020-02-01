@@ -9,7 +9,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
    {
       private static readonly GetAddrMessage instance = new GetAddrMessage();
 
-      public GetAddrMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
+      public GetAddrMessageSerializer(INetworkDefinition chainDefinition) : base(chainDefinition) { }
 
       public override GetAddrMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion) => instance;
 

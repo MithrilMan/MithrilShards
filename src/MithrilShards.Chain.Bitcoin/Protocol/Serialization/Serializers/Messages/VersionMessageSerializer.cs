@@ -11,7 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
    {
       private readonly IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer;
 
-      public VersionMessageSerializer(IChainDefinition chainDefinition, IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer) : base(chainDefinition)
+      public VersionMessageSerializer(INetworkDefinition chainDefinition, IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer) : base(chainDefinition)
       {
          this.networkAddressNoTimeSerializer = networkAddressNoTimeSerializer;
       }

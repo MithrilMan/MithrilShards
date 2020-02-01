@@ -20,7 +20,7 @@ namespace MithrilShards.Network.Bedrock
       private readonly ILogger logger;
       readonly ILoggerFactory loggerFactory;
       readonly IEventBus eventBus;
-      private readonly IChainDefinition chainDefinition;
+      private readonly INetworkDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
       readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
       readonly IPeerContextFactory peerContextFactory;
@@ -29,7 +29,7 @@ namespace MithrilShards.Network.Bedrock
       public MithrilForgeClientConnectionHandler(ILogger<MithrilForgeClientConnectionHandler> logger,
                                            ILoggerFactory loggerFactory,
                                            IEventBus eventBus,
-                                           IChainDefinition chainDefinition,
+                                           INetworkDefinition chainDefinition,
                                            INetworkMessageSerializerManager networkMessageSerializerManager,
                                            INetworkMessageProcessorFactory networkMessageProcessorFactory,
                                            IPeerContextFactory peerContextFactory,

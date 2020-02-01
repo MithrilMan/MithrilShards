@@ -30,7 +30,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       private readonly ReaderWriterLockSlim theLock = new ReaderWriterLockSlim();
 
       private readonly ILogger<HeadersTree> logger;
-      private readonly IChainDefinition chainDefinition;
+      private readonly INetworkDefinition chainDefinition;
       readonly IBlockHeaderRepository blockHeaderRepository;
       readonly IConsensusValidator consensusValidator;
 
@@ -64,7 +64,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
-      public HeadersTree(ILogger<HeadersTree> logger, IChainDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository, IConsensusValidator consensusValidator)
+      public HeadersTree(ILogger<HeadersTree> logger, INetworkDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository, IConsensusValidator consensusValidator)
       {
          this.logger = logger;
          this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
@@ -352,21 +352,20 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
-      public bool TryAddHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastHeader)
+      public bool TryAddHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastProcessedHeader)
       {
-         lastHeader = null;
+         lastProcessedHeader = null;
 
          using (new WriteLock(this.theLock))
          {
             foreach (BlockHeader header in headers)
             {
                bool accepted = this.consensusValidator.ValidateHeader(header, out state);
-
-               //::ChainstateActive().CheckBlockIndex(chainparams.GetConsensus());
+               this.consensusValidator.CheckBlockIndex();
 
                if (!accepted) return false;
 
-               lastHeader = header
+               lastProcessedHeader = header;
             }
          }
       }

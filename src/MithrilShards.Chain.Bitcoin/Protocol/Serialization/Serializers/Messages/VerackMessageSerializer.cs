@@ -7,7 +7,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class VerackMessageSerializer : NetworkMessageSerializerBase<VerackMessage>
    {
-      public VerackMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
+      public VerackMessageSerializer(INetworkDefinition chainDefinition) : base(chainDefinition) { }
 
       private static readonly VerackMessage instance = new VerackMessage();
       public override VerackMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)

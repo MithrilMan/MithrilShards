@@ -10,7 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
    {
       private readonly IProtocolTypeSerializer<NetworkAddress> networkAddressSerializer;
 
-      public AddrMessageSerializer(IChainDefinition chainDefinition, IProtocolTypeSerializer<NetworkAddress> networkAddressSerializer) : base(chainDefinition)
+      public AddrMessageSerializer(INetworkDefinition chainDefinition, IProtocolTypeSerializer<NetworkAddress> networkAddressSerializer) : base(chainDefinition)
       {
          this.networkAddressSerializer = networkAddressSerializer;
       }

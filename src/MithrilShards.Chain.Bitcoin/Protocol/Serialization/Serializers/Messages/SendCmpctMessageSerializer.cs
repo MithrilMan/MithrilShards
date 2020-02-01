@@ -7,7 +7,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class SendCmpctMessageSerializer : NetworkMessageSerializerBase<SendCmpctMessage>
    {
-      public SendCmpctMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
+      public SendCmpctMessageSerializer(INetworkDefinition chainDefinition) : base(chainDefinition) { }
 
       public override void Serialize(SendCmpctMessage message, int protocolVersion, IBufferWriter<byte> output)
       {

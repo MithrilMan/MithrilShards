@@ -2,9 +2,11 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Network.Server.Guards;
 using MithrilShards.Chain.Bitcoin.Protocol;
@@ -26,17 +28,29 @@ namespace MithrilShards.Chain.Bitcoin
       /// <param name="minimumSupportedVersion">The minimum version local nodes requires in order to connect to other peers.</param>
       /// <param name="currentVersion">The current version local peer aim to use with connected peers.</param>
       /// <returns></returns>
-      public static IForgeBuilder UseBitcoinChain<TChainDefinition>(this IForgeBuilder forgeBuilder,
-                                                                    int minimumSupportedVersion,
-                                                                    int currentVersion) where TChainDefinition : class, IChainDefinition
+      public static IForgeBuilder UseBitcoinChain(this IForgeBuilder forgeBuilder,
+                                                  string networkName,
+                                                  int minimumSupportedVersion,
+                                                  int currentVersion)
       {
          if (forgeBuilder is null) throw new ArgumentNullException(nameof(forgeBuilder));
+
+         Type? chainDefinitionType = networkName.ToLowerInvariant() switch
+         {
+            "bitcoin-main" => typeof(BitcoinMainDefinition),
+            "bitcoin-testnet" => typeof(BitcoinTestnetDefinition),
+            "bitcoin-regtest" => typeof(BitcoinRegtestDefinition),
+            _ => null
+         };
+
+         if (chainDefinitionType == null) ThrowHelper.ThrowArgumentException($"Unknown Network {networkName.ToLowerInvariant()}");
 
          forgeBuilder.AddShard<BitcoinShard, BitcoinSettings>(
             (hostBuildContext, services) =>
             {
                services
-                  .AddSingleton<IChainDefinition, TChainDefinition>()
+                  .AddSingleton(typeof(IChainDefinition), chainDefinitionType)
+                  .AddSingleton<INetworkDefinition>(serviceProvider => serviceProvider.GetRequiredService<IChainDefinition>().NetworkDefinition)
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
                   .AddSingleton<HeadersTree>()
                   .AddSingleton<IBlockHeaderRepository, InMemoryBlockHeaderRepository>()

@@ -60,7 +60,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// </summary>
       private const int MAX_LOCATOR_HASHES = 101;
       readonly IDateTimeProvider dateTimeProvider;
-      private readonly IChainDefinition chainDefinition;
+      private readonly INetworkDefinition chainDefinition;
       private readonly IInitialBlockDownloadState ibdState;
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
       readonly IBlockDownloader blockDownloader;
@@ -71,7 +71,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IEventBus eventBus,
                                   IDateTimeProvider dateTimeProvider,
                                   IPeerBehaviorManager peerBehaviorManager,
-                                  IChainDefinition chainDefinition,
+                                  INetworkDefinition chainDefinition,
                                   IInitialBlockDownloadState ibdState,
                                   IBlockHeaderHashCalculator blockHeaderHashCalculator,
                                   IBlockDownloader blockDownloader,
@@ -299,7 +299,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             {
                if (!pIndexWalk.Validity.HasFlag(HeaderValidityStatuses.HasBlockData)  // we don't have data for this block
                   && this.blockDownloader.Equals(pIndexWalk.Hash) // it's not already in download
-                                                                  // todo understand this //&& !IsWitnessEnabled(pindexWalk->pprev, chainparams.GetConsensus()) || State(pfrom->GetId())->fHaveWitness)) 
+                                                                  // todo understand this //&& !IsWitnessEnabled(pindexWalk->pprev, chainparams.GetConsensus()) || State(pfrom->GetId())->fHaveWitness))
                   )
                {
                   blocksToDownload.Add(pIndexWalk);
@@ -308,7 +308,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             }
 
             /// If pindexWalk still isn't on our main chain, we're looking at a very large reorg at a time we think we're close to caught
-            /// up to the main chain -- this shouldn't really happen. 
+            /// up to the main chain -- this shouldn't really happen.
             /// Bail out on the direct fetch and rely on parallel download instead.
 
             if (!this.headersTree.IsInBestChain(pIndexWalk))
@@ -352,8 +352,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                      this.logger.LogDebug("Downloading blocks toward {HeaderNode}", lastHeader);
                   }
                   else if (
-                     this.status.UseCompactBlocks 
-                     && this.blockDownloader.BlocksInDownload == 1 
+                     this.status.UseCompactBlocks
+                     && this.blockDownloader.BlocksInDownload == 1
                      && lastHeader.Previous?.IsValid(HeaderValidityStatuses.ValidChain) == true)
                   {
                      // In any case, we want to download using a compact block, not a regular one
@@ -363,8 +363,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                }
             }
          }
-
-         net_processing L1787
       }
 
       /// <summary>

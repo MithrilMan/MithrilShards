@@ -9,7 +9,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
    {
       private static readonly SendHeadersMessage instance = new SendHeadersMessage();
 
-      public SendHeadersMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
+      public SendHeadersMessageSerializer(INetworkDefinition chainDefinition) : base(chainDefinition) { }
 
       public override void Serialize(SendHeadersMessage message, int protocolVersion, IBufferWriter<byte> output) { }
 

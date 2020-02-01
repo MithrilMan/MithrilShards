@@ -21,7 +21,7 @@ namespace MithrilShards.Network.Legacy
       /// <summary>Provider of time functions.</summary>
       private readonly IDateTimeProvider dateTimeProvider;
       readonly IPeerContextFactory peerContextFactory;
-      readonly IChainDefinition chainDefinition;
+      readonly INetworkDefinition chainDefinition;
       private readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
 
@@ -29,7 +29,7 @@ namespace MithrilShards.Network.Legacy
                                    IEventBus eventBus,
                                    IDateTimeProvider dateTimeProvider,
                                    IPeerContextFactory peerContextFactory,
-                                   IChainDefinition chainDefinition,
+                                   INetworkDefinition chainDefinition,
                                    INetworkMessageProcessorFactory networkMessageProcessorFactory,
                                    INetworkMessageSerializerManager networkMessageSerializerManager)
       {

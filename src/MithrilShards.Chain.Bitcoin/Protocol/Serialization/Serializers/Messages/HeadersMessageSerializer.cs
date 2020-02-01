@@ -10,7 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
    {
       private readonly IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer;
 
-      public HeadersMessageSerializer(IChainDefinition chainDefinition, IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer) : base(chainDefinition)
+      public HeadersMessageSerializer(INetworkDefinition chainDefinition, IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer) : base(chainDefinition)
       {
          this.blockHeaderSerializer = blockHeaderSerializer;
       }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus;
 
 namespace MithrilShards.Chain.Bitcoin
@@ -39,6 +40,12 @@ namespace MithrilShards.Chain.Bitcoin
       public static void ThrowBlockHeaderRepositoryException(string message)
       {
          throw new BlockHeaderRepositoryException(message);
+      }
+
+      [DoesNotReturn]
+      public static void ThrowInvalidChainDefinitionException(string message)
+      {
+         throw new InvalidChainDefinitionException(message);
       }
    }
 }

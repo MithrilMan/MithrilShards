@@ -7,7 +7,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class PingMessageSerializer : NetworkMessageSerializerBase<PingMessage>
    {
-      public PingMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
+      public PingMessageSerializer(INetworkDefinition chainDefinition) : base(chainDefinition) { }
 
       public override void Serialize(PingMessage message, int protocolVersion, IBufferWriter<byte> output)
       {
