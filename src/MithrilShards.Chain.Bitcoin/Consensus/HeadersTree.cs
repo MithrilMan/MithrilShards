@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.DataTypes;
@@ -30,7 +31,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       private readonly ReaderWriterLockSlim theLock = new ReaderWriterLockSlim();
 
       private readonly ILogger<HeadersTree> logger;
-      private readonly INetworkDefinition chainDefinition;
+      private readonly IConsensusParameters consensusParameters;
       readonly IBlockHeaderRepository blockHeaderRepository;
       readonly IConsensusValidator consensusValidator;
 
@@ -51,19 +52,21 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       private readonly HeaderNode genesisNode;
 
-      public UInt256 Genesis => this.chainDefinition.Genesis;
+      public UInt256 Genesis => this.consensusParameters.Genesis;
 
       private int height;
       public int Height => this.height;
 
-      public HeadersTree(ILogger<HeadersTree> logger, INetworkDefinition chainDefinition, IBlockHeaderRepository blockHeaderRepository, IConsensusValidator consensusValidator)
+      public HeadersTree(ILogger<HeadersTree> logger,
+                         IConsensusParameters consensusParameters,
+                         IBlockHeaderRepository blockHeaderRepository)
       {
          this.logger = logger;
-         this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
+         this.consensusParameters = consensusParameters ?? throw new ArgumentNullException(nameof(consensusParameters));
          this.blockHeaderRepository = blockHeaderRepository;
          this.consensusValidator = consensusValidator;
 
-         this.genesisNode = new HeaderNode(0, this.chainDefinition.Genesis, null, Target.Zero);
+         this.genesisNode = new HeaderNode(0, this.consensusParameters.Genesis, null, Target.Zero);
 
          this.ResetToGenesis();
       }
@@ -76,8 +79,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             this.bestChain.Clear();
             this.knownHeaders.Clear();
 
-            this.bestChain.Add(this.chainDefinition.Genesis);
-            this.knownHeaders.Add(this.chainDefinition.Genesis, this.genesisNode);
+            this.bestChain.Add(this.consensusParameters.Genesis);
+            this.knownHeaders.Add(this.consensusParameters.Genesis, this.genesisNode);
          }
       }
 
@@ -341,24 +344,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          using (new ReadLock(this.theLock))
          {
             return this.GetHeaderNodeNoLock(this.height);
-         }
-      }
-
-      public bool TryAddHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastProcessedHeader)
-      {
-         lastProcessedHeader = null;
-
-         using (new WriteLock(this.theLock))
-         {
-            foreach (BlockHeader header in headers)
-            {
-               bool accepted = this.consensusValidator.ValidateHeader(header, out state);
-               this.consensusValidator.CheckBlockIndex();
-
-               if (!accepted) return false;
-
-               lastProcessedHeader = header;
-            }
          }
       }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
@@ -28,6 +29,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       readonly IHeaderValidationContextFactory headerValidationContextFactory;
 
       private readonly object headerValidationLock = new object();
+      private readonly object validationLock = new object();
 
       public ConsensusValidator(ILogger<ConsensusValidator> logger,
                                 IEventBus eventBus,
@@ -82,6 +84,43 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             .ToList();
       }
 
+
+
+      public bool ProcessNewBlockHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastProcessedHeader)
+      {
+         lastProcessedHeader = null!;
+         state = null!;
+
+         lock (this.validationLock)
+         {
+            foreach (BlockHeader header in headers)
+            {
+               bool accepted = this.ValidateHeader(header, out state, out lastProcessedHeader);
+               this.CheckBlockIndex();
+
+               if (!accepted)
+               {
+                  lastProcessedHeader = null!;
+                  return false;
+               }
+
+               lastProcessedHeader = header;
+            }
+         }
+
+         //if (NotifyHeaderTip())
+         //{
+         //   if (::ChainstateActive().IsInitialBlockDownload() && ppindex && *ppindex)
+         //   {
+         //      LogPrintf("Synchronizing blockheaders, height: %d (~%.2f%%)\n", (*ppindex)->nHeight, 100.0 / ((*ppindex)->nHeight + (GetAdjustedTime() - (*ppindex)->GetBlockTime()) / Params().GetConsensus().nPowTargetSpacing) * (*ppindex)->nHeight);
+         //   }
+         //}
+
+         return true;
+      }
+
+
+
       /// <summary>
       /// Validates the header performing checks for every <see cref="IHeaderValidationRule"/> known rule.
       /// </summary>
@@ -91,8 +130,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <see langword="true"/> if the validation succeed, <see langword="false"/> otherwise and the reason of the fault
       /// can be found in <paramref name="validationState"/>.
       /// </returns>
-      public bool ValidateHeader(BlockHeader header, out BlockValidationState validationState)
+      private bool ValidateHeader(BlockHeader header, out BlockValidationState validationState)
       {
+
+         ParallelMergeOptions HeadersTree.TrySetTip here
+
          lock (this.headerValidationLock)
          {
             IHeaderValidationContext context = this.headerValidationContextFactory.Create(header);

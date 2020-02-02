@@ -66,6 +66,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
       readonly IBlockDownloader blockDownloader;
       readonly ILocalServiceProvider localServiceProvider;
+      readonly IConsensusValidator consensusValidator;
       private readonly HeadersTree headersTree;
 
       public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
@@ -77,6 +78,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IBlockHeaderHashCalculator blockHeaderHashCalculator,
                                   IBlockDownloader blockDownloader,
                                   ILocalServiceProvider localServiceProvider,
+                                  IConsensusValidator consensusValidator,
                                   HeadersTree headersLookup)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
@@ -86,6 +88,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.blockHeaderHashCalculator = blockHeaderHashCalculator;
          this.blockDownloader = blockDownloader;
          this.localServiceProvider = localServiceProvider;
+         this.consensusValidator = consensusValidator;
          this.headersTree = headersLookup;
       }
 
@@ -346,19 +349,41 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                   await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
                }
 
-               this.DisconnectPeerIfNotUseful();
+               if (!this.DisconnectPeerIfNotUseful(headersCount))
+               {
+                  // TODO maybe implement peer eviction protection
+                  //if(this.IsOutboundDisconnectionCandidate() && this.status.BestKnownHeader != null)
+                  //{
+                  //   // If this is an outbound peer, check to see if we should protect	it from the bad/lagging chain logic.
+                  //   if (g_outbound_peers_with_protect_from_disconnect < MAX_OUTBOUND_PEERS_TO_PROTECT_FROM_DISCONNECT
+                  //      && this.status.BestKnownHeader.ChainWork >= this.headersTree.GetTip().ChainWork
+                  //      && !this.status->m_chain_sync.m_protect)
+                  //   {
+                  //      this.logger.LogDebug("Protecting outbound peer from eviction");
+                  //      this.status.m_chain_sync.m_protect = true;
+                  //      ++g_outbound_peers_with_protect_from_disconnect;
+                  //   }
+                  //}
+               }
             }
          }
+
+         return true;
       }
 
-      private void DisconnectPeerIfNotUseful(int headersCount)
+      /// <summary>
+      /// Disconnects the peer if not useful.
+      /// </summary>
+      /// <param name="headersCount">The headers count.</param>
+      /// <returns><see langword="true"/> if the peer is going to be disconnected; otherwise <see langword="false"/>.</returns>
+      private bool DisconnectPeerIfNotUseful(int headersCount)
       {
          /// If we're in IBD, we want outbound peers that will serve us a useful chain.
          /// Disconnect peers that are on chains with insufficient work.
          if (this.ibdState.IsDownloadingBlocks() && headersCount != MAX_HEADERS)
          {
             // When nCount < MAX_HEADERS_RESULTS, we know we have no more headers to fetch from this peer.
-            if (this.status.BestKnownHeader && this.status.BestKnownHeader!.ChainWork < this.consensusParameters.MinimumChainWork)
+            if (this.status.BestKnownHeader != null && this.status.BestKnownHeader.ChainWork < this.consensusParameters.MinimumChainWork)
             {
                /// This peer has too little work on their headers chain to help us sync so disconnect if it's using an outbound
                /// slot, unless the peer is whitelisted or addnode.
@@ -368,9 +393,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                if (this.IsOutboundDisconnectionCandidate())
                {
                   this.PeerContext.Disconnect("Outbound peer headers chain has insufficient work.");
+                  return true;
                }
             }
          }
+
+         return false;
       }
 
       private bool IsOutboundDisconnectionCandidate()
@@ -486,18 +514,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private bool ProcessNewBlockHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastHeader)
       {
-         if (this.headersTree.TryAddHeaders(headers, out state, out lastHeader))
-         {
-            //validation.cpp L3681
-
-            //if (NotifyHeaderTip())
-            //{
-            //   if (::ChainstateActive().IsInitialBlockDownload() && ppindex && *ppindex)
-            //   {
-            //      LogPrintf("Synchronizing blockheaders, height: %d (~%.2f%%)\n", (*ppindex)->nHeight, 100.0 / ((*ppindex)->nHeight + (GetAdjustedTime() - (*ppindex)->GetBlockTime()) / Params().GetConsensus().nPowTargetSpacing) * (*ppindex)->nHeight);
-            //   }
-            //}
-         }
+         return this.consensusValidator.ProcessNewBlockHeaders(headers, out state, out lastHeader!);
       }
 
       private bool IsWitnessEnabled(HeaderNode? headerNode)
