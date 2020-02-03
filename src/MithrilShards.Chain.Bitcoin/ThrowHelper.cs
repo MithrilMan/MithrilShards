@@ -47,5 +47,11 @@ namespace MithrilShards.Chain.Bitcoin
       {
          throw new InvalidChainDefinitionException(message);
       }
+
+      [DoesNotReturn]
+      public static void ThrowNotSupportedException(string message)
+      {
+         throw new NotSupportedException(message);
+      }
    }
 }

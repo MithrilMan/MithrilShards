@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 {
    public abstract class HeaderValidationRuleBase : IHeaderValidationRule
    {
       protected readonly ILogger logger;
-      
+
       /// <summary>
       /// Initializes a new instance of the <see cref="HeaderValidationRuleBase"/> class.
       /// </summary>

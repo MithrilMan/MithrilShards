@@ -10,7 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
    {
       public CheckProofOfWork(ILogger<CheckProofOfWork> logger) : base(logger) { }
 
-      public override bool Check(IHeaderValidationContext context)
+      public override bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
       {
          BlockHeader header = context.Header;
 

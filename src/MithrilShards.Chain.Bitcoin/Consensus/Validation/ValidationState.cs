@@ -24,7 +24,7 @@
          Error
       }
 
-      private InnerState mode;
+      private InnerState mode = InnerState.Valid;
 
 
       public string? RejectReason { get; private set; }

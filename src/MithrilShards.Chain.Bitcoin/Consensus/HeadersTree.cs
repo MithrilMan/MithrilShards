@@ -33,7 +33,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       private readonly ILogger<HeadersTree> logger;
       private readonly IConsensusParameters consensusParameters;
       readonly IBlockHeaderRepository blockHeaderRepository;
-      readonly IConsensusValidator consensusValidator;
 
       /// <summary>
       /// Known set of hashes, both on forks and on best chains.
@@ -64,7 +63,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.logger = logger;
          this.consensusParameters = consensusParameters ?? throw new ArgumentNullException(nameof(consensusParameters));
          this.blockHeaderRepository = blockHeaderRepository;
-         this.consensusValidator = consensusValidator;
 
          this.genesisNode = new HeaderNode(0, this.consensusParameters.Genesis, null, Target.Zero);
 
@@ -161,27 +159,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
          using (new WriteLock(this.theLock))
          {
-            if (newTipHash == this.Genesis)
-            {
-               if (newTipPreviousHash != null)
-               {
-                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "invalid genesis", "genesis block should not have previous block.");
-                  return this.ValidationFailure(validationState);
-               }
-
-               this.ResetToGenesis();
-
-               return ConnectHeaderResult.ResettedToGenesis;
-            }
-            else
-            {
-               if (newTipPreviousHash == null)
-               {
-                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "null previous header", "previous hash null allowed only on genesis block");
-                  return this.ValidationFailure(validationState);
-               }
-            }
-
             // check if the tip we want to set is already into our chain
             if (this.knownHeaders.TryGetValue(newTipHash, out HeaderNode? tipNode))
             {
@@ -190,30 +167,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                   validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
                   return this.ValidationFailure(validationState);
                }
-
-               if (!this.checkProofOfWorkRule.Check(new HeaderValidationContext(newTip)))
-               {
-                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "high-hash", "invalid proof of work");
-                  return this.ValidationFailure(validationState);
-               }
-
-               this.logger.LogDebug("The tip we want to set is already in our headers chain.");
-               return ConnectHeaderResult.Connected;
             }
 
-            // ensures tip previous header is present.
-            if (!this.knownHeaders.TryGetValue(newTipPreviousHash, out HeaderNode? newTipPreviousHeader))
-            {
-               //previous tip header not found, abort.
-               validationState.Invalid(BlockValidationFailureContext.BlockMissingPreviousHeader, "prev-blk-not-found", "previous header not found, can't connect headers");
-               return this.ValidationFailure(validationState);
-            }
-
-            if (newTipPreviousHeader.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
-            {
-               validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "bad-prevblk", "previous block invalid");
-               return this.ValidationFailure(validationState);
-            }
 
             continue L3612 validation.cpp
 
@@ -264,6 +219,25 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             }
 
             return header!;
+         }
+      }
+
+      /// <summary>
+      /// Gets the <see cref="BlockHeader" /> referenced by the <paramref name="headerNode" />.
+      /// </summary>
+      /// <param name="headerNode">The header node.</param>
+      /// <returns></returns>
+      public bool TryGetBlockHeader(HeaderNode? headerNode, [MaybeNullWhen(false)]out BlockHeader blockHeader)
+      {
+         if (headerNode == null)
+         {
+            blockHeader = null!;
+            return false;
+         }
+
+         using (new ReadLock(this.theLock))
+         {
+            return this.blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader!);
          }
       }
 

@@ -10,10 +10,9 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
    {
       public static new Target Zero { get; } = new Target("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
-      private Target(string hexString) : base(hexString) { }
+      public Target(string hexString) : base(hexString) { }
 
       public Target(ReadOnlySpan<byte> input) : base(input) { }
-
 
       public Target(uint compactValue)
       {

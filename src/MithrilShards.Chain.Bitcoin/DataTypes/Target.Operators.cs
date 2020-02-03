@@ -24,5 +24,10 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          // todo
          return a + b;
       }
+
+      internal uint ToCompact()
+      {
+         throw new NotImplementedException();
+      }
    }
 }

@@ -41,7 +41,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <remarks>It's an in-memory value only that get computed during the header tree building.</remarks>
       public Target ChainWork { get; internal set; }
 
-      public HeaderNode(int height, BlockHeader header, HeaderNode previous)
+      internal HeaderNode(int height, BlockHeader header, HeaderNode previous)
       {
          if (height < 0) ThrowHelper.ThrowArgumentException($"{nameof(height)} must be greater or equal to 0.");
          if (header == null) ThrowHelper.ThrowArgumentNullException(nameof(header));
@@ -78,6 +78,27 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       public override string ToString()
       {
          return $"{this.Hash} ({this.Height})";
+      }
+
+      /// <summary>
+      /// Finds the ancestor of this entry in the chain that matches the given block height.
+      /// </summary>
+      /// <param name="height">The block height to search for.</param>
+      /// <returns>The ancestor of this chain at the specified height.</returns>
+      public HeaderNode? GetAncestor(int height)
+      {
+         if (height > this.Height)
+            return null;
+
+         //TODO: Improve using Skip list. this mean to add another field to this light class :/
+         int heightDiff = this.Height - height;
+         HeaderNode? ancestor = this;
+         for (int i = 0; i < heightDiff; i++)
+         {
+            ancestor = ancestor!.Previous;
+         }
+
+         return ancestor;
       }
    }
 }

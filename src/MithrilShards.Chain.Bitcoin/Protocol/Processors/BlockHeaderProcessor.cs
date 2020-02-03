@@ -238,7 +238,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          // If we don't have the last header, then the peer gave us something new (if these headers are valid).
          bool newHeaderReceived = !this.headersTree.IsKnown(headers.Last().Hash);
 
-         if (!this.ProcessNewBlockHeaders(headers, out BlockValidationState state, out HeaderNode? lastHeader))
+         if (!this.consensusValidator.ProcessNewBlockHeaders(headers, out BlockValidationState state, out HeaderNode? lastHeader))
          {
             if (state.IsInvalid())
             {
@@ -510,11 +510,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                this.status.LastUnknownBlockHash = null;
             }
          }
-      }
-
-      private bool ProcessNewBlockHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastHeader)
-      {
-         return this.consensusValidator.ProcessNewBlockHeaders(headers, out state, out lastHeader!);
       }
 
       private bool IsWitnessEnabled(HeaderNode? headerNode)

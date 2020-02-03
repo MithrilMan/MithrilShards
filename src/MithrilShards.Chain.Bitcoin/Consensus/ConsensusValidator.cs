@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -26,6 +27,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// The known header validation rules.
       /// </summary>
       readonly IEnumerable<IHeaderValidationRule> headerValidationRules;
+      readonly IConsensusParameters consensusParameters;
+      readonly HeadersTree headersTree;
       readonly IHeaderValidationContextFactory headerValidationContextFactory;
 
       private readonly object headerValidationLock = new object();
@@ -34,11 +37,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       public ConsensusValidator(ILogger<ConsensusValidator> logger,
                                 IEventBus eventBus,
                                 IEnumerable<IHeaderValidationRule> headerValidationRules,
+                                IConsensusParameters consensusParameters,
+                                HeadersTree headersTree,
                                 IHeaderValidationContextFactory headerValidationContextFactory)
       {
          this.logger = logger;
          this.eventBus = eventBus;
          this.headerValidationRules = headerValidationRules;
+         this.consensusParameters = consensusParameters;
+         this.headersTree = headersTree;
          this.headerValidationContextFactory = headerValidationContextFactory;
 
          this.VerifyValidationRules(this.headerValidationRules);
@@ -95,7 +102,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          {
             foreach (BlockHeader header in headers)
             {
-               bool accepted = this.ValidateHeader(header, out state, out lastProcessedHeader);
+               bool accepted = this.AcceptBlockHeader(header, out state, out lastProcessedHeader);
                this.CheckBlockIndex();
 
                if (!accepted)
@@ -130,26 +137,56 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <see langword="true"/> if the validation succeed, <see langword="false"/> otherwise and the reason of the fault
       /// can be found in <paramref name="validationState"/>.
       /// </returns>
-      private bool ValidateHeader(BlockHeader header, out BlockValidationState validationState)
+      private bool AcceptBlockHeader(BlockHeader header, out BlockValidationState validationState, [MaybeNullWhen(false)]out HeaderNode lastProcessedHeader)
       {
-
-         ParallelMergeOptions HeadersTree.TrySetTip here
+         UInt256 headerHash = header.Hash!;
+         validationState = new BlockValidationState();
+         lastProcessedHeader = null!;
 
          lock (this.headerValidationLock)
          {
-            IHeaderValidationContext context = this.headerValidationContextFactory.Create(header);
-
-            validationState = new BlockValidationState();
-            foreach (IHeaderValidationRule rule in this.headerValidationRules)
+            //don't validate genesis header
+            if (headerHash != this.consensusParameters.Genesis)
             {
-               if (!rule.Check(context, ref validationState))
+               // check if the tip we want to set is already into our chain
+               if (this.headersTree.TryGetNode(headerHash, false, out HeaderNode? tipNode))
                {
-                  this.logger.LogDebug("Header validation failed: {HeaderValidationState}", validationState.ToString());
+                  if (tipNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
+                  {
+                     validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
+                     return false;
+                  }
+
+                  this.logger.LogDebug("The header we want to accept is already in our headers chain.");
+                  return true;
+               }
+
+               if (header.PreviousBlockHash == null)
+               {
+                  validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "prev-hash-null", "previous hash null, allowed only on genesis block");
                   return false;
                }
+
+               IHeaderValidationContext context = this.headerValidationContextFactory.Create(header);
+
+               foreach (IHeaderValidationRule rule in this.headerValidationRules)
+               {
+                  if (!rule.Check(context, ref validationState))
+                  {
+                     this.logger.LogDebug("Header validation failed: {HeaderValidationState}", validationState.ToString());
+                     return false;
+                  }
+               }
+
+               validationState.IsValid();
             }
 
-            validationState.IsValid();
+            // new header validated
+            if (lastProcessedHeader == null)
+            {
+               lastProcessedHeader = AddToBlockIndex(block);
+            }
+
             return true;
          }
       }

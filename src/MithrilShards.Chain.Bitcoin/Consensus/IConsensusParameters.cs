@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MithrilShards.Chain.Bitcoin.DataTypes;
+﻿using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -14,20 +11,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       UInt256 Genesis { get; }
 
       /// <summary>
-      /// Gets or sets the pow target spacing.
-      /// </summary>
-      /// <value>
-      /// The pow target spacing.
-      /// </value>
-      long PowTargetSpacing { get; }
-
-      /// <summary>
       /// Gets the maximum allowed PoW.
       /// </summary>
       /// <value>
       /// The pow limit.
       /// </value>
-      UInt256 PowLimit { get; }
+      Target PowLimit { get; }
 
       /// <summary>
       /// Gets the pow target timespan.
@@ -36,6 +25,30 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// The pow target timespan.
       /// </value>
       long PowTargetTimespan { get; }
+
+      /// <summary>
+      /// Gets or sets the pow target spacing.
+      /// </summary>
+      /// <value>
+      /// The pow target spacing.
+      /// </value>
+      long PowTargetSpacing { get; }
+
+      /// <summary>
+      /// Gets a value indicating whether a block can be mined with the minimum difficulty, to use just on test networks.
+      /// </summary>
+      /// <remarks>
+      /// Set this to <see langword="false"/> for any serious network, use <see langword="true"/> only for test purposes or test networks.
+      /// </remarks>
+      bool PowAllowMinDifficultyBlocks { get; }
+
+      /// <summary>
+      /// Gets a value indicating whether PoW retargeting is disabled or not.
+      /// </summary>
+      /// <value>
+      ///   <c>true</c> if PoW retargeting is disabled; otherwise, <c>false</c>.
+      /// </value>
+      bool PowNoRetargeting { get; }
 
       /// <summary>
       /// Gets the subsidy halving interval, in blocks.
