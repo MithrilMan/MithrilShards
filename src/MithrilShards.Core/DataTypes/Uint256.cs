@@ -50,16 +50,16 @@ namespace MithrilShards.Core.DataTypes
             throw new FormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
          }
 
-         ReadOnlySpan<char> hexAsSpan = (hexString[0] == '0' && hexString[1] == 'X') ? hexString.AsSpan(2) : hexString.AsSpan();
+         ReadOnlySpan<char> hexAsSpan = (hexString[0] == '0' && (hexString[1] == 'X' || hexString[1] == 'x')) ? hexString.AsSpan(2) : hexString.AsSpan();
 
-         if (hexString.Length != EXPECTED_SIZE * 2)
+         if (hexAsSpan.Length != EXPECTED_SIZE * 2)
          {
             throw new FormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
          }
 
          Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
 
-         int i = hexString.Length - 1;
+         int i = hexAsSpan.Length - 1;
          int j = 0;
 
          while (i > 0)
