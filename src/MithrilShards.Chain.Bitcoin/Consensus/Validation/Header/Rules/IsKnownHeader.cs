@@ -12,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
    /// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.HeaderValidationRuleBase" />
    public class IsKnownHeader : HeaderValidationRuleBase
    {
-      public IsKnownHeader(ILogger<CheckDuplicate> logger) : base(logger) { }
+      public IsKnownHeader(ILogger<IsKnownHeader> logger) : base(logger) { }
 
       public override bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
       {

@@ -56,29 +56,32 @@ namespace MithrilShards.Chain.Bitcoin.Network
       // Also used if a block was /not/ received and timed out or started with another peer
       private bool MarkBlockAsReceived(UInt256 hash)
       {
-         std::map<uint256, std::pair<NodeId, std::list<QueuedBlock>::iterator>>::iterator itInFlight = mapBlocksInFlight.find(hash);
-         if (itInFlight != mapBlocksInFlight.end())
-         {
-            CNodeState* state = State(itInFlight->second.first);
-            assert(state != nullptr);
-            state->nBlocksInFlightValidHeaders -= itInFlight->second.second->fValidatedHeaders;
-            if (state->nBlocksInFlightValidHeaders == 0 && itInFlight->second.second->fValidatedHeaders)
-            {
-               // Last validated block on the queue was received.
-               nPeersWithValidatedDownloads--;
-            }
-            if (state->vBlocksInFlight.begin() == itInFlight->second.second)
-            {
-               // First block on the queue was received, update the start download time for the next one
-               state->nDownloadingSince = std::max(state->nDownloadingSince, GetTimeMicros());
-            }
-            state->vBlocksInFlight.erase(itInFlight->second.second);
-            state->nBlocksInFlight--;
-            state->nStallingSince = 0;
-            mapBlocksInFlight.erase(itInFlight);
-            return true;
-         }
-         return false;
+         //std::map<uint256, std::pair<NodeId, std::list<QueuedBlock>::iterator>>::iterator itInFlight = mapBlocksInFlight.find(hash);
+         //if (itInFlight != mapBlocksInFlight.end())
+         //{
+         //   CNodeState* state = State(itInFlight->second.first);
+         //   assert(state != nullptr);
+         //   state->nBlocksInFlightValidHeaders -= itInFlight->second.second->fValidatedHeaders;
+         //   if (state->nBlocksInFlightValidHeaders == 0 && itInFlight->second.second->fValidatedHeaders)
+         //   {
+         //      // Last validated block on the queue was received.
+         //      nPeersWithValidatedDownloads--;
+         //   }
+         //   if (state->vBlocksInFlight.begin() == itInFlight->second.second)
+         //   {
+         //      // First block on the queue was received, update the start download time for the next one
+         //      state->nDownloadingSince = std::max(state->nDownloadingSince, GetTimeMicros());
+         //   }
+         //   state->vBlocksInFlight.erase(itInFlight->second.second);
+         //   state->nBlocksInFlight--;
+         //   state->nStallingSince = 0;
+         //   mapBlocksInFlight.erase(itInFlight);
+         //   return true;
+         //}
+         //return false;
+
+         //TODO
+         return true;
       }
    }
 }

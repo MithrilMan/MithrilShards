@@ -93,7 +93,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
 
 
-      public bool ProcessNewBlockHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)]out HeaderNode lastProcessedHeader)
+      public bool ProcessNewBlockHeaders(BlockHeader[] headers, out BlockValidationState state, [MaybeNullWhen(false)] out HeaderNode lastProcessedHeader)
       {
          lastProcessedHeader = null!;
          state = null!;
@@ -111,7 +111,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                   return false;
                }
 
-               lastProcessedHeader = header;
+               // lastProcessedHeader = header;
             }
          }
 
@@ -137,7 +137,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <see langword="true"/> if the validation succeed, <see langword="false"/> otherwise and the reason of the fault
       /// can be found in <paramref name="validationState"/>.
       /// </returns>
-      private bool AcceptBlockHeader(BlockHeader header, out BlockValidationState validationState, [MaybeNullWhen(false)]out HeaderNode lastProcessedHeader)
+      private bool AcceptBlockHeader(BlockHeader header, out BlockValidationState validationState, [MaybeNullWhen(false)] out HeaderNode lastProcessedHeader)
       {
          UInt256 headerHash = header.Hash!;
          validationState = new BlockValidationState();
@@ -177,15 +177,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                      return false;
                   }
                }
-
-               validationState.IsValid();
             }
 
-            // new header validated
-            if (lastProcessedHeader == null)
-            {
-               lastProcessedHeader = AddToBlockIndex(block);
-            }
+            //lastProcessedHeader = AddToBlockIndex(block);
+
+            lastProcessedHeader = this.headersTree.Add(header);
 
             return true;
          }

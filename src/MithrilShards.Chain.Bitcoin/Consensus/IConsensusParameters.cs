@@ -1,4 +1,5 @@
 ﻿using MithrilShards.Chain.Bitcoin.DataTypes;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -9,6 +10,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Gets the hash of the first block (aka genesis) of the chain.
       /// </summary>
       UInt256 Genesis { get; }
+
+      /// <summary>
+      /// Gets the genesis header.
+      /// </summary>
+      BlockHeader GenesisHeader { get; }
 
       /// <summary>
       /// Gets the maximum allowed PoW.

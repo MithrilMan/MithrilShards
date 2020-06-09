@@ -41,17 +41,34 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <remarks>It's an in-memory value only that get computed during the header tree building.</remarks>
       public Target ChainWork { get; internal set; }
 
-      internal HeaderNode(int height, BlockHeader header, HeaderNode previous)
+      /// <summary>
+      /// Initializes a new instance of the <see cref="HeaderNode"/> that references a genesis header.
+      /// Only genesis header can have previous set to null
+      /// </summary>
+      /// <param name="header">The header.</param>
+      internal HeaderNode(BlockHeader header)
       {
-         if (height < 0) ThrowHelper.ThrowArgumentException($"{nameof(height)} must be greater or equal to 0.");
          if (header == null) ThrowHelper.ThrowArgumentNullException(nameof(header));
          if (header.Hash == null) ThrowHelper.ThrowArgumentException($"{nameof(header)} hash cannot be null.");
 
-         this.Height = height;
+         this.Height = 0;
          this.Hash = header.Hash;
-         this.Previous = previous;
 
-         this.ChainWork = previous == null ? Target.Zero : (previous.ChainWork + new Target(header.Bits));
+         this.ChainWork = Target.Zero;
+         this.Validity = HeaderValidityStatuses.ValidMask;
+      }
+
+      internal HeaderNode(BlockHeader header, HeaderNode previous)
+      {
+         if (header == null) ThrowHelper.ThrowArgumentNullException(nameof(header));
+         if (header.Hash == null) ThrowHelper.ThrowArgumentException($"{nameof(header)} hash cannot be null.");
+
+         this.Height = previous.Height + 1;
+         this.Hash = header.Hash;
+
+         this.Previous = previous;
+         this.ChainWork = previous.ChainWork + new Target(header.Bits);
+         this.Validity = HeaderValidityStatuses.ValidTree;
       }
 
 

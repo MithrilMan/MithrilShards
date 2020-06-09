@@ -10,6 +10,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    /// </summary>
    public interface IProofOfWorkCalculator
    {
-      int GetNextWorkRequired(HeaderNode previousHeaderNode, BlockHeader header);
+      uint GetNextWorkRequired(HeaderNode previousHeaderNode, BlockHeader header);
    }
 }

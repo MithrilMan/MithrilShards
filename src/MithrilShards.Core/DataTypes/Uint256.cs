@@ -43,6 +43,7 @@ namespace MithrilShards.Core.DataTypes
       /// <summary>
       /// Initializes a new instance of the <see cref="UInt256"/> class.
       /// Passed hex string must be a valid hex string with 64 char length, or 66 if prefix 0x is used, otherwise an exception is thrown.
+      /// Input data is considered in big endian.
       /// </summary>
       public UInt256(string hexString)
       {

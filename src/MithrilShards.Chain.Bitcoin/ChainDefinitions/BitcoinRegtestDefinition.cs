@@ -2,6 +2,7 @@
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Network;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
@@ -21,9 +22,12 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
       public override ConsensusParameters ConfigureConsensus()
       {
+         BlockHeader genesisBlock = this.BuildGenesisBlock("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206");
+
          return new ConsensusParameters
          {
-            Genesis = new UInt256("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"),
+            Genesis = genesisBlock.Hash!,
+            GenesisHeader = genesisBlock,
 
             PowLimit = new Target("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
             PowTargetTimespan = (long)TimeSpan.FromDays(14).TotalSeconds, // 2 weeks
@@ -34,6 +38,16 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
             SubsidyHalvingInterval = 150,
             SegwitHeight = 0, // SEGWIT is always activated on regtest unless overridden
             MinimumChainWork = UInt256.Zero,
+         };
+      }
+
+      private BlockHeader BuildGenesisBlock(string genesisHash)
+      {
+         //TODO complete construction (a Block will be needed and not a BlockHeader)
+         return new BlockHeader
+         {
+            Bits = 0,
+            Hash = new UInt256(genesisHash),
          };
       }
    }

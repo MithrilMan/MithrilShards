@@ -1,4 +1,5 @@
 ﻿using MithrilShards.Chain.Bitcoin.DataTypes;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -6,6 +7,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    public class ConsensusParameters : IConsensusParameters
    {
       public UInt256 Genesis { get; set; } = null!;
+
+      public BlockHeader GenesisHeader { get; set; } = null!;
 
       public int SegwitHeight { get; set; }
 
@@ -22,5 +25,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       public bool PowNoRetargeting { get; set; }
 
       public UInt256 MinimumChainWork { get; set; } = null!;
+
    }
 }

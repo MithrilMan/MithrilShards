@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus;
-using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules;
 using MithrilShards.Chain.Bitcoin.Network;
@@ -50,10 +49,14 @@ namespace MithrilShards.Chain.Bitcoin
             {
                services
                   .AddSingleton(typeof(IChainDefinition), chainDefinitionType)
+                  .AddSingleton<IConsensusParameters>(serviceProvider => serviceProvider.GetRequiredService<IChainDefinition>().Consensus)
                   .AddSingleton<INetworkDefinition>(serviceProvider => serviceProvider.GetRequiredService<IChainDefinition>().NetworkDefinition)
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
                   .AddSingleton<HeadersTree>()
                   .AddSingleton<IBlockHeaderRepository, InMemoryBlockHeaderRepository>()
+                  .AddSingleton<IBlockDownloader, BlockDownloader>()
+                  .AddSingleton<IConsensusValidator, ConsensusValidator>()
+                  .AddSingleton<IHeaderValidationContextFactory, HeaderValidationContextFactory>()
                   .AddSingleton<ILocalServiceProvider, LocalServiceProvider>()
                   .AddSingleton<SelfConnectionTracker>()
                   .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())

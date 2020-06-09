@@ -33,7 +33,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
 
          uint proofOfWorkLimit = this.consensusParameters.PowLimit.ToCompact();
-         long difficultyAdjustmentInterval = this.GetDifficultyAdjustmentInterval();
+         int difficultyAdjustmentInterval = (int)this.GetDifficultyAdjustmentInterval();
 
          // Only change once per difficulty adjustment interval
          if ((previousHeaderNode.Height + 1) % difficultyAdjustmentInterval != 0)
@@ -67,16 +67,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
 
          // Go back by what we want to be 14 days worth of blocks
-         int heightReference = previousHeaderNode.Height - (int)(difficultyAdjustmentInterval - 1);
-         if (heightReference < 0) ThrowHelper.ThrowNotSupportedException($"Critical error: {heightReference} cannot be less than 0");
-
+         int heightReference = previousHeaderNode.Height - (difficultyAdjustmentInterval - 1);
          HeaderNode? headerNodeReference = previousHeaderNode.GetAncestor(heightReference);
+
          if (!this.headersTree.TryGetBlockHeader(headerNodeReference, out BlockHeader? headerReference))
          {
             ThrowHelper.ThrowNotSupportedException("Header ancestor not found, PoW required work computation requires a full chain.");
          }
 
-         return CalculateNextWorkRequired(previousHeaderNode, previousHeader, headerReference.TimeStamp);
+         return this.CalculateNextWorkRequired(previousHeaderNode, previousHeader, headerReference.TimeStamp);
       }
 
       public uint CalculateNextWorkRequired(HeaderNode previousHeaderNode, BlockHeader previousHeader, long timeReference)
@@ -87,25 +86,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
 
          // Limit adjustment step
-         long minValue = this.consensusParameters.PowTargetTimespan / 4;
-         long maxValue = this.consensusParameters.PowTargetTimespan * 4;
-
-         long actualTimespan = previousHeader.TimeStamp - timeReference;
-         if (actualTimespan < minValue)
-         {
-            actualTimespan = minValue;
-         }
-         else if (actualTimespan > maxValue)
-         {
-            actualTimespan = maxValue;
-         }
-
+         long actualTimespan = Math.Clamp(
+             value: previousHeader.TimeStamp - timeReference,
+             min: this.consensusParameters.PowTargetTimespan / 4,
+             max: this.consensusParameters.PowTargetTimespan * 4
+             );
 
          // retarget
          Target powLimit = this.consensusParameters.PowLimit;
-         Target bnNew = new Target(previousHeader.Bits);
-         bnNew *= actualTimespan;
-         bnNew /= this.consensusParameters.PowTargetTimespan;
+         Target bnNew = new Target(previousHeader.Bits) * actualTimespan / this.consensusParameters.PowTargetTimespan;
 
          if (bnNew > powLimit)
          {

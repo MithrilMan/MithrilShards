@@ -64,7 +64,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.consensusParameters = consensusParameters ?? throw new ArgumentNullException(nameof(consensusParameters));
          this.blockHeaderRepository = blockHeaderRepository;
 
-         this.genesisNode = new HeaderNode(0, this.consensusParameters.Genesis, null, Target.Zero);
+         this.genesisNode = new HeaderNode(this.consensusParameters.GenesisHeader);
 
          this.ResetToGenesis();
       }
@@ -77,8 +77,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             this.bestChain.Clear();
             this.knownHeaders.Clear();
 
-            this.bestChain.Add(this.consensusParameters.Genesis);
-            this.knownHeaders.Add(this.consensusParameters.Genesis, this.genesisNode);
+            this.bestChain.Add(this.Genesis);
+            this.knownHeaders.Add(this.Genesis, this.genesisNode);
          }
       }
 
@@ -131,7 +131,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <param name="height">The height.</param>
       /// <param name="blockHash">The block hash.</param>
       /// <returns></returns>
-      public bool TryGetHash(int height, [MaybeNullWhen(false)]out UInt256 blockHash)
+      public bool TryGetHash(int height, [MaybeNullWhen(false)] out UInt256 blockHash)
       {
          using (new ReadLock(this.theLock))
          {
@@ -147,54 +147,97 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          return true;
       }
 
-      /// <summary>
-      /// Set a new tip in the chain
-      /// </summary>
-      /// <param name="newTip">The new tip</param>
-      /// <param name="newTipPreviousHash">The block hash before the new tip</param>
-      public ConnectHeaderResult TrySetTip(in BlockHeader newTip, ref BlockValidationState validationState)
+
+      public HeaderNode Add(in BlockHeader newBlockHeader)
       {
-         UInt256 newTipHash = newTip.Hash!;
-         UInt256? newTipPreviousHash = newTip.PreviousBlockHash;
+         UInt256 newHash = newBlockHeader.Hash!;
+         UInt256? previousHash = newBlockHeader.PreviousBlockHash;
+         HeaderNode? previousHeader;
 
          using (new WriteLock(this.theLock))
          {
-            // check if the tip we want to set is already into our chain
-            if (this.knownHeaders.TryGetValue(newTipHash, out HeaderNode? tipNode))
+            // check if the header we want to add has been already added
+            if (this.knownHeaders.TryGetValue(newHash, out HeaderNode? headerAlredyAdded))
             {
-               if (tipNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
-               {
-                  validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
-                  return this.ValidationFailure(validationState);
-               }
+               return headerAlredyAdded;
             }
 
-
-            continue L3612 validation.cpp
-
-            // if newTipPreviousHash isn't current tip, means we need to rollback
-            bool needRewind = this.height != newTipPreviousHeader.Height;
-            if (needRewind)
+            if (previousHash == null)
             {
-               int rollingBackHeight = this.height;
-               while (rollingBackHeight > newTipPreviousHeader.Height)
-               {
-                  this.knownHeaders.Remove(this.bestChain[rollingBackHeight]);
-                  this.bestChain.RemoveAt(rollingBackHeight);
-                  rollingBackHeight--;
-               }
-               this.height = rollingBackHeight;
+               previousHeader = this.genesisNode;
+            }
+            else if (!this.knownHeaders.TryGetValue(previousHash, out previousHeader))
+            {
+               throw new Exception("Cannot add an header without a known previous header");
             }
 
-            // now we can put the tip on top of our chain.
-            this.height++;
-            this.bestChain.Add(newTipHash);
-            this.knownHeaders.Add(newTipHash, new HeaderNode(this.height, newTipHash, newTipPreviousHash));
-            this.blockHeaderRepository.TryAdd(newTip);
+            var newHeader = new HeaderNode(newBlockHeader, previousHeader);
+            this.knownHeaders.Add(newHash, newHeader);
 
-            return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
+            //check if we are extending the tip
+            if (this.bestChain[this.height] == previousHeader.Hash)
+            {
+               this.height++;
+               this.bestChain.Add(newHash);
+            }
+            else
+            {
+               // TODO
+               // need to rewind
+            }
+
+            return newHeader;
          }
       }
+
+      ///// <summary>
+      ///// Set a new tip in the chain
+      ///// </summary>
+      ///// <param name="newTip">The new tip</param>
+      ///// <param name="newTipPreviousHash">The block hash before the new tip</param>
+      //public ConnectHeaderResult TrySetTip(in BlockHeader newTip, ref BlockValidationState validationState)
+      //{
+      //   UInt256 newTipHash = newTip.Hash!;
+      //   UInt256? newTipPreviousHash = newTip.PreviousBlockHash;
+
+      //   using (new WriteLock(this.theLock))
+      //   {
+      //      // check if the tip we want to set is already into our chain
+      //      if (this.knownHeaders.TryGetValue(newTipHash, out HeaderNode? tipNode))
+      //      {
+      //         if (tipNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
+      //         {
+      //            validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
+      //            return this.ValidationFailure(validationState);
+      //         }
+      //      }
+
+
+      //      continue L3612 validation.cpp
+
+      //      // if newTipPreviousHash isn't current tip, means we need to rollback
+      //      bool needRewind = this.height != newTipPreviousHeader.Height;
+      //      if (needRewind)
+      //      {
+      //         int rollingBackHeight = this.height;
+      //         while (rollingBackHeight > newTipPreviousHeader.Height)
+      //         {
+      //            this.knownHeaders.Remove(this.bestChain[rollingBackHeight]);
+      //            this.bestChain.RemoveAt(rollingBackHeight);
+      //            rollingBackHeight--;
+      //         }
+      //         this.height = rollingBackHeight;
+      //      }
+
+      //      // now we can put the tip on top of our chain.
+      //      this.height++;
+      //      this.bestChain.Add(newTipHash);
+      //      this.knownHeaders.Add(newTipHash, new HeaderNode(this.height, newTipHash, newTipPreviousHash));
+      //      this.blockHeaderRepository.TryAdd(newTip);
+
+      //      return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
+      //   }
+      //}
 
       public BlockLocator GetTipLocator()
       {
@@ -227,7 +270,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       /// <param name="headerNode">The header node.</param>
       /// <returns></returns>
-      public bool TryGetBlockHeader(HeaderNode? headerNode, [MaybeNullWhen(false)]out BlockHeader blockHeader)
+      public bool TryGetBlockHeader(HeaderNode? headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader)
       {
          if (headerNode == null)
          {
