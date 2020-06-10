@@ -20,6 +20,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
       }
 
+      protected override async ValueTask OnPeerHandshakedAsync()
+      {
+         // ask for addresses when the peer handshakes
+         await this.SendMessageAsync(minVersion: KnownVersion.V31402, new GetAddrMessage()).ConfigureAwait(false);
+      }
+
       public async ValueTask<bool> ProcessMessageAsync(GetAddrMessage message, CancellationToken cancellation)
       {
          this.logger.LogDebug("Peer requiring addresses from us.");

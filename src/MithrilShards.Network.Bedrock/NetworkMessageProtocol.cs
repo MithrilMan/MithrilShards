@@ -73,6 +73,7 @@ namespace MithrilShards.Network.Bedrock
                if (this.networkMessageSerializerManager
                   .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message))
                {
+                  this.peerContext.Metrics.Received(this.contextData.GetTotalMessageLength());
                   return true;
                }
                else
@@ -151,12 +152,14 @@ namespace MithrilShards.Network.Bedrock
                if (magicRead == this.contextData.MagicNumber)
                {
                   this.contextData.MagicNumberRead = true;
-                  this.peerContext.Metrics.Wasted(reader.Position.GetInteger() - 4);
                   return true;
                }
                else
                {
                   reader.Rewind(3);
+                  //TODO check this logic
+                  this.peerContext.Metrics.Wasted(reader.Remaining - prevRemaining);
+                  return false;
                }
             }
             else

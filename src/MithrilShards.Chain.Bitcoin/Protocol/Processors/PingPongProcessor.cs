@@ -13,18 +13,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<PongMessage>
    {
 
-
       public PingPongProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
       }
-
-      protected override async ValueTask OnPeerHandshakedAsync()
-      {
-         // ask for addresses when the peer handshakes
-         await this.SendMessageAsync(minVersion: KnownVersion.V31402, new GetAddrMessage()).ConfigureAwait(false);
-      }
-
 
       public async ValueTask<bool> ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
       {

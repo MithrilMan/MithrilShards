@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,8 +18,8 @@ namespace MithrilShards.Core.Network
    {
       private const string FEED_CONNECTED_PEERS = "ConnectedPeers";
 
-      private readonly Dictionary<string, IPeerContext> inboundPeers = new Dictionary<string, IPeerContext>();
-      private readonly Dictionary<string, IPeerContext> outboundPeers = new Dictionary<string, IPeerContext>();
+      protected readonly ConcurrentDictionary<string, IPeerContext> inboundPeers = new ConcurrentDictionary<string, IPeerContext>();
+      protected readonly ConcurrentDictionary<string, IPeerContext> outboundPeers = new ConcurrentDictionary<string, IPeerContext>();
 
       private readonly ILogger<ConnectionManager> logger;
       private readonly IEventBus eventBus;
@@ -66,7 +67,7 @@ namespace MithrilShards.Core.Network
       /// <param name="peerContext">The peer context.</param>
       private void AddConnectedPeer(PeerConnected @event)
       {
-         Dictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? this.inboundPeers : this.outboundPeers;
+         ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? this.inboundPeers : this.outboundPeers;
          container[@event.PeerContext.PeerId] = @event.PeerContext;
          this.logger.LogDebug("Added peer {PeerId} to the list of connected peers", @event.PeerContext.PeerId);
       }
@@ -77,8 +78,8 @@ namespace MithrilShards.Core.Network
       /// <param name="peerContext">The peer context.</param>
       private void RemoveConnectedPeer(PeerDisconnected @event)
       {
-         Dictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? this.inboundPeers : this.outboundPeers;
-         if (!container.Remove(@event.PeerContext.PeerId))
+         ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? this.inboundPeers : this.outboundPeers;
+         if (!container.TryRemove(@event.PeerContext.PeerId, out _))
          {
             this.logger.LogWarning("Cannot remove peer {PeerId}, peer not found", @event.PeerContext.PeerId);
          }
@@ -88,7 +89,7 @@ namespace MithrilShards.Core.Network
          }
       }
 
-      public Task StartAsync(CancellationToken cancellationToken)
+      public virtual Task StartAsync(CancellationToken cancellationToken)
       {
          this.RegisterStatisticFeeds();
          this.eventSubscriptionManager.RegisterSubscriptions(
@@ -103,7 +104,7 @@ namespace MithrilShards.Core.Network
          return Task.CompletedTask;
       }
 
-      public Task StopAsync(CancellationToken cancellationToken)
+      public virtual Task StopAsync(CancellationToken cancellationToken)
       {
          this.eventSubscriptionManager.Dispose();
 

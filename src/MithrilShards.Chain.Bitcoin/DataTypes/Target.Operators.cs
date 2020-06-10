@@ -10,6 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
    public partial class Target : UInt256
    {
       const int UINT_ELEMENTS_COUNT = EXPECTED_SIZE / sizeof(uint);
+      const int UINT_BIT_SIZE = sizeof(uint) * 8;
 
       public static Target operator +(Target left, Target right)
       {
@@ -24,7 +25,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          {
             ulong n = carry + result[i] + rightBytes[i];
             result[i] = (uint)(n & 0xffffffff);
-            carry = n >> sizeof(uint);
+            carry = n >> UINT_BIT_SIZE;
          }
 
          return new Target(MemoryMarshal.Cast<uint, byte>(result));
@@ -56,13 +57,13 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          Span<uint> result = stackalloc uint[UINT_ELEMENTS_COUNT];
          result.Fill(0);
 
-         int k = shiftAmount / sizeof(uint);
-         shiftAmount %= sizeof(uint);
+         int k = shiftAmount / UINT_BIT_SIZE;
+         shiftAmount %= UINT_BIT_SIZE;
 
          for (int i = 0; i < UINT_ELEMENTS_COUNT; i++)
          {
             if (i + k + 1 < UINT_ELEMENTS_COUNT && shiftAmount != 0)
-               result[i + k + 1] |= leftCopy[i] >> (32 - shiftAmount);
+               result[i + k + 1] |= leftCopy[i] >> (UINT_BIT_SIZE - shiftAmount);
 
             if (i + k < UINT_ELEMENTS_COUNT)
                result[i + k] |= leftCopy[i] << shiftAmount;
@@ -81,13 +82,13 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          Span<uint> result = stackalloc uint[UINT_ELEMENTS_COUNT];
          result.Fill(0);
 
-         int k = shiftAmount / sizeof(uint);
-         shiftAmount %= sizeof(uint);
+         int k = shiftAmount / UINT_BIT_SIZE;
+         shiftAmount %= UINT_BIT_SIZE;
 
          for (int i = 0; i < UINT_ELEMENTS_COUNT; i++)
          {
             if (i + k + 1 < UINT_ELEMENTS_COUNT && shiftAmount != 0)
-               result[i + k + 1] |= leftCopy[i] << (32 - shiftAmount);
+               result[i + k + 1] |= leftCopy[i] << (UINT_BIT_SIZE - shiftAmount);
 
             if (i + k < UINT_ELEMENTS_COUNT)
                result[i + k] |= leftCopy[i] >> shiftAmount;
@@ -103,11 +104,6 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       //   return a + b;
       //}
 
-      internal uint ToCompact()
-      {
-         throw new NotImplementedException();
-      }
-
       public static Target operator *(Target left, Target right)
       {
          ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), UINT_ELEMENTS_COUNT);
@@ -120,10 +116,27 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
             ulong carry = 0;
             for (int i = 0; i + j < UINT_ELEMENTS_COUNT; i++)
             {
-               ulong n = carry + result[i + j] + (ulong)(leftBytes[j] * rightBytes[i]);
+               ulong n = carry + result[i + j] + ((ulong)leftBytes[j] * rightBytes[i]);
                result[i + j] = (uint)(n & 0xffffffff);
-               carry = n >> 32;
+               carry = n >> UINT_BIT_SIZE;
             }
+         }
+
+         return new Target(MemoryMarshal.Cast<uint, byte>(result));
+      }
+
+      public static Target operator *(Target left, uint right)
+      {
+         ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), UINT_ELEMENTS_COUNT);
+
+         Span<uint> result = stackalloc uint[UINT_ELEMENTS_COUNT];
+
+         ulong carry = 0;
+         for (int i = 0; i < UINT_ELEMENTS_COUNT; i++)
+         {
+            ulong n = carry + ((ulong)leftBytes[i] * right);
+            result[i] = (uint)(n & 0xffffffff);
+            carry = n >> UINT_BIT_SIZE;
          }
 
          return new Target(MemoryMarshal.Cast<uint, byte>(result));
@@ -150,16 +163,17 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
 
          // the quotient.
          Span<uint> result = stackalloc uint[UINT_ELEMENTS_COUNT];
-         result.Fill(0);
+         //result.Fill(0); //allocated data is already zeroed
 
          int shiftAmount = numeratorBits - denominatorBits;
-         numerator <<= shiftAmount; // shift so that div and num align.
+         denominator <<= shiftAmount; // shift so that div and num align.
          while (shiftAmount >= 0)
          {
             if (numerator >= denominator)
             {
                numerator -= denominator;
-               result[shiftAmount / sizeof(uint)] |= (uint)(1 << (shiftAmount & (sizeof(uint) - 1))); // set a bit of the result.
+               // set a bit of the result.
+               result[shiftAmount / UINT_BIT_SIZE] |= (uint)(1 << (shiftAmount & (UINT_BIT_SIZE - 1)));
             }
 
             denominator >>= 1; // shift back.
@@ -169,60 +183,14 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          return new Target(MemoryMarshal.Cast<uint, byte>(result));
       }
 
-      public static Target operator *(Target left, long right)
-      {
-         return left * FromValue((ulong)right);
-      }
-
       public static Target operator *(Target left, ulong right)
       {
-         return left * FromValue(right);
-      }
-
-      public static Target operator /(Target left, long right)
-      {
-         return left / FromValue((ulong)right);
+         return left * FromRawValue(right);
       }
 
       public static Target operator /(Target left, ulong right)
       {
-         return left / FromValue(right);
-      }
-
-      public static Target Add(Target left, Target right)
-      {
-         return left + right;
-      }
-
-      public static Target Subtract(Target left, Target right)
-      {
-         return left - right;
-      }
-
-
-      public static Target Multiply(Target left, Target right)
-      {
-         return left * right;
-      }
-
-      public static Target Divide(Target left, Target right)
-      {
-         return left / right;
-      }
-
-      public static Target LeftShift(Target left, int shiftAmount)
-      {
-         return left << shiftAmount;
-      }
-
-      public static Target RightShift(Target left, int shiftAmount)
-      {
-         return left >> shiftAmount;
-      }
-
-      public static Target Negate(Target item)
-      {
-         return -item;
+         return left / FromRawValue(right);
       }
    }
 }

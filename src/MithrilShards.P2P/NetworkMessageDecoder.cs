@@ -71,6 +71,7 @@ namespace MithrilShards.Network.Legacy
                if (this.networkMessageSerializerManager
                   .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message))
                {
+                  this.peerContext.Metrics.Received(this.ContextData.GetTotalMessageLength());
                   return true;
                }
                else
@@ -149,12 +150,14 @@ namespace MithrilShards.Network.Legacy
                if (magicRead == this.ContextData.MagicNumber)
                {
                   this.ContextData.MagicNumberRead = true;
-                  this.peerContext.Metrics.Wasted(reader.Position.GetInteger() - 4);
                   return true;
                }
                else
                {
                   reader.Rewind(3);
+                  //TODO check this logic
+                  this.peerContext.Metrics.Wasted(reader.Remaining - prevRemaining);
+                  return false;
                }
             }
             else

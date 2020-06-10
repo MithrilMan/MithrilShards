@@ -28,6 +28,9 @@ namespace MithrilShards.Network.Benchmark
 
       static void Main(string[] args)
       {
+         Benchmarks.Target.Target_Study.TestResults();
+         return;
+
          //// to disable tiered compilation, either set environment variable COMPLUS_TieredCompilation to 0 or uncomment this configuration
          //IConfig config = DefaultConfig.Instance
          //   .StopOnFirstError(true)

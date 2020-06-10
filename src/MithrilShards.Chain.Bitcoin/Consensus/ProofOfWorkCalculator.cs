@@ -86,7 +86,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
 
          // Limit adjustment step
-         long actualTimespan = Math.Clamp(
+         ulong actualTimespan = (ulong)Math.Clamp(
              value: previousHeader.TimeStamp - timeReference,
              min: this.consensusParameters.PowTargetTimespan / 4,
              max: this.consensusParameters.PowTargetTimespan * 4
@@ -94,7 +94,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
          // retarget
          Target powLimit = this.consensusParameters.PowLimit;
-         Target bnNew = new Target(previousHeader.Bits) * actualTimespan / this.consensusParameters.PowTargetTimespan;
+         Target bnNew = new Target(previousHeader.Bits) * actualTimespan / (ulong)this.consensusParameters.PowTargetTimespan;
 
          if (bnNew > powLimit)
          {
