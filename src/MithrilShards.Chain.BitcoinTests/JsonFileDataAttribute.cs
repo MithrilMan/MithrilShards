@@ -57,7 +57,7 @@ namespace Xunit
 
          if (!File.Exists(path))
          {
-            throw new ArgumentException($"Could not find file at path: {path}");
+            throw new ArgumentException($"Could not find file at path: x {path}");
          }
 
          // Load the file
