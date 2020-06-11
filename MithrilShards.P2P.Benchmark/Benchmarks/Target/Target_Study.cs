@@ -78,31 +78,6 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
       //   return new NBitcoin_Target(scalar);
       //}
 
-      //[Benchmark]
-      //public MS_Target MulScalar_Target()
-      //{
-      //   return t1 * scalar;
-      //}
-
-      //[Benchmark]
-      //public NBitcoin_Target MulScalar_NBitcoinTarget()
-      //{
-      //   return new NBitcoin_Target(nt1.ToBigInteger() * new BigInteger((long)scalar));
-      //}
-
-      //[Benchmark]
-      //public MS_Target DivScalar_Target()
-      //{
-      //   return t1 / scalar;
-      //}
-
-      //[Benchmark]
-      //public NBitcoin_Target DivScalar_NBitcoinTarget()
-      //{
-      //   return new NBitcoin_Target(nt1.ToBigInteger() / new BigInteger((long)scalar));
-      //}
-
-
       [Benchmark]
       public uint CalculateNextWorkRequired()
       {

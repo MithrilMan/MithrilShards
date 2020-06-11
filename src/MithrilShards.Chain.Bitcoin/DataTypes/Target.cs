@@ -2,7 +2,6 @@
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using MithrilShards.Core.DataTypes;
 
@@ -19,18 +18,17 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       /// <returns></returns>
       public static Target FromRawValue(ulong value)
       {
-         return new Target
-         {
-            part1 = value,
-            //part1 = ((ulong)((uint)value) | (ulong)((uint)value >> 32))
-         };
+         return new Target { part1 = value };
       }
-
 
       private Target() { }
 
       public Target(string hexString) : base(hexString) { }
 
+      /// <summary>
+      /// Initializes a new instance of the <see cref="Target"/> class from a raw byte array.
+      /// </summary>
+      /// <param name="input"></param>
       public Target(ReadOnlySpan<byte> input) : base(input) { }
 
       /// <summary>
@@ -52,8 +50,14 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          }
          else
          {
-            Target temp = new Target { part1 = mantissa } << (8 * (exponent - 3));
-            temp.GetBytes().CopyTo(data);
+            //BigInteger n = new BigInteger(mantissa) << (8 * (exponent - 3));
+            //n.TryWriteBytes(data, out _);
+
+            //Target temp = new Target { part1 = mantissa } << (8 * (exponent - 3));
+            //temp.GetBytes().CopyTo(data);
+
+            this.part1 = mantissa;
+            this.ShiftLeft(8 * (exponent - 3));
          }
 
          /// 0x00800000 is the mask to use to obtain the sign, if needed.
@@ -110,7 +114,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          }
          else
          {
-            compact = (uint)(this >> 8 * (size - 3)).part1;
+            compact = this.GetCompactMantissa(8 * (size - 3));
          }
 
          // The 0x00800000 bit denotes the sign.
@@ -135,6 +139,5 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          var value = compact & 0x00FFFFFF;
          return new BigInteger(value) << (8 * ((int)exp - 3));
       }
-
    }
 }
