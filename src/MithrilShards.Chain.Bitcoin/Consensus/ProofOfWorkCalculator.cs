@@ -75,30 +75,42 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             ThrowHelper.ThrowNotSupportedException("Header ancestor not found, PoW required work computation requires a full chain.");
          }
 
-         return this.CalculateNextWorkRequired(previousHeaderNode, previousHeader, headerReference.TimeStamp);
+         return this.CalculateNextWorkRequired(previousHeader, headerReference.TimeStamp);
       }
 
-      public uint CalculateNextWorkRequired(HeaderNode previousHeaderNode, BlockHeader previousHeader, long timeReference)
+      public uint CalculateNextWorkRequired(BlockHeader previousHeader, uint timeReference)
       {
          if (this.consensusParameters.PowNoRetargeting)
          {
             return previousHeader.Bits;
          }
 
+         //// Limit adjustment step
+         //uint actualTimespan = Math.Clamp(
+         //    value: previousHeader.TimeStamp - timeReference,
+         //    min: this.consensusParameters.PowTargetTimespan / 4,
+         //    max: this.consensusParameters.PowTargetTimespan * 4
+         //    );
+
          // Limit adjustment step
-         ulong actualTimespan = (ulong)Math.Clamp(
-             value: previousHeader.TimeStamp - timeReference,
-             min: this.consensusParameters.PowTargetTimespan / 4,
-             max: this.consensusParameters.PowTargetTimespan * 4
-             );
+         uint actualTimespan = previousHeader.TimeStamp - timeReference;
+         if (actualTimespan < this.consensusParameters.PowTargetTimespan / 4)
+         {
+            actualTimespan = this.consensusParameters.PowTargetTimespan / 4;
+         }
+         else if (actualTimespan > this.consensusParameters.PowTargetTimespan * 4)
+         {
+            actualTimespan = this.consensusParameters.PowTargetTimespan * 4;
+         }
 
          // retarget
-         Target powLimit = this.consensusParameters.PowLimit;
-         Target bnNew = new Target(previousHeader.Bits) * actualTimespan / (ulong)this.consensusParameters.PowTargetTimespan;
+         Target bnNew = new Target(previousHeader.Bits);
+         bnNew.Multiply(actualTimespan);
+         bnNew.Divide(this.consensusParameters.PowTargetTimespan);
 
-         if (bnNew > powLimit)
+         if (bnNew > this.consensusParameters.PowLimit)
          {
-            bnNew = powLimit;
+            bnNew = this.consensusParameters.PowLimit;
          }
 
          return bnNew.ToCompact();

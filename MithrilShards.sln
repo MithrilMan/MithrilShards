@@ -52,6 +52,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Dev.Controlle
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Logging.TableFormatter", "src\MithrilShards.Logging.TableFormatter\MithrilShards.Logging.TableFormatter.csproj", "{31B2C28C-A356-4C4B-B359-1C123CA4A259}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{73FF5914-1F61-48DA-9E72-4A2FA4C82123}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Chain.BitcoinTests", "src\MithrilShards.Chain.BitcoinTests\MithrilShards.Chain.BitcoinTests.csproj", "{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +102,10 @@ Global
 		{31B2C28C-A356-4C4B-B359-1C123CA4A259}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31B2C28C-A356-4C4B-B359-1C123CA4A259}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31B2C28C-A356-4C4B-B359-1C123CA4A259}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -108,6 +116,7 @@ Global
 		{C1B18295-7204-48B6-B6B1-5FA036B8ACE8} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
 		{54E1A44C-2EAC-440E-8802-B2EDCC328624} = {BEA3071B-CDD3-4FD7-9B59-71C1F7CF23BB}
 		{7F79C482-85AD-4F12-8484-FBD22D5DDAF9} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
+		{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2} = {73FF5914-1F61-48DA-9E72-4A2FA4C82123}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}

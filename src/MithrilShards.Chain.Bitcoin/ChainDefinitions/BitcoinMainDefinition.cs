@@ -30,8 +30,8 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
             GenesisHeader = genesisBlock,
 
             PowLimit = new Target("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
-            PowTargetTimespan = (long)TimeSpan.FromDays(14).TotalSeconds, // 2 weeks
-            PowTargetSpacing = (long)TimeSpan.FromMinutes(10).TotalSeconds,
+            PowTargetTimespan = (uint)TimeSpan.FromDays(14).TotalSeconds, // 2 weeks
+            PowTargetSpacing = (uint)TimeSpan.FromMinutes(10).TotalSeconds,
             PowAllowMinDifficultyBlocks = false,
             PowNoRetargeting = false,
 

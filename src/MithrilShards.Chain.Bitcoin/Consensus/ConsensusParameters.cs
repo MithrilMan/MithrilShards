@@ -16,9 +16,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public Target PowLimit { get; set; } = null!;
 
-      public long PowTargetTimespan { get; set; }
+      public uint PowTargetTimespan { get; set; }
 
-      public long PowTargetSpacing { get; set; }
+      public uint PowTargetSpacing { get; set; }
 
       public bool PowAllowMinDifficultyBlocks { get; set; }
 

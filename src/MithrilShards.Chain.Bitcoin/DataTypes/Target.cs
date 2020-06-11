@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.DataTypes
@@ -101,25 +99,6 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          return 0;
       }
 
-      public int Bits2()
-      {
-         ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref this.part1), UINT_ELEMENTS_COUNT);
-
-         for (int pos = leftBytes.Length - 1; pos >= 0; pos--)
-         {
-            if (leftBytes[pos] != 0)
-            {
-               for (int nbits = 31; nbits > 0; nbits--)
-               {
-                  if ((leftBytes[pos] & 1U << nbits) != 0)
-                     return 32 * pos + nbits + 1;
-               }
-               return 32 * pos + 1;
-            }
-         }
-         return 0;
-      }
-
       public uint ToCompact(bool isNegative = false)
       {
          uint compact;
@@ -148,5 +127,14 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          compact |= (uint)(isNegative && ((compact & 0x007fffff) != 0) ? 0x00800000 : 0);
          return compact;
       }
+
+      public BigInteger ToBigInteger()
+      {
+         uint compact = ToCompact();
+         var exp = compact >> 24;
+         var value = compact & 0x00FFFFFF;
+         return new BigInteger(value) << (8 * ((int)exp - 3));
+      }
+
    }
 }

@@ -1,13 +1,16 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis;
-using NBitcoin.BouncyCastle.Math;
-using NBitcoin_Target = MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes.NBitcoin_Target;
+using NBitcoin_Target = NBitcoin.Target;
 using MS_Target = MithrilShards.Chain.Bitcoin.DataTypes.Target;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using System.Numerics;
+using MithrilShards.Chain.Bitcoin.Consensus;
+using BenchmarkDotNet.Loggers;
+using Microsoft.Extensions.Logging.Abstractions;
+using MithrilShards.Chain.Bitcoin.ChainDefinitions;
+using Perfolizer.Mathematics.Randomization;
+using System.Security.Cryptography;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.Target
 {
@@ -21,137 +24,119 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
       MS_Target t1;
       NBitcoin_Target nt1;
 
-      ulong scalar = (ulong)TimeSpan.FromDays(14).TotalSeconds; //actualTimespan value of bitcoin
+      //[Params(1, 1000, 1209600)] // 1209600 = actualTimespan value of bitcoin
+      public uint scalar = (uint)TimeSpan.FromDays(14).TotalSeconds; //actualTimespan value of bitcoin
+
+      BlockHeader header;
+
+      uint lastRetargetTime = 1261130161;
+      uint blockTime = 1262152739;
+      uint bits = 0x1d00ffff;
+
+      ProofOfWorkCalculator powCalculator = new ProofOfWorkCalculator(
+         new NullLogger<ProofOfWorkCalculator>(),
+         new BitcoinMainDefinition().ConfigureConsensus(),
+         null
+         );
+
+      NBitcoin.Consensus nbitcoin_consensus = NBitcoin.Network.Main.Consensus;
+      NBitcoin.Consensus ms_consensus = NBitcoin.Network.Main.Consensus;
 
       [GlobalSetup]
       public void Setup()
       {
          t1 = new MS_Target(perfectCompactValue);
          nt1 = new NBitcoin_Target(perfectCompactValue);
-      }
-
-      [Benchmark]
-      public MS_Target MulScalar_Target()
-      {
-         return t1 * scalar;
-      }
-
-      [Benchmark]
-      public NBitcoin_Target MulScalar_NBitcoinTarget()
-      {
-         return new NBitcoin_Target(nt1
-            .ToBigInteger()
-            .Multiply(BigInteger.ValueOf((long)scalar))
-            );
-      }
-
-      //[Benchmark]
-      //public object Div_Target()
-      //{
-      //   return t1 / t1;
-      //}
-
-      //[Benchmark]
-      //public object Div_NBitcoinTarget()
-      //{
-      //   return nt1 / nt1;
-      //}
-
-
-
-      internal static void Debug()
-      {
-         uint diff = 0x1b0404cb;
-
-         var t1 = new MS_Target(diff);
-         NBitcoin_Target nt1 = new NBitcoin_Target(diff);
-
-         uint scalar = 20;
-
-         var t1MulScalar = t1 * scalar;
-
-         var bigInt = nt1.ToBigInteger();
-         var nt1MulScalar = bigInt.Multiply(BigInteger.ValueOf((long)scalar));
-
-         var bits = t1MulScalar.Bits();
-         var nBits = new NBitcoin_Target(nt1MulScalar).ToUInt256();
-      }
-
-
-      internal static void TestResults()
-      {
-         var test = new Target_Study();
-         test.Setup();
-
-         var compact = test.t1.ToCompact();
-         var nCompact = test.nt1.ToCompact();
-
-
-         Console.WriteLine($"MulScalar_NBitcoinTarget {test.MulScalar_NBitcoinTarget().ToUInt256().ToString()}");
-         Console.WriteLine($"MulScalar_Target {test.MulScalar_Target()}");
-
-         var resultStrat = TestStrat(
-            powTargetTimespanTicks: 12096000000000,
-            actualTimespanTicks: 20554910000000,
-            newTargetBigInt: "26959535291011309493156476344723991336010898738574164086137773096960",
-            powLimitBigInt: "26959535291011309493156476344723991336010898738574164086137773096960"
-            );
-
-         var resultMS = TestMS(
-            powTargetTimespanTicks: 12096000000000,
-            actualTimespanTicks: 20554910000000,
-            newTargetBigInt: "26959535291011309493156476344723991336010898738574164086137773096960",
-            powLimitBigInt: "26959535291011309493156476344723991336010898738574164086137773096960"
-            );
-      }
-
-
-      internal static NBitcoin_Target TestStrat(long powTargetTimespanTicks, long actualTimespanTicks, string newTargetBigInt, string powLimitBigInt)
-      {
-         TimeSpan powTargetTimespan = TimeSpan.FromTicks(powTargetTimespanTicks);
-         TimeSpan actualTimespan = TimeSpan.FromTicks(actualTimespanTicks);
-         NBitcoin_Target proofOfWorkLimit = new NBitcoin_Target(new BigInteger(powLimitBigInt));
-
-         if (actualTimespan < TimeSpan.FromTicks(powTargetTimespan.Ticks / 4))
-            actualTimespan = TimeSpan.FromTicks(powTargetTimespan.Ticks / 4);
-         if (actualTimespan > TimeSpan.FromTicks(powTargetTimespan.Ticks * 4))
-            actualTimespan = TimeSpan.FromTicks(powTargetTimespan.Ticks * 4);
-
-         // Retarget.
-         BigInteger newTarget = new BigInteger(newTargetBigInt);
-         newTarget = newTarget.Multiply(BigInteger.ValueOf((long)actualTimespan.TotalSeconds));
-         newTarget = newTarget.Divide(BigInteger.ValueOf((long)powTargetTimespan.TotalSeconds));
-
-         var finalTarget = new NBitcoin_Target(newTarget);
-         if (finalTarget > proofOfWorkLimit)
-            finalTarget = proofOfWorkLimit;
-
-         return finalTarget;
-      }
-
-      internal static MS_Target TestMS(long powTargetTimespanTicks, long actualTimespanTicks, string newTargetBigInt, string powLimitBigInt)
-      {
-         TimeSpan powTargetTimespan = TimeSpan.FromTicks(powTargetTimespanTicks);
-         BigInteger newTarget = new BigInteger(newTargetBigInt);
-
-         ulong actualTimespan = (ulong)Math.Clamp(
-             value: TimeSpan.FromTicks(actualTimespanTicks).TotalSeconds,
-             min: TimeSpan.FromTicks(powTargetTimespan.Ticks / 4).TotalSeconds,
-             max: TimeSpan.FromTicks(powTargetTimespan.Ticks * 4).TotalSeconds
-             );
-
-         // retarget
-         MS_Target powLimit = new MS_Target(new NBitcoin_Target(new BigInteger(powLimitBigInt)).ToUInt256().ToBytes());
-         MS_Target bnNew = new MS_Target(new NBitcoin_Target(newTarget).ToUInt256().ToBytes());
-         bnNew *= actualTimespan;
-         bnNew /= (ulong)powTargetTimespan.TotalSeconds;
-
-         if (bnNew > powLimit)
+         header = new BlockHeader
          {
-            bnNew = powLimit;
-         }
+            TimeStamp = blockTime,
+            Bits = bits
+         };
+      }
 
-         return bnNew;
+      //[Benchmark]
+      //public uint ToCompact()
+      //{
+      //   return t1.ToCompact();
+      //}
+
+      //[Benchmark]
+      //public uint ToCompact_NBitcoin()
+      //{
+      //   return nt1.ToCompact();
+      //}
+
+      //[Benchmark]
+      //public MS_Target SetCompact()
+      //{
+      //   return new MS_Target(scalar);
+      //}
+
+      //[Benchmark]
+      //public NBitcoin_Target SetCompact_NBitcoin()
+      //{
+      //   return new NBitcoin_Target(scalar);
+      //}
+
+      //[Benchmark]
+      //public MS_Target MulScalar_Target()
+      //{
+      //   return t1 * scalar;
+      //}
+
+      //[Benchmark]
+      //public NBitcoin_Target MulScalar_NBitcoinTarget()
+      //{
+      //   return new NBitcoin_Target(nt1.ToBigInteger() * new BigInteger((long)scalar));
+      //}
+
+      //[Benchmark]
+      //public MS_Target DivScalar_Target()
+      //{
+      //   return t1 / scalar;
+      //}
+
+      //[Benchmark]
+      //public NBitcoin_Target DivScalar_NBitcoinTarget()
+      //{
+      //   return new NBitcoin_Target(nt1.ToBigInteger() / new BigInteger((long)scalar));
+      //}
+
+
+      [Benchmark]
+      public uint CalculateNextWorkRequired()
+      {
+         return powCalculator.CalculateNextWorkRequired(header, lastRetargetTime);
+      }
+
+      [Benchmark]
+      public uint CalculateNextWorkRequired_NBitcoin()
+      {
+         return NBitcoinStyle_CalculateNextWorkRequired(header, lastRetargetTime);
+      }
+
+      public uint NBitcoinStyle_CalculateNextWorkRequired(BlockHeader header, uint lastRetargetTime)
+      {
+         if (nbitcoin_consensus.PowNoRetargeting)
+            return header.Bits;
+
+         // Limit adjustment step
+         TimeSpan nActualTimespan = TimeSpan.FromSeconds(header.TimeStamp - lastRetargetTime);
+         if (nActualTimespan < TimeSpan.FromTicks(nbitcoin_consensus.PowTargetTimespan.Ticks / 4))
+            nActualTimespan = TimeSpan.FromTicks(nbitcoin_consensus.PowTargetTimespan.Ticks / 4);
+         if (nActualTimespan > TimeSpan.FromTicks(nbitcoin_consensus.PowTargetTimespan.Ticks * 4))
+            nActualTimespan = TimeSpan.FromTicks(nbitcoin_consensus.PowTargetTimespan.Ticks * 4);
+
+         // Retarget
+         BigInteger bnNew = new NBitcoin_Target(header.Bits).ToBigInteger();
+         var cmp = new NBitcoin_Target(bnNew).ToCompact();
+         bnNew = bnNew * (new BigInteger((long)nActualTimespan.TotalSeconds));
+         bnNew = bnNew / (new BigInteger((long)nbitcoin_consensus.PowTargetTimespan.TotalSeconds));
+         var newTarget = new NBitcoin_Target(bnNew);
+         if (newTarget > nbitcoin_consensus.PowLimit)
+            newTarget = nbitcoin_consensus.PowLimit;
+
+         return newTarget.ToCompact();
       }
    }
 }

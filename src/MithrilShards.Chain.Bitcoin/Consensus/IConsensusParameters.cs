@@ -25,20 +25,20 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       Target PowLimit { get; }
 
       /// <summary>
-      /// Gets the pow target timespan.
+      /// Gets the pow target timespan, in seconds.
       /// </summary>
       /// <value>
       /// The pow target timespan.
       /// </value>
-      long PowTargetTimespan { get; }
+      uint PowTargetTimespan { get; }
 
       /// <summary>
-      /// Gets or sets the pow target spacing.
+      /// Gets or sets the pow target spacing, in seconds.
       /// </summary>
       /// <value>
       /// The pow target spacing.
       /// </value>
-      long PowTargetSpacing { get; }
+      uint PowTargetSpacing { get; }
 
       /// <summary>
       /// Gets a value indicating whether a block can be mined with the minimum difficulty, to use just on test networks.
