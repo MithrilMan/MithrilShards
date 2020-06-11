@@ -24,4 +24,10 @@
       <ProjectReference Include="..\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
    </ItemGroup>
 
+   <ItemGroup>
+     <None Update="_data\ProofOfWorkCalculatorTests.json">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </None>
+   </ItemGroup>
+
 </Project>

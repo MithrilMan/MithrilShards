@@ -19,11 +19,18 @@ namespace MithrilShards.Chain.BitcoinTests
          consensusParameters = new BitcoinMainDefinition().ConfigureConsensus();
       }
 
+      public static TheoryData<uint, int, uint, uint, uint> Data() => new TheoryData<uint, int, uint, uint, uint>
+      {
+         { 1261130161, 32255, 1262152739, 0x1d00ffff, 0x1d00d86aU }, // Block #30240
+         { 1231006505, 2015, 1233061996, 0x1d00ffff, 0x1d00ffffU }, // Block #0
+         { 1279008237, 68543, 1279297671, 0x1c05a3f4, 0x1c0168fdU }, // Block #66528
+         { 1279008237, 46367, 1269211443, 0x1c387f6f, 0x1d00e1fdU } // NOTE: Not an actual block time. Block 46367
+      };
+
+
       [Theory]
-      [InlineData(1261130161, 32255, 1262152739, 0x1d00ffff, 0x1d00d86aU)] // Block #30240
-      [InlineData(1231006505, 2015, 1233061996, 0x1d00ffff, 0x1d00ffffU)] // Block #0
-      [InlineData(1279008237, 68543, 1279297671, 0x1c05a3f4, 0x1c0168fdU)] // Block #66528
-      [InlineData(1279008237, 46367, 1269211443, 0x1c387f6f, 0x1d00e1fdU)] // NOTE: Not an actual block time. Block 46367
+      //[JsonFileData("_data/ProofOfWorkCalculatorTests.json", "CalculateNextWorkRequired")]
+      [MemberData(nameof(Data))]
       public void CalculateNextWorkRequiredTest(uint lastRetargetTime, int height, uint blockTime, uint bits, uint expectedResult)
       {
          ProofOfWorkCalculator powCalculator = new ProofOfWorkCalculator(
@@ -43,10 +50,7 @@ namespace MithrilShards.Chain.BitcoinTests
       }
 
       [Theory]
-      [InlineData(1261130161, 32255, 1262152739, 0x1d00ffff, 0x1d00d86aU)] // Block #30240
-      [InlineData(1231006505, 2015, 1233061996, 0x1d00ffff, 0x1d00ffffU)] // Block #0
-      [InlineData(1279008237, 68543, 1279297671, 0x1c05a3f4, 0x1c0168fdU)] // Block #66528
-      [InlineData(1279008237, 46367, 1269211443, 0x1c387f6f, 0x1d00e1fdU)] // NOTE: Not an actual block time. Block 46367
+      [MemberData(nameof(Data))]
       public void NBitcoinCalculateNextWorkRequiredTest(uint lastRetargetTime, int height, uint blockTime, uint bits, uint expectedResult)
       {
          var header = new BlockHeader
