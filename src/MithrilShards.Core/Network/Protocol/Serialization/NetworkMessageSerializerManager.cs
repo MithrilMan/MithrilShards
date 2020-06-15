@@ -53,7 +53,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          return false;
       }
 
-      public bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, [MaybeNullWhen(true)]out INetworkMessage message)
+      public bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, [MaybeNullWhen(false)]out INetworkMessage message)
       {
          if (this.serializers.TryGetValue(commandName, out INetworkMessageSerializer? serializer))
          {

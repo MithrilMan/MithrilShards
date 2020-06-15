@@ -73,10 +73,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          using (new WriteLock(this.theLock))
          {
-            this.height = 0;
             this.bestChain.Clear();
             this.knownHeaders.Clear();
 
+            this.height = 0;
             this.bestChain.Add(this.Genesis);
             this.knownHeaders.Add(this.Genesis, this.genesisNode);
          }
@@ -173,6 +173,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
             var newHeader = new HeaderNode(newBlockHeader, previousHeader);
             this.knownHeaders.Add(newHash, newHeader);
+
+            // add node to the repository
+            this.blockHeaderRepository.TryAdd(newBlockHeader);
 
             //check if we are extending the tip
             if (this.bestChain[this.height] == previousHeader.Hash)
@@ -307,25 +310,25 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns></returns>
       private BlockLocator GetLocatorNoLock(int height)
       {
-         int itemsToAdd = height <= 10 ? (height + 1) : (10 + (int)Math.Ceiling(Math.Log2(height)));
-         UInt256[] hashes = new UInt256[itemsToAdd];
+         List<UInt256> hashes = new List<UInt256>(32); //sets initial capacity to a number that can fit usual case
 
          int index = 0;
          while (index < 10 && height > 0)
          {
-            hashes[index++] = this.bestChain[height--];
+            hashes.Add(this.bestChain[height--]);
+            index++;
          }
 
          int step = 1;
          while (height > 0)
          {
-            hashes[index++] = this.bestChain[height];
+            hashes.Add(this.bestChain[height]);
             step *= 2;
             height -= step;
          }
-         hashes[itemsToAdd - 1] = this.Genesis;
+         hashes.Add(this.Genesis);
 
-         return new BlockLocator { BlockLocatorHashes = hashes };
+         return new BlockLocator { BlockLocatorHashes = hashes.ToArray() };
       }
 
       /// <summary>

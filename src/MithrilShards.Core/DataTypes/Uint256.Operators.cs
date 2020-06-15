@@ -5,11 +5,11 @@ namespace MithrilShards.Core.DataTypes
 {
    public partial class UInt256 : IEquatable<UInt256>
    {
-      public override bool Equals(object? obj) => ReferenceEquals(this, obj) ? true : this.Equals(obj as UInt256);
+      public override bool Equals(object? obj) => ReferenceEquals(this, obj) || this.Equals(obj as UInt256);
 
       public static bool operator !=(UInt256? a, UInt256? b) => !(a == b);
 
-      public static bool operator ==(UInt256? a, UInt256? b) => a is null ? false : a.Equals(b);
+      public static bool operator ==(UInt256? a, UInt256? b) => ReferenceEquals(a, b) || (a?.Equals(b) ?? false);
 
       public bool Equals(UInt256? other)
       {

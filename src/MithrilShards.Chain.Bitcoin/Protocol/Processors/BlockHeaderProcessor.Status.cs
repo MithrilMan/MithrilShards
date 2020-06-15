@@ -50,7 +50,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// <value>
          /// The last unknown block hash.
          /// </value>
-         public UInt256? LastUnknownBlockHash { get; internal set; } = null;
+         public UInt256? LastUnknownBlockHash { get; internal set; }
 
          /// <summary>
          /// Gets or sets the best known block we know this peer has announced.

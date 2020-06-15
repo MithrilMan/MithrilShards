@@ -47,7 +47,7 @@ namespace MithrilShards.Network.Bedrock
          this.peerContext = peerContext;
       }
 
-      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, [MaybeNullWhen(false)] out INetworkMessage message)
+      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, /*[MaybeNullWhen(false)]*/ out INetworkMessage message)
       {
          var reader = new SequenceReader<byte>(input);
 
@@ -71,7 +71,7 @@ namespace MithrilShards.Network.Bedrock
 
                string commandName = this.contextData.CommandName!;
                if (this.networkMessageSerializerManager
-                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message))
+                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message!))
                {
                   this.peerContext.Metrics.Received(this.contextData.GetTotalMessageLength());
                   return true;

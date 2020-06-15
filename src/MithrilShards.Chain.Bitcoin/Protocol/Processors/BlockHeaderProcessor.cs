@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.DataTypes;
@@ -17,7 +14,6 @@ using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.PeerBehaviorManager;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
@@ -52,7 +48,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <summary>
       /// The maximum number of blocks that can be requested from a single peer.
       /// </summary>
-      private const int MAX_BLOCKS_IN_TRANSIT_PER_PEER = 16;
+      private const int MAX_BLOCKS_IN_TRANSIT_PER_PEER = 26; //FIX default bitcoin value: 16
 
       /// <summary>
       /// Maximum number of block hashes allowed in the BlockLocator.</summary>
@@ -94,13 +90,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       /// <summary>
       /// When the peer handshake, sends <see cref="SendCmpctMessage"/>  and <see cref="SendHeadersMessage"/> if the
-      /// negotiated protocol allow that and as
+      /// negotiated protocol allow that and update peer status based on its version message.
       /// </summary>
       /// <param name="event">The event.</param>
       /// <returns></returns>
       protected override async ValueTask OnPeerHandshakedAsync()
       {
-         this.status.PeerStartingHeight = this.PeerContext.Data.Get<HandshakeProcessor.HandshakeProcessorStatus>()?.PeerVersion?.StartHeight ?? 0;
+         VersionMessage peerVersion = this.PeerContext.Data.Get<HandshakeProcessor.HandshakeProcessorStatus>().PeerVersion!;
+
+         this.status.PeerStartingHeight = peerVersion.StartHeight;
+         this.status.CanServeWitness = (peerVersion.Services & (ulong)NodeServices.Witness) != 0;
 
          await this.SendMessageAsync(minVersion: KnownVersion.V70014, new SendCmpctMessage { HighBandwidthMode = true, Version = 1 }).ConfigureAwait(false);
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
@@ -276,9 +275,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
          }
 
-         bool fCanDirectFetch = this.CanDirectFetch();
          // If this set of headers is valid and ends in a block with at least as much work as our tip, download as much as possible.
-         if (fCanDirectFetch && lastHeader.IsValid(HeaderValidityStatuses.ValidTree) && this.headersTree.GetTip().ChainWork <= lastHeader.ChainWork)
+         if (
+            this.CanDirectFetch()
+            && lastHeader.IsValid(HeaderValidityStatuses.ValidTree)
+            && this.headersTree.GetTip().ChainWork <= lastHeader.ChainWork
+            )
          {
             List<HeaderNode> blocksToDownload = new List<HeaderNode>();
             HeaderNode? currentHeader = lastHeader;
@@ -286,19 +288,20 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             while (currentHeader != null && !this.headersTree.IsInBestChain(currentHeader) && blocksToDownload.Count <= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
             {
                if (!currentHeader.Validity.HasFlag(HeaderValidityStatuses.HasBlockData)  // we don't have data for this block
-                  && this.blockDownloader.Equals(currentHeader.Hash) // it's not already in download
+                  && !this.blockDownloader.IsDownloading(currentHeader) // it's not already in download
                   && (!this.IsWitnessEnabled(currentHeader.Previous) || this.status.CanServeWitness) //witness isn't enabled or the other peer can't serve witness
                   )
                {
                   blocksToDownload.Add(currentHeader);
                }
+
                currentHeader = currentHeader.Previous;
             }
 
             /// If currentHeader still isn't on our main chain, we're looking at a very large reorg at a time we think we're close to caught
             /// up to the main chain -- this shouldn't really happen.
             /// Bail out on the direct fetch and rely on parallel download instead.
-            if (!this.headersTree.IsInBestChain(currentHeader))
+            if (currentHeader != null && !this.headersTree.IsInBestChain(currentHeader))
             {
                this.logger.LogDebug("Large reorg, won't direct fetch to {HeaderNode}", lastHeader);
             }

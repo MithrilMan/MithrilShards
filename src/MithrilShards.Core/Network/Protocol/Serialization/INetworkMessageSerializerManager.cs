@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization
 {
@@ -6,6 +7,6 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
    {
       bool TrySerialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output, out int serializedLength);
 
-      bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, out INetworkMessage message);
+      bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, [MaybeNullWhen(false)] out INetworkMessage message);
    }
 }

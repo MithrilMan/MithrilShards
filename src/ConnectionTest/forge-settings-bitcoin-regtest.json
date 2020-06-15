@@ -5,8 +5,8 @@
       "AllowLoopbackConnection": false,
       "Listeners": [
          {
-            "IsWhitelistingEndpoint": false,
-            "Endpoint": "0.0.0.0:45010"
+            "IsWhitelistingEndpoint": true,
+            "Endpoint": "0.0.0.0:45017"
          },
          {
             "IsWhitelistingEndpoint": true,

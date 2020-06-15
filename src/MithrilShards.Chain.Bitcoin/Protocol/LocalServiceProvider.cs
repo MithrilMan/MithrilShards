@@ -17,7 +17,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
       {
          this.logger = logger;
 
-         this.AddServices(NodeServices.Network | NodeServices.NetworkLimited);
+         this.AddServices(NodeServices.Network | NodeServices.NetworkLimited | NodeServices.Witness);
       }
 
       public void AddServices(NodeServices services)

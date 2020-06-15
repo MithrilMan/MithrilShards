@@ -117,6 +117,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             //TODO
             // this.SupportedTransactionOptions |= TransactionOptions.Witness;
+
+            /// actually for blocks this is handled in BlockHeaderProcessor
          }
 
          // will prevent to handle version messages to other Processors
