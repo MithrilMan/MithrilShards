@@ -11,13 +11,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public override void Serialize(SendCmpctMessage message, int protocolVersion, IBufferWriter<byte> output)
       {
-         output.WriteBool(message.HighBandwidthMode);
+         output.WriteBool(message.AnnounceUsingCompactBlock);
          output.WriteULong(message.Version);
       }
 
       public override SendCmpctMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
       {
-         return new SendCmpctMessage { HighBandwidthMode = reader.ReadBool(), Version = reader.ReadULong() };
+         return new SendCmpctMessage { AnnounceUsingCompactBlock = reader.ReadBool(), Version = reader.ReadULong() };
       }
    }
 }

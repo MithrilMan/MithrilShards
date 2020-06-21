@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
-using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
-using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Threading;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -24,7 +19,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    /// <remarks>
    /// Internally it uses <see cref="ReaderWriterLockSlim"/> to ensure thread safety on every get and set method.
    /// </remarks>
-   public class HeadersTree
+   public class HeadersTree : IHeadersTree
    {
       private const int INITIAL_ITEMS_ALLOCATED = 16 ^ 2; //this parameter may go into settings, better to be multiple of 2
 
@@ -32,7 +27,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       private readonly ILogger<HeadersTree> logger;
       private readonly IConsensusParameters consensusParameters;
-      readonly IBlockHeaderRepository blockHeaderRepository;
 
       /// <summary>
       /// Known set of hashes, both on forks and on best chains.
@@ -49,22 +43,18 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <summary>
       /// The genesis node.
       /// </summary>
-      private readonly HeaderNode genesisNode;
-
-      public UInt256 Genesis => this.consensusParameters.Genesis;
+      public HeaderNode Genesis { get; }
 
       private int height;
       public int Height => this.height;
 
       public HeadersTree(ILogger<HeadersTree> logger,
-                         IConsensusParameters consensusParameters,
-                         IBlockHeaderRepository blockHeaderRepository)
+                         IConsensusParameters consensusParameters)
       {
          this.logger = logger;
          this.consensusParameters = consensusParameters ?? throw new ArgumentNullException(nameof(consensusParameters));
-         this.blockHeaderRepository = blockHeaderRepository;
 
-         this.genesisNode = new HeaderNode(this.consensusParameters.GenesisHeader);
+         this.Genesis = HeaderNode.GenerateGenesis(this.consensusParameters.GenesisHeader);
 
          this.ResetToGenesis();
       }
@@ -77,28 +67,28 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             this.knownHeaders.Clear();
 
             this.height = 0;
-            this.bestChain.Add(this.Genesis);
-            this.knownHeaders.Add(this.Genesis, this.genesisNode);
-         }
-      }
-
-      public bool Contains(UInt256 blockHash)
-      {
-         using (new ReadLock(this.theLock))
-         {
-            return this.knownHeaders.ContainsKey(blockHash);
+            this.bestChain.Add(this.Genesis.Hash);
+            this.knownHeaders.Add(this.Genesis.Hash, this.Genesis);
          }
       }
 
       /// <summary>
-      /// Tries to get the height of an hash.
+      /// Tries to get the <see cref="HeaderNode" /> giving its hash.
       /// </summary>
       /// <param name="blockHash">The block hash.</param>
       /// <param name="onlyBestChain">if set to <c>true</c> check only headers that belong to the best chain.</param>
-      /// <param name="height">The height if found, -1 otherwise.</param>
-      /// <returns><c>true</c> if the result has been found, <see langword="false"/> otherwise.</returns>
-      public bool TryGetNode(UInt256 blockHash, bool onlyBestChain, [MaybeNullWhen(false)] out HeaderNode node)
+      /// <param name="node">The header node having the passed <paramref name="blockHash"/>.</param>
+      /// <returns>
+      ///   <c>true</c> if the result has been found, <see langword="false" /> otherwise.
+      /// </returns>
+      public bool TryGetNode(UInt256? blockHash, bool onlyBestChain, [MaybeNullWhen(false)] out HeaderNode node)
       {
+         if (blockHash == null)
+         {
+            node = null;
+            return false;
+         }
+
          using (new ReadLock(this.theLock))
          {
             return onlyBestChain ? this.knownHeaders.TryGetValue(blockHash, out node!) : this.TryGetNodeOnBestChainNoLock(blockHash, out node!);
@@ -106,10 +96,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       }
 
       /// <summary>
-      /// Tries to get the node on best chain at a specified height.
+      /// Tries to get the <see cref="HeaderNode" /> on best chain at a specified height.
       /// </summary>
       /// <param name="height">The height.</param>
-      /// <returns></returns>
+      /// <param name="node">The header node having the passed <paramref name="blockHash"/>.</param>
+      /// <returns>
+      ///   <c>true</c> if the result has been found, <see langword="false" /> otherwise.
+      /// </returns>
       public bool TryGetNodeOnBestChain(int height, [MaybeNullWhen(false)] out HeaderNode node)
       {
          using (new ReadLock(this.theLock))
@@ -147,6 +140,26 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          return true;
       }
 
+      /// <summary>
+      /// Find first common block between two chains.
+      /// </summary>
+      /// <param name="block">The tip of the other chain.</param>
+      /// <returns>First common block or <c>null</c>.</returns>
+      public HeaderNode? FindFork(HeaderNode reference)
+      {
+         if (reference is null)
+            throw new ArgumentNullException(nameof(reference));
+
+         HeaderNode? fork = reference.Height > this.Height ? reference.GetAncestor(this.Height) : reference;
+
+         while (fork != null && !this.IsInBestChain(fork))
+         {
+            fork = fork.Previous;
+         }
+
+         return reference;
+      }
+
 
       public HeaderNode Add(in BlockHeader newBlockHeader)
       {
@@ -164,7 +177,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
             if (previousHash == null)
             {
-               previousHeader = this.genesisNode;
+               previousHeader = this.Genesis;
             }
             else if (!this.knownHeaders.TryGetValue(previousHash, out previousHeader))
             {
@@ -173,9 +186,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
             var newHeader = new HeaderNode(newBlockHeader, previousHeader);
             this.knownHeaders.Add(newHash, newHeader);
-
-            // add node to the repository
-            this.blockHeaderRepository.TryAdd(newBlockHeader);
 
             //check if we are extending the tip
             if (this.bestChain[this.height] == previousHeader.Hash)
@@ -192,6 +202,16 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             return newHeader;
          }
       }
+
+
+      public void SetTip(HeaderNode newTip)
+      {
+         //TODO
+         /// only this method have to alter bestChain, all other place should be removed (except if we implement a RewindTip but even in
+         /// that case it should probably call internally this method
+      }
+
+
 
       ///// <summary>
       ///// Set a new tip in the chain
@@ -250,43 +270,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
-
-      /// <summary>
-      /// Gets the full block header tip.
-      /// </summary>
-      /// <returns></returns>
-      public BlockHeader GetTipAsBlockHeader()
-      {
-         using (new ReadLock(this.theLock))
-         {
-            if (!this.blockHeaderRepository.TryGet(this.bestChain[this.height], out BlockHeader? header))
-            {
-               ThrowHelper.ThrowBlockHeaderRepositoryException($"Unexpected error, cannot fetch the tip at height {this.height}.");
-            }
-
-            return header!;
-         }
-      }
-
-      /// <summary>
-      /// Gets the <see cref="BlockHeader" /> referenced by the <paramref name="headerNode" />.
-      /// </summary>
-      /// <param name="headerNode">The header node.</param>
-      /// <returns></returns>
-      public bool TryGetBlockHeader(HeaderNode? headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader)
-      {
-         if (headerNode == null)
-         {
-            blockHeader = null!;
-            return false;
-         }
-
-         using (new ReadLock(this.theLock))
-         {
-            return this.blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader!);
-         }
-      }
-
       public BlockLocator? GetLocator(int height)
       {
          using (new ReadLock(this.theLock))
@@ -326,7 +309,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             step *= 2;
             height -= step;
          }
-         hashes.Add(this.Genesis);
+         hashes.Add(this.Genesis.Hash);
 
          return new BlockLocator { BlockLocatorHashes = hashes.ToArray() };
       }
@@ -352,7 +335,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             }
          }
 
-         return this.genesisNode;
+         return this.Genesis;
       }
 
       /// <summary>
@@ -367,6 +350,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
+      /// <summary>
+      /// Determines whether an header is present in the best chain.
+      /// </summary>
+      /// <param name="headerNode">The header node to check.</param>
       public bool IsInBestChain(HeaderNode? headerNode)
       {
          if (headerNode == null) return false;

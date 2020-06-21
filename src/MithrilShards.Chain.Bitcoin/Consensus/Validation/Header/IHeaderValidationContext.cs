@@ -16,12 +16,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
       Dictionary<object, object> Items { get; }
 
       /// <summary>
-      /// Gets the headers tree that represents currently known headers.
+      /// Gives access to current block chain state and known headers
+      /// (TODO: abstract with an interface that acts as a subset of what ChainState can do)
       /// </summary>
       /// <value>
       /// The headers tree.
       /// </value>
-      HeadersTree HeadersTree { get; }
+      IChainState ChainState { get; }
 
       /// <summary>
       /// Gets a value indicating whether this instance is in initial block download state.

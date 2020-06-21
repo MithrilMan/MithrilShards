@@ -8,7 +8,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 {
    /// <summary>
    /// Represents a node in a linked list (tree) of headers.
-   /// It exposes current node height and parent
+   /// It exposes current node height, parent and cumulative ChainWork
    /// </summary>
    public class HeaderNode
    {
@@ -36,6 +36,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       public HeaderNode? Previous { get; }
 
       /// <summary>
+      /// Points to a previous item based on skip list implementation.
+      /// </summary>
+      /// <value>
+      /// The previous <see cref="HeaderNode"/>.
+      /// </value>
+      public HeaderNode? Skip { get; }
+
+      /// <summary>
       /// Total amount of work (expected number of hashes) in the chain up to and including this block.
       /// </summary>
       /// <remarks>It's an in-memory value only that get computed during the header tree building.</remarks>
@@ -43,18 +51,19 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       /// <summary>
       /// Initializes a new instance of the <see cref="HeaderNode"/> that references a genesis header.
-      /// Only genesis header can have previous set to null
+      /// Only genesis header can have previous set to null.
       /// </summary>
       /// <param name="header">The header.</param>
-      internal HeaderNode(BlockHeader header)
+      private HeaderNode(BlockHeader header)
       {
          if (header == null) ThrowHelper.ThrowArgumentNullException(nameof(header));
          if (header.Hash == null) ThrowHelper.ThrowArgumentException($"{nameof(header)} hash cannot be null.");
 
-         this.Height = 0;
          this.Hash = header.Hash;
-
+         this.Height = 0;
+         this.Previous = null;
          this.ChainWork = Target.Zero;
+         this.Skip = null;
          this.Validity = HeaderValidityStatuses.ValidMask;
       }
 
@@ -63,12 +72,41 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          if (header == null) ThrowHelper.ThrowArgumentNullException(nameof(header));
          if (header.Hash == null) ThrowHelper.ThrowArgumentException($"{nameof(header)} hash cannot be null.");
 
-         this.Height = previous.Height + 1;
          this.Hash = header.Hash;
-
+         this.Height = previous.Height + 1;
          this.Previous = previous;
          this.ChainWork = previous.ChainWork + new Target(header.Bits);
+         this.Skip = previous.GetAncestor(GetSkipHeight(this.Height));
          this.Validity = HeaderValidityStatuses.ValidTree;
+      }
+
+      /// <summary>
+      /// Generates the genesis HeaderNode.
+      /// </summary>
+      /// <param name="genesisNode">The genesis node.</param>
+      /// <returns></returns>
+      public static HeaderNode GenerateGenesis(BlockHeader genesisNode)
+      {
+         return new HeaderNode(genesisNode);
+      }
+
+      private static int GetSkipHeight(int height)
+      {
+         if (height < 2)
+         {
+            return 0;
+         }
+
+         /// Turn the lowest '1' bit in the binary representation of a number into a '0'.
+         int invertLowestOne(int n)
+         {
+            return n & (n - 1);
+         }
+
+         // Determine which height to jump back to. Any number strictly lower than height is acceptable,
+         // but the following expression seems to perform well in simulations (max 110 steps to go back
+         // up to 2**18 blocks).
+         return ((height & 1) != 0) ? invertLowestOne(invertLowestOne(height - 1)) + 1 : invertLowestOne(height);
       }
 
 
@@ -104,18 +142,32 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns>The ancestor of this chain at the specified height.</returns>
       public HeaderNode? GetAncestor(int height)
       {
-         if (height > this.Height)
+         if (height > this.Height || height < 0)
             return null;
 
-         //TODO: Improve using Skip list. this mean to add another field to this light class :/
-         int heightDiff = this.Height - height;
-         HeaderNode? ancestor = this;
-         for (int i = 0; i < heightDiff; i++)
+         HeaderNode current = this;
+         int heightWalk = this.Height;
+         while (heightWalk > height)
          {
-            ancestor = ancestor!.Previous;
+            int heightSkip = GetSkipHeight(heightWalk);
+            int heightSkipPrev = GetSkipHeight(heightWalk - 1); //walk.Previous.Skip.Height;
+            if (current.Skip != null &&
+               (heightSkip == height ||
+                  (heightSkip > height && !(heightSkipPrev < (heightSkip - 2) &&
+                                             heightSkipPrev >= height))))
+            {
+               // Only follow Skip if pprev->pskip isn't better than pskip->pprev.
+               current = current.Skip;
+               heightWalk = heightSkip;
+            }
+            else
+            {
+               current = current.Previous!;
+               heightWalk--;
+            }
          }
 
-         return ancestor;
+         return current;
       }
    }
 }

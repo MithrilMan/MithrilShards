@@ -26,7 +26,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private readonly IInitialBlockDownloadTracker initialBlockDownloadState;
       private readonly IUserAgentBuilder userAgentBuilder;
       readonly ILocalServiceProvider localServiceProvider;
-      readonly HeadersTree headersTree;
+      readonly IHeadersTree headersTree;
       private readonly SelfConnectionTracker selfConnectionTracker;
 
       public HandshakeProcessor(ILogger<HandshakeProcessor> logger,
@@ -38,7 +38,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                 IInitialBlockDownloadTracker initialBlockDownloadState,
                                 IUserAgentBuilder userAgentBuilder,
                                 ILocalServiceProvider localServiceProvider,
-                                HeadersTree headersTree,
+                                IHeadersTree headersTree,
                                 SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.dateTimeProvider = dateTimeProvider;
@@ -73,6 +73,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public async ValueTask<bool> ProcessMessageAsync(VersionMessage version, CancellationToken cancellation)
       {
+         bool peerServiceSupports(NodeServices service)
+         {
+            return (version.Services & (ulong)service) != 0;
+         }
+
          // did peers already handshaked?
          if (this.status.IsHandShaked)
          {
@@ -113,12 +118,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
 
          this.PeerContext.TimeOffset = this.dateTimeProvider.GetTimeOffset() - version.Timestamp;
-         if ((version.Services & (ulong)NodeServices.Witness) != 0)
-         {
-            //TODO
-            // this.SupportedTransactionOptions |= TransactionOptions.Witness;
 
-            /// actually for blocks this is handled in BlockHeaderProcessor
+         if (!peerServiceSupports(NodeServices.Network))
+         {
+            if (!peerServiceSupports(NodeServices.NetworkLimited))
+            {
+               this.status.IsClient = true;
+            }
+            else
+            {
+               this.status.IsLimitedNode = true;
+            }
          }
 
          // will prevent to handle version messages to other Processors

@@ -63,12 +63,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (this.isHandshakeAware)
          {
-#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
             this.RegisterLifeTimeSubscription(this.eventBus.Subscribe<PeerHandshaked>(async (receivedEvent) =>
             {
                await this.OnPeerHandshakedAsync().ConfigureAwait(false);
             }));
-#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
          }
 
          return default;
@@ -99,9 +97,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <param name="message">The message to send.</param>
       /// <param name="cancellationToken">The cancellation token.</param>
       /// <returns></returns>
-      public async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default)
+      protected async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default)
       {
-         await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
+         await this.SendMessageAsync(int.MinValue, message, cancellationToken).ConfigureAwait(false);
       }
 
       /// <summary>
@@ -116,15 +114,20 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       protected async ValueTask<bool> SendMessageAsync(int minVersion, INetworkMessage message, CancellationToken cancellationToken = default)
       {
-         if (minVersion == 0 || this.PeerContext.NegotiatedProtocolVersion.Version >= minVersion)
+         if (this.PeerContext.NegotiatedProtocolVersion.Version < minVersion)
          {
-            await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
-            return true;
-         }
-         else
-         {
+            this.logger.LogDebug("Can't send message, negotiated protocol version is below required protocol.");
             return false;
          }
+
+         if (!this.PeerContext.IsConnected)
+         {
+            this.logger.LogDebug("Can't send message, the peer is not in a connected state.");
+            return false;
+         }
+
+         await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
+         return true;
       }
 
       /// <summary>
@@ -192,6 +195,21 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             this.PeerContext.Disconnect(reason);
          }
+      }
+
+      /// <summary>
+      /// Returns <see langword="true"/> if the negotiated version supports the specified <paramref name="minVersion"/>.
+      /// Returns <see langword="false"/> otherwise.
+      /// </summary>
+      /// <param name="minVersion">The minimum version that has to be supported in order to return true.</param>
+      /// <remarks>
+      /// This is useful when there is logic that has to be executed only if a specified version of the negotiated protocol
+      /// is supported and would require multiple call of <see cref="SendMessageAsync"/> with the minVersion overload.
+      /// </remarks>
+      /// <returns></returns>
+      protected bool IsSupported(int minVersion)
+      {
+         return this.PeerContext.NegotiatedProtocolVersion.Version >= minVersion;
       }
 
 

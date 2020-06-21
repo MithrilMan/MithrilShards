@@ -8,6 +8,7 @@ using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Threading;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
 {
@@ -98,7 +99,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          lastProcessedHeader = null!;
          state = null!;
 
-         lock (this.validationLock)
+         using (var writeLock = GlobalLocks.WriteOnMain())
          {
             foreach (BlockHeader header in headers)
             {
@@ -110,8 +111,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                   lastProcessedHeader = null!;
                   return false;
                }
-
-               // lastProcessedHeader = header;
             }
          }
 

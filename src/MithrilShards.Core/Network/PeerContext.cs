@@ -60,6 +60,8 @@ namespace MithrilShards.Core.Network
 
       public CancellationTokenSource ConnectionCancellationTokenSource { get; } = new CancellationTokenSource();
 
+      public bool IsConnected { get; protected set; } = false;
+
       public PeerContext(ILogger logger,
                          IEventBus eventBus,
                          PeerConnectionDirection direction,

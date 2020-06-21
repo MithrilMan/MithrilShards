@@ -14,21 +14,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    {
       readonly ILogger<ProofOfWorkCalculator> logger;
       readonly IConsensusParameters consensusParameters;
-      readonly HeadersTree headersTree;
+      readonly IBlockHeaderRepository blockHeaderRepository;
 
-      public ProofOfWorkCalculator(ILogger<ProofOfWorkCalculator> logger, IConsensusParameters consensusParameters, HeadersTree headersTree)
+      public ProofOfWorkCalculator(ILogger<ProofOfWorkCalculator> logger,
+                                   IConsensusParameters consensusParameters,
+                                   IBlockHeaderRepository blockHeaderRepository)
       {
          this.logger = logger;
          this.consensusParameters = consensusParameters;
-         this.headersTree = headersTree;
+         this.blockHeaderRepository = blockHeaderRepository;
       }
 
       public uint GetNextWorkRequired(HeaderNode previousHeaderNode, BlockHeader header)
       {
          if (previousHeaderNode == null) ThrowHelper.ThrowArgumentNullException(nameof(previousHeaderNode));
 
-         if (!this.headersTree.TryGetBlockHeader(previousHeaderNode, out BlockHeader? previousHeader))
+         if (!this.blockHeaderRepository.TryGet(previousHeaderNode.Hash, out BlockHeader? previousHeader))
          {
+            //this should never happens, if it happens means we have consistency problem (we lost an header)
             ThrowHelper.ThrowArgumentNullException(nameof(previousHeaderNode));
          }
 
@@ -53,7 +56,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                   BlockHeader currentHeader = previousHeader;
                   while (currentHeaderNode.Previous != null
                      && (currentHeaderNode.Height % difficultyAdjustmentInterval) != 0
-                     && this.headersTree.TryGetBlockHeader(currentHeaderNode, out currentHeader!) && currentHeader.Bits == proofOfWorkLimit
+                     && this.blockHeaderRepository.TryGet(currentHeaderNode.Hash, out currentHeader!) && currentHeader.Bits == proofOfWorkLimit
                      )
                   {
                      currentHeaderNode = currentHeaderNode.Previous;
@@ -70,7 +73,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          int heightReference = previousHeaderNode.Height - (difficultyAdjustmentInterval - 1);
          HeaderNode? headerNodeReference = previousHeaderNode.GetAncestor(heightReference);
 
-         if (!this.headersTree.TryGetBlockHeader(headerNodeReference, out BlockHeader? headerReference))
+         BlockHeader? headerReference = null;
+         if (headerNodeReference == null || !this.blockHeaderRepository.TryGet(headerNodeReference.Hash, out headerReference))
          {
             ThrowHelper.ThrowNotSupportedException("Header ancestor not found, PoW required work computation requires a full chain.");
          }

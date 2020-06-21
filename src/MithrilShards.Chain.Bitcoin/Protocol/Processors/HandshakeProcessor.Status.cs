@@ -19,6 +19,18 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          internal bool VersionAckReceived { get; private set; } = false;
 
+
+         /// <summary>
+         /// Whether the peer is a limited node (isn't a full node and has only a limited amount of blocks to serve).
+         /// </summary>
+         public bool IsLimitedNode { get; internal set; } = false;
+
+         /// <summary>
+         /// Whether this peer is a client.
+         /// A Client is a node not relaying blocks and tx and not serving (parts) of the historical blockchain as "clients".
+         /// </summary>
+         public bool IsClient { get; internal set; } = false;
+
          public HandshakeProcessorStatus(HandshakeProcessor processor)
          {
             this.processor = processor;
@@ -62,7 +74,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             this.IsHandShaked = true;
             this.processor.logger.LogDebug("Handshake successful");
 
-            this.processor.eventBus.Publish(new PeerHandshaked(this.processor.PeerContext));
+            this.processor.PeerContext.OnHandshakeCompleted();
 
             return default;
          }

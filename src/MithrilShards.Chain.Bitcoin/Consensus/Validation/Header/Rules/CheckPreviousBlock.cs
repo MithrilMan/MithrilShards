@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
       public override bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
       {
          // ensures tip previous header is present.
-         if (!context.HeadersTree.TryGetNode(context.Header.PreviousBlockHash!, false, out HeaderNode? previousNode))
+         if (!context.ChainState.TryGetKnownHeaderNode(context.Header.PreviousBlockHash!, out HeaderNode? previousNode))
          {
             //previous tip header not found, abort.
             validationState.Invalid(BlockValidationFailureContext.BlockMissingPreviousHeader, "prev-blk-not-found", "previous header not found, can't connect headers");
