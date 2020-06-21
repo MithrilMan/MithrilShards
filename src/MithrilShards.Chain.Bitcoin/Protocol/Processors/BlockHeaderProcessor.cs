@@ -56,7 +56,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <seealso cref="https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2018-August/016285.html"/>
       /// <seealso cref="https://github.com/bitcoin/bitcoin/pull/13907"
       /// </summary>
-      private const int MAX_LOCATOR_HASHES = 101;
+      private const int MAX_LOCATOR_SIZE = 101;
       readonly IDateTimeProvider dateTimeProvider;
       private readonly IConsensusParameters consensusParameters;
       private readonly IInitialBlockDownloadTracker ibdState;
@@ -174,40 +174,68 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return new ValueTask<bool>(true);
       }
 
-      public ValueTask<bool> ProcessMessageAsync(GetHeadersMessage message, CancellationToken cancellation)
+      public async ValueTask<bool> ProcessMessageAsync(GetHeadersMessage message, CancellationToken cancellation)
       {
          if (message is null) throw new System.ArgumentNullException(nameof(message));
 
-         if (message.BlockLocator!.BlockLocatorHashes.Length > MAX_LOCATOR_HASHES)
+         if (message.BlockLocator!.BlockLocatorHashes.Length > MAX_LOCATOR_SIZE)
          {
-            this.logger.LogDebug("Exceeded maximum number of block hashes for getheaders message.");
-            this.Misbehave(10, "Exceeded maximum getheaders block hashes length", true);
+            this.logger.LogDebug("Exceeded maximum block locator size for getheaders message.");
+            this.Misbehave(10, "Exceeded maximum getheaders block locator size", true);
+            return true;
          }
 
          if (this.ibdState.IsDownloadingBlocks())
          {
             this.logger.LogDebug("Ignoring getheaders from {PeerId} because node is in initial block download state.", this.PeerContext.PeerId);
-            return new ValueTask<bool>(true);
+            return true;
          }
 
-         HeaderNode startingNode;
+         HeaderNode? startingNode;
          // If block locator is null, return the hashStop block
          if ((message.BlockLocator.BlockLocatorHashes?.Length ?? 0) == 0)
          {
             if (!this.chainState.TryGetBestChainHeaderNode(message.HashStop!, out startingNode!))
             {
                this.logger.LogDebug("Empty block locator and HashStop not found");
-               return new ValueTask<bool>(true);
+               return true;
             }
+
+            //TODO (ref net_processing.cpp 2479 tag 0.20)
+            //if (!BlockRequestAllowed(pindex, chainparams.GetConsensus()))
+            //{
+            //   LogPrint(BCLog::NET, "%s: ignoring request from peer=%i for old block header that isn't in the main chain\n", __func__, pfrom->GetId());
+            //   return true;
+            //}
          }
          else
          {
-            startingNode = this.chainState.GetHighestNodeInBestChainFromBlockLocator(message.BlockLocator);
+            // Find the last block the caller has in the main chain
+            startingNode = this.chainState.FindForkInGlobalIndex(message.BlockLocator);
+            this.chainState.TryGetNext(startingNode, out startingNode);
          }
 
-         this.logger.LogDebug("Serving headers from {StartingNodeHeight}:{StartingNodeHash}", startingNode.Height, startingNode.Hash);
+         this.logger.LogDebug("Serving headers from {StartingNodeHeight}:{StartingNodeHash}", startingNode?.Height, startingNode?.Hash);
 
-         return new ValueTask<bool>(true);
+         List<BlockHeader> headersToSend = new List<BlockHeader>();
+         HeaderNode? headerToSend = startingNode;
+         while (headerToSend != null)
+         {
+            if (!this.chainState.TryGetBlockHeader(headerToSend, out BlockHeader? blockHeader))
+            {
+               //fatal error, should never happen
+               ThrowHelper.ThrowNotSupportedException("Block Header not found");
+               return true;
+            }
+            headersToSend.Add(blockHeader);
+         }
+
+         await this.SendMessageAsync(new HeadersMessage
+         {
+            Headers = headersToSend.ToArray()
+         }).ConfigureAwait(false);
+
+         return true;
       }
 
       public async ValueTask<bool> ProcessMessageAsync(HeadersMessage headersMessage, CancellationToken cancellation)

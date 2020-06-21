@@ -315,30 +315,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       }
 
       /// <summary>
-      /// Returns the first common block between our known best chain and the block locator.
-      /// </summary>
-      /// <param name="hashes">Hash to search for</param>
-      /// <returns>First found block or genesis</returns>
-      public HeaderNode GetHighestNodeInBestChainFromBlockLocator(BlockLocator blockLocator)
-      {
-         if (blockLocator == null) throw new ArgumentNullException(nameof(blockLocator));
-
-         using (new ReadLock(this.theLock))
-         {
-            foreach (UInt256 hash in blockLocator.BlockLocatorHashes)
-            {
-               // ensure that any header we have in common belong to the main chain.
-               if (this.TryGetNodeOnBestChainNoLock(hash, out HeaderNode? node))
-               {
-                  return node;
-               }
-            }
-         }
-
-         return this.Genesis;
-      }
-
-      /// <summary>
       /// Gets the current tip header node.
       /// </summary>
       /// <returns></returns>

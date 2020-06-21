@@ -104,12 +104,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          return this.HeadersTree.GetTipLocator();
       }
 
-      public HeaderNode GetHighestNodeInBestChainFromBlockLocator(BlockLocator blockLocator)
-      {
-         using var readMainLock = GlobalLocks.ReadOnMain();
-         return this.HeadersTree.GetHighestNodeInBestChainFromBlockLocator(blockLocator);
-      }
-
       public bool TryGetBestChainHeaderNode(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
          using var readMainLock = GlobalLocks.ReadOnMain();
@@ -132,7 +126,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public bool IsInBestChain(HeaderNode headerNode)
       {
-         return this.IsInBestChain(headerNode);
+         return this.HeadersTree.IsInBestChain(headerNode);
       }
 
       public HeaderNode GetTip()
@@ -149,6 +143,55 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
 
          return header!;
+      }
+
+      public HeaderNode FindForkInGlobalIndex(BlockLocator locator)
+      {
+         using (GlobalLocks.ReadOnMain())
+         {
+
+            // Find the latest block common to locator and chain - we expect that
+            // locator.vHave is sorted descending by height.
+            foreach (UInt256? hash in locator.BlockLocatorHashes)
+            {
+               if (TryGetKnownHeaderNode(hash, out HeaderNode? pindex))
+               {
+                  if (IsInBestChain(pindex))
+                  {
+                     return pindex;
+                  }
+
+                  if (pindex.GetAncestor(this.BestChainTip.Height) == this.BestChainTip)
+                  {
+                     return this.BestChainTip;
+                  }
+               }
+            }
+         }
+         return this.HeadersTree.Genesis;
+      }
+
+
+      public bool TryGetNext(HeaderNode headerNode, [MaybeNullWhen(false)] out HeaderNode nextHeaderNode)
+      {
+         using (GlobalLocks.ReadOnMain())
+         {
+            if (
+               this.HeadersTree.TryGetNodeOnBestChain(headerNode.Height + 1, out nextHeaderNode)
+               && nextHeaderNode.Previous?.Hash == nextHeaderNode.Hash
+               )
+            {
+               return true;
+            }
+
+            nextHeaderNode = null;
+            return false;
+         }
+      }
+
+      public bool TryGetBlockHeader(HeaderNode headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader)
+      {
+         return this.blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader);
       }
 
       ///TODO valutare se lasciare qui solo cose inerenti la TIP, lasciare il resto in HeadersTree in modo che si possano fare

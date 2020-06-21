@@ -12,8 +12,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       HeaderNode Add(in BlockHeader newBlockHeader);
 
-      HeaderNode GetHighestNodeInBestChainFromBlockLocator(BlockLocator blockLocator);
-
       BlockLocator GetTipLocator();
 
       BlockLocator? GetLocator(UInt256 blockHash);

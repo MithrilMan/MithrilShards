@@ -36,13 +36,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       bool TryGetBestChainHeaderNode(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node);
 
       /// <summary>
-      /// Returns the first common block between our known best chain and the block locator.
-      /// </summary>
-      /// <param name="hashes">Hash to search for</param>
-      /// <returns>First found block or genesis</returns>
-      HeaderNode GetHighestNodeInBestChainFromBlockLocator(BlockLocator blockLocator);
-
-      /// <summary>
       /// Determines whether the specified hash is a known hash.
       /// May be present on best chain or on a fork.
       /// </summary>
@@ -67,5 +60,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       BlockHeader GetTipHeader();
 
       BlockLocator? GetLocator(UInt256 blockHash);
+
+      /// <summary>
+      /// Returns the first common block between our known best chain and the block locator.
+      /// </summary>
+      /// <param name="locator">The locator.</param>
+      /// <returns></returns>
+      HeaderNode FindForkInGlobalIndex(BlockLocator locator);
+
+      /// <summary>
+      /// Tries to gets the next header in the best chain.
+      /// </summary>
+      /// <param name="headerNode">The header node.</param>
+      /// <param name="nextHeaderNode">The next header node, null if not found.</param>
+      /// <returns><see langword="true"/> if the next header exists, false otherwise</returns>
+      bool TryGetNext(HeaderNode headerNode, [MaybeNullWhen(false)] out HeaderNode nextHeaderNode);
+
+      bool TryGetBlockHeader(HeaderNode headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader);
    }
 }
