@@ -8,6 +8,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
    /// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.HeaderValidationRuleBase" />
    public class CheckPreviousBlock : HeaderValidationRuleBase
    {
+      public const string PREV_BLOCK = "PREV_BLOCK";
+
       public CheckPreviousBlock(ILogger<CheckPreviousBlock> logger) : base(logger) { }
 
       public override bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
@@ -25,6 +27,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
             validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "bad-prevblk", "previous block invalid");
             return false;
          }
+
+         context.SetData(PREV_BLOCK, previousNode);
 
          return true;
       }

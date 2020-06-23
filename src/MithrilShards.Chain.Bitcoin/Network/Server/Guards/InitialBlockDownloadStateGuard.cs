@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MithrilShards.Core;
+using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Core.Network;
 
 namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards

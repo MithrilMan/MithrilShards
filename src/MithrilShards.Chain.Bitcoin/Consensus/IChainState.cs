@@ -12,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <value>
       /// The best chain tip.
       /// </value>
-      public HeaderNode BestChainTip { get; }
+      public HeaderNode ChainTip { get; }
 
       /// <summary>
       /// Gets the tip of the best validated header.
@@ -21,7 +21,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <value>
       /// The tip of the best validated header.
       /// </value>
-      public HeaderNode ValidatedHeadersTip { get; }
+      public HeaderNode BestHeader { get; }
 
       BlockLocator GetTipLocator();
 
@@ -77,5 +77,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       bool TryGetNext(HeaderNode headerNode, [MaybeNullWhen(false)] out HeaderNode nextHeaderNode);
 
       bool TryGetBlockHeader(HeaderNode headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader);
+
+      HeaderNode AddToBlockIndex(BlockHeader header);
    }
 }

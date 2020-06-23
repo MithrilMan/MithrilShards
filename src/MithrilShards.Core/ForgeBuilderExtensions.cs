@@ -28,7 +28,6 @@ namespace MithrilShards.Core
 
                // miscellaneous
                .AddSingleton<IDateTimeProvider, DateTimeProvider>()
-               .AddSingleton<IInitialBlockDownloadTracker, InitialBlockDownloadTracker>()
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IUserAgentBuilder, UserAgentBuilder>()
 

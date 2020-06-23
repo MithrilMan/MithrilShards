@@ -29,24 +29,21 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       readonly IEnumerable<IHeaderValidationRule> headerValidationRules;
       readonly IConsensusParameters consensusParameters;
-      readonly HeadersTree headersTree;
+      readonly IChainState chainState;
       readonly IHeaderValidationContextFactory headerValidationContextFactory;
-
-      private readonly object headerValidationLock = new object();
-      private readonly object validationLock = new object();
 
       public ConsensusValidator(ILogger<ConsensusValidator> logger,
                                 IEventBus eventBus,
                                 IEnumerable<IHeaderValidationRule> headerValidationRules,
                                 IConsensusParameters consensusParameters,
-                                HeadersTree headersTree,
+                                IChainState chainState,
                                 IHeaderValidationContextFactory headerValidationContextFactory)
       {
          this.logger = logger;
          this.eventBus = eventBus;
          this.headerValidationRules = headerValidationRules;
          this.consensusParameters = consensusParameters;
-         this.headersTree = headersTree;
+         this.chainState = chainState;
          this.headerValidationContextFactory = headerValidationContextFactory;
 
          this.VerifyValidationRules(this.headerValidationRules);
@@ -130,7 +127,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <summary>
       /// Validates the header performing checks for every <see cref="IHeaderValidationRule"/> known rule.
       /// </summary>
-      /// <param name="header">The header to validate.</param>
+      /// <param name="header">The header to be validated.</param>
       /// <param name="validationState">The resulting state of the validation.</param>
       /// <returns>
       /// <see langword="true"/> if the validation succeed, <see langword="false"/> otherwise and the reason of the fault
@@ -142,13 +139,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          validationState = new BlockValidationState();
          lastProcessedHeader = null!;
 
-         lock (this.headerValidationLock)
+         using (GlobalLocks.WriteOnMain())
          {
             //don't validate genesis header
             if (headerHash != this.consensusParameters.Genesis)
             {
                // check if the tip we want to set is already into our chain
-               if (this.headersTree.TryGetNode(headerHash, false, out HeaderNode? tipNode))
+               if (this.chainState.TryGetKnownHeaderNode(headerHash, out HeaderNode? tipNode))
                {
                   if (tipNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
                   {
@@ -180,7 +177,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
             //lastProcessedHeader = AddToBlockIndex(block);
 
-            lastProcessedHeader = this.headersTree.Add(header);
+            lastProcessedHeader = this.chainState.AddToBlockIndex(header);
 
             return true;
          }

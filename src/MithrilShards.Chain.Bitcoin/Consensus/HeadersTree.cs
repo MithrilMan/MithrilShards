@@ -48,8 +48,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       private int height;
       public int Height => this.height;
 
-      public HeadersTree(ILogger<HeadersTree> logger,
-                         IConsensusParameters consensusParameters)
+      public HeadersTree(ILogger<HeadersTree> logger, IConsensusParameters consensusParameters)
       {
          this.logger = logger;
          this.consensusParameters = consensusParameters ?? throw new ArgumentNullException(nameof(consensusParameters));
@@ -161,45 +160,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       }
 
 
-      public HeaderNode Add(in BlockHeader newBlockHeader)
+      public void Add(in HeaderNode newHeader)
       {
-         UInt256 newHash = newBlockHeader.Hash!;
-         UInt256? previousHash = newBlockHeader.PreviousBlockHash;
-         HeaderNode? previousHeader;
-
          using (new WriteLock(this.theLock))
          {
-            // check if the header we want to add has been already added
-            if (this.knownHeaders.TryGetValue(newHash, out HeaderNode? headerAlredyAdded))
-            {
-               return headerAlredyAdded;
-            }
-
-            if (previousHash == null)
-            {
-               previousHeader = this.Genesis;
-            }
-            else if (!this.knownHeaders.TryGetValue(previousHash, out previousHeader))
-            {
-               throw new Exception("Cannot add an header without a known previous header");
-            }
-
-            var newHeader = new HeaderNode(newBlockHeader, previousHeader);
-            this.knownHeaders.Add(newHash, newHeader);
-
-            //check if we are extending the tip
-            if (this.bestChain[this.height] == previousHeader.Hash)
-            {
-               this.height++;
-               this.bestChain.Add(newHash);
-            }
-            else
-            {
-               // TODO
-               // need to rewind
-            }
-
-            return newHeader;
+            this.knownHeaders.Add(newHeader.Hash, newHeader);
          }
       }
 
@@ -392,7 +357,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns></returns>
       private ConnectHeaderResult ValidationFailure(BlockValidationState validationState)
       {
-         this.logger.LogDebug("Header validation failure: {0}", validationState.ToString());
+         this.logger.LogDebug("Header validation failure: {ValidationFailure}", validationState.ToString());
          return ConnectHeaderResult.Invalid;
       }
    }

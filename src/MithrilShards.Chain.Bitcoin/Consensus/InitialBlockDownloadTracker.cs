@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 
-namespace MithrilShards.Core
+namespace MithrilShards.Chain.Bitcoin.Consensus
 {
    /// <summary>
    /// temporary Mock, to be moved and implemented properly

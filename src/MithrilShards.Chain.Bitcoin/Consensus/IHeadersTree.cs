@@ -10,7 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       int Height { get; }
 
-      HeaderNode Add(in BlockHeader newBlockHeader);
+      void Add(in HeaderNode newHeader);
 
       BlockLocator GetTipLocator();
 

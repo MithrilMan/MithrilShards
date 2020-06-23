@@ -10,26 +10,59 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
 {
    public partial class Target : UInt256
    {
-      const int UINT_ELEMENTS_COUNT = EXPECTED_SIZE / sizeof(uint);
-      const int UINT_BIT_SIZE = sizeof(uint) * 8;
+      //public static Target operator +(Target left, Target right)
+      //{
+      //   const int UINT_ELEMENTS_COUNT = EXPECTED_SIZE / sizeof(uint);
+      //   const int UINT_BIT_SIZE = sizeof(uint) * 8;
+      //
+      //   ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), UINT_ELEMENTS_COUNT);
+      //   ReadOnlySpan<uint> rightBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref right.part1), UINT_ELEMENTS_COUNT);
+
+      //   Span<uint> result = stackalloc uint[UINT_ELEMENTS_COUNT];
+      //   leftBytes.CopyTo(result);
+
+      //   ulong carry = 0;
+      //   for (int i = 0; i < UINT_ELEMENTS_COUNT; i++)
+      //   {
+      //      ulong n = carry + result[i] + rightBytes[i];
+      //      result[i] = (uint)(n & 0xffffffff);
+      //      carry = n >> UINT_BIT_SIZE;
+      //   }
+
+      //   return new Target(MemoryMarshal.Cast<uint, byte>(result));
+      //}
 
       public static Target operator +(Target left, Target right)
       {
-         ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), UINT_ELEMENTS_COUNT);
-         ReadOnlySpan<uint> rightBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref right.part1), UINT_ELEMENTS_COUNT);
+         const int ELEMENTS = EXPECTED_SIZE / sizeof(uint);
+         const int SIZE = sizeof(uint) * 8;
 
-         Span<uint> result = stackalloc uint[UINT_ELEMENTS_COUNT];
-         leftBytes.CopyTo(result);
+         ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), ELEMENTS);
+         ReadOnlySpan<uint> rightBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), ELEMENTS);
 
-         ulong carry = 0;
-         for (int i = 0; i < UINT_ELEMENTS_COUNT; i++)
+         Span<uint> result = stackalloc uint[ELEMENTS];
+         result.Clear();
+
+         long carry = 0;
+         for (int i = 0; i < ELEMENTS; i++)
          {
-            ulong n = carry + result[i] + rightBytes[i];
+            long n = carry + leftBytes[i] + rightBytes[i];
             result[i] = (uint)(n & 0xffffffff);
-            carry = n >> UINT_BIT_SIZE;
+            carry = n >> SIZE;
          }
 
          return new Target(MemoryMarshal.Cast<uint, byte>(result));
+      }
+
+      public static Target operator ~(Target left)
+      {
+         return new Target
+         {
+            part1 = ~left.part1,
+            part2 = ~left.part2,
+            part3 = ~left.part3,
+            part4 = ~left.part4,
+         };
       }
 
       private void ShiftLeft(int shiftAmount)
@@ -86,19 +119,22 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
 
       public static Target operator >>(Target left, int shiftAmount)
       {
-         ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), UINT_ELEMENTS_COUNT);
+         const int ELEMENTS = EXPECTED_SIZE / sizeof(uint);
+         const int SIZE = sizeof(uint) * 8;
 
-         Span<uint> result = stackalloc uint[UINT_ELEMENTS_COUNT];
-         result.Fill(0);
+         ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), ELEMENTS);
 
-         int k = shiftAmount / UINT_BIT_SIZE;
-         shiftAmount %= UINT_BIT_SIZE;
+         Span<uint> result = stackalloc uint[ELEMENTS];
+         result.Clear();
 
-         for (int i = k; i < UINT_ELEMENTS_COUNT; i++)
+         int k = shiftAmount / SIZE;
+         shiftAmount %= SIZE;
+
+         for (int i = k; i < ELEMENTS; i++)
          {
             if (i - k - 1 >= 0 && shiftAmount != 0)
             {
-               result[i - k - 1] |= leftBytes[i] << (UINT_BIT_SIZE - shiftAmount);
+               result[i - k - 1] |= leftBytes[i] << (SIZE - shiftAmount);
             }
 
             result[i - k] |= (leftBytes[i] >> shiftAmount);
@@ -109,14 +145,17 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
 
       public void Multiply(uint value)
       {
-         Span<uint> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, uint>(ref this.part1), UINT_ELEMENTS_COUNT);
+         const int ELEMENTS = EXPECTED_SIZE / sizeof(uint);
+         const int SIZE = sizeof(uint) * 8;
+
+         Span<uint> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, uint>(ref this.part1), ELEMENTS);
 
          ulong carry = 0;
-         for (int i = 0; i < UINT_ELEMENTS_COUNT; i++)
+         for (int i = 0; i < ELEMENTS; i++)
          {
             ulong n = carry + ((ulong)value * data[i]);
             data[i] = (uint)(n & 0xffffffff);
-            carry = n >> UINT_BIT_SIZE;
+            carry = n >> SIZE;
          }
 
          //this is slower

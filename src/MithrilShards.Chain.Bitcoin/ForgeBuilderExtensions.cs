@@ -54,6 +54,10 @@ namespace MithrilShards.Chain.Bitcoin
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
                   .AddSingleton<IHeadersTree, HeadersTree>()
                   .AddSingleton<IChainState, ChainState>()
+                  .AddSingleton<ICoinsView, CoinsView>()
+                  .AddSingleton<IHeadersTree, HeadersTree>()
+                  .AddSingleton<IInitialBlockDownloadTracker, InitialBlockDownloadTracker>()
+                  .AddSingleton<IHeaderMedianTimeCalculator, HeaderMedianTimeCalculator>()
                   .AddSingleton<IBlockHeaderRepository, InMemoryBlockHeaderRepository>()
                   .AddSingleton<IBlockDownloader, BlockDownloader>()
                   .AddSingleton<IConsensusValidator, ConsensusValidator>()
@@ -75,8 +79,9 @@ namespace MithrilShards.Chain.Bitcoin
       private static IServiceCollection AddValidationRules(this IServiceCollection services)
       {
          services
+            .AddSingleton<IHeaderValidationRule, CheckPreviousBlock>()
             .AddSingleton<IHeaderValidationRule, CheckProofOfWork>()
-            .AddSingleton<IServerPeerConnectionGuard, MaxConnectionThresholdGuard>()
+            .AddSingleton<IHeaderValidationRule, CheckBlockTime>()
             ;
 
          return services;

@@ -63,16 +63,16 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <value>
       /// The best chain tip.
       /// </value>
-      public HeaderNode BestChainTip { get; }
+      public HeaderNode ChainTip { get; private set; }
 
       /// <summary>
-      /// Gets the tip of the best validated header.
-      /// It may not be the header of current best chain.
+      /// Gets the best validated header we know so far.
+      /// It may not be the header of current best chain during IBD or during initial phases of a reorg.
       /// </summary>
       /// <value>
-      /// The tip of the best validated header.
+      /// The best validated header we know so far.
       /// </value>
-      public HeaderNode ValidatedHeadersTip { get; }
+      public HeaderNode BestHeader { get; private set; }
 
       public ChainState(ILogger<ChainState> logger,
                         IHeadersTree headersTree,
@@ -86,8 +86,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.blockHeaderRepository = blockHeaderRepository;
          this.initialBlockDownloadTracker = initialBlockDownloadTracker;
 
-         this.BestChainTip = headersTree.Genesis;
-         this.ValidatedHeadersTip = headersTree.Genesis;
+         this.ChainTip = headersTree.Genesis;
+         this.BestHeader = headersTree.Genesis;
       }
 
       /// <summary>
@@ -131,15 +131,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public HeaderNode GetTip()
       {
-         return this.BestChainTip;
+         return this.ChainTip;
       }
 
       public BlockHeader GetTipHeader()
       {
          using var readMainLock = GlobalLocks.ReadOnMain();
-         if (!this.blockHeaderRepository.TryGet(this.BestChainTip.Hash, out BlockHeader? header))
+         if (!this.blockHeaderRepository.TryGet(this.ChainTip.Hash, out BlockHeader? header))
          {
-            ThrowHelper.ThrowBlockHeaderRepositoryException($"Unexpected error, cannot fetch the tip at height {this.BestChainTip.Height}.");
+            ThrowHelper.ThrowBlockHeaderRepositoryException($"Unexpected error, cannot fetch the tip at height {this.ChainTip.Height}.");
          }
 
          return header!;
@@ -161,9 +161,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                      return pindex;
                   }
 
-                  if (pindex.GetAncestor(this.BestChainTip.Height) == this.BestChainTip)
+                  if (pindex.GetAncestor(this.ChainTip.Height) == this.ChainTip)
                   {
-                     return this.BestChainTip;
+                     return this.ChainTip;
                   }
                }
             }
@@ -192,6 +192,41 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       public bool TryGetBlockHeader(HeaderNode headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader)
       {
          return this.blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader);
+      }
+
+      public HeaderNode AddToBlockIndex(BlockHeader header)
+      {
+         using (GlobalLocks.WriteOnMain())
+         {
+
+            // Check for duplicate
+            if (this.TryGetKnownHeaderNode(header.Hash, out HeaderNode? headerNode))
+            {
+               return headerNode;
+            }
+
+            if (!this.TryGetKnownHeaderNode(header.PreviousBlockHash, out HeaderNode? previousHeader))
+            {
+               ThrowHelper.ThrowNotSupportedException("Previous hash not found (shouldn't happen).");
+            }
+
+            headerNode = new HeaderNode(header, previousHeader);
+
+            //TODO?
+            //            // We assign the sequence id to blocks only when the full data is available,
+            //            // to avoid miners withholding blocks but broadcasting headers, to get a
+            //            // competitive advantage.
+            //            pindexNew->nSequenceId = 0;
+
+            if (this.BestHeader == null || this.BestHeader.ChainWork < headerNode.ChainWork)
+            {
+               this.BestHeader = headerNode;
+            }
+
+            this.HeadersTree.Add(headerNode);
+
+            return headerNode;
+         }
       }
 
       ///TODO valutare se lasciare qui solo cose inerenti la TIP, lasciare il resto in HeadersTree in modo che si possano fare

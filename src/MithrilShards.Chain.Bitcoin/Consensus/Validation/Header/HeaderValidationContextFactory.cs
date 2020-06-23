@@ -24,7 +24,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 
       public IHeaderValidationContext Create(BlockHeader header)
       {
-         return new HeaderValidationContext(header, this.initialBlockDownloadState.IsDownloadingBlocks(), this.chainState);
+         return new HeaderValidationContext(logger, header, this.initialBlockDownloadState.IsDownloadingBlocks(), this.chainState);
       }
    }
 }
