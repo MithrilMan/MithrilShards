@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 
       public IChainState ChainState { get; }
 
-      protected Dictionary<string, object> items => new Dictionary<string, object>();
+      protected Dictionary<string, object> items = new Dictionary<string, object>();
 
       /// <summary>
       /// Initializes a new instance of the <see cref="HeaderValidationContext"/> class.

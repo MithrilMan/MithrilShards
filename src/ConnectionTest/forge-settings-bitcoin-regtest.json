@@ -18,6 +18,9 @@
          { "Endpoint": "127.0.0.1:19000" }
       ]
    },
+   "Bitcoin": {
+      "MaxTimeAdjustment":  4200
+   },
    "StatisticsCollector": {
       "ContinuousConsoleDisplay": false,
       "ContinuousConsoleDisplayRate": 5

@@ -21,7 +21,6 @@ namespace MithrilShards.Network.Legacy
       readonly IEventBus eventBus;
 
       /// <summary>Provider of time functions.</summary>
-      private readonly IDateTimeProvider dateTimeProvider;
       readonly IPeerContextFactory peerContextFactory;
       readonly NetworkMessageDecoder networkMessageDecoder;
       private readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
@@ -41,7 +40,6 @@ namespace MithrilShards.Network.Legacy
 
       public PeerConnection(ILogger<PeerConnection> logger,
                             IEventBus eventBus,
-                            IDateTimeProvider dateTimeProvider,
                             TcpClient connectedClient,
                             PeerConnectionDirection peerConnectionDirection,
                             IPeerContextFactory peerContextFactory,
@@ -51,7 +49,6 @@ namespace MithrilShards.Network.Legacy
       {
          this.logger = logger;
          this.eventBus = eventBus;
-         this.dateTimeProvider = dateTimeProvider;
          this.ConnectedClient = connectedClient;
          this.Direction = peerConnectionDirection;
          this.peerContextFactory = peerContextFactory;

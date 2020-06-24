@@ -120,11 +120,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return false;
          }
 
-         if (!this.PeerContext.IsConnected)
-         {
-            this.logger.LogDebug("Can't send message, the peer is not in a connected state.");
-            return false;
-         }
+         //TODO: handshake shouldn't be involved in this check
+         //if (!this.PeerContext.IsConnected)
+         //{
+         //   this.logger.LogDebug("Can't send message, the peer is not in a connected state.");
+         //   return false;
+         //}
 
          await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
          return true;
@@ -147,7 +148,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          return Task.Run(async () =>
          {
-            await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
+            try
+            {
+               await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+               // Task canceled, legit, ignoring exception.
+            }
+
             // if cancellation was requested, return without doing anything
             if (!cancellation.IsCancellationRequested && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
             {
@@ -172,7 +181,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          return Task.Run(async () =>
          {
-            await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
+            try
+            {
+               await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+               // Task canceled, legit, ignoring exception.
+            }
+
             // if cancellation was requested, return without doing anything
             if (!cancellation.IsCancellationRequested && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
             {

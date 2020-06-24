@@ -8,7 +8,7 @@ namespace MithrilShards.Chain.Bitcoin
    /// </summary>
    public static class GlobalLocks
    {
-      private static readonly ReaderWriterLockSlim cs_main = new ReaderWriterLockSlim();
+      private static readonly ReaderWriterLockSlim cs_main = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
       public static WriteLock WriteOnMain()
       {

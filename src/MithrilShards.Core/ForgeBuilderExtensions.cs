@@ -27,7 +27,6 @@ namespace MithrilShards.Core
                .AddSingleton<ISubscriptionErrorHandler, DefaultSubscriptionErrorHandler>()
 
                // miscellaneous
-               .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IUserAgentBuilder, UserAgentBuilder>()
 

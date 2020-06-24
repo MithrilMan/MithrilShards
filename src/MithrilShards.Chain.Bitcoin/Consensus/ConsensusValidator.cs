@@ -31,6 +31,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       readonly IConsensusParameters consensusParameters;
       readonly IChainState chainState;
       readonly IHeaderValidationContextFactory headerValidationContextFactory;
+      private readonly UInt256 genesisHash;
 
       public ConsensusValidator(ILogger<ConsensusValidator> logger,
                                 IEventBus eventBus,
@@ -45,6 +46,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.consensusParameters = consensusParameters;
          this.chainState = chainState;
          this.headerValidationContextFactory = headerValidationContextFactory;
+
+         this.genesisHash = consensusParameters.GenesisHeader.Hash!;
 
          this.VerifyValidationRules(this.headerValidationRules);
       }
@@ -142,18 +145,20 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          using (GlobalLocks.WriteOnMain())
          {
             //don't validate genesis header
-            if (headerHash != this.consensusParameters.Genesis)
+            if (headerHash != this.genesisHash)
             {
                // check if the tip we want to set is already into our chain
-               if (this.chainState.TryGetKnownHeaderNode(headerHash, out HeaderNode? tipNode))
+               if (this.chainState.TryGetKnownHeaderNode(headerHash, out HeaderNode? existingHeader))
                {
-                  if (tipNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
+                  if (existingHeader.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
                   {
                      validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
                      return false;
                   }
 
                   this.logger.LogDebug("The header we want to accept is already in our headers chain.");
+
+                  lastProcessedHeader = existingHeader;
                   return true;
                }
 
@@ -174,8 +179,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                   }
                }
             }
-
-            //lastProcessedHeader = AddToBlockIndex(block);
 
             lastProcessedHeader = this.chainState.AddToBlockIndex(header);
 

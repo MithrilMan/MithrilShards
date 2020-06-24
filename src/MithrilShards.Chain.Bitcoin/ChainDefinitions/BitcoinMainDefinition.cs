@@ -2,13 +2,17 @@
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Network;
+using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using MithrilShards.Core.Crypto;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 {
    public class BitcoinMainDefinition : BitcoinChain
    {
+      public BitcoinMainDefinition(IBlockHeaderHashCalculator blockHeaderHashCalculator) : base(blockHeaderHashCalculator) { }
+
       public override BitcoinNetworkDefinition ConfigureNetwork()
       {
          return new BitcoinNetworkDefinition
@@ -22,12 +26,9 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
       public override ConsensusParameters ConfigureConsensus()
       {
-         BlockHeader genesisBlock = this.BuildGenesisBlock("000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f");
-
          return new ConsensusParameters
          {
-            Genesis = genesisBlock.Hash!,
-            GenesisHeader = genesisBlock,
+            GenesisHeader = this.BuildGenesisBlock(),
 
             PowLimit = new Target("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
             PowTargetTimespan = (uint)TimeSpan.FromDays(14).TotalSeconds, // 2 weeks
@@ -41,14 +42,22 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
          };
       }
 
-      private BlockHeader BuildGenesisBlock(string genesisHash)
+      private BlockHeader BuildGenesisBlock()
       {
          //TODO complete construction (a Block will be needed and not a BlockHeader)
-         return new BlockHeader
+         var genesisHeader = new BlockHeader
          {
-            Bits = 0,
-            Hash = new UInt256(genesisHash),
+            Bits = 0x1d00ffff,
+            TimeStamp = 1231006505,
+            Nonce = 2083236893,
+            Version = 1,
+            PreviousBlockHash = null
          };
+
+         genesisHeader.Hash = new UInt256("000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f");
+         //this.ComputeHash(genesisHeader);
+
+         return genesisHeader;
       }
    }
 }

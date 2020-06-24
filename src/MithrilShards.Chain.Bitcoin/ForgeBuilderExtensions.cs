@@ -53,6 +53,7 @@ namespace MithrilShards.Chain.Bitcoin
                   .AddSingleton<INetworkDefinition>(serviceProvider => serviceProvider.GetRequiredService<IChainDefinition>().NetworkDefinition)
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
                   .AddSingleton<IHeadersTree, HeadersTree>()
+                  .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                   .AddSingleton<IChainState, ChainState>()
                   .AddSingleton<ICoinsView, CoinsView>()
                   .AddSingleton<IHeadersTree, HeadersTree>()

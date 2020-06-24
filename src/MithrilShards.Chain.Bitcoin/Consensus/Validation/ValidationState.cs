@@ -41,6 +41,7 @@
       {
          this.RejectReason = reason;
          this.DebugMessage = debugMessage;
+         this.mode = InnerState.Invalid;
       }
 
       public void Error(string reason)

@@ -28,9 +28,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </returns>
       public uint Calculate(UInt256 startingBlockHash, int startingBlockHeight)
       {
-         if (startingBlockHeight <= 0)
+         if (startingBlockHeight < 0)
          {
-            ThrowHelper.ThrowArgumentException("{startingBlockHeight} must be greater than 0");
+            ThrowHelper.ThrowArgumentException("{startingBlockHeight} must be greater or equal than 0");
          }
 
          int samplesLenght = startingBlockHeight > medianTimeSpan ? medianTimeSpan : startingBlockHeight + 1;

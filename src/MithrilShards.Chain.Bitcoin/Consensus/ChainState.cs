@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
@@ -32,6 +33,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       protected private readonly ICoinsView coinsView;
 
       readonly IInitialBlockDownloadTracker initialBlockDownloadTracker;
+      readonly IConsensusParameters consensusParameters;
 
       /// <summary>
       /// Gets or sets the block sequence identifier.
@@ -78,16 +80,19 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                         IHeadersTree headersTree,
                         ICoinsView coinsView,
                         IBlockHeaderRepository blockHeaderRepository,
-                        IInitialBlockDownloadTracker initialBlockDownloadTracker)
+                        IInitialBlockDownloadTracker initialBlockDownloadTracker,
+                        IConsensusParameters consensusParameters)
       {
          this.logger = logger;
          this.HeadersTree = headersTree;
          this.coinsView = coinsView;
          this.blockHeaderRepository = blockHeaderRepository;
          this.initialBlockDownloadTracker = initialBlockDownloadTracker;
-
+         this.consensusParameters = consensusParameters;
          this.ChainTip = headersTree.Genesis;
          this.BestHeader = headersTree.Genesis;
+
+         this.blockHeaderRepository.TryAdd(consensusParameters.GenesisHeader);
       }
 
       /// <summary>
@@ -212,24 +217,16 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
             headerNode = new HeaderNode(header, previousHeader);
 
-            //TODO?
-            //            // We assign the sequence id to blocks only when the full data is available,
-            //            // to avoid miners withholding blocks but broadcasting headers, to get a
-            //            // competitive advantage.
-            //            pindexNew->nSequenceId = 0;
-
             if (this.BestHeader == null || this.BestHeader.ChainWork < headerNode.ChainWork)
             {
                this.BestHeader = headerNode;
             }
 
             this.HeadersTree.Add(headerNode);
+            this.blockHeaderRepository.TryAdd(header);
 
             return headerNode;
          }
       }
-
-      ///TODO valutare se lasciare qui solo cose inerenti la TIP, lasciare il resto in HeadersTree in modo che si possano fare
-      ///query dirette sui known headers e best chain
    }
 }

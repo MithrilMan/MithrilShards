@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using Perfolizer.Mathematics.Randomization;
 using System.Security.Cryptography;
+using MithrilShards.Chain.Bitcoin.Protocol;
+using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.Target
 {
@@ -35,7 +37,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
 
       ProofOfWorkCalculator powCalculator = new ProofOfWorkCalculator(
          new NullLogger<ProofOfWorkCalculator>(),
-         new BitcoinMainDefinition().ConfigureConsensus(),
+         new BitcoinMainDefinition(new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()))).ConfigureConsensus(),
          null
          );
 

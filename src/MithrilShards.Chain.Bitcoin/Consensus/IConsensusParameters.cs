@@ -7,11 +7,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    public interface IConsensusParameters
    {
       /// <summary>
-      /// Gets the hash of the first block (aka genesis) of the chain.
-      /// </summary>
-      UInt256 Genesis { get; }
-
-      /// <summary>
       /// Gets the genesis header.
       /// </summary>
       BlockHeader GenesisHeader { get; }

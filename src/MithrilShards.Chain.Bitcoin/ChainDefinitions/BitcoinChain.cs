@@ -1,18 +1,25 @@
 ﻿using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Network;
+using MithrilShards.Chain.Bitcoin.Protocol;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol;
 
 namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 {
    public abstract class BitcoinChain : IChainDefinition
    {
+      readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
+
       public INetworkDefinition NetworkDefinition { get; private set; } = null!;
 
       public IConsensusParameters Consensus { get; private set; } = null!;
 
 
-      public BitcoinChain()
+      public BitcoinChain(IBlockHeaderHashCalculator blockHeaderHashCalculator)
       {
+         this.blockHeaderHashCalculator = blockHeaderHashCalculator;
+
          this.Initialize();
       }
 
@@ -25,5 +32,10 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
       public abstract BitcoinNetworkDefinition ConfigureNetwork();
 
       public abstract ConsensusParameters ConfigureConsensus();
+
+      protected UInt256 ComputeHash(BlockHeader header)
+      {
+         return this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion: 0); //protocol version doesn't matter for hash
+      }
    }
 }

@@ -6,8 +6,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 {
    public class ConsensusParameters : IConsensusParameters
    {
-      public UInt256 Genesis { get; set; } = null!;
-
       public BlockHeader GenesisHeader { get; set; } = null!;
 
       public int SegwitHeight { get; set; }

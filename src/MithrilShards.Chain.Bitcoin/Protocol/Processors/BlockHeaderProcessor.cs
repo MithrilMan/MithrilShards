@@ -264,6 +264,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          int protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
          int headersCount = headers.Length;
+         bool newHeaderReceived = false;
 
          if (headersCount == 0)
          {
@@ -278,10 +279,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                // fully handled as non connecting announcement
                return true;
             }
-         }
 
-         // compute hashes in parallel to speed up the operation and check sent headers are sequential.
-         Parallel.ForEach(headers, header => header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion));
+            // compute hashes in parallel to speed up the operation and check sent headers are sequential.
+            Parallel.ForEach(headers, header => header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion));
+
+            newHeaderReceived = !this.chainState.TryGetKnownHeaderNode(headers.Last().Hash!, out _);
+         }
 
          // Ensure headers are consecutive.
          for (int i = 1; i < headersCount; i++)
@@ -304,8 +307,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          using (var writeMainLock = GlobalLocks.WriteOnMain())
          {
-            bool newHeaderReceived = !this.chainState.TryGetKnownHeaderNode(headers.Last().Hash!, out _);
-
             if (this.status.UnconnectingHeaderReceived > 0)
             {
                this.logger.LogDebug("Resetting UnconnectingHeaderReceived, was {UnconnectingHeaderReceived}.", this.status.UnconnectingHeaderReceived);

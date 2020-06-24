@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace MithrilShards.Core
+namespace MithrilShards.Chain.Bitcoin
 {
    /// <summary>
    /// Providing date time functionality.

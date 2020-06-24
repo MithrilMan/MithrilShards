@@ -5,6 +5,8 @@ using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using System;
 using System.Numerics;
+using MithrilShards.Chain.Bitcoin.Protocol;
+using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types;
 
 namespace MithrilShards.Chain.BitcoinTests
 {
@@ -16,7 +18,9 @@ namespace MithrilShards.Chain.BitcoinTests
       public ProofOfWorkCalculatorTests(ITestOutputHelper output)
       {
          logger = new XunitLogger<ProofOfWorkCalculator>(output); // or new NullLogger<ProofOfWorkCalculator>
-         consensusParameters = new BitcoinMainDefinition().ConfigureConsensus();
+
+         var headerHashCalculator = new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()));
+         consensusParameters = new BitcoinMainDefinition(headerHashCalculator).ConfigureConsensus();
       }
 
       [Theory]

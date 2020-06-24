@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Threading;
@@ -90,7 +89,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
          using (new ReadLock(this.theLock))
          {
-            return onlyBestChain ? this.knownHeaders.TryGetValue(blockHash, out node!) : this.TryGetNodeOnBestChainNoLock(blockHash, out node!);
+            return onlyBestChain ? this.TryGetNodeOnBestChainNoLock(blockHash, out node!) : this.knownHeaders.TryGetValue(blockHash, out node!);
          }
       }
 
@@ -348,17 +347,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             node = null!;
             return false;
          }
-      }
-
-      /// <summary>
-      /// Logs the validation failure reason and return a <see cref="ConnectHeaderResult.Invalid"/>.
-      /// </summary>
-      /// <param name="validationState">Validation state containing failing reason.</param>
-      /// <returns></returns>
-      private ConnectHeaderResult ValidationFailure(BlockValidationState validationState)
-      {
-         this.logger.LogDebug("Header validation failure: {ValidationFailure}", validationState.ToString());
-         return ConnectHeaderResult.Invalid;
       }
    }
 }

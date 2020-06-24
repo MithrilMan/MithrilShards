@@ -27,11 +27,17 @@ namespace MithrilShards.Core
       {
          throw new ArgumentNullException(fieldName);
       }
-      
+
       [DoesNotReturn]
       public static void ThrowArgumentException(string message)
       {
          throw new ArgumentException(message);
+      }
+
+      [DoesNotReturn]
+      public static void ThrowInvalidOperationException(string message)
+      {
+         throw new InvalidOperationException(message);
       }
    }
 }

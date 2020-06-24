@@ -38,7 +38,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          const int SIZE = sizeof(uint) * 8;
 
          ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), ELEMENTS);
-         ReadOnlySpan<uint> rightBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref left.part1), ELEMENTS);
+         ReadOnlySpan<uint> rightBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref right.part1), ELEMENTS);
 
          Span<uint> result = stackalloc uint[ELEMENTS];
          result.Clear();
