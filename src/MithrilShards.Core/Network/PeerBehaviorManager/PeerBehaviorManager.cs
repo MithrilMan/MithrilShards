@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Statistics;
@@ -14,6 +15,8 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       private const int INITIAL_SCORE = 0;
       private readonly ILogger<DefaultPeerBehaviorManager> logger;
       private readonly IEventBus eventBus;
+      private readonly ForgeConnectivitySettings connectivitySettings;
+
       private readonly Dictionary<string, PeerScore> connectedPeers = new Dictionary<string, PeerScore>();
 
       /// <summary>
@@ -21,11 +24,15 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       /// </summary>
       private readonly EventSubscriptionManager eventSubscriptionManager = new EventSubscriptionManager();
 
-      public DefaultPeerBehaviorManager(ILogger<DefaultPeerBehaviorManager> logger, IEventBus eventBus, IStatisticFeedsCollector statisticFeedsCollector)
+      public DefaultPeerBehaviorManager(ILogger<DefaultPeerBehaviorManager> logger,
+                                        IEventBus eventBus,
+                                        IStatisticFeedsCollector statisticFeedsCollector,
+                                        IOptions<ForgeConnectivitySettings> connectivityOptions)
       {
          this.logger = logger;
          this.eventBus = eventBus;
          this.statisticFeedsCollector = statisticFeedsCollector;
+         this.connectivitySettings = connectivityOptions.Value!;
       }
 
       public Task StartAsync(CancellationToken cancellationToken)
@@ -48,14 +55,27 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
 
       public void Misbehave(IPeerContext peerContext, uint penality, string reason)
       {
+         if (penality == 0)
+         {
+            return;
+         }
+
          if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
          {
             this.logger.LogWarning("Cannot attribute bad behavior to the peer {PeerId} because the peer isn't connected.", peerContext.PeerId);
+            // did we have to add it to banned peers anyway?
+            return;
          }
-         else
+
+         this.logger.LogDebug("Peer {PeerId} misbehave: {MisbehaveReason}.", peerContext.PeerId, reason);
+         int currentResult = score.UpdateScore(-(int)penality);
+
+         if (currentResult < connectivitySettings.BanScore)
          {
-            this.logger.LogDebug("Peer {PeerId} misbehave: {MisbehaveReason}.", peerContext.PeerId, reason);
-            int currentResult = score.UpdateScore(-(int)penality);
+            //if threshold of bad behavior has been exceeded, this peer need to be banned
+            this.logger.LogDebug("Peer {PeerEndPoint} BAN threshold exceeded.", peerContext.RemoteEndPoint);
+
+            //TODO: ban
          }
       }
 

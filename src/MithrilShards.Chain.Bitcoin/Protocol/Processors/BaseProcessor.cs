@@ -16,6 +16,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
    public abstract class BaseProcessor : INetworkMessageProcessor
    {
+      const int INIT_PROTO_VERSION = KnownVersion.V209;
+
       protected readonly ILogger<BaseProcessor> logger;
       protected readonly IEventBus eventBus;
       private readonly IPeerBehaviorManager peerBehaviorManager;
@@ -99,7 +101,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       protected async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default)
       {
-         await this.SendMessageAsync(int.MinValue, message, cancellationToken).ConfigureAwait(false);
+         await this.SendMessageAsync(INIT_PROTO_VERSION, message, cancellationToken).ConfigureAwait(false);
       }
 
       /// <summary>
