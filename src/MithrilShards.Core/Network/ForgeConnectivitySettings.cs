@@ -11,6 +11,7 @@ namespace MithrilShards.Core.Network
       const bool DEFAULT_ALLOW_LOOPBACK_CONNECTION = true;
       const int DEFAULT_FORCE_SHUTDOWN_AFTER = 300;
       const int DEFAULT_BAN_SCORE = -100;
+      const int DEFAULT_MISBEHAVING_BAN_TIME = 60 * 60 * 24; // 24 hours
 
       public int MaxInboundConnections { get; set; } = DEFAULT_MAX_INBOUND_CONNECTIONS;
 
@@ -24,6 +25,11 @@ namespace MithrilShards.Core.Network
       public int ForceShutdownAfter { get; set; } = DEFAULT_FORCE_SHUTDOWN_AFTER;
 
       public int BanScore { get; set; } = DEFAULT_BAN_SCORE;
+
+      /// <summary>
+      /// Gets or sets the ban time (in seconds).
+      /// </summary>
+      public int MisbehavingBanTime { get; set; } = DEFAULT_MISBEHAVING_BAN_TIME;
 
       public List<ServerPeerBinding> Listeners { get; } = new List<ServerPeerBinding>();
 

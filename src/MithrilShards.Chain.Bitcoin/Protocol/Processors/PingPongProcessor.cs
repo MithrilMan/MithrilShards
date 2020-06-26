@@ -21,13 +21,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       const int PING_INTERVAL = 2 * 60;
 
       /// <summary>
-      /// Time after which to disconnect, after waiting for a ping response.
+      /// Time after which to disconnect, after waiting for a ping response (in seconds).
       /// </summary>
       const int TIMEOUT_INTERVAL = 20 * 60;
 
       readonly IRandomNumberGenerator randomNumberGenerator;
 
-      private CancellationTokenSource pingCancellationTokenSource;
+      private CancellationTokenSource pingCancellationTokenSource = null!;
 
       public PingPongProcessor(ILogger<HandshakeProcessor> logger,
                                IEventBus eventBus,
@@ -49,10 +49,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          while (!cancellationToken.IsCancellationRequested)
          {
-            var ping = new PingMessage
+            var ping = new PingMessage();
+            if (PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V60001)
             {
-               Nonce = this.randomNumberGenerator.GetUint64()
-            };
+               ping.Nonce = this.randomNumberGenerator.GetUint64();
+            }
+
             await this.SendMessageAsync(ping).ConfigureAwait(false);
 
             this.status.PingSent(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), ping);
@@ -61,11 +63,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             //in case of memory leak, investigate this.
             this.pingCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            // ensures the handshake is performed timely
-            await this.DisconnectIfAsync(() =>
+
+            // ensures the handshake is performed timely (supported only starting from version 60001)
+            if (PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V60001)
             {
-               return new ValueTask<bool>(this.status.PingResponseTime == 0);
-            }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", this.pingCancellationTokenSource.Token).ConfigureAwait(false);
+               await this.DisconnectIfAsync(() =>
+               {
+                  return new ValueTask<bool>(this.status.PingResponseTime == 0);
+               }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", this.pingCancellationTokenSource.Token).ConfigureAwait(false);
+            }
 
             await Task.Delay(TimeSpan.FromSeconds(PING_INTERVAL), cancellationToken).ConfigureAwait(false);
          }

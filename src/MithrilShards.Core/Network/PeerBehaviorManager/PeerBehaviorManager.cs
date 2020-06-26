@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network.Events;
+using MithrilShards.Core.Network.PeerAddressBook;
 using MithrilShards.Core.Statistics;
 
 namespace MithrilShards.Core.Network.PeerBehaviorManager
@@ -16,6 +17,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       private readonly ILogger<DefaultPeerBehaviorManager> logger;
       private readonly IEventBus eventBus;
       private readonly ForgeConnectivitySettings connectivitySettings;
+      private readonly IPeerAddressBook peerAddressBook;
 
       private readonly Dictionary<string, PeerScore> connectedPeers = new Dictionary<string, PeerScore>();
 
@@ -27,12 +29,14 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       public DefaultPeerBehaviorManager(ILogger<DefaultPeerBehaviorManager> logger,
                                         IEventBus eventBus,
                                         IStatisticFeedsCollector statisticFeedsCollector,
-                                        IOptions<ForgeConnectivitySettings> connectivityOptions)
+                                        IOptions<ForgeConnectivitySettings> connectivityOptions,
+                                        IPeerAddressBook peerAddressBook)
       {
          this.logger = logger;
          this.eventBus = eventBus;
          this.statisticFeedsCollector = statisticFeedsCollector;
-         this.connectivitySettings = connectivityOptions.Value!;
+         this.connectivitySettings = connectivityOptions.Value;
+         this.peerAddressBook = peerAddressBook;
       }
 
       public Task StartAsync(CancellationToken cancellationToken)
@@ -73,9 +77,8 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
          if (currentResult < connectivitySettings.BanScore)
          {
             //if threshold of bad behavior has been exceeded, this peer need to be banned
-            this.logger.LogDebug("Peer {PeerEndPoint} BAN threshold exceeded.", peerContext.RemoteEndPoint);
-
-            //TODO: ban
+            this.logger.LogDebug("Peer {RemoteEndPoint} BAN threshold exceeded.", peerContext.RemoteEndPoint);
+            this.peerAddressBook.Ban(peerContext, DateTimeOffset.UtcNow + TimeSpan.FromSeconds(connectivitySettings.MisbehavingBanTime), "Peer Misbehaving");
          }
       }
 

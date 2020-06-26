@@ -60,11 +60,11 @@ namespace ConnectionTest
             case "bitcoin-main":
                return new ForgeBuilder()
                   .UseForge<DefaultForge>(args)
-                  .UseBitcoinChain(networkName: network, minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion);
+                  .UseBitcoinChain(networkName: network, minimumSupportedVersion: KnownVersion.V70012, currentVersion: KnownVersion.CurrentVersion);
             case "bitcoin-regtest":
                return new ForgeBuilder()
                   .UseForge<DefaultForge>(args, "forge-settings-bitcoin-regtest.json")
-                  .UseBitcoinChain(networkName: network, minimumSupportedVersion: KnownVersion.V209, currentVersion: KnownVersion.CurrentVersion);
+                  .UseBitcoinChain(networkName: network, minimumSupportedVersion: KnownVersion.V70012, currentVersion: KnownVersion.CurrentVersion);
             default:
                Console.WriteLine($"UNKNOWN NETWORK specified in -network argument: {network}. Fallback to Bitcoin-Main");
                throw new ArgumentException("Unknown Network");
