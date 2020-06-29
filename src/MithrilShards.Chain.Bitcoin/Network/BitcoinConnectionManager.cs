@@ -42,7 +42,7 @@ namespace MithrilShards.Chain.Bitcoin.Network
          return base.StartAsync(cancellationToken);
       }
 
-      private async Task StartCheckingPeerHealthAsync(CancellationToken cancellationToken)
+      private Task StartCheckingPeerHealthAsync(CancellationToken cancellationToken)
       {
          //DateTimeOffset dateReference = DateTimeOffset.UtcNow;
 
@@ -62,6 +62,7 @@ namespace MithrilShards.Chain.Bitcoin.Network
          //}
 
          // ping is handled in the PingPongProcessor
+         return Task.CompletedTask;
       }
    }
 }
