@@ -155,7 +155,7 @@ namespace MithrilShards.Core.Network
 
       protected virtual Task StartOutgoingConnectionAttemptsAsync(CancellationToken cancellation)
       {
-         using IDisposable logger = this.logger.BeginScope("Starting Connectors");
+         this.logger.LogDebug("Starting Connectors");
          if (this.connectors == null)
          {
             this.logger.LogWarning("No Connectors found, the Forge will not try to connect to any peer.");

@@ -101,7 +101,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       protected async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default)
       {
-         await this.SendMessageAsync(INIT_PROTO_VERSION, message, cancellationToken).ConfigureAwait(false);
+         await this.SendMessageAsync(this.PeerContext.NegotiatedProtocolVersion.Version, message, cancellationToken).ConfigureAwait(false);
       }
 
       /// <summary>

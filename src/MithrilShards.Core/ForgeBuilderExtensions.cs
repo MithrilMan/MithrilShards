@@ -9,6 +9,7 @@ using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using MithrilShards.Core.Statistics;
+using MithrilShards.Core.Threading;
 
 namespace MithrilShards.Core
 {
@@ -29,6 +30,7 @@ namespace MithrilShards.Core
                // miscellaneous
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IUserAgentBuilder, UserAgentBuilder>()
+               .AddSingleton<IPeriodicWork, PeriodicWork>()
 
                //fake or null miscellaneous implementations
                .AddSingleton<IStatisticFeedsCollector, StatisticFeedsCollectorNullImplementation>()

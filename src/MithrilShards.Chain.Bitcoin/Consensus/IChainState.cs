@@ -18,9 +18,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Gets the tip of the best validated header.
       /// It may not be the header of current best chain.
       /// </summary>
-      /// <value>
-      /// The tip of the best validated header.
-      /// </value>
       public HeaderNode BestHeader { get; }
 
       BlockLocator GetTipLocator();

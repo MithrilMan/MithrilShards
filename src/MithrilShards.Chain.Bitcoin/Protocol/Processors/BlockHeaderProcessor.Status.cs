@@ -43,43 +43,33 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          public int UnconnectingHeaderReceived { get; internal set; } = 0;
 
          /// <summary>
-         /// Gets or sets the last unknown block hash.
+         /// The hash of the last unknown block this peer has announced.
          /// </summary>
-         /// <value>
-         /// The last unknown block hash.
-         /// </value>
          public UInt256? LastUnknownBlockHash { get; internal set; }
 
          /// <summary>
          /// Gets or sets the best known block we know this peer has announced.
          /// </summary>
-         /// <value>
-         /// The best known header.
-         /// </value>
          public HeaderNode? BestKnownHeader { get; internal set; }
+
+         /// <summary>
+         /// The best header we have sent to the peer.
+         /// </summary>
+         public HeaderNode? BestSentHeader { get; internal set; }
 
          /// <summary>
          /// Gets the time of last new block announcement.
          /// </summary>
-         /// <value>
-         /// The last block announcement time (epoch).
-         /// </value>
          public long LastBlockAnnouncement { get; internal set; }
 
          /// <summary>
          /// Gets the blocks in download.
          /// </summary>
-         /// <value>
-         /// The blocks in download.
-         /// </value>
          public int BlocksInDownload { get; internal set; }
 
          /// <summary>
          /// Whether this peer can give us witnesses. (fHaveWitness)
          /// </summary>
-         /// <value>
-         ///   <c>true</c> if the peer can serve witness; otherwise, <c>false</c>.
-         /// </value>
          public bool CanServeWitness { get; internal set; }
 
          /// <summary>
@@ -90,9 +80,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// <summary>
          /// Gets the date when the peer started to download blocks.
          /// </summary>
-         /// <value>
-         /// The date when the peer started to download blocks.
-         /// </value>
          public long DownloadingSince { get; internal set; }
       }
    }
