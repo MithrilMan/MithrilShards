@@ -59,6 +59,11 @@ namespace MithrilShards.Core.Network
          this.eventBus = eventBus;
          this.statisticFeedsCollector = statisticFeedsCollector;
          this.connectors = connectors;
+
+         foreach (IConnector? connector in this.connectors)
+         {
+            connector?.SetConnectionManager(this);
+         }
       }
 
       /// <summary>
@@ -112,12 +117,12 @@ namespace MithrilShards.Core.Network
       }
 
 
-      public List<object[]>? GetStatisticFeedValues(string feedId)
+      public List<object?[]>? GetStatisticFeedValues(string feedId)
       {
          switch (feedId)
          {
             case FEED_CONNECTED_PEERS:
-               return new List<object[]> {
+               return new List<object?[]> {
                   new object[] {
                      this.inboundPeers.Count,
                      this.outboundPeers.Count
@@ -165,7 +170,7 @@ namespace MithrilShards.Core.Network
          {
             try
             {
-               _ = connector.StartConnectionLoopAsync(this, cancellation);
+               _ = connector.StartConnectionLoopAsync(cancellation);
             }
             catch (OperationCanceledException)
             {

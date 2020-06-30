@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,6 @@ using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Core;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
@@ -29,34 +29,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<HeadersMessage>,
       INetworkMessageHandler<SendCmpctMessage>
    {
-      /// <summary>
-      /// Number of headers sent in one getheaders result.
-      /// We rely on the assumption that if a peer sends less than this number, we reached its tip.
-      /// Changing this value is a protocol upgrade.
-      /// </summary>
-      private const int MAX_HEADERS = 2000;
-
-      /// <summary>
-      /// Maximum number of headers to announce when relaying blocks with headers message.
-      /// </summary>
-      private const int MAX_BLOCKS_TO_ANNOUNCE = 8;
-
-      /// <summary>
-      /// Maximum number of unconnecting headers before triggering a peer Misbehave action.
-      /// </summary>
-      private const int MAX_UNCONNECTING_HEADERS = 10;
-
-      /// <summary>
-      /// The maximum number of blocks that can be requested from a single peer.
-      /// </summary>
-      private const int MAX_BLOCKS_IN_TRANSIT_PER_PEER = 26; //FIX default bitcoin value: 16
-
-      /// <summary>
-      /// Maximum number of block hashes allowed in the BlockLocator.</summary>
-      /// <seealso cref="https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2018-August/016285.html"/>
-      /// <seealso cref="https://github.com/bitcoin/bitcoin/pull/13907"
-      /// </summary>
-      private const int MAX_LOCATOR_SIZE = 101;
       readonly IDateTimeProvider dateTimeProvider;
       private readonly IConsensusParameters consensusParameters;
       private readonly IInitialBlockDownloadTracker ibdState;
@@ -65,6 +37,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       readonly ILocalServiceProvider localServiceProvider;
       readonly IConsensusValidator consensusValidator;
       readonly IChainState chainState;
+      readonly IPeriodicWork headerSyncLoop;
 
       public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
                                   IEventBus eventBus,
@@ -76,7 +49,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IBlockDownloader blockDownloader,
                                   ILocalServiceProvider localServiceProvider,
                                   IConsensusValidator consensusValidator,
-                                  IChainState chainState)
+                                  IChainState chainState,
+                                  IPeriodicWork headerSyncLoop)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.dateTimeProvider = dateTimeProvider;
@@ -87,6 +61,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.localServiceProvider = localServiceProvider;
          this.consensusValidator = consensusValidator;
          this.chainState = chainState;
+         this.headerSyncLoop = headerSyncLoop;
       }
 
       /// <summary>
@@ -117,46 +92,110 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             await this.SendMessageAsync(new SendCmpctMessage { AnnounceUsingCompactBlock = false, Version = 1 }).ConfigureAwait(false);
          }
 
-         /// ask for blocks
-         await this.SendMessageAsync(new GetHeadersMessage
-         {
-            Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-            BlockLocator = this.chainState.GetTipLocator(),
-            HashStop = UInt256.Zero
-         }).ConfigureAwait(false);
+         ///// ask for blocks
+         //await this.SendMessageAsync(new GetHeadersMessage
+         //{
+         //   Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
+         //   BlockLocator = this.chainState.GetTipLocator(),
+         //   HashStop = UInt256.Zero
+         //}).ConfigureAwait(false);
+
+         _ = this.headerSyncLoop.StartAsync(
+               label: $"headerSyncLoop-{PeerContext.PeerId}",
+               work: SyncLoopAsync,
+               interval: TimeSpan.FromMilliseconds(SYNC_LOOP_INTERVAL),
+               cancellation: PeerContext.ConnectionCancellationTokenSource.Token
+            );
       }
 
 
-      //public ValueTask<bool> SyncLoop()
-      //{
-      //   if (ibdState.IsDownloadingBlocks()) //ensure this check is right
-      //   {
-      //      if (!this.status.fSyncStarted && !pto->fClient && !fImporting && !fReindex)
-      //      {
-      //         // Only actively request headers from a single peer, unless we're close to today.
-      //         if ((nSyncStarted == 0 && fFetch) || pindexBestHeader->GetBlockTime() > GetAdjustedTime() - 24 * 60 * 60)
-      //         {
-      //            state.fSyncStarted = true;
-      //            state.nHeadersSyncTimeout = GetTimeMicros() + HEADERS_DOWNLOAD_TIMEOUT_BASE + HEADERS_DOWNLOAD_TIMEOUT_PER_HEADER * (GetAdjustedTime() - pindexBestHeader->GetBlockTime()) / (consensusParams.nPowTargetSpacing);
-      //            nSyncStarted++;
-      //            const CBlockIndex* pindexStart = pindexBestHeader;
-      //            /* If possible, start at the block preceding the currently
-      //               best known header.  This ensures that we always get a
-      //               non-empty list of headers back as long as the peer
-      //               is up-to-date.  With a non-empty response, we can initialise
-      //               the peer's known best block.  This wouldn't be possible
-      //               if we requested starting at pindexBestHeader and
-      //               got back an empty response.  */
-      //            if (pindexStart->pprev)
-      //               pindexStart = pindexStart->pprev;
-      //            LogPrint(BCLog::NET, "initial getheaders (%d) to peer=%d (startheight:%d)\n", pindexStart->nHeight, pto->GetId(), pto->nStartingHeight);
-      //            connman->PushMessage(pto, msgMaker.Make(NetMsgType::GETHEADERS, ::ChainActive().GetLocator(pindexStart), uint256()));
-      //         }
-      //      }
-      //   }
+      private async Task SyncLoopAsync(CancellationToken cancellationToken)
+      {
+         using var readLock = GlobalLocks.ReadOnMain();
 
-      //}
+         var bestHeaderNode = this.chainState.BestHeader;
+         if (!this.chainState.TryGetBlockHeader(bestHeaderNode, out BlockHeader? bestBlockHeader))
+         {
+            ThrowHelper.ThrowNotSupportedException("BestHeader should always be available, this should never happen");
+         }
 
+         if (!this.status.IsSynchronizingHeaders)
+         {
+            status.IsSynchronizingHeaders = true;
+            status.HeadersSyncTimeout =
+               this.dateTimeProvider.GetTimeMicros()
+               + HEADERS_DOWNLOAD_TIMEOUT_BASE
+               + HEADERS_DOWNLOAD_TIMEOUT_PER_HEADER * (
+                  (this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() - bestBlockHeader.TimeStamp) / this.consensusParameters.PowTargetSpacing
+                  );
+
+            /* If possible, start at the block preceding the currently
+               best known header.  This ensures that we always get a
+               non-empty list of headers back as long as the peer
+               is up-to-date.  With a non-empty response, we can initialise
+               the peer's known best block.  This wouldn't be possible
+               if we requested starting at pindexBestHeader and
+               got back an empty response.  */
+            var pindexStart = bestHeaderNode.Previous ?? bestHeaderNode;
+
+            this.logger.LogDebug("Starting syncing headers from height {LocatorHeight} (peer startheight: {startheight})", pindexStart.Height, this.status.PeerStartingHeight);
+
+            var newGetHeaderRequest = new GetHeadersMessage
+            {
+               Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
+               BlockLocator = this.chainState.GetLocator(pindexStart.Hash),
+               HashStop = UInt256.Zero
+            };
+
+            await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
+         }
+
+         this.CheckSyncStallingLocked(bestBlockHeader);
+      }
+
+
+      private void CheckSyncStallingLocked(BlockHeader bestHeader)
+      {
+         // Check for headers sync timeouts
+         if (status.IsSynchronizingHeaders && status.HeadersSyncTimeout < long.MaxValue)
+         {
+            var now = this.dateTimeProvider.GetTimeMicros();
+            // Detect whether this is a stalling initial-headers-sync peer
+            if (bestHeader.TimeStamp <= this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() - 24 * 60 * 60)
+            {
+               bool isTheOnlyPeerSynching = true; //nSyncStarted == 1 && (nPreferredDownload - state.fPreferredDownload >= 1)
+               if (now > status.HeadersSyncTimeout && isTheOnlyPeerSynching)
+               {
+                  // Disconnect a (non-whitelisted) peer if it is our only sync peer,
+                  // and we have others we could be using instead.
+                  // Note: If all our peers are inbound, then we won't
+                  // disconnect our sync peer for stalling; we have bigger
+                  // problems if we can't get any outbound peers.
+                  if (!this.PeerContext.Permissions.Has(BitcoinPeerPermissions.NOBAN))
+                  {
+                     this.PeerContext.Disconnect("Timeout downloading headers, disconnecting");
+                     return;
+                  }
+                  else
+                  {
+                     this.logger.LogDebug("Timeout downloading headers from whitelisted peer {PeerId}, not disconnecting.", this.PeerContext.PeerId);
+                     // Reset the headers sync state so that we have a
+                     // chance to try downloading from a different peer.
+                     // Note: this will also result in at least one more
+                     // getheaders message to be sent to
+                     // this peer (eventually).
+                     status.IsSynchronizingHeaders = false;
+                     status.HeadersSyncTimeout = 0;
+                  }
+               }
+            }
+            else
+            {
+               // After we've caught up once, reset the timeout so we can't trigger disconnect later.
+               status.HeadersSyncTimeout = long.MaxValue;
+            }
+         }
+      }
 
       /// <summary>
       /// The other peer prefer to be announced about new block using headers

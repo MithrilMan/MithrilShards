@@ -27,29 +27,32 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       const int TIMEOUT_INTERVAL = 20 * 60;
 
       readonly IRandomNumberGenerator randomNumberGenerator;
+      readonly IDateTimeProvider dateTimeProvider;
       readonly IPeriodicWork periodicPing;
+
+      private CancellationTokenSource pingCancellationTokenSource = null!;
 
       public PingPongProcessor(ILogger<HandshakeProcessor> logger,
                                IEventBus eventBus,
                                IPeerBehaviorManager peerBehaviorManager,
                                IRandomNumberGenerator randomNumberGenerator,
+                               IDateTimeProvider dateTimeProvider,
                                IPeriodicWork periodicPing)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.randomNumberGenerator = randomNumberGenerator;
+         this.dateTimeProvider = dateTimeProvider;
          this.periodicPing = periodicPing;
       }
 
       protected override ValueTask OnPeerHandshakedAsync()
       {
-         _ = PingAsync(this.PeerContext.ConnectionCancellationTokenSource.Token);
-
-         this.periodicPing.StartAsync(
-            this.PeerContext.ConnectionCancellationTokenSource.Token,
-            TimeSpan.FromSeconds(PING_INTERVAL),
-            PingAsync
+         _ = this.periodicPing.StartAsync(
+               label: $"periodicPing-{PeerContext.PeerId}",
+               work: PingAsync,
+               interval: TimeSpan.FromSeconds(PING_INTERVAL),
+               cancellation: PeerContext.ConnectionCancellationTokenSource.Token
             );
-
 
          return default;
       }
@@ -64,9 +67,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          await this.SendMessageAsync(ping).ConfigureAwait(false);
 
-         this.status.PingSent(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), ping);
+         this.status.PingSent(this.dateTimeProvider.GetTimeMicros(), ping);
          this.logger.LogDebug("Sent ping request with nonce {PingNonce}", this.status.PingRequestNonce);
 
+         //in case of memory leak, investigate this.
+         this.pingCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
          // ensures the handshake is performed timely (supported only starting from version 60001)
          if (PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V60001)
@@ -74,7 +79,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             await this.DisconnectIfAsync(() =>
             {
                return new ValueTask<bool>(this.status.PingResponseTime == 0);
-            }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", cancellationToken).ConfigureAwait(false);
+            }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", this.pingCancellationTokenSource.Token).ConfigureAwait(false);
          }
       }
 
@@ -89,8 +94,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (this.status.PingRequestNonce != 0 && message.Nonce == this.status.PingRequestNonce)
          {
-            var (Nonce, RoundTrip) = this.status.PongReceived(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            var (Nonce, RoundTrip) = this.status.PongReceived(this.dateTimeProvider.GetTimeMicros());
             this.logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec.", Nonce, RoundTrip);
+            this.pingCancellationTokenSource.Cancel();
          }
          else
          {

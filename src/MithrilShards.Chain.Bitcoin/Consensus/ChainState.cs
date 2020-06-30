@@ -181,10 +181,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          using (GlobalLocks.ReadOnMain())
          {
-            if (
-               this.HeadersTree.TryGetNodeOnBestChain(headerNode.Height + 1, out nextHeaderNode)
-               && nextHeaderNode.Previous?.Hash == nextHeaderNode.Hash
-               )
+            if (this.IsInBestChain(headerNode) && this.HeadersTree.TryGetNodeOnBestChain(headerNode.Height + 1, out nextHeaderNode))
             {
                return true;
             }

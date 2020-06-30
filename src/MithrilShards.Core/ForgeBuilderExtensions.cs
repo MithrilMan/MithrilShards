@@ -30,7 +30,8 @@ namespace MithrilShards.Core
                // miscellaneous
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IUserAgentBuilder, UserAgentBuilder>()
-               .AddSingleton<IPeriodicWork, PeriodicWork>()
+               .AddTransient<IPeriodicWork, PeriodicWork>()
+               .AddSingleton<IPeriodicWorkTracker, PeriodicWorkTracker>()
 
                //fake or null miscellaneous implementations
                .AddSingleton<IStatisticFeedsCollector, StatisticFeedsCollectorNullImplementation>()

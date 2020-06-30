@@ -39,5 +39,11 @@ namespace MithrilShards.Core
       {
          throw new InvalidOperationException(message);
       }
+
+      [DoesNotReturn]
+      public static void ThrowNullReferenceException(string message)
+      {
+         throw new NullReferenceException(message);
+      }
    }
 }

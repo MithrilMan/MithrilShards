@@ -12,7 +12,15 @@ namespace MithrilShards.Chain.Bitcoin.Network
    public class BitcoinPeerContext : PeerContext
    {
 
+      /// <summary>
+      /// The peer time offset.
+      /// </summary>
       public TimeSpan TimeOffset { get; set; } = TimeSpan.Zero;
+
+      /// <summary>
+      /// Peer permissions.
+      /// </summary>
+      public BitcoinPeerPermissions Permissions { get; set; } = new BitcoinPeerPermissions();
 
       public BitcoinPeerContext(ILogger logger,
                                 IEventBus eventBus,

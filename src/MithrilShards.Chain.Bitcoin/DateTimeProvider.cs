@@ -18,6 +18,12 @@ If your clock is wrong, the node will not work properly.
 To recover from this state fix your time and restart the node.
 **************************************************************
 ";
+      /// <summary>
+      /// Represents the number of ticks that are in 1 microsecond.
+      /// </summary>
+      const long TicksPerMicrosecond = TimeSpan.TicksPerMillisecond / 1000;
+      const long UnixEpochTicks = 719_162 * TimeSpan.TicksPerDay;
+      const long UnixEpochMicroseconds = UnixEpochTicks / TimeSpan.TicksPerMillisecond;
 
       readonly ILogger<DateTimeProvider> logger;
       private readonly BitcoinSettings settings;
@@ -55,6 +61,15 @@ To recover from this state fix your time and restart the node.
       {
          return DateTime.UtcNow.ToUnixTimestamp();
       }
+
+      public virtual long GetTimeMicros()
+      {
+         // Truncate sub-millisecond precision before offsetting by the Unix Epoch to avoid
+         // the last digit being off by one for dates that result in negative Unix times
+         long microseconds = DateTimeOffset.UtcNow.Ticks / TicksPerMicrosecond;
+         return microseconds - UnixEpochMicroseconds;
+      }
+
 
       /// <inheritdoc />
       public virtual DateTime GetUtcNow()

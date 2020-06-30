@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Forge;
+using MithrilShards.Core.Threading;
 
 namespace MithrilShards.Core.Network.Client
 {
@@ -30,7 +31,8 @@ namespace MithrilShards.Core.Network.Client
                                 IEventBus eventBus,
                                 IOptions<ForgeConnectivitySettings> options,
                                 IConnectivityPeerStats serverPeerStats,
-                                IForgeConnectivity forgeConnectivity) : base(logger, eventBus, options, serverPeerStats)
+                                IForgeConnectivity forgeConnectivity,
+                                IPeriodicWork connectionLoop) : base(logger, eventBus, options, serverPeerStats, connectionLoop)
       {
          this.connectionsToAttempt.AddRange(
             from connection in this.settings.Connections

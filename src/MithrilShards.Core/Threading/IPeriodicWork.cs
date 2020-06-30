@@ -14,6 +14,15 @@ namespace MithrilShards.Core.Threading
    /// <seealso cref="System.IDisposable" />
    public interface IPeriodicWork : IDisposable
    {
+      public delegate Task WorkAsync(CancellationToken cancellation);
+
+      /// <summary>
+      /// Gets the periodic work instance identifier.
+      /// </summary>
+      public Guid Id { get; }
+
+      public string Label { get; }
+
       /// <summary>
       /// Gets a value indicating whether this periodic work is running.
       /// </summary>
@@ -30,12 +39,33 @@ namespace MithrilShards.Core.Threading
       Exception? LastException { get; }
 
       /// <summary>
+      /// Gets a value indicating whether the worker stops if an exception happens (except when the task is canceled).
+      /// </summary>
+      bool StopOnException { get; }
+
+      /// <summary>
+      /// Configures the specified instance.
+      /// </summary>
+      /// <param name="stopOnException">if set to <c>true</c> stops the execution when an exception happens (except when the task is canceled).</param>
+      /// <param name="exceptionHandler ">Exception handler invoked whenever an unhandled exception happens during work execution</param>
+      void Configure(bool stopOnException = false, IPeriodicWorkExceptionHandler? exceptionHandler = null);
+
+      /// <summary>
       /// Starts the asynchronous periodic work.
       /// </summary>
       /// <param name="cancellation">The cancellation token.</param>
       /// <param name="interval">The interval of time that will be awaited before executing again the work.</param>
       /// <param name="work">The work to execute.</param>
-      Task StartAsync(CancellationToken cancellation, TimeSpan interval, PeriodicWork.WorkAsync work);
+      Task StartAsync(string label, WorkAsync work, TimeSpan interval, CancellationToken cancellation);
+
+      /// <summary>
+      /// Starts the asynchronous periodic work with a dynamic interval between iterations.
+      /// </summary>
+      /// <param name="cancellation">The cancellation token.</param>
+      /// <param name="interval">A function that return the interval of time to wait before next execution.</param>
+      /// <param name="work">The work to execute.</param>
+      /// <returns></returns>
+      Task StartAsync(string label, WorkAsync work, Func<TimeSpan> interval, CancellationToken cancellation);
 
       /// <summary>
       /// Stops the asynchronous periodic work.

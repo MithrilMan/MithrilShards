@@ -19,6 +19,6 @@ namespace MithrilShards.Core.Statistics
       /// </summary>
       /// <param name="feedId">The feed identifier.</param>
       /// <returns>The feed values, ordered by column definition</returns>
-      List<object[]>? GetStatisticFeedValues(string feedId);
+      List<object?[]>? GetStatisticFeedValues(string feedId);
    }
 }

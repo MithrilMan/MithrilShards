@@ -34,9 +34,10 @@ namespace MithrilShards.Chain.Bitcoin.Network
       public override Task StartAsync(CancellationToken cancellationToken)
       {
          _ = this.periodicPeerHealthCheck.StartAsync(
-            cancellationToken,
-            TimeSpan.FromSeconds(10),
-            this.StartCheckingPeerHealthAsync
+               label: $"periodicPeerHealthCheck",
+               work: this.StartCheckingPeerHealthAsync,
+               interval: TimeSpan.FromSeconds(10),
+               cancellation: cancellationToken
             );
 
          return base.StartAsync(cancellationToken);

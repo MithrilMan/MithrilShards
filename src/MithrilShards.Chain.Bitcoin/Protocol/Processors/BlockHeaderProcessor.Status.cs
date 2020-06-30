@@ -45,42 +45,52 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// <summary>
          /// The hash of the last unknown block this peer has announced.
          /// </summary>
-         public UInt256? LastUnknownBlockHash { get; internal set; }
+         public UInt256? LastUnknownBlockHash { get; internal set; } = null;
 
          /// <summary>
          /// Gets or sets the best known block we know this peer has announced.
          /// </summary>
-         public HeaderNode? BestKnownHeader { get; internal set; }
+         public HeaderNode? BestKnownHeader { get; internal set; } = null;
 
          /// <summary>
          /// The best header we have sent to the peer.
          /// </summary>
-         public HeaderNode? BestSentHeader { get; internal set; }
+         public HeaderNode? BestSentHeader { get; internal set; } = null;
 
          /// <summary>
          /// Gets the time of last new block announcement.
          /// </summary>
-         public long LastBlockAnnouncement { get; internal set; }
+         public long LastBlockAnnouncement { get; internal set; } = 0;
 
          /// <summary>
          /// Gets the blocks in download.
          /// </summary>
-         public int BlocksInDownload { get; internal set; }
+         public int BlocksInDownload { get; internal set; } = 0;
 
          /// <summary>
          /// Whether this peer can give us witnesses. (fHaveWitness)
          /// </summary>
-         public bool CanServeWitness { get; internal set; }
+         public bool CanServeWitness { get; internal set; } = false;
 
          /// <summary>
          /// Gets or sets a value indicating whether this peer wants witnesses in cmpctblocks/blocktxns.
          /// </summary>
-         public bool WantsCompactWitness { get; set; }
+         public bool WantsCompactWitness { get; internal set; } = false;
 
          /// <summary>
          /// Gets the date when the peer started to download blocks.
          /// </summary>
-         public long DownloadingSince { get; internal set; }
+         public long DownloadingSince { get; internal set; } = 0;
+
+         /// <summary>
+         /// Gets a value indicating whether this peer is synchronizing headers with our node.
+         /// </summary>
+         public bool IsSynchronizingHeaders { get; internal set; } = false;
+
+         /// <summary>
+         /// When to potentially disconnect the peer for stalling headers download.
+         /// </summary>
+         public long HeadersSyncTimeout { get; internal set; } = long.MaxValue;
       }
    }
 }

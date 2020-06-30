@@ -14,6 +14,11 @@ namespace MithrilShards.Chain.Bitcoin
       long GetTime();
 
       /// <summary>
+      /// Get the current time in Linux format in microseconds.
+      /// </summary>
+      long GetTimeMicros();
+
+      /// <summary>
       /// Get the current time offset in UTC.
       /// </summary>
       DateTimeOffset GetTimeOffset();
