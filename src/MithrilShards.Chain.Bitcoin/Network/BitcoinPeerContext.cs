@@ -39,8 +39,9 @@ namespace MithrilShards.Chain.Bitcoin.Network
          base.AttachNetworkMessageProcessor(messageProcessor);
       }
 
-      public void OnHandshakeCompleted()
+      public void OnHandshakeCompleted(Protocol.Messages.VersionMessage peerVersion)
       {
+         this.UserAgent = peerVersion.UserAgent;
          this.IsConnected = true;
          this.eventBus.Publish(new PeerHandshaked(this));
       }

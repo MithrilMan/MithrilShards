@@ -13,6 +13,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          private readonly HandshakeProcessor processor;
          internal bool IsVersionSent { get; private set; } = false;
 
+         /// <summary>
+         /// Gets the version payload received from the peer.
+         /// </summary>
          internal VersionMessage? PeerVersion { get; private set; } = null;
 
          public bool IsHandShaked { get; private set; } = false;
@@ -74,7 +77,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             this.IsHandShaked = true;
             this.processor.logger.LogDebug("Handshake successful");
 
-            this.processor.PeerContext.OnHandshakeCompleted();
+            this.processor.PeerContext.OnHandshakeCompleted(this.PeerVersion);
 
             return default;
          }

@@ -45,6 +45,8 @@ namespace MithrilShards.Core.Network
       /// </summary>
       public IPEndPoint RemoteEndPoint { get; }
 
+      public string? UserAgent { get; set; }
+
       public IFeatureCollection Data { get; } = new FeatureCollection();
 
       /// <summary>

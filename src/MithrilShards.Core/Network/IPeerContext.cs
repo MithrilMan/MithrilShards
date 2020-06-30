@@ -33,6 +33,11 @@ namespace MithrilShards.Core.Network
       /// </summary>
       IPEndPoint RemoteEndPoint { get; }
 
+      /// <summary>
+      /// Gets the user agent.
+      /// </summary>
+      public string? UserAgent { get; }
+
       PeerMetrics Metrics { get; }
 
       /// <summary>

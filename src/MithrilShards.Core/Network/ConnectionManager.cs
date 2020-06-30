@@ -11,11 +11,13 @@ using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Statistics;
+using MithrilShards.Core.Utils;
 
 namespace MithrilShards.Core.Network
 {
    public class ConnectionManager : IConnectionManager, IStatisticFeedsProvider
    {
+      private const string FEED_CONNECTED_PEERS_SUMMARY = "ConnectedPeersSummary";
       private const string FEED_CONNECTED_PEERS = "ConnectedPeers";
 
       protected readonly ConcurrentDictionary<string, IPeerContext> inboundPeers = new ConcurrentDictionary<string, IPeerContext>();
@@ -116,46 +118,57 @@ namespace MithrilShards.Core.Network
          return Task.CompletedTask;
       }
 
-
-      public List<object?[]>? GetStatisticFeedValues(string feedId)
-      {
-         switch (feedId)
-         {
-            case FEED_CONNECTED_PEERS:
-               return new List<object?[]> {
-                  new object[] {
-                     this.inboundPeers.Count,
-                     this.outboundPeers.Count
-                  }
-               };
-            default:
-               return null;
-         }
-      }
-
       public void RegisterStatisticFeeds()
       {
+         string byteFormatter((object? value, int widthHint) item) => ByteSizeFormatter.HumanReadable((long)item.value!);
+
          this.statisticFeedsCollector.RegisterStatisticFeeds(this,
-            new StatisticFeedDefinition(
-               FEED_CONNECTED_PEERS,
-               "Connected Peers",
+            new StatisticFeedDefinition(FEED_CONNECTED_PEERS_SUMMARY, "Connected Peers summary",
                new List<FieldDefinition>{
-                  new FieldDefinition(
-                     "Inbound",
-                     "Number of inbound peers currently connected to one of the Forge listener",
-                     15,
-                     string.Empty
-                     ),
-                  new FieldDefinition(
-                     "Outbound",
-                     "Number of outbound peers our forge is currently connected to",
-                     15,
-                     string.Empty
-                     )
+                  new FieldDefinition("Inbound","Number of inbound peers currently connected to one of the Forge listener",15),
+                  new FieldDefinition("Outbound","Number of outbound peers our forge is currently connected to",15)
+               },
+               TimeSpan.FromSeconds(15)
+            ),
+            new StatisticFeedDefinition(FEED_CONNECTED_PEERS, "Connected Peers",
+               new List<FieldDefinition>{
+                  new FieldDefinition("Endpoint", "Peer remote endpoint", 25),
+                  new FieldDefinition("Type", "Type of connection (inbound, outbound, etc..)", 10),
+                  new FieldDefinition("Version", "Negotiated protocol version", 8),
+                  new FieldDefinition("User Agent", "Peer User Agent", 20),
+                  new FieldDefinition("Received", "Bytes received from this peer", 10, null, byteFormatter),
+                  new FieldDefinition("Sent", "Bytes sent to this peer", 10, null, byteFormatter),
+                  new FieldDefinition( "Wasted","Bytes that we received but wasn't understood from our node", 10, null, byteFormatter),
                },
                TimeSpan.FromSeconds(15)
             )
          );
+      }
+
+      public List<object?[]>? GetStatisticFeedValues(string feedId)
+      {
+         return feedId switch
+         {
+            FEED_CONNECTED_PEERS_SUMMARY => new List<object?[]> {
+                  new object?[] {
+                     this.inboundPeers.Count,
+                     this.outboundPeers.Count
+                  }
+               },
+            FEED_CONNECTED_PEERS => inboundPeers.Values.Concat(outboundPeers.Values)
+               .Select(peer =>
+                  new object?[] {
+                     peer.RemoteEndPoint,
+                     peer.Direction,
+                     peer.NegotiatedProtocolVersion.Version,
+                     peer.UserAgent,
+                     peer.Metrics.ReceivedBytes,
+                     peer.Metrics.SentBytes,
+                     peer.Metrics.WastedBytes,
+                  }
+               ).ToList(),
+            _ => null
+         };
       }
 
       protected virtual Task StartOutgoingConnectionAttemptsAsync(CancellationToken cancellation)
