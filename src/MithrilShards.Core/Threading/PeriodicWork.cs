@@ -89,7 +89,7 @@ namespace MithrilShards.Core.Threading
                try
                {
                   await work(token).WithCancellationAsync(token).ConfigureAwait(false);
-                  await Task.Delay(interval(), token).ConfigureAwait(false);
+                  await Task.Delay(interval()).WithCancellationAsync(token).ConfigureAwait(false);
                }
                catch (OperationCanceledException)
                {

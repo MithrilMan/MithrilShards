@@ -96,6 +96,12 @@ namespace MithrilShards.Core.Network
          this.messageProcessors.Add(messageProcessor);
       }
 
+      public void Disconnect(string reason)
+      {
+         this.IsConnected = false;
+         this.eventBus.Publish(new PeerDisconnectionRequired(this.RemoteEndPoint, reason));
+      }
+
       public void Dispose()
       {
          this.logger.LogDebug("Disposing PeerContext of {PeerId}.", this.PeerId);
@@ -112,6 +118,8 @@ namespace MithrilShards.Core.Network
             }
          }
 
+         this.IsConnected = false;
+         this.ConnectionCancellationTokenSource.Cancel();
          this.eventBus.Publish(new PeerDisconnected(this, "Client disconnected", null));
       }
    }

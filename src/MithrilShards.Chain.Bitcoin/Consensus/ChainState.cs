@@ -106,7 +106,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       public BlockLocator GetTipLocator()
       {
          using var readMainLock = GlobalLocks.ReadOnMain();
-         return this.HeadersTree.GetTipLocator();
+         return this.HeadersTree.GetLocator(this.ChainTip)!;
       }
 
       public bool TryGetBestChainHeaderNode(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node)
@@ -123,10 +123,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       }
 
 
-      public BlockLocator? GetLocator(UInt256 blockHash)
+      public BlockLocator? GetLocator(HeaderNode headerNode)
       {
          using var readMainLock = GlobalLocks.ReadOnMain();
-         return this.HeadersTree.GetLocator(blockHash);
+         return this.HeadersTree.GetLocator(headerNode);
       }
 
       public bool IsInBestChain(HeaderNode headerNode)

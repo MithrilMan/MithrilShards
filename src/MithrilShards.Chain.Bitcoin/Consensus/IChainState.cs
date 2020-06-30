@@ -56,7 +56,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns></returns>
       BlockHeader GetTipHeader();
 
-      BlockLocator? GetLocator(UInt256 blockHash);
+      /// <summary>
+      /// Gets the block locator starting from passed <paramref name="headerNode"/>.
+      /// </summary>
+      /// <param name="headerNode">The header node representing last known header of the block locator.</param>
+      /// <returns></returns>
+      BlockLocator? GetLocator(HeaderNode headerNode);
 
       /// <summary>
       /// Returns the first common block between our known best chain and the block locator.

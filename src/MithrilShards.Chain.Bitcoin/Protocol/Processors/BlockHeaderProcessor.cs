@@ -143,7 +143,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             var newGetHeaderRequest = new GetHeadersMessage
             {
                Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-               BlockLocator = this.chainState.GetLocator(pindexStart.Hash),
+               BlockLocator = this.chainState.GetLocator(pindexStart),
                HashStop = UInt256.Zero
             };
 
@@ -408,7 +408,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                var newGetHeaderRequest = new GetHeadersMessage
                {
                   Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-                  BlockLocator = this.chainState.GetLocator(lastProcessedHeader.Hash),
+                  BlockLocator = this.chainState.GetLocator(lastProcessedHeader),
                   HashStop = UInt256.Zero
                };
                await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);

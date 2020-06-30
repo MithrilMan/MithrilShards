@@ -22,7 +22,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    {
       private const int INITIAL_ITEMS_ALLOCATED = 16 ^ 2; //this parameter may go into settings, better to be multiple of 2
 
-      private readonly ReaderWriterLockSlim theLock = new ReaderWriterLockSlim();
+      private readonly ReaderWriterLockSlim theLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
       private readonly ILogger<HeadersTree> logger;
       private readonly IConsensusParameters consensusParameters;
@@ -228,52 +228,43 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockLocator GetTipLocator()
       {
-         using (new ReadLock(this.theLock))
-         {
-            return this.GetLocatorNoLock(this.height);
-         }
+         return this.GetLocator(this.GetTip())!;
       }
 
-      public BlockLocator? GetLocator(int height)
+      public BlockLocator? GetLocator(HeaderNode? headerNode)
       {
-         using (new ReadLock(this.theLock))
-         {
-            return (height > this.height || height < 0) ? null : this.GetLocatorNoLock(height);
-         }
-      }
+         using var readLock = new ReadLock(this.theLock);
 
-      public BlockLocator? GetLocator(UInt256 blockHash)
-      {
-         using (new ReadLock(this.theLock))
+         if (headerNode == null)
          {
-            return (!this.knownHeaders.TryGetValue(blockHash, out HeaderNode? node)) ? null : this.GetLocatorNoLock(node.Height);
+            headerNode = this.GetTip();
          }
-      }
 
-      /// <summary>
-      /// Performing code to generate a <see cref="BlockLocator"/>.
-      /// </summary>
-      /// <param name="height">The height block locator starts from.</param>
-      /// <returns></returns>
-      private BlockLocator GetLocatorNoLock(int height)
-      {
          List<UInt256> hashes = new List<UInt256>(32); //sets initial capacity to a number that can fit usual case
-
-         int index = 0;
-         while (index < 10 && height > 0)
-         {
-            hashes.Add(this.bestChain[height--]);
-            index++;
-         }
-
          int step = 1;
-         while (height > 0)
+
+         while (headerNode != null)
          {
-            hashes.Add(this.bestChain[height]);
-            step *= 2;
-            height -= step;
+            hashes.Add(headerNode.Hash);
+
+            // Stop when we have added the genesis block.
+            if (headerNode.Height == 0) break;
+
+            // Exponentially larger steps back, plus the genesis block.
+            int height = Math.Max(headerNode.Height - step, 0);
+            if (this.IsInBestChain(headerNode))
+            {
+               // Use O(1) CChain index if possible.
+               this.TryGetNodeOnBestChain(height, out headerNode);
+            }
+            else
+            {
+               // Otherwise, use O(log n) skiplist.
+               headerNode = headerNode.GetAncestor(height);
+            }
+
+            if (hashes.Count > 10) step *= 2;
          }
-         hashes.Add(this.Genesis.Hash);
 
          return new BlockLocator { BlockLocatorHashes = hashes.ToArray() };
       }
@@ -301,7 +292,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          using (new ReadLock(this.theLock))
          {
             int headerHeight = headerNode.Height;
-            return this.bestChain.Count < headerHeight && this.bestChain[headerHeight] == headerNode.Hash;
+            return this.bestChain.Count > headerHeight && this.bestChain[headerHeight] == headerNode.Hash;
          }
       }
 
