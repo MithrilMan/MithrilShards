@@ -150,7 +150,10 @@ namespace MithrilShards.Core.Threading
 
       public void Dispose()
       {
-         this.StopAsync();
+         if (this.isRunning)
+         {
+            this.StopAsync();
+         }
 
          GC.SuppressFinalize(this);
       }
