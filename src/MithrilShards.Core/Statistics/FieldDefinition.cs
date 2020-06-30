@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace MithrilShards.Core.Statistics
 {
@@ -29,6 +30,8 @@ namespace MithrilShards.Core.Statistics
       /// The unit of measure.
       /// </value>
       public string? UnitOfMeasure { get; }
+
+      [JsonIgnore]
       public Func<(object? value, int widthHint), string>? ValueFormatter { get; }
 
       /// <summary>
