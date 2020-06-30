@@ -44,11 +44,5 @@ namespace MithrilShards.Chain.Bitcoin.Network
          this.IsConnected = true;
          this.eventBus.Publish(new PeerHandshaked(this));
       }
-
-      public void Disconnect(string reason)
-      {
-         this.IsConnected = false;
-         this.eventBus.Publish(new PeerDisconnectionRequired(this.RemoteEndPoint, reason));
-      }
    }
 }

@@ -72,5 +72,12 @@ namespace MithrilShards.Core.Network
       /// This flag is set if the peer already passed handshake (where expected by the protocol).
       /// </summary>
       public bool IsConnected { get; }
+
+
+      /// <summary>
+      /// Disconnects the peer for the specified reason.
+      /// </summary>
+      /// <param name="reason">The disconnection reason.</param>
+      void Disconnect(string reason);
    }
 }
