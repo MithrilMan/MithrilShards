@@ -98,9 +98,10 @@ namespace MithrilShards.Core.EventBus
          List<ISubscription> allSubscriptions = new List<ISubscription>();
          lock (this.subscriptionsLock)
          {
-            if (this.subscriptions.ContainsKey(typeof(TEvent)))
+            Type eventType = typeof(TEvent);
+            if (this.subscriptions.ContainsKey(eventType))
             {
-               allSubscriptions = this.subscriptions[typeof(TEvent)].ToList();
+               allSubscriptions = this.subscriptions[eventType].ToList();
             }
          }
 
