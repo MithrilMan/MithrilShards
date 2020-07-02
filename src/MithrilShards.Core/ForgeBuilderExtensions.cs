@@ -27,11 +27,14 @@ namespace MithrilShards.Core
                .AddSingleton<IEventBus, InMemoryEventBus>()
                .AddSingleton<ISubscriptionErrorHandler, DefaultSubscriptionErrorHandler>()
 
+               // async task and tasks managers
+               .AddTransient<IPeriodicWork, PeriodicWork>()
+               .AddSingleton<IPeriodicWorkTracker, PeriodicWorkTracker>()
+               .AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>()
+
                // miscellaneous
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IUserAgentBuilder, UserAgentBuilder>()
-               .AddTransient<IPeriodicWork, PeriodicWork>()
-               .AddSingleton<IPeriodicWorkTracker, PeriodicWorkTracker>()
 
                //fake or null miscellaneous implementations
                .AddSingleton<IStatisticFeedsCollector, StatisticFeedsCollectorNullImplementation>()

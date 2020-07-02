@@ -31,7 +31,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public BitcoinPeerContext PeerContext { get; private set; }
 
-      public bool Enabled { get; private set; } = true;
+      public virtual bool Enabled { get; private set; } = true;
 
       /// <summary>Initializes a new instance of the <see cref="BaseProcessor"/> class.</summary>
       /// <param name="logger">The logger.</param>
@@ -91,6 +91,22 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       protected void RegisterLifeTimeSubscription(SubscriptionToken subscription)
       {
          this.eventSubscriptionManager.RegisterSubscriptions(subscription);
+      }
+
+      /// <summary>
+      /// Registers a <see cref="IEventBus"/> message <paramref name="handler"/> that will be automatically
+      /// unregistered once the component gets disposed.
+      /// </summary>
+      /// <param name="subscription">The subscription.</param>
+      protected void RegisterLifeTimeEventHandler<TEventBase>(Func<TEventBase, ValueTask> handler, Func<TEventBase, bool>? clause = null) where TEventBase : EventBase
+      {
+         this.eventSubscriptionManager.RegisterSubscriptions(this.eventBus.Subscribe<TEventBase>(async (message) =>
+         {
+            // ensure we listen only to events we are interested into
+            if (clause != null && !clause(message)) return;
+
+            await handler(message).ConfigureAwait(false);
+         }));
       }
 
       /// <summary>

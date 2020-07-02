@@ -19,6 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.P2P.Benchmark
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{59B8229B-8557-4987-B758-5E41D996DCD2}"
 	ProjectSection(SolutionItems) = preProject
+		Documentation\note.md = Documentation\note.md
 		readme.md = readme.md
 		Documentation\todo.md = Documentation\todo.md
 	EndProjectSection
@@ -54,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Logging.Table
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{73FF5914-1F61-48DA-9E72-4A2FA4C82123}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Chain.BitcoinTests", "src\MithrilShards.Chain.BitcoinTests\MithrilShards.Chain.BitcoinTests.csproj", "{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Chain.BitcoinTests", "src\MithrilShards.Chain.BitcoinTests\MithrilShards.Chain.BitcoinTests.csproj", "{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

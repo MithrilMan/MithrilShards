@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata;
-using Microsoft.Extensions.Logging;
-using MithrilShards.Core;
+﻿using Microsoft.Extensions.Logging;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
 {
@@ -8,6 +6,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
    /// Check if the header is a known header
    /// </summary>
    /// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.HeaderValidationRuleBase" />
+   [RequiresRule(typeof(CheckPreviousBlock))]
    public class CheckBlockTime : HeaderValidationRuleBase
    {
       /// <summary>

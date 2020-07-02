@@ -13,15 +13,12 @@ namespace MithrilShards.Core.Network.Protocol.Processors
    public class NetworkMessageProcessorFactory : INetworkMessageProcessorFactory
    {
       readonly ILogger<INetworkMessageProcessorFactory> logger;
-      readonly ILoggerFactory loggerFactory;
       readonly IServiceProvider serviceProvider;
 
       public NetworkMessageProcessorFactory(ILogger<INetworkMessageProcessorFactory> logger,
-                                            ILoggerFactory loggerFactory,
                                             IServiceProvider serviceProvider)
       {
          this.logger = logger;
-         this.loggerFactory = loggerFactory;
          this.serviceProvider = serviceProvider;
       }
 
@@ -33,12 +30,15 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       {
          if (peerContext is null)
          {
-            throw new ArgumentNullException(nameof(peerContext));
+            ThrowHelper.ThrowArgumentNullException(nameof(peerContext));
          }
 
          IEnumerable<INetworkMessageProcessor> processors = this.serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>();
          foreach (INetworkMessageProcessor processor in processors)
          {
+            // skip processors that aren't enabled
+            if (!processor.Enabled) continue;
+
             peerContext.AttachNetworkMessageProcessor(processor);
             await processor.AttachAsync(peerContext).ConfigureAwait(false);
          }

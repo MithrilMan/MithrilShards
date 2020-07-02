@@ -5,7 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus;
+using MithrilShards.Chain.Bitcoin.Consensus.Events;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
@@ -35,8 +37,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
       readonly IBlockDownloader blockDownloader;
       readonly ILocalServiceProvider localServiceProvider;
-      readonly IConsensusValidator consensusValidator;
       readonly IChainState chainState;
+      readonly IHeaderValidator headerValidator;
       readonly IPeriodicWork headerSyncLoop;
 
       public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
@@ -48,8 +50,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IBlockHeaderHashCalculator blockHeaderHashCalculator,
                                   IBlockDownloader blockDownloader,
                                   ILocalServiceProvider localServiceProvider,
-                                  IConsensusValidator consensusValidator,
                                   IChainState chainState,
+                                  IHeaderValidator headerValidator,
                                   IPeriodicWork headerSyncLoop)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
@@ -59,9 +61,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.blockHeaderHashCalculator = blockHeaderHashCalculator;
          this.blockDownloader = blockDownloader;
          this.localServiceProvider = localServiceProvider;
-         this.consensusValidator = consensusValidator;
          this.chainState = chainState;
+         this.headerValidator = headerValidator;
          this.headerSyncLoop = headerSyncLoop;
+      }
+
+      protected override ValueTask OnPeerAttachedAsync()
+      {
+         this.RegisterLifeTimeEventHandler<BlockHeaderValidationSucceeded>(this.OnBlockHeaderValidationSucceededAsync, arg => arg.PeerContext == PeerContext);
+         this.RegisterLifeTimeEventHandler<BlockHeaderValidationFailed>(this.OnBlockHeaderValidationFailedAsync, arg => arg.PeerContext == PeerContext);
+
+         return base.OnPeerAttachedAsync();
       }
 
       /// <summary>
@@ -245,9 +255,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return new ValueTask<bool>(true);
       }
 
+      /// <summary>
+      /// The peer wants some headers from us
+      /// </summary>
       public async ValueTask<bool> ProcessMessageAsync(GetHeadersMessage message, CancellationToken cancellation)
       {
-         if (message is null) throw new System.ArgumentNullException(nameof(message));
+         if (message is null) ThrowHelper.ThrowArgumentException(nameof(message));
 
          if (message.BlockLocator!.BlockLocatorHashes.Length > MAX_LOCATOR_SIZE)
          {
@@ -309,6 +322,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return true;
       }
 
+      /// <summary>
+      /// The peer sent us headers.
+      /// </summary>
       public async ValueTask<bool> ProcessMessageAsync(HeadersMessage headersMessage, CancellationToken cancellation)
       {
          BlockHeader[]? headers = headersMessage.Headers;
@@ -359,7 +375,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             }
 
             // compute hashes in parallel to speed up the operation and check sent headers are sequential.
-            Parallel.ForEach(headers, header => header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion));
+            Parallel.ForEach(headers, header =>
+            {
+               header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion);
+            });
 
             newHeaderReceived = !this.chainState.TryGetKnownHeaderNode(headers.Last().Hash!, out _);
          }
@@ -374,16 +393,36 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             }
          }
 
-         if (!this.consensusValidator.ProcessNewBlockHeaders(headers, out BlockValidationState state, out HeaderNode? lastProcessedHeader))
-         {
-            if (state.IsInvalid())
-            {
-               this.MisbehaveDuringHeaderValidation(state, "invalid header received");
-               return false;
-            }
-         }
+         //enqueue headers for validation
+         await this.headerValidator.RequestValidationAsync(new HeadersToValidate(headers, PeerContext)).ConfigureAwait(false);
 
-         using (var writeMainLock = GlobalLocks.WriteOnMain())
+         return true;
+      }
+
+      /// <summary>
+      /// Called when block header validation failed.
+      /// </summary>
+      /// <param name="arg">The argument.</param>
+      /// <returns></returns>
+      private ValueTask OnBlockHeaderValidationFailedAsync(BlockHeaderValidationFailed arg)
+      {
+         this.logger.LogDebug("Header Validation failed");
+         this.MisbehaveDuringHeaderValidation(arg.ValidationState, "invalid header received");
+
+         return default;
+      }
+
+      /// <summary>
+      /// Called when block header validation succeeded.
+      /// </summary>
+      /// <param name="arg">The argument.</param>
+      /// <returns></returns>
+      private async ValueTask OnBlockHeaderValidationSucceededAsync(BlockHeaderValidationSucceeded arg)
+      {
+         this.logger.LogDebug("Header Validation succeeded");
+         var lastValidatedHeaderNode = arg.LastValidatedHeaderNode;
+
+         using (var readLock = GlobalLocks.ReadOnMain())
          {
             if (this.status.UnconnectingHeaderReceived > 0)
             {
@@ -391,24 +430,24 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                this.status.UnconnectingHeaderReceived = 0;
             }
 
-            this.UpdateBlockAvailability(lastProcessedHeader!.Hash);
+            this.UpdateBlockAvailability(lastValidatedHeaderNode!.Hash);
 
-            if (newHeaderReceived && lastProcessedHeader.ChainWork > this.chainState.GetTip().ChainWork)
+            if (arg.NewHeaderFound && lastValidatedHeaderNode.ChainWork > this.chainState.GetTip().ChainWork)
             {
                // we received the new tip of the chain
                this.status.LastBlockAnnouncement = this.dateTimeProvider.GetTime();
             }
 
-            if (headersCount == MAX_HEADERS)
+            if (arg.ValidatedHeadersCount == MAX_HEADERS)
             {
                // We received the maximum number of headers per protocol definition, the peer may have more headers.
                // TODO: optimize: if pindexLast is an ancestor of ::ChainActive().Tip or pindexBestHeader, continue
                // from there instead.
-               this.logger.LogDebug("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastProcessedHeader.Height, this.status.PeerStartingHeight);
+               this.logger.LogDebug("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastValidatedHeaderNode.Height, this.status.PeerStartingHeight);
                var newGetHeaderRequest = new GetHeadersMessage
                {
                   Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
-                  BlockLocator = this.chainState.GetLocator(lastProcessedHeader),
+                  BlockLocator = this.chainState.GetLocator(lastValidatedHeaderNode),
                   HashStop = UInt256.Zero
                };
                await this.SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
@@ -417,12 +456,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             // If this set of headers is valid and ends in a block with at least as much work as our tip, download as much as possible.
             if (
                this.CanDirectFetch()
-               && lastProcessedHeader.IsValid(HeaderValidityStatuses.ValidTree)
-               && this.chainState.GetTip().ChainWork <= lastProcessedHeader.ChainWork
+               && lastValidatedHeaderNode.IsValid(HeaderValidityStatuses.ValidTree)
+               && this.chainState.GetTip().ChainWork <= lastValidatedHeaderNode.ChainWork
                )
             {
                List<HeaderNode> blocksToDownload = new List<HeaderNode>();
-               HeaderNode? currentHeader = lastProcessedHeader;
+               HeaderNode? currentHeader = lastValidatedHeaderNode;
 
                while (currentHeader != null && !this.chainState.IsInBestChain(currentHeader) && blocksToDownload.Count <= MAX_BLOCKS_IN_TRANSIT_PER_PEER)
                {
@@ -442,7 +481,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                /// Bail out on the direct fetch and rely on parallel download instead.
                if (currentHeader != null && !this.chainState.IsInBestChain(currentHeader))
                {
-                  this.logger.LogDebug("Large reorg, won't direct fetch to {HeaderNode}", lastProcessedHeader);
+                  this.logger.LogDebug("Large reorg, won't direct fetch to {HeaderNode}", lastValidatedHeaderNode);
                }
                else
                {
@@ -460,7 +499,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
                      uint fetchFlags = this.GetFetchFlags();
 
-                     if (ShouldRequestCompactBlock(lastProcessedHeader))
+                     if (ShouldRequestCompactBlock(lastValidatedHeaderNode))
                      {
                         vGetData.Add(new InventoryVector { Type = InventoryType.MSG_CMPCT_BLOCK, Hash = blockHash });
                      }
@@ -484,17 +523,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
                   if (vGetData.Count > 0)
                   {
-                     this.logger.LogDebug("Downloading blocks toward {HeaderNode} via headers direct fetch.", lastProcessedHeader);
+                     this.logger.LogDebug("Downloading blocks toward {HeaderNode} via headers direct fetch.", lastValidatedHeaderNode);
 
                      await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
                   }
 
-                  this.DisconnectPeerIfNotUseful(headersCount);
+                  this.DisconnectPeerIfNotUseful(arg.ValidatedHeadersCount);
                }
             }
          }
-
-         return true;
       }
 
       private bool ShouldRequestCompactBlock(HeaderNode lastHeader)
@@ -554,7 +591,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (!this.chainState.TryGetKnownHeaderNode(headers[0].PreviousBlockHash, out _) && headers.Length < MAX_BLOCKS_TO_ANNOUNCE)
          {
-            if (++this.status.UnconnectingHeaderReceived % MAX_UNCONNECTING_HEADERS == 0)
+            this.status.UnconnectingHeaderReceived++;
+            if (this.status.UnconnectingHeaderReceived % MAX_UNCONNECTING_HEADERS == 0)
             {
                this.Misbehave(20, "Exceeded maximum number of received unconnecting headers.");
             }
