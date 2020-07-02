@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.Events;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
@@ -40,6 +41,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       readonly IChainState chainState;
       readonly IHeaderValidator headerValidator;
       readonly IPeriodicWork headerSyncLoop;
+      readonly BitcoinSettings options;
+      private Target minimumChainWork;
 
       public BlockHeaderProcessor(ILogger<HandshakeProcessor> logger,
                                   IEventBus eventBus,
@@ -52,7 +55,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   ILocalServiceProvider localServiceProvider,
                                   IChainState chainState,
                                   IHeaderValidator headerValidator,
-                                  IPeriodicWork headerSyncLoop)
+                                  IPeriodicWork headerSyncLoop,
+                                  IOptions<BitcoinSettings> options)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.dateTimeProvider = dateTimeProvider;
@@ -64,6 +68,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.chainState = chainState;
          this.headerValidator = headerValidator;
          this.headerSyncLoop = headerSyncLoop;
+         this.options = options.Value;
+
+
+         minimumChainWork = this.options.MinimumChainWork ?? this.consensusParameters.MinimumChainWork;
+         if (minimumChainWork < this.consensusParameters.MinimumChainWork)
+         {
+            this.logger.LogWarning($"{nameof(minimumChainWork)} set below default value of {this.consensusParameters.MinimumChainWork}");
+         }
       }
 
       protected override ValueTask OnPeerAttachedAsync()
@@ -528,9 +540,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                      await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
                   }
 
-                  this.DisconnectPeerIfNotUseful(arg.ValidatedHeadersCount);
                }
             }
+
+            this.DisconnectPeerIfNotUseful(arg.ValidatedHeadersCount);
          }
       }
 
@@ -553,7 +566,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          if (this.ibdState.IsDownloadingBlocks() && headersCount != MAX_HEADERS)
          {
             // When nCount < MAX_HEADERS_RESULTS, we know we have no more headers to fetch from this peer.
-            if (this.status.BestKnownHeader != null && this.status.BestKnownHeader.ChainWork < this.consensusParameters.MinimumChainWork)
+            if (this.status.BestKnownHeader != null && this.status.BestKnownHeader.ChainWork < minimumChainWork)
             {
                /// This peer has too little work on their headers chain to help us sync so disconnect if it's using an outbound
                /// slot, unless the peer is whitelisted or addnode.

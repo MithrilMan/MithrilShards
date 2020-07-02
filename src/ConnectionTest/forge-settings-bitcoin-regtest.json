@@ -19,7 +19,8 @@
       ]
    },
    "Bitcoin": {
-      "MaxTimeAdjustment":  4200
+      "MaxTimeAdjustment": 4200,
+      "MinimumChainWork": "0x00000000000000000000000000000000000000000000012b2a3a62424f21c918"
    },
    "StatisticsCollector": {
       "ContinuousConsoleDisplay": false,

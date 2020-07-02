@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using MithrilShards.Chain.Bitcoin.Converters;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.DataTypes
 {
+   [TypeConverter(typeof(TargetConverter))]
    public partial class Target : UInt256
    {
       private static BigInteger Pow256 = BigInteger.Pow(new BigInteger(2), 256);

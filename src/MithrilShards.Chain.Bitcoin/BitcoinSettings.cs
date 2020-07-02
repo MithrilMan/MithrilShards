@@ -1,4 +1,5 @@
-﻿using MithrilShards.Core.MithrilShards;
+﻿using MithrilShards.Chain.Bitcoin.DataTypes;
+using MithrilShards.Core.MithrilShards;
 
 namespace MithrilShards.Chain.Bitcoin
 {
@@ -9,9 +10,6 @@ namespace MithrilShards.Chain.Bitcoin
 
       public long MaxTimeAdjustment { get; set; } = DEFAULT_MAX_TIME_ADJUSTMENT;
 
-      public BitcoinSettings()
-      {
-
-      }
+      public Target? MinimumChainWork { get; set; } = null;
    }
 }

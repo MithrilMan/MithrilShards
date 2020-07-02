@@ -37,7 +37,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
             SubsidyHalvingInterval = 150,
             SegwitHeight = 0, // SEGWIT is always activated on regtest unless overridden
-            MinimumChainWork = UInt256.Zero,
+            MinimumChainWork = new Target("0x00000000000000000000000000000000000000000000012b2a3a62424f21c919") //Target.Zero,
          };
       }
 

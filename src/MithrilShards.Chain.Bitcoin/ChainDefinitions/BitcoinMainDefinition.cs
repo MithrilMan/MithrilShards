@@ -38,7 +38,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
             SubsidyHalvingInterval = 210000,
             SegwitHeight = 481824, // 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893,
-            MinimumChainWork = new UInt256("0x000000000000000000000000000000000000000008ea3cf107ae0dec57f03fe8"),
+            MinimumChainWork = new Target("0x000000000000000000000000000000000000000008ea3cf107ae0dec57f03fe8"),
          };
       }
 

@@ -75,6 +75,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <value>
       /// The minimum chain work.
       /// </value>
-      UInt256 MinimumChainWork { get; }
+      Target MinimumChainWork { get; }
    }
 }

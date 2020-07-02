@@ -22,7 +22,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public bool PowNoRetargeting { get; set; }
 
-      public UInt256 MinimumChainWork { get; set; } = null!;
+      public Target MinimumChainWork { get; set; } = null!;
 
    }
 }
