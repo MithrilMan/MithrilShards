@@ -46,15 +46,24 @@ namespace MithrilShards.Core.Threading
       /// <summary>
       /// Configures the specified instance.
       /// </summary>
-      /// <param name="stopOnException">if set to <c>true</c> stops the execution when an exception happens (except when the task is canceled).</param>
-      /// <param name="exceptionHandler ">Exception handler invoked whenever an unhandled exception happens during work execution</param>
+      /// <param name="stopOnException">
+      /// If set to <c>true</c> stops the execution when an exception happens (except when the task is canceled).
+      /// This may be overridden handling <paramref name="exceptionHandler"/>.
+      /// </param>
+      /// <param name="exceptionHandler ">
+      /// Exception handler invoked whenever an unhandled exception happens during work execution.
+      /// Handling the exception allows to override the <paramref name="stopOnException"/> flag acting on <see cref="IPeriodicWorkExceptionHandler.Feedback"/>
+      /// </param>
       void Configure(bool stopOnException = false, IPeriodicWorkExceptionHandler? exceptionHandler = null);
 
       /// <summary>
       /// Starts the asynchronous periodic work.
       /// </summary>
       /// <param name="cancellation">The cancellation token.</param>
-      /// <param name="interval">The interval of time that will be awaited before executing again the work.</param>
+      /// <param name="interval">
+      /// The interval of time that will be awaited before executing again the work.
+      /// Specifying TimeSpan.Zero acts as a continuous loop.
+      /// </param>
       /// <param name="work">The work to execute.</param>
       Task StartAsync(string label, WorkAsync work, TimeSpan interval, CancellationToken cancellation);
 

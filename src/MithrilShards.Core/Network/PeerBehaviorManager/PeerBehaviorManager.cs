@@ -95,6 +95,19 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
          }
       }
 
+      public int GetScore(IPeerContext peerContext)
+      {
+         if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
+         {
+            this.logger.LogWarning("Peer {PeerId} not found, returning neutral score.", peerContext.PeerId);
+            return 0;
+         }
+         else
+         {
+            return score.Score;
+         }
+      }
+
       /// <summary>
       /// Adds the specified peer to the list of connected peer.
       /// </summary>

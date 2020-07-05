@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using MithrilShards.Chain.Bitcoin.Consensus;
+using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
@@ -10,6 +12,19 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public class BlockHeaderProcessorStatus
       {
+         /// <summary>
+         /// Whether the peer is a limited node (isn't a full node and has only a limited amount of blocks to serve).
+         /// (obtained from Version message).
+         /// </summary>
+         public bool IsLimitedNode { get; internal set; } = false;
+
+         /// <summary>
+         /// Whether this peer is a client.
+         /// A Client is a node not relaying blocks and tx and not serving (parts) of the historical blockchain as "clients".
+         /// (obtained from Version message).
+         /// </summary>
+         public bool IsClient { get; internal set; } = false;
+
          public int PeerStartingHeight { get; internal set; } = 0;
 
          /// <summary>
@@ -63,11 +78,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          public long LastBlockAnnouncement { get; internal set; } = 0;
 
          /// <summary>
-         /// Gets the blocks in download.
-         /// </summary>
-         public int BlocksInDownload { get; internal set; } = 0;
-
-         /// <summary>
          /// Whether this peer can give us witnesses. (fHaveWitness)
          /// </summary>
          public bool CanServeWitness { get; internal set; } = false;
@@ -76,11 +86,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// Gets or sets a value indicating whether this peer wants witnesses in cmpctblocks/blocktxns.
          /// </summary>
          public bool WantsCompactWitness { get; internal set; } = false;
-
-         /// <summary>
-         /// Gets the date when the peer started to download blocks.
-         /// </summary>
-         public long DownloadingSince { get; internal set; } = 0;
 
          /// <summary>
          /// Gets a value indicating whether this peer is synchronizing headers with our node.

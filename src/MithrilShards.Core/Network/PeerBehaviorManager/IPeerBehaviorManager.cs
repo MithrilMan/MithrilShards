@@ -20,5 +20,12 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       /// <param name="bonus">The bonus.</param>
       /// <param name="reason">The reason.</param>
       void AddBonus(IPeerContext peerContext, uint bonus, string reason);
+
+      /// <summary>
+      /// Gets the peer score.
+      /// </summary>
+      /// <param name="peerContext">The peer context.</param>
+      /// <returns></returns>
+      int GetScore(IPeerContext peerContext);
    }
 }

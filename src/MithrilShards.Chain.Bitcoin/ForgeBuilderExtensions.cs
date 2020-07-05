@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus;
+using MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules;
@@ -61,7 +62,7 @@ namespace MithrilShards.Chain.Bitcoin
                   .AddSingleton<IInitialBlockDownloadTracker, InitialBlockDownloadTracker>()
                   .AddSingleton<IHeaderMedianTimeCalculator, HeaderMedianTimeCalculator>()
                   .AddSingleton<IBlockHeaderRepository, InMemoryBlockHeaderRepository>()
-                  .AddSingleton<IBlockDownloader, BlockDownloader>()
+                  .AddSingleton<IBlockFetcherManager, BlockFetcherManager>()
                   .AddSingleton<IValidationRulesChecker, ValidationRulesChecker>()
                   .AddSingleton<IHeaderValidator, HeaderValidator>()
                   .AddHostedService(sp => sp.GetRequiredService<IHeaderValidator>())

@@ -81,5 +81,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       bool TryGetBlockHeader(HeaderNode headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader);
 
       HeaderNode AddToBlockIndex(BlockHeader header);
+
+      /// <summary>
+      /// Tries to get the header node on best chain at the specified height.
+      /// </summary>
+      /// <param name="height">The height.</param>
+      bool TryGetAtHeight(int height, [MaybeNullWhen(false)] out HeaderNode? headerNode);
    }
 }

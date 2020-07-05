@@ -61,10 +61,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
          this.validationLoop.Configure(false, this);
       }
 
-      public void OnException(IPeriodicWork failedWork, Exception ex, out bool continueExecution)
+      public void OnException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
-         this.logger.LogCritical("An unhandled exception has been rised in the header validation loop.");
-         continueExecution = false;
+         this.logger.LogCritical("An unhandled exception has been raised in the header validation loop.");
+         feedback.IsCritical = true;
+         feedback.ContinueExecution = false;
+         feedback.Message = "Without validation loop, it's impossible to advance in consensus. A node restart is required to fix the problem.";
       }
 
       public Task StartAsync(CancellationToken cancellationToken)
@@ -112,14 +114,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
             /// If during validation a new header is found, this will be set to true.
             /// Once a new header is found, every other new header is expected to be new too
             /// because we don't store unconnecting headers.
-            bool newHeaderFound = false;
+            int newHeadersFoundCount = 0;
+
             int validatedHeaders = 0;
 
             using (var writeLock = GlobalLocks.WriteOnMain())
             {
                foreach (BlockHeader header in request.Headers)
                {
-                  if (!this.AcceptBlockHeaderLocked(header, out state, out HeaderNode? validatedHeaderNode, out newHeaderFound))
+                  if (!this.AcceptBlockHeaderLocked(header, out state, out HeaderNode? validatedHeaderNode, out bool newHeaderFound))
                   {
                      invalidBlockHeader = header;
                      break;
@@ -128,6 +131,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
                   validatedHeaders++;
                   lastValidatedBlockHeader = header;
                   lastValidatedHeaderNode = validatedHeaderNode;
+                  if (newHeaderFound) newHeadersFoundCount++;
                }
             }
 
@@ -145,7 +149,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
                this.eventBus.Publish(new BlockHeaderValidationSucceeded(validatedHeaders,
                                                                         lastValidatedBlockHeader!,
                                                                         lastValidatedHeaderNode!,
-                                                                        newHeaderFound,
+                                                                        newHeadersFoundCount,
                                                                         request.Peer));
             }
          }
@@ -174,7 +178,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
             // check if the tip we want to set is already into our chain
             if (this.chainState.TryGetKnownHeaderNode(headerHash, out HeaderNode? existingHeader))
             {
-               if (existingHeader.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
+               if (existingHeader.IsInvalid())
                {
                   validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
                   isNew = false;

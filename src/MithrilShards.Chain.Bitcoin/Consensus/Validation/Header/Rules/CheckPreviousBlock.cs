@@ -22,7 +22,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
             return false;
          }
 
-         if (previousNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
+         if (previousNode.IsInvalid())
          {
             validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "bad-prevblk", "previous block invalid");
             return false;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
@@ -13,9 +14,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    public class HeaderNode
    {
       /// <summary>
-      /// Gets the validity of the header.
+      /// Represents validity and availability statuses, used for example by <see cref="IsValid"/> and IsAvailable.
       /// </summary>
-      public HeaderValidityStatuses Validity { get; private set; }
+      private int status;
 
       /// <summary>
       /// Gets the height this node takes in the tree representation of the whole hierarchy of headers.
@@ -47,7 +48,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Total amount of work (expected number of hashes) in the chain up to and including this block.
       /// </summary>
       /// <remarks>It's an in-memory value only that get computed during the header tree building.</remarks>
-      public Target ChainWork { get; internal set; }
+      public Target ChainWork { get; set; }
+
+      /// <summary>
+      /// Number of transactions in the chain up to and including this block.
+      /// This value will be non-zero only if and only if transactions for this block and all its parents are available.
+      /// Change to 64-bit type when necessary
+      /// </value>
+      /// <remarks>It's an in-memory value only that get computed during the header tree building and validation.</remarks>
+      public uint ChainTxCount { get; set; }
 
       /// <summary>
       /// Initializes a new instance of the <see cref="HeaderNode"/> that references a genesis header.
@@ -64,7 +73,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.Previous = null;
          this.ChainWork = Target.Zero;
          this.Skip = null;
-         this.Validity = HeaderValidityStatuses.ValidMask;
+         this.status = (int)HeaderValidityStatuses.ValidMask;
       }
 
       internal HeaderNode(BlockHeader header, HeaderNode previous)
@@ -77,9 +86,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.Previous = previous;
          this.ChainWork = previous.ChainWork + new Target(header.Bits).GetBlockProof();
          this.Skip = previous.GetAncestor(GetSkipHeight(this.Height));
-         this.Validity = HeaderValidityStatuses.ValidTree;
+         this.status = (int)HeaderValidityStatuses.ValidTree;
 
-         //pindexNew->nTimeMax = (pindexNew->pprev ? std::max(pindexNew->pprev->nTimeMax, pindexNew->nTime) : pindexNew->nTime);
+         //pindexNew.TimeMax = (pindexNew->pprev ? std::max(pindexNew->pprev.TimeMax, pindexNew.Time) : pindexNew.Time);
       }
 
       /// <summary>
@@ -129,28 +138,95 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       }
 
       /// <summary>
-      /// Check whether this block index entry is valid up to the passed validity level.
+      /// Check whether this entry is valid up to the passed validity level.
       /// </summary>
       /// <returns>
       ///   <c>true</c> if this instance is valid; otherwise, <c>false</c>.
       /// </returns>
-      public bool IsValid(HeaderValidityStatuses nUpTo = HeaderValidityStatuses.ValidTransactions)
+      public bool IsValid(HeaderValidityStatuses upTo = HeaderValidityStatuses.ValidTransactions)
       {
-         // Only validity flags allowed.
-         if ((nUpTo & HeaderValidityStatuses.ValidMask) != nUpTo)
+         // if some failed flag is on, it's not valid.
+         if (IsInvalid()) return false;
+
+         return (this.status & (int)HeaderValidityStatuses.ValidMask) >= (int)upTo;
+      }
+
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      public bool IsInvalid()
+      {
+         return (this.status & (int)HeaderValidityStatuses.FailedMask) != 0;
+      }
+
+      //! Raise the validity level of this block index entry.
+      //! Returns true if the validity was changed.
+      bool RaiseValidity(HeaderValidityStatuses upTo)
+      {
+         if ((status & (int)HeaderValidityStatuses.FailedMask) != 0) return false;
+
+         if ((status & (int)HeaderValidityStatuses.ValidMask) < (int)upTo)
          {
-            ThrowHelper.ThrowArgumentException("Only validity flags are allowed");
+            status = (status & ~(int)HeaderValidityStatuses.ValidMask) | (int)upTo;
+            return true;
+         }
+         return false;
+      }
+
+      /// <summary>
+      /// Check whether this entry has the required data availability.
+      /// </summary>
+      public bool HasAvailability(HeaderDataAvailability availability)
+      {
+         return (this.status & (int)availability) == (int)availability;
+      }
+
+      /// <summary>
+      /// Check whether this entry has the required data availability.
+      /// </summary>
+      public void AddAvailability(HeaderDataAvailability availability)
+      {
+         this.status |= (int)availability;
+      }
+
+      /// <summary>
+      /// Check whether this entry has the required data availability.
+      /// </summary>
+      public void RemoveAvailability(HeaderDataAvailability availability)
+      {
+         this.status &= ~(int)availability;
+      }
+
+      internal HeaderNode LastCommonAncestor(HeaderNode otherHeaderNode)
+      {
+         //move both chains at the height of the lower one
+         HeaderNode? left = this.Height > otherHeaderNode.Height ? this.GetAncestor(otherHeaderNode.Height) : this;
+         HeaderNode? right = otherHeaderNode.Height > this.Height ? otherHeaderNode.GetAncestor(this.Height) : otherHeaderNode;
+
+         // walk back walking previous header, until we find that both are the header
+         while (left != right && left != null && right != null)
+         {
+            left = left.Previous;
+            right = right.Previous;
          }
 
-         if (this.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
-            return false;
-
-         return (this.Validity & HeaderValidityStatuses.ValidMask) >= nUpTo;
+         //at this point returning left or right is the same, both are equals and at worst case they go back down to genesis
+         return left!;
       }
 
       public override string ToString()
       {
          return $"{this.Hash} ({this.Height})";
+      }
+
+      /// <summary>
+      /// Determines whether <paramref name="expectedAncestor"/> is in same chain (can be this header itself).
+      /// </summary>
+      /// <param name="expectedAncestor">The expected ancestor.</param>
+      /// <returns>
+      ///   <c>true</c> if [is in same chain] [the specified expected ancestor]; otherwise, <c>false</c>.
+      /// </returns>
+      public bool IsInSameChain(HeaderNode expectedAncestor)
+      {
+         return this == expectedAncestor || this.GetAncestor(expectedAncestor.Height)?.Hash == expectedAncestor.Hash;
       }
 
       /// <summary>
@@ -186,6 +262,43 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
 
          return current;
+      }
+
+      public bool HaveTxsDownloaded()
+      {
+         return this.ChainTxCount > 0;
+      }
+
+      public override bool Equals(object? obj)
+      {
+         var item = obj as HeaderNode;
+         if (item is null)
+            return false;
+
+         return this.Hash.Equals(item.Hash);
+      }
+
+      public static bool operator ==(HeaderNode? a, HeaderNode? b)
+      {
+         if (ReferenceEquals(a, b))
+            return true;
+
+         if (a is null || b is null)
+            return false;
+
+         return a.Hash == b.Hash;
+      }
+
+      /// <inheritdoc />
+      public static bool operator !=(HeaderNode a, HeaderNode b)
+      {
+         return !(a == b);
+      }
+
+      /// <inheritdoc />
+      public override int GetHashCode()
+      {
+         return this.Hash.GetHashCode();
       }
    }
 }

@@ -45,7 +45,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       public HeaderNode Genesis { get; }
 
       private int height;
-      public int Height => this.height;
 
       public HeadersTree(ILogger<HeadersTree> logger, IConsensusParameters consensusParameters)
       {
@@ -116,49 +115,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
-      /// <summary>
-      /// Tries the get hash of a block at the specified height.
-      /// </summary>
-      /// <param name="height">The height.</param>
-      /// <param name="blockHash">The block hash.</param>
-      /// <returns></returns>
-      public bool TryGetHash(int height, [MaybeNullWhen(false)] out UInt256 blockHash)
-      {
-         using (new ReadLock(this.theLock))
-         {
-            if (height > this.height || height < 0)
-            {
-               blockHash = null!;
-               return false;
-            }
-
-            blockHash = this.bestChain[height];
-         }
-
-         return true;
-      }
-
-      /// <summary>
-      /// Find first common block between two chains.
-      /// </summary>
-      /// <param name="block">The tip of the other chain.</param>
-      /// <returns>First common block or <c>null</c>.</returns>
-      public HeaderNode? FindFork(HeaderNode reference)
-      {
-         if (reference is null)
-            throw new ArgumentNullException(nameof(reference));
-
-         HeaderNode? fork = reference.Height > this.Height ? reference.GetAncestor(this.Height) : reference;
-
-         while (fork != null && !this.IsInBestChain(fork))
-         {
-            fork = fork.Previous;
-         }
-
-         return reference;
-      }
-
-
       public void Add(in HeaderNode newHeader)
       {
          using (new WriteLock(this.theLock))
@@ -166,8 +122,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             this.knownHeaders.Add(newHeader.Hash, newHeader);
          }
       }
-
-
       public void SetTip(HeaderNode newTip)
       {
          //TODO
@@ -225,11 +179,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       //      return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
       //   }
       //}
-
-      public BlockLocator GetTipLocator()
-      {
-         return this.GetLocator(this.GetTip())!;
-      }
 
       public BlockLocator? GetLocator(HeaderNode? headerNode)
       {
@@ -293,24 +242,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          {
             int headerHeight = headerNode.Height;
             return this.bestChain.Count > headerHeight && this.bestChain[headerHeight] == headerNode.Hash;
-         }
-      }
-
-      /// <summary>
-      /// Determines whether the specified hash is a known hash.
-      /// May be present on best chain or on a fork.
-      /// </summary>
-      /// <param name="hash">The hash.</param>
-      /// <returns>
-      ///   <c>true</c> if the specified hash is known; otherwise, <c>false</c>.
-      /// </returns>
-      public bool IsKnown(UInt256? hash)
-      {
-         if (hash == null) return false;
-
-         using (new ReadLock(this.theLock))
-         {
-            return this.knownHeaders.ContainsKey(hash);
          }
       }
 

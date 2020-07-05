@@ -11,6 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       internal class HandshakeProcessorStatus
       {
          private readonly HandshakeProcessor processor;
+
          internal bool IsVersionSent { get; private set; } = false;
 
          /// <summary>

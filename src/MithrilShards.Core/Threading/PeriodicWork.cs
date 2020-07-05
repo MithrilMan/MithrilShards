@@ -2,7 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
+using MithrilShards.Core.Threading.Events;
 
 namespace MithrilShards.Core.Threading
 {
@@ -19,6 +21,7 @@ namespace MithrilShards.Core.Threading
    {
       private readonly ILogger logger;
       readonly IPeriodicWorkTracker periodicWorkTracker;
+      readonly IEventBus eventBus;
       private CancellationTokenSource? cancellationTokenSource;
 
       public Guid Id { get; }
@@ -40,10 +43,11 @@ namespace MithrilShards.Core.Threading
 
       private IPeriodicWorkExceptionHandler? exceptionHandler = null;
 
-      public PeriodicWork(ILogger<PeriodicWork> logger, IPeriodicWorkTracker periodicWorkTracker)
+      public PeriodicWork(ILogger<PeriodicWork> logger, IPeriodicWorkTracker periodicWorkTracker, IEventBus eventBus)
       {
          this.logger = logger;
          this.periodicWorkTracker = periodicWorkTracker;
+         this.eventBus = eventBus;
 
          this.Id = Guid.NewGuid();
       }
@@ -101,13 +105,19 @@ namespace MithrilShards.Core.Threading
                   lastException = ex;
                   Interlocked.Increment(ref exceptionsCount);
 
-                  bool continueExecution = false;
-                  this.exceptionHandler?.OnException(this, ex, out continueExecution);
+                  IPeriodicWorkExceptionHandler.Feedback feedback = new IPeriodicWorkExceptionHandler.Feedback(!stopOnException, false, null);
+                  this.exceptionHandler?.OnException(this, ex, ref feedback);
 
-                  if (stopOnException || !continueExecution)
+                  if (!feedback.ContinueExecution)
                   {
                      logger.LogDebug("PeriodicWork {PeriodicWorkId} terminated because of {PeriodicWorkException}.", this.Id, ex);
                      this.isRunning = false;
+
+                     if (feedback.IsCritical)
+                     {
+                        this.eventBus.Publish(new PeriodicWorkCriticallyStopped(this.label, this.Id, this.lastException, feedback.Message));
+                     }
+
                      return;
                   }
                }

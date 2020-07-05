@@ -196,6 +196,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          return this.blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader);
       }
 
+      public bool TryGetAtHeight(int height, [MaybeNullWhen(false)] out HeaderNode? headerNode)
+      {
+         using (GlobalLocks.ReadOnMain())
+         {
+            return this.HeadersTree.TryGetNodeOnBestChain(height, out headerNode);
+         }
+      }
+
       public HeaderNode AddToBlockIndex(BlockHeader header)
       {
          using (GlobalLocks.WriteOnMain())

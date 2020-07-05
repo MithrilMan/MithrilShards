@@ -25,7 +25,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Events
       /// The header node corresponding to the last validated block header.
       /// </summary>
       public HeaderNode LastValidatedHeaderNode { get; }
-      public bool NewHeaderFound { get; }
+
+      /// <summary>
+      /// The number of new headers found during this validation batch.
+      /// </summary>
+      /// <value>
+      /// The new headers found count.
+      /// </value>
+      public int NewHeadersFoundCount { get; }
 
       /// <summary>
       /// The peer that sent us the header.
@@ -34,22 +41,23 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Events
       public IPeerContext? PeerContext { get; }
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="BlockHeaderValidationSucceeded"/> class.
+      /// Initializes a new instance of the <see cref="BlockHeaderValidationSucceeded" /> class.
       /// </summary>
       /// <param name="validatedHeaders">The number of headers validated in the batch.</param>
       /// <param name="lastValidatedBlockHeader">The last validated block header.</param>
       /// <param name="lastValidatedHeaderNode">The last validated header node.</param>
+      /// <param name="newHeadersFoundCount">The number of new headers found during this validation batch.</param>
       /// <param name="peerContext">The peer context.</param>
       public BlockHeaderValidationSucceeded(int validatedHeaders,
                                             BlockHeader lastValidatedBlockHeader,
                                             HeaderNode lastValidatedHeaderNode,
-                                            bool newHeaderFound,
+                                            int newHeadersFoundCount,
                                             IPeerContext? peerContext)
       {
          this.ValidatedHeadersCount = validatedHeaders;
          this.LastValidatedBlockHeader = lastValidatedBlockHeader;
          this.LastValidatedHeaderNode = lastValidatedHeaderNode;
-         this.NewHeaderFound = newHeaderFound;
+         this.NewHeadersFoundCount = newHeadersFoundCount;
          this.PeerContext = peerContext;
       }
    }

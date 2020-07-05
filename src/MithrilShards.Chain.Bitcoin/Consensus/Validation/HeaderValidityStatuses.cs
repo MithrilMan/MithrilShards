@@ -2,10 +2,13 @@
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 {
+   /// <summary>
+   /// To waste less memory, 3 different kind of enums are gropued into one, using a mask to access specific informations
+   /// </summary>
    [Flags]
    public enum HeaderValidityStatuses
    {
-      Unset= 0,
+      Unset = 0,
 
       /// <summary>
       /// All parent headers found, difficulty matches, timestamp >= median previous, checkpoint.
@@ -35,38 +38,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       ValidMask /*         */ = 0b_00000000_00001111,
 
 
-
-
-      /// <summary>
-      /// Full block available.
-      /// </summary>
-      HasBlockData /*      */ = 0b_00000000_00010000,
-
-      /// <summary>
-      /// Undo data available.
-      /// </summary>
-      HasUndoData /*       */ = 0b_00000000_00100000,
-
-      /// <summary>
-      /// Block data was received with a witness-enforcing client.
-      /// </summary>
-      OptWitness /*        */ = 0b_00000000_01000000,
-
-
-
-
-
       /// <summary>
       /// Validation failed at the stage after last raised valid flag.
       /// </summary>
-      Failed /*            */ = 0b_10000000_00000000,
+      Failed /*            */ = 0b_00000000_10000000,
 
       /// <summary>
       /// Descends from a failed block.
       /// </summary>
-      FailedChild /*       */ = 0b_01000000_00000000,
+      FailedChild /*       */ = 0b_00000000_01000000,
 
       /// <summary>Failure mask.</summary>
-      FailedMask /*        */ = 0b_11000000_00000000
+      FailedMask /*        */ = 0b_11000000_11000000
    }
 }

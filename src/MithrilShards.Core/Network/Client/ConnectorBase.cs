@@ -34,10 +34,7 @@ namespace MithrilShards.Core.Network.Client
 
          this.DefaultDelayBetweenAttempts = TimeSpan.FromSeconds(15);
 
-         this.connectionLoop.Configure(
-            stopOnException: true,
-            exceptionHandler: this
-            );
+         this.connectionLoop.Configure(stopOnException: true, exceptionHandler: this);
       }
 
       public void SetConnectionManager(IConnectionManager connectionManager)
@@ -88,16 +85,18 @@ namespace MithrilShards.Core.Network.Client
       /// <returns></returns>
       protected abstract ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation);
 
-      public void OnException(IPeriodicWork failedWork, Exception ex, out bool continueExecution)
+      public void OnException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
          if (failedWork == this.connectionLoop)
          {
             this.logger.LogCritical(ex, "Connector {Connector} failure, it has been stopped, node may have connection problems.", this.GetType().Name);
-            continueExecution = false;
+            feedback.ContinueExecution = false;
+            feedback.IsCritical = true;
+            feedback.Message = "Without Connector loop no new connection can be established, restart the node to fix the problem.";
             return;
          }
 
-         continueExecution = true;
+         feedback.ContinueExecution = true;
       }
    }
 }
