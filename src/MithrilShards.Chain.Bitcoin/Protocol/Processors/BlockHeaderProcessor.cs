@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
    /// Manage the exchange of block and headers between peers.
    /// </summary>
    /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.Processors.BaseProcessor" />
-   public partial class BlockHeaderProcessor : BaseProcessor,
+   public partial class BlockHeaderProcessor : BaseProcessor, IPeriodicWorkExceptionHandler,
       INetworkMessageHandler<GetHeadersMessage>,
       INetworkMessageHandler<SendHeadersMessage>,
       INetworkMessageHandler<HeadersMessage>,
@@ -42,6 +42,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       readonly IChainState chainState;
       readonly IHeaderValidator headerValidator;
       readonly IPeriodicWork headerSyncLoop;
+      readonly IPeriodicWork blockRequestLoop;
       readonly BitcoinSettings options;
       private Target minimumChainWork;
 
@@ -57,6 +58,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IChainState chainState,
                                   IHeaderValidator headerValidator,
                                   IPeriodicWork headerSyncLoop,
+                                  IPeriodicWork blockRequestLoop,
                                   IOptions<BitcoinSettings> options)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
@@ -69,6 +71,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.chainState = chainState;
          this.headerValidator = headerValidator;
          this.headerSyncLoop = headerSyncLoop;
+         this.blockRequestLoop = blockRequestLoop;
          this.options = options.Value;
 
 
@@ -76,6 +79,25 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          if (minimumChainWork < this.consensusParameters.MinimumChainWork)
          {
             this.logger.LogWarning($"{nameof(minimumChainWork)} set below default value of {this.consensusParameters.MinimumChainWork}");
+         }
+
+         headerSyncLoop.Configure(stopOnException: false, this);
+         blockRequestLoop.Configure(stopOnException: false, this);
+      }
+
+      public void OnException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
+      {
+         string? disconnectionReason = failedWork switch
+         {
+            IPeriodicWork work when work == headerSyncLoop => "Peer header syncing loop had failures.",
+            IPeriodicWork work when work == blockRequestLoop => "Peer block request loop had failures.",
+            _ => null
+         };
+
+         if (disconnectionReason != null)
+         {
+            feedback.ContinueExecution = false;
+            this.PeerContext.Disconnect(disconnectionReason);
          }
       }
 
@@ -134,8 +156,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                interval: TimeSpan.FromMilliseconds(SYNC_LOOP_INTERVAL),
                cancellation: PeerContext.ConnectionCancellationTokenSource.Token
             );
-      }
 
+         _ = this.blockRequestLoop.StartAsync(
+            label: $"{nameof(blockRequestLoop)}-{PeerContext.PeerId}",
+            work: BlockRequestLoop,
+            interval: TimeSpan.FromMilliseconds(BLOCK_REQUEST_INTERVAL),
+            cancellation: PeerContext.ConnectionCancellationTokenSource.Token
+            );
+      }
 
       private async Task SyncLoopAsync(CancellationToken cancellationToken)
       {
@@ -564,7 +592,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private bool ShouldRequestCompactBlock(HeaderNode lastHeader)
       {
          return this.status.SupportsDesiredCompactVersion
-       //TODO fix     && this.blockFetcherManager.BlocksInDownload == 0
+            //TODO fix     && this.blockFetcherManager.BlocksInDownload == 0
             && lastHeader.Previous?.IsValid(HeaderValidityStatuses.ValidChain) == true;
       }
 

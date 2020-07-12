@@ -1,4 +1,5 @@
-﻿using MithrilShards.Core.DataTypes;
+﻿using System.Threading.Tasks;
+using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 {
@@ -37,6 +38,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       /// <param name="hash">The hash.</param>
       /// <param name="minimumScore">The minimum score.</param>
       /// <returns></returns>
-      bool TryFetch(HeaderNode blockToDownload, uint minimumScore);
+      Task<bool> TryFetchAsync(HeaderNode blockToDownload, uint minimumScore);
    }
 }

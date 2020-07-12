@@ -1,6 +1,5 @@
 ﻿using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
 {
@@ -24,5 +23,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public Target MinimumChainWork { get; set; } = null!;
 
+      public long MaxTipAge { get; set; }
    }
 }

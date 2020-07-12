@@ -63,6 +63,7 @@ namespace MithrilShards.Chain.Bitcoin
                   .AddSingleton<IHeaderMedianTimeCalculator, HeaderMedianTimeCalculator>()
                   .AddSingleton<IBlockHeaderRepository, InMemoryBlockHeaderRepository>()
                   .AddSingleton<IBlockFetcherManager, BlockFetcherManager>()
+                  .AddHostedService(sp => sp.GetRequiredService<IBlockFetcherManager>())
                   .AddSingleton<IValidationRulesChecker, ValidationRulesChecker>()
                   .AddSingleton<IHeaderValidator, HeaderValidator>()
                   .AddHostedService(sp => sp.GetRequiredService<IHeaderValidator>())

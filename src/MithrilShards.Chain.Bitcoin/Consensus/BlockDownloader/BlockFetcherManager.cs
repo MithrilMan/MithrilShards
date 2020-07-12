@@ -40,6 +40,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
       readonly ILogger<BlockFetcherManager> logger;
       readonly IEventBus eventBus;
+      readonly IChainState chainState;
       readonly IPeriodicWork blockFetchAssignmentLoop;
       readonly IPeriodicWork checkStaleBlockFetchersLoop;
       readonly IPeriodicWork checkFetchersScoreLoop;
@@ -85,12 +86,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
       public BlockFetcherManager(ILogger<BlockFetcherManager> logger,
                                  IEventBus eventBus,
+                                 IChainState chainState,
                                  IPeriodicWork downloadAssignmentLoop,
                                  IPeriodicWork checkStaleBlockDownload,
                                  IPeriodicWork checkFetcherScore)
       {
          this.logger = logger;
          this.eventBus = eventBus;
+         this.chainState = chainState;
          this.blockFetchAssignmentLoop = downloadAssignmentLoop;
          this.checkStaleBlockFetchersLoop = checkStaleBlockDownload;
          this.checkFetchersScoreLoop = checkFetcherScore;
@@ -170,6 +173,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
          if (args.NewHeadersFoundCount > 0)
          {
+            //check if the header is relative to current "best header"
+            //this.chainState.
+            var bestNodeHeader = this.chainState.BestHeader;
+            if (args.LastValidatedHeaderNode.LastCommonAncestor(bestNodeHeader) != bestNodeHeader)
+            {
+               /// these validated headers refers to a chain that's not currently the best chain so I don't require blocks yet.
+               /// Blocks are requested when the new validated headers cause the bestNodeHeader to switch on a fork
+
+               ///TODO: ensure we are not stuck in case our best known header refers to something not validated fully
+               ///(e.g. headers validate but blocks are never sent to us)
+               ///Technically this branch may be left without blocks and so should be removed and rolled back to be moved then to a better fork
+               this.logger.LogDebug("Ignoring validated headers because they are on a lower fork at this time");
+               return;
+            }
+
+
             List<HeaderNode> newNodesToFetch = new List<HeaderNode>();
 
             for (int i = 0; i < args.NewHeadersFoundCount; i++)
@@ -215,7 +234,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                return;
             }
 
-            int availableSlots = this.blocksInDownload.Count - MAX_PARALLEL_DOWNLOADED_BLOCKS;
+            int availableSlots = MAX_PARALLEL_DOWNLOADED_BLOCKS - this.blocksInDownload.Count;
 
             for (int i = 0; i < availableSlots; i++)
             {
@@ -253,7 +272,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                where score > 0 // only peers that can fetch the block
                select fetcher
                )
-               .FirstOrDefault(fetcher => fetcher.TryFetch(blockToDownload, 0));
+               .FirstOrDefault((fetcher) => fetcher.TryFetchAsync(blockToDownload, 0).ConfigureAwait(false).GetAwaiter().GetResult()); //TODO use async
 
             if (selectedFetcher == null)
             {
@@ -323,9 +342,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
             sum += score;
          }
 
-         this.fetchersScore = (min, max, (uint)(sum / fetchers.Count));
+         this.fetchersScore = (min, max, fetchers.Count == 0 ? 0 : (uint)(sum / fetchers.Count));
 
          return Task.CompletedTask;
+      }
+
+      public void RequireAssignment(IBlockFetcher fetcher, HeaderNode requestedBlock)
+      {
+         throw new NotImplementedException();
       }
    }
 }

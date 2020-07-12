@@ -290,7 +290,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       }
 
       /// <inheritdoc />
-      public static bool operator !=(HeaderNode a, HeaderNode b)
+      public static bool operator !=(HeaderNode? a, HeaderNode? b)
       {
          return !(a == b);
       }

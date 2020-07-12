@@ -53,6 +53,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private const int SYNC_LOOP_INTERVAL = 250;
 
       /// <summary>
+      /// The block request loop interval
+      /// </summary>
+      private const int BLOCK_REQUEST_INTERVAL = 250;
+
+      /// <summary>
       /// Size of the "block download window": how far ahead of our current height do we fetch?
       /// Larger windows tolerate larger download speed differences between peer, but increase the potential
       /// degree of disordering of blocks on disk(which make re-indexing and pruning harder).

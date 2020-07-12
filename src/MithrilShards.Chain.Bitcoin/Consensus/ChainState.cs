@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Core;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -32,7 +30,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </value>
       protected private readonly ICoinsView coinsView;
 
-      readonly IInitialBlockDownloadTracker initialBlockDownloadTracker;
       readonly IConsensusParameters consensusParameters;
 
       /// <summary>
@@ -80,14 +77,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                         IHeadersTree headersTree,
                         ICoinsView coinsView,
                         IBlockHeaderRepository blockHeaderRepository,
-                        IInitialBlockDownloadTracker initialBlockDownloadTracker,
                         IConsensusParameters consensusParameters)
       {
          this.logger = logger;
          this.HeadersTree = headersTree;
          this.coinsView = coinsView;
          this.blockHeaderRepository = blockHeaderRepository;
-         this.initialBlockDownloadTracker = initialBlockDownloadTracker;
          this.consensusParameters = consensusParameters;
          this.ChainTip = headersTree.Genesis;
          this.BestHeader = headersTree.Genesis;

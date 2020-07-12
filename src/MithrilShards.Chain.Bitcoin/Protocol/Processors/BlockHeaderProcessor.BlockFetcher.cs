@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
+using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network;
@@ -19,12 +22,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public uint GetFetchBlockScore(HeaderNode blockToBeEvaluated)
       {
-         bool isAvailable = this.status.BestKnownHeader?.IsInSameChain(blockToBeEvaluated) == false;
-         bool canServe = (!this.IsWitnessEnabled(blockToBeEvaluated.Previous) || this.status.CanServeWitness);
-         return (isAvailable && canServe) ? GetScore() + 100 : 0;
+         return CanFetch(blockToBeEvaluated) ? GetScore() + 100 : 0;
       }
 
-      public bool TryFetch(HeaderNode blockToDownload, uint minimumScore)
+      private bool CanFetch(HeaderNode node)
+      {
+         bool isAvailable = this.status.BestKnownHeader?.IsInSameChain(node) == true;
+         bool canServe = (!this.IsWitnessEnabled(node.Previous) || this.status.CanServeWitness);
+         return isAvailable && canServe;
+      }
+
+      public async Task<bool> TryFetchAsync(HeaderNode blockToDownload, uint minimumScore)
       {
          var blockScore = GetFetchBlockScore(blockToDownload);
          if (blockScore < minimumScore || blockScore == 0)
@@ -33,12 +41,50 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return false;
          }
 
-         FetchBlock(blockToDownload);
+         await FetchBlock(blockToDownload).ConfigureAwait(false);
          return true;
       }
 
-      private void FetchBlock(HeaderNode blockToDownload)
+
+      public Task BlockRequestLoop(CancellationToken cancellation)
       {
+         return Task.CompletedTask;
+         //implement this way if I fail to distribute work among peers
+
+         //List<HeaderNode>? blocksToRequest = this.FindNextBlocksToDownload(out IBlockFetcher? staller);
+         //if (blocksToRequest == null) return;
+
+         //var vGetData = new List<InventoryVector>();
+
+         //foreach (HeaderNode blockToDownload in blocksToRequest)
+         //{
+         //   uint fetchFlags = GetFetchFlags();
+         //   vGetData.Add(new InventoryVector { Type = InventoryType.MSG_BLOCK | fetchFlags, Hash = blockToDownload.Hash });
+
+         //   if (this.blockFetcherManager.RegisterFetcher TryDownloadBlock(this.PeerContext, blockToDownload, out QueuedBlock? queuedBlock))
+         //   {
+         //      if (this.blockDownloadStatus.BlocksInDownload.Count == 1)
+         //      {
+         //         // We're starting a block download (batch) from this peer.
+         //         this.blockDownloadStatus.DownloadingSince = this.dateTimeProvider.GetTime();
+         //      }
+         //   }
+
+         //   this.logger.LogDebug("Requesting block {BlockHash} (height {BlockHeight})", blockToDownload.Hash, blockToDownload.Height);
+         //}
+         //if (state.nBlocksInFlight == 0 && staller != -1)
+         //{
+         //   if (State(staller)->nStallingSince == 0)
+         //   {
+         //      State(staller)->nStallingSince = nNow;
+         //      LogPrint(BCLog::NET, "Stall started peer=%d\n", staller);
+         //   }
+         //}
+      }
+
+      private async Task FetchBlock(HeaderNode blockToDownload)
+      {
+         #region Code that was into the headers processor to request block in place
          //if (!currentHeader.Validity.HasFlag(HeaderDataAvailability.HasBlockData)  // we don't have data for this block
          //   && !this.blockFetcherManager.IsDownloading(currentHeader) // it's not already in download
          //   && (!this.IsWitnessEnabled(currentHeader.Previous) || this.status.CanServeWitness) //witness isn't enabled or the other peer can't serve witness
@@ -90,22 +136,34 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          //   await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
          //}
+         #endregion
+
+         /// when this method is called, we already gave back our availability to download this header so we shouldn't
+         /// have to repeat checks we are already enforcing elsewhere, but we do it anyway to be safe (consider if remove checks)
+
+         // we don't have data for this block and we can fetch it
+         if (!blockToDownload.HasAvailability(HeaderDataAvailability.HasBlockData) && CanFetch(blockToDownload))
+         {
+            this.fetcherStatus.BlocksInDownload.Add(blockToDownload.Hash);
+
+            var vGetData = new List<InventoryVector>();
+            uint fetchFlags = this.GetFetchFlags();
+            vGetData.Add(new InventoryVector { Type = InventoryType.MSG_BLOCK | fetchFlags, Hash = blockToDownload.Hash });
+
+            await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
+         }
       }
-
-
-
-
 
 
       /// <summary>
       /// Update LastCommonBlock and add not-in-flight missing successors to vBlocks, until it has at most count entries.
       /// </summary>
       /// <returns>Blocks to download</returns>
-      public List<HeaderNode>? FindNextBlocksToDownload(out IBlockFetcher? nodeStaller)
+      public List<HeaderNode>? FindNextBlocksToDownload(out IBlockFetcher? staller)
       {
          List<HeaderNode> blocksToDownload = new List<HeaderNode>(MAX_BLOCKS_IN_TRANSIT_PER_PEER);
 
-         nodeStaller = null;
+         staller = null;
 
          int count = fetcherStatus.BlocksInDownload.Count;
          if (count == 0) return null; //no blocks to download
@@ -170,11 +228,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                   // We consider the chain that this peer is on invalid.
                   return blocksToDownload;
                }
+
                if (!status.CanServeWitness && IsWitnessEnabled(pindex.Previous))
                {
                   // We wouldn't download this block or its descendants from this peer.
                   return blocksToDownload;
                }
+
                if (pindex.HasAvailability(HeaderDataAvailability.HasBlockData) || this.chainState.IsInBestChain(pindex))
                {
                   if (pindex.HaveTxsDownloaded())
@@ -182,7 +242,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                      fetcherStatus.LastCommonBlock = pindex;
                   }
                }
-               else if (!this.blockFetcherManager.TryGetFetcher(pindex.Hash, out IBlockFetcher? fetcherDownloadingBlock))
+               else if (!this.blockFetcherManager.TryGetFetcher(pindex.Hash, out IBlockFetcher? fetcherDownloadingBlock)) //nobody is fetching yet this block
                {
                   // The block is not already downloaded, and not yet in flight.
                   if (pindex.Height > nWindowEnd)
@@ -191,7 +251,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                      if (blocksToDownload.Count == 0 && waitingfor != this)
                      {
                         // We aren't able to fetch anything, but we would be if the download window was one larger.
-                        nodeStaller = waitingfor;
+                        staller = waitingfor;
                      }
                      return blocksToDownload;
                   }
@@ -201,7 +261,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                      return blocksToDownload;
                   }
                }
-               else if (waitingfor == null)
+               else if (waitingfor == null) // someone is already fetching this block
                {
                   // This is the first already-in-flight block.
                   waitingfor = fetcherDownloadingBlock;
@@ -229,7 +289,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// <summary>
          /// The list of blocks this peer is asked to download.
          /// </summary>
-         public List<QueuedBlock> BlocksInDownload { get; } = new List<QueuedBlock>();
+         public List<UInt256> BlocksInDownload { get; } = new List<UInt256>();
 
          /// <summary>
          /// Since when we're stalling block download progress (in microseconds), or 0.
