@@ -107,7 +107,7 @@ namespace MithrilShards.Chain.Bitcoin
       {
          // discover and register all message serializer in this assembly
          Type serializerInterface = typeof(INetworkMessageSerializer);
-         foreach (Type messageSerializerType in typeof(BitcoinShard).Assembly.GetTypes().Where(t => serializerInterface.IsAssignableFrom(t)))
+         foreach (Type messageSerializerType in typeof(BitcoinShard).Assembly.GetTypes().Where(t => serializerInterface.IsAssignableFrom(t) && !t.IsAbstract))
          {
             services.AddSingleton(typeof(INetworkMessageSerializer), messageSerializerType);
          }

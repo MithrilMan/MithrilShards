@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.Network.Protocol;
@@ -7,7 +8,7 @@ using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages
 {
-   public class VersionMessageSerializer : NetworkMessageSerializerBase<VersionMessage>
+   public class VersionMessageSerializer : BitcoinNetworkMessageSerializerBase<VersionMessage>
    {
       private readonly IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer;
 
@@ -16,7 +17,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
          this.networkAddressNoTimeSerializer = networkAddressNoTimeSerializer;
       }
 
-      public override void Serialize(VersionMessage message, int protocolVersion, IBufferWriter<byte> output)
+      public override void Serialize(VersionMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
       {
          // version message doesn't have to look into passed protocolVersion but rely on it's message.Version.
          protocolVersion = message.Version;
@@ -44,7 +45,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
          output.WriteBool(message.Relay);
       }
 
-      public override VersionMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
+      public override VersionMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
          var message = new VersionMessage
          {

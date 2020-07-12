@@ -116,7 +116,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
          // starts the loop that check for stale block fetchers.
          this.checkStaleBlockFetchersLoop.StartAsync(
-            label: nameof(blockFetchAssignmentLoop),
+            label: nameof(checkStaleBlockFetchersLoop),
             work: CheckStaleBlockFetchersWork,
             interval: TimeSpan.FromSeconds(CHECK_STALE_BLOCK_FETCHERS_LOOP_INTERVAL),
             cancellationToken

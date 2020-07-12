@@ -69,7 +69,7 @@ namespace MithrilShards.Network.Legacy
                string commandName = this.ContextData.GetCommandName();
 
                if (this.networkMessageSerializerManager
-                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message))
+                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, this.peerContext, out message))
                {
                   this.peerContext.Metrics.Received(this.ContextData.GetTotalMessageLength());
                   return true;

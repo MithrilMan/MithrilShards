@@ -14,7 +14,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          this.uInt256Serializator = uInt256Serializator;
       }
 
-      public BlockHeader Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
+      public BlockHeader Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
       {
          return new BlockHeader
          {
@@ -28,7 +28,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          };
       }
 
-      public int Serialize(BlockHeader typeInstance, int protocolVersion, IBufferWriter<byte> writer)
+      public int Serialize(BlockHeader typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
       {
          int size = 0;
          size += writer.WriteInt(typeInstance.Version);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using MithrilShards.Core.Network.Protocol.Serialization;
@@ -135,6 +136,32 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
          }
       }
 
+      /// <summary>
+      /// Reads the byte array, reading first a VarInt of the size of the array, followed by the full array data.
+      /// </summary>
+      /// <param name="reader">The reader.</param>
+      /// <param name="length">The length.</param>
+      /// <returns></returns>
+      [MethodImpl(MethodImplOptions.AggressiveInlining)]
+      public static byte[]? ReadByteArray(ref this SequenceReader<byte> reader)
+      {
+         int arraySize = (int)ReadVarInt(ref reader);
+
+         if (arraySize == 0) return null;
+
+         ReadOnlySequence<byte> sequence = reader.Sequence.Slice(reader.Position, arraySize);
+         reader.Advance(arraySize);
+
+         if (sequence.IsSingleSegment)
+         {
+            return sequence.FirstSpan.ToArray();
+         }
+         else
+         {
+            return sequence.ToArray();
+         }
+      }
+
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static ulong ReadVarInt(ref this SequenceReader<byte> reader)
       {
@@ -168,16 +195,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       /// <param name="serializer">The serializer.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer)
+      public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer, ProtocolTypeSerializerOptions? options = null)
       {
-
          ulong itemsCount = reader.ReadVarInt();
 
          TSerializableType[] result = new TSerializableType[itemsCount];
 
          for (ulong i = 0; i < itemsCount; i++)
          {
-            result[i] = serializer.Deserialize(ref reader, protocolVersion);
+            result[i] = serializer.Deserialize(ref reader, protocolVersion, options);
          }
 
          return result;
@@ -192,9 +218,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       /// <param name="serializer">The serializer.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      public static TSerializableType ReadWithSerializer<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer)
+      public static TSerializableType ReadWithSerializer<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer, ProtocolTypeSerializerOptions? options = null)
       {
-         return serializer.Deserialize(ref reader, protocolVersion);
+         return serializer.Deserialize(ref reader, protocolVersion, options);
       }
    }
 }

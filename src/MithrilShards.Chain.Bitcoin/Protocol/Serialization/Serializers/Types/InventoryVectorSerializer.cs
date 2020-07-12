@@ -14,7 +14,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          this.uInt256Serializator = uInt256Serializator;
       }
 
-      public InventoryVector Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
+      public InventoryVector Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
       {
          return new InventoryVector
          {
@@ -23,7 +23,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          };
       }
 
-      public int Serialize(InventoryVector typeInstance, int protocolVersion, IBufferWriter<byte> writer)
+      public int Serialize(InventoryVector typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
       {
          int size = 0;
          size += writer.WriteUInt(typeInstance.Type);

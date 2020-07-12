@@ -14,12 +14,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          this.uInt256Serializator = uInt256Serializator;
       }
 
-      public BlockLocator Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
+      public BlockLocator Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
       {
          return new BlockLocator { BlockLocatorHashes = reader.ReadArray(protocolVersion, this.uInt256Serializator) };
       }
 
-      public int Serialize(BlockLocator typeInstance, int protocolVersion, IBufferWriter<byte> writer)
+      public int Serialize(BlockLocator typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
       {
          return writer.WriteArray(typeInstance.BlockLocatorHashes, protocolVersion, this.uInt256Serializator);
       }

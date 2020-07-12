@@ -71,7 +71,7 @@ namespace MithrilShards.Network.Bedrock
 
                string commandName = this.contextData.CommandName!;
                if (this.networkMessageSerializerManager
-                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message!))
+                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, this.peerContext, out message!))
                {
                   this.peerContext.Metrics.Received(this.contextData.GetTotalMessageLength());
                   return true;
@@ -246,6 +246,7 @@ namespace MithrilShards.Network.Bedrock
          {
             if (this.networkMessageSerializerManager.TrySerialize(message,
                                                                   this.peerContext.NegotiatedProtocolVersion.Version,
+                                                                  this.peerContext,
                                                                   output,
                                                                   out int sentBytes))
             {

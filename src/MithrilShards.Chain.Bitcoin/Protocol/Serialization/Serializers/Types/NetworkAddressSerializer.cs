@@ -7,7 +7,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 {
    public class NetworkAddressSerializer : IProtocolTypeSerializer<NetworkAddress>
    {
-      public NetworkAddress Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
+      public NetworkAddress Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
       {
          return new NetworkAddress
          {
@@ -20,7 +20,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          };
       }
 
-      public int Serialize(NetworkAddress typeInstance, int protocolVersion, IBufferWriter<byte> writer)
+      public int Serialize(NetworkAddress typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
       {
          int size = 0;
          // https://bitcoin.org/en/developer-reference#version
