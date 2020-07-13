@@ -19,7 +19,7 @@ namespace MithrilShards.Core.EventBus
       /// The operation is thread safe.
       /// </summary>
       /// <param name="subscriptions">The subscription action.</param>
-      public void RegisterSubscriptions(params SubscriptionToken[] subscriptions)
+      public EventSubscriptionManager RegisterSubscriptions(params SubscriptionToken[] subscriptions)
       {
          if (this.disposedValue) throw new ObjectDisposedException(nameof(EventSubscriptionManager));
 
@@ -27,6 +27,8 @@ namespace MithrilShards.Core.EventBus
          {
             this.subscriptionTokens.AddRange(subscriptions);
          }
+
+         return this;
       }
 
       #region IDisposable Support

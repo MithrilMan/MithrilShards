@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using MithrilShards.Chain.Bitcoin.Consensus;
-using MithrilShards.Chain.Bitcoin.Network;
+﻿using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors

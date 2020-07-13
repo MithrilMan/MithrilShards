@@ -28,7 +28,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private bool CanFetch(HeaderNode node)
       {
          bool isAvailable = this.status.BestKnownHeader?.IsInSameChain(node) == true;
-         bool canServe = (!this.IsWitnessEnabled(node.Previous) || this.status.CanServeWitness);
+         bool canServe = (!this.IsWitnessEnabled(node.Previous) || this.PeerContext.CanServeWitness);
          return isAvailable && canServe;
       }
 
@@ -229,7 +229,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                   return blocksToDownload;
                }
 
-               if (!status.CanServeWitness && IsWitnessEnabled(pindex.Previous))
+               if (!PeerContext.CanServeWitness && IsWitnessEnabled(pindex.Previous))
                {
                   // We wouldn't download this block or its descendants from this peer.
                   return blocksToDownload;

@@ -3,7 +3,7 @@
    /// <summary>
    /// Tracks the ongoing block fetch operation.
    /// </summary>
-   public class OngoingBlockFetch
+   public class PendingDownload
    {
       /// <summary>
       /// Gets the HeaderNode representing the block to fetch.
@@ -20,7 +20,7 @@
       /// </summary>
       public long StartingTime { get; }
 
-      public OngoingBlockFetch(HeaderNode blockInDownload, IBlockFetcher blockFetcher, long startingTime)
+      public PendingDownload(HeaderNode blockInDownload, IBlockFetcher blockFetcher, long startingTime)
       {
          this.BlockInDownload = blockInDownload;
          this.BlockFetcher = blockFetcher;

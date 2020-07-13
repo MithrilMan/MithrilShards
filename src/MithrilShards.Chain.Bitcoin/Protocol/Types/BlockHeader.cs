@@ -4,7 +4,7 @@ using MithrilShards.Core.DataTypes;
 namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 {
    /// <summary>
-   /// Inventory vector (inv_vect).
+   /// Represents a block header.
    /// </summary>
    public class BlockHeader
    {
@@ -37,8 +37,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// The nonce used to generate this block… to allow variations of the header and compute different hashes.
       /// </summary>
       public uint Nonce { get; set; }
-
-      public ulong TransactionCount { get; set; }
 
       /// <summary>
       /// Not part of the protocol message, this property represents the block hash.

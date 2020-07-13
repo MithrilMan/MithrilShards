@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
-using MithrilShards.Chain.Bitcoin.Consensus.Events;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using MithrilShards.Chain.Events;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
@@ -31,7 +31,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<GetHeadersMessage>,
       INetworkMessageHandler<SendHeadersMessage>,
       INetworkMessageHandler<HeadersMessage>,
-      INetworkMessageHandler<SendCmpctMessage>
+      INetworkMessageHandler<SendCmpctMessage>,
+      INetworkMessageHandler<BlockMessage>
    {
       readonly IDateTimeProvider dateTimeProvider;
       private readonly IConsensusParameters consensusParameters;
@@ -121,11 +122,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          VersionMessage peerVersion = handshakeStatus.PeerVersion!;
 
-         this.status.IsLimitedNode = handshakeStatus.IsLimitedNode;
-         this.status.IsClient = handshakeStatus.IsClient;
+         this.status.IsLimitedNode = this.PeerContext.IsLimitedNode;
+         this.status.IsClient = this.PeerContext.IsClient;
 
          this.status.PeerStartingHeight = peerVersion.StartHeight;
-         this.status.CanServeWitness = (peerVersion.Services & (ulong)NodeServices.Witness) != 0;
+         this.status.CanServeWitness =  this.PeerContext.CanServeWitness;
 
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
 
@@ -529,6 +530,31 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          await this.headerValidator.RequestValidationAsync(new HeadersToValidate(headers, PeerContext)).ConfigureAwait(false);
 
          return true;
+      }
+
+      /// <summary>
+      /// The node received a block.
+      /// </summary>
+      public ValueTask<bool> ProcessMessageAsync(BlockMessage message, CancellationToken cancellation)
+      {
+         BlockHeader header = message.Block!.Header!;
+         bool forceProcessing = false;
+         header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, this.PeerContext.NegotiatedProtocolVersion.Version);
+
+         this.eventBus.Publish(new BlockReceived(message.Block!, this.PeerContext, this));
+
+         bool fNewBlock = false;
+         //chainman.ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
+         //if (fNewBlock)
+         //{
+         //   pfrom.nLastBlockTime = GetTime();
+         //}
+         //else
+         //{
+         //   LOCK(cs_main);
+         //   mapBlockSource.erase(pblock->GetHash());
+         //}
+         return new ValueTask<bool>(true);
       }
 
       /// <summary>

@@ -7,8 +7,8 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.Consensus.Events;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
+using MithrilShards.Chain.Events;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Threading;
@@ -40,6 +40,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
       readonly ILogger<BlockFetcherManager> logger;
       readonly IEventBus eventBus;
+      readonly IDateTimeProvider dateTimeProvider;
       readonly IChainState chainState;
       readonly IPeriodicWork blockFetchAssignmentLoop;
       readonly IPeriodicWork checkStaleBlockFetchersLoop;
@@ -65,7 +66,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       /// <summary>
       /// The blocks we are actually downloading
       /// </summary>
-      private readonly ConcurrentDictionary<IBlockFetcher, List<HeaderNode>> blocksInDownload = new ConcurrentDictionary<IBlockFetcher, List<HeaderNode>>();
+      private readonly ConcurrentDictionary<IBlockFetcher, List<PendingDownload>> blocksInDownload = new ConcurrentDictionary<IBlockFetcher, List<PendingDownload>>();
 
       /// <summary>
       /// Channel used to get data to send to fetchers.
@@ -86,6 +87,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
       public BlockFetcherManager(ILogger<BlockFetcherManager> logger,
                                  IEventBus eventBus,
+                                 IDateTimeProvider dateTimeProvider,
                                  IChainState chainState,
                                  IPeriodicWork downloadAssignmentLoop,
                                  IPeriodicWork checkStaleBlockDownload,
@@ -93,6 +95,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       {
          this.logger = logger;
          this.eventBus = eventBus;
+         this.dateTimeProvider = dateTimeProvider;
          this.chainState = chainState;
          this.blockFetchAssignmentLoop = downloadAssignmentLoop;
          this.checkStaleBlockFetchersLoop = checkStaleBlockDownload;
@@ -131,7 +134,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
             );
 
          // subscribe to events we are interested into
-         eventSubscriptionManager.RegisterSubscriptions(this.eventBus.Subscribe<BlockHeaderValidationSucceeded>(this.OnBlockHeaderValidationSucceeded));
+         eventSubscriptionManager
+            .RegisterSubscriptions(this.eventBus.Subscribe<BlockHeaderValidationSucceeded>(this.OnBlockHeaderValidationSucceeded))
+            .RegisterSubscriptions(this.eventBus.Subscribe<BlockReceived>(this.OnBlockReceived));
 
          return Task.CompletedTask;
       }
@@ -155,6 +160,32 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
          fetcher = items.fetcher;
 
          return result;
+      }
+
+      private void OnBlockReceived(BlockReceived arg)
+      {
+         UInt256 blockHash = arg.ReceivedBlock.Header!.Hash!;
+
+         //if we received a block from a fetcher, try to remove it from current downloading blocks
+         if (arg.Fetcher != null)
+         {
+            //check if the block was requested and remove it from the queued blocks
+            if (!this.blocksInDownload.TryGetValue(arg.Fetcher, out List<PendingDownload>? pendingDownloads))
+            {
+               this.logger.LogDebug("Received block {UnrequestedBlock} from an unexpected source, do nothing.", blockHash);
+               return;
+            }
+
+            var currentPending = pendingDownloads.FirstOrDefault(d => d.BlockInDownload.Hash == blockHash);
+
+            if (currentPending != null)
+            {
+               pendingDownloads.Remove(currentPending);
+
+               // TODO: check the time it took to download and update the score?
+               long elapsedUsec = dateTimeProvider.GetTimeMicros() - currentPending.StartingTime;
+            }
+         }
       }
 
       /// <summary>
@@ -281,13 +312,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                return;
             }
 
-            if (!this.blocksInDownload.TryGetValue(selectedFetcher, out List<HeaderNode>? selectedFetcherFetchingBlocks))
+            if (!this.blocksInDownload.TryGetValue(selectedFetcher, out List<PendingDownload>? selectedFetcherPendingDownloads))
             {
-               selectedFetcherFetchingBlocks = new List<HeaderNode>();
-               this.blocksInDownload.TryAdd(selectedFetcher, selectedFetcherFetchingBlocks);
+               selectedFetcherPendingDownloads = new List<PendingDownload>();
+               this.blocksInDownload.TryAdd(selectedFetcher, selectedFetcherPendingDownloads);
             }
 
-            selectedFetcherFetchingBlocks.Add(blockToDownload);
+            selectedFetcherPendingDownloads.Add(new PendingDownload(blockToDownload, selectedFetcher, this.dateTimeProvider.GetTimeMicros()));
          }
       }
 

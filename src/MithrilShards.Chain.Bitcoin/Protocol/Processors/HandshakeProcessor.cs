@@ -123,13 +123,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             if (!peerServiceSupports(NodeServices.NetworkLimited))
             {
-               this.status.IsClient = true;
+               this.PeerContext.IsClient = true;
             }
             else
             {
-               this.status.IsLimitedNode = true;
+               this.PeerContext.IsLimitedNode = true;
             }
          }
+
+         this.PeerContext.CanServeWitness = peerServiceSupports(NodeServices.Witness);
 
          // will prevent to handle version messages to other Processors
          return false;

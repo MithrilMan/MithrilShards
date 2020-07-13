@@ -12,6 +12,17 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          return this.options.ContainsKey(key);
       }
 
+      public ProtocolTypeSerializerOptions(params (string Key, object Value)[] values)
+      {
+         if (values != null)
+         {
+            foreach (var item in values)
+            {
+               this.options.Add(item.Key, item.Value);
+            }
+         }
+      }
+
 
       /// <summary>
       /// Gets the desired option, if available, or the default value.
@@ -32,9 +43,10 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
       /// </summary>
       /// <param name="key">The key.</param>
       /// <param name="value">The value.</param>
-      public void Set(string key, object value)
+      public ProtocolTypeSerializerOptions Set(string key, object value)
       {
          this.options.Add(key, value);
+         return this;
       }
    }
 }

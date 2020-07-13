@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Consensus\Validation\Block\Rules\" />
     <Folder Include="Encoders\" />
   </ItemGroup>
 

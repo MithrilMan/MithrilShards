@@ -1,4 +1,5 @@
-﻿using MithrilShards.Chain.Bitcoin.Protocol.Types;
+﻿using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
@@ -9,13 +10,21 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
    /// </summary>
    /// <seealso cref="INetworkMessage" />
    [NetworkMessage(COMMAND)]
-   public sealed class BlockMessage : INetworkMessage
+   public sealed class BlockMessage : ConfigurableNetworkMessageBase
    {
       private const string COMMAND = "block";
-      string INetworkMessage.Command => COMMAND;
 
-      public BlockHeader? Header { get; set; }
+      protected override string Command => COMMAND;
+
+      public Block? Block { get; set; }
 
 
+
+      public BlockMessage SetSerializerOption(bool useWitness)
+      {
+         this.SetSerializationOptions((SerializerOptions.SERIALIZE_WITNESS, useWitness));
+
+         return this;
+      }
    }
 }

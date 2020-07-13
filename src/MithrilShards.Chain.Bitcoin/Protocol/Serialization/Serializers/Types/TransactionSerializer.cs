@@ -6,7 +6,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 {
    public class TransactionSerializer : IProtocolTypeSerializer<Transaction>
    {
-      const string SERIALIZE_WITNESS = "witness";
       readonly IProtocolTypeSerializer<TransactionInput> transactionInputSerializer;
       readonly IProtocolTypeSerializer<TransactionOutput> transactionOutputSerializer;
       readonly IProtocolTypeSerializer<TransactionWitness> transactionWitnessSerializer;
@@ -22,7 +21,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 
       public Transaction Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
       {
-         bool allowWitness = options?.Get(SERIALIZE_WITNESS, false) ?? false;
+         bool allowWitness = options?.Get(SerializerOptions.SERIALIZE_WITNESS, false) ?? false;
          byte flags = 0;
 
          var tx = new Transaction { Version = reader.ReadInt() };
@@ -76,7 +75,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 
       public int Serialize(Transaction tx, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
       {
-         bool allowWitness = options?.Get(SERIALIZE_WITNESS, false) ?? false;
+         bool allowWitness = options?.Get(SerializerOptions.SERIALIZE_WITNESS, false) ?? false;
          byte flags = 0;
          int size = 0;
 

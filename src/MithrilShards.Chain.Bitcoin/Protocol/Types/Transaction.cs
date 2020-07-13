@@ -52,7 +52,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 
          for (int i = 0; i < Inputs!.Length; i++)
          {
-            if ((Inputs[i].ScriptWitness?.Components?.Length ?? 0) == 0)
+            if ((Inputs[i].ScriptWitness?.Components?.Length ?? 0) > 0)
             {
                return true;
             }

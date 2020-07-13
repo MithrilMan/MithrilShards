@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 
-namespace MithrilShards.Chain.Bitcoin.Consensus.Events
+namespace MithrilShards.Chain.Events
 {
    /// <summary>
    /// A block header batch has succeeded.
    /// </summary>
-   /// <seealso cref="MithrilShards.Core.EventBus.EventBase" />
+   /// <seealso cref="EventBase" />
    public class BlockHeaderValidationSucceeded : EventBase
    {
       /// <summary>

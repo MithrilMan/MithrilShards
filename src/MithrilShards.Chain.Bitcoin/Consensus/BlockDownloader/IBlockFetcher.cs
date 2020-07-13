@@ -39,5 +39,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       /// <param name="minimumScore">The minimum score.</param>
       /// <returns></returns>
       Task<bool> TryFetchAsync(HeaderNode blockToDownload, uint minimumScore);
+
+      ///// <summary>
+      ///// Signals to the fetcher to stop the download of the specified block, if possible.
+      ///// </summary>
+      ///// <param name="blockHash">The block hash.</param>
+      //bool MarkAsReceived(UInt256 blockHash);
    }
 }
