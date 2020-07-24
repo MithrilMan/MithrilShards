@@ -120,23 +120,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          return ((height & 1) != 0) ? invertLowestOne(invertLowestOne(height - 1)) + 1 : invertLowestOne(height);
       }
 
-      /// <summary>Calculates the amount of work that this block contributes to the total chain work.</summary>
-      /// <returns>Amount of work.</returns>
-      private static Target GetBlockProof(BlockHeader header)
-      {
-         //var target = new Target(header.Bits, out bool isNegative, out bool isOverflow);
-
-         //if (isNegative || isOverflow || target == Target.Zero)
-         //   return Target.Zero;
-
-         //// We need to compute 2**256 / (bnTarget+1), but we can't represent 2**256
-         //// as it's too large for an arith_uint256. However, as 2**256 is at least as large
-         //// as bnTarget+1, it is equal to ((2**256 - bnTarget - 1) / (bnTarget+1)) + 1,
-         //// or ~bnTarget / (bnTarget+1) + 1.
-         //return (~target / (target + Target.FromRawValue(1))) + Target.FromRawValue(1);
-         return new Target(header.Bits).GetBlockProof();
-      }
-
       /// <summary>
       /// Check whether this entry is valid up to the passed validity level.
       /// </summary>

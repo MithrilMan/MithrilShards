@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using MithrilShards.Chain.Bitcoin.Protocol.Types;
+﻿using MithrilShards.Chain.Bitcoin.Protocol.Types;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 {

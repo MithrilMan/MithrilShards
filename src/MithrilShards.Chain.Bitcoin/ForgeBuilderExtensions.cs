@@ -2,10 +2,13 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Block;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules;
 using MithrilShards.Chain.Bitcoin.Network;
@@ -58,36 +61,52 @@ namespace MithrilShards.Chain.Bitcoin
                   .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                   .AddSingleton<IChainState, ChainState>()
                   .AddSingleton<ICoinsView, CoinsView>()
-                  .AddSingleton<IHeadersTree, HeadersTree>()
                   .AddSingleton<IInitialBlockDownloadTracker, InitialBlockDownloadTracker>()
                   .AddSingleton<IHeaderMedianTimeCalculator, HeaderMedianTimeCalculator>()
                   .AddSingleton<IBlockHeaderRepository, InMemoryBlockHeaderRepository>()
+                  .AddSingleton<IProofOfWorkCalculator, ProofOfWorkCalculator>()
                   .AddSingleton<IBlockFetcherManager, BlockFetcherManager>()
-                  .AddHostedService(sp => sp.GetRequiredService<IBlockFetcherManager>())
-                  .AddSingleton<IValidationRulesChecker, ValidationRulesChecker>()
-                  .AddSingleton<IHeaderValidator, HeaderValidator>()
-                  .AddHostedService(sp => sp.GetRequiredService<IHeaderValidator>())
-                  .AddSingleton<IHeaderValidationContextFactory, HeaderValidationContextFactory>()
+                  .AddHostedService(sp => (IHostedService)sp.GetRequiredService<IBlockFetcherManager>())
                   .AddSingleton<ILocalServiceProvider, LocalServiceProvider>()
                   .AddSingleton<SelfConnectionTracker>()
-                  .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())
-                  .Replace(ServiceDescriptor.Singleton<IUserAgentBuilder, BitcoinUserAgentBuilder>())
-                  .Replace(ServiceDescriptor.Singleton<IBlockHeaderHashCalculator, BlockHeaderHashCalculator>())
+
                   .AddPeerGuards()
                   .AddMessageSerializers()
                   .AddProtocolTypeSerializers()
-                  .AddValidationRules()
-                  .AddMessageProcessors();
+                  .AddHeaderValidation()
+                  .AddBlockValidation()
+                  .AddMessageProcessors()
+                  .ReplaceServices();
             });
 
          return forgeBuilder;
       }
-      private static IServiceCollection AddValidationRules(this IServiceCollection services)
+
+      private static IServiceCollection AddHeaderValidation(this IServiceCollection services)
       {
          services
+            .AddSingleton<IValidationRuleSet<IHeaderValidationRule>, ValidationRuleSet<IHeaderValidationRule>>()
+            .AddSingleton<IHeaderValidator, HeaderValidator>()
+            .AddHostedService(sp => (IHostedService)sp.GetRequiredService<IHeaderValidator>())
+            .AddSingleton<IHeaderValidationContextFactory, HeaderValidationContextFactory>()
+
+            //validation rules
+            .AddSingleton<IHeaderValidationRule, IsKnownHeader>()
             .AddSingleton<IHeaderValidationRule, CheckPreviousBlock>()
             .AddSingleton<IHeaderValidationRule, CheckProofOfWork>()
             .AddSingleton<IHeaderValidationRule, CheckBlockTime>()
+            ;
+
+         return services;
+      }
+
+      private static IServiceCollection AddBlockValidation(this IServiceCollection services)
+      {
+         services
+            .AddSingleton<IValidationRuleSet<IBlockValidationRule>, ValidationRuleSet<IBlockValidationRule>>()
+            .AddSingleton<IBlockValidator, BlockValidator>()
+            .AddHostedService(sp => (IHostedService)sp.GetRequiredService<IBlockValidator>())
+            .AddSingleton<IBlockValidationContextFactory, BlockValidationContextFactory>()
             ;
 
          return services;
@@ -139,6 +158,17 @@ namespace MithrilShards.Chain.Bitcoin
          {
             services.AddTransient(typeof(INetworkMessageProcessor), processorType);
          }
+
+         return services;
+      }
+
+      private static IServiceCollection ReplaceServices(this IServiceCollection services)
+      {
+         services
+            .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())
+            .Replace(ServiceDescriptor.Singleton<IUserAgentBuilder, BitcoinUserAgentBuilder>())
+            .Replace(ServiceDescriptor.Singleton<IBlockHeaderHashCalculator, BlockHeaderHashCalculator>())
+            ;
 
          return services;
       }

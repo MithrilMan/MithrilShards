@@ -1,0 +1,14 @@
+﻿using System.Threading.Tasks;
+
+namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
+{
+   public interface IBlockValidator
+   {
+      /// <summary>
+      /// Requests the block validation process on issued block.
+      /// </summary>
+      /// <param name="block">The block.</param>
+      /// <returns></returns>
+      ValueTask RequestValidationAsync(BlockToValidate block);
+   }
+}

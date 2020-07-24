@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Network;
@@ -42,6 +43,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       readonly ILocalServiceProvider localServiceProvider;
       readonly IChainState chainState;
       readonly IHeaderValidator headerValidator;
+      readonly IBlockValidator blockValidator;
       readonly IPeriodicWork headerSyncLoop;
       readonly IPeriodicWork blockRequestLoop;
       readonly BitcoinSettings options;
@@ -58,6 +60,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   ILocalServiceProvider localServiceProvider,
                                   IChainState chainState,
                                   IHeaderValidator headerValidator,
+                                  IBlockValidator blockValidator,
                                   IPeriodicWork headerSyncLoop,
                                   IPeriodicWork blockRequestLoop,
                                   IOptions<BitcoinSettings> options)
@@ -71,6 +74,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.localServiceProvider = localServiceProvider;
          this.chainState = chainState;
          this.headerValidator = headerValidator;
+         this.blockValidator = blockValidator;
          this.headerSyncLoop = headerSyncLoop;
          this.blockRequestLoop = blockRequestLoop;
          this.options = options.Value;
@@ -126,7 +130,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.status.IsClient = this.PeerContext.IsClient;
 
          this.status.PeerStartingHeight = peerVersion.StartHeight;
-         this.status.CanServeWitness =  this.PeerContext.CanServeWitness;
+         this.status.CanServeWitness = this.PeerContext.CanServeWitness;
 
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
 
@@ -491,7 +495,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          int protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
          int headersCount = headers.Length;
-         bool newHeaderReceived = false;
 
          if (headersCount == 0)
          {
@@ -512,8 +515,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             {
                header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion);
             });
-
-            newHeaderReceived = !this.chainState.TryGetKnownHeaderNode(headers.Last().Hash!, out _);
          }
 
          // Ensure headers are consecutive.
@@ -544,6 +545,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.eventBus.Publish(new BlockReceived(message.Block!, this.PeerContext, this));
 
          bool fNewBlock = false;
+
+         //enqueue headers for validation
+         await this.blockValidator.RequestValidationAsync(new BlockToValidate(message.Block!, PeerContext)).ConfigureAwait(false);
+
          //chainman.ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
          //if (fNewBlock)
          //{

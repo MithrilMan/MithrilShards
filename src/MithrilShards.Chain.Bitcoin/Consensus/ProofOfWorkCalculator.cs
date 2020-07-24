@@ -89,13 +89,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             return previousHeader.Bits;
          }
 
-         //// Limit adjustment step
-         //uint actualTimespan = Math.Clamp(
-         //    value: previousHeader.TimeStamp - timeReference,
-         //    min: this.consensusParameters.PowTargetTimespan / 4,
-         //    max: this.consensusParameters.PowTargetTimespan * 4
-         //    );
-
          // Limit adjustment step
          uint actualTimespan = previousHeader.TimeStamp - timeReference;
          if (actualTimespan < this.consensusParameters.PowTargetTimespan / 4)
@@ -128,6 +121,26 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       private long GetDifficultyAdjustmentInterval()
       {
          return this.consensusParameters.PowTargetTimespan / this.consensusParameters.PowTargetSpacing;
+      }
+
+
+      public bool CheckProofOfWork(BlockHeader header)
+      {
+         Target blockTarget = new Target(header.Bits, out bool isNegative, out bool isOverflow);
+
+         // check range
+         if (isNegative || blockTarget == Target.Zero || isOverflow || blockTarget > this.consensusParameters.PowLimit)
+         {
+            return false;
+         }
+
+         // Check proof of work matches claimed amount
+         if (header.Hash > blockTarget)
+         {
+            return false;
+         }
+
+         return true;
       }
    }
 }

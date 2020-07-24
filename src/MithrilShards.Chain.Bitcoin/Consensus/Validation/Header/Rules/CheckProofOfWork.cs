@@ -1,45 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
 {
-   public class CheckProofOfWork : HeaderValidationRuleBase
+   public class CheckProofOfWork : IHeaderValidationRule
    {
-      public CheckProofOfWork(ILogger<CheckProofOfWork> logger) : base(logger) { }
+      readonly ILogger<CheckProofOfWork> logger;
+      readonly IProofOfWorkCalculator proofOfWorkCalculator;
 
-      public override bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
+      public CheckProofOfWork(ILogger<CheckProofOfWork> logger, IProofOfWorkCalculator proofOfWorkCalculator)
+      {
+         this.logger = logger;
+         this.proofOfWorkCalculator = proofOfWorkCalculator;
+      }
+
+      public bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
       {
          BlockHeader header = context.Header;
 
+         // Check proof of work matches claimed amount
+         //if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits, consensusParams))
+         if (!this.proofOfWorkCalculator.CheckProofOfWork(header))
+         {
+            validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "high-hash", "proof of work failed");
+            return false;
+         }
 
-         return true; //TODO implement the rule properly
-
-         //var bits = header.Bits.ToBigInteger();
-         //if (bits.CompareTo(BigInteger.Zero) <= 0 || bits.CompareTo(Pow256) >= 0)
-         //   return false;
-
-         //return GetPoWHash() <= this.Bits.ToUInt256();
-
-         //TODO
-
-         //bool fNegative;
-         //bool fOverflow;
-         //arith_uint256 bnTarget;
-
-         //bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
-
-         //// Check range
-         //if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit))
-         //   return false;
-
-         //// Check proof of work matches claimed amount
-         //if (UintToArith256(hash) > bnTarget)
-         //   return false;
-
-         //return true;
+         return true;
       }
    }
 }

@@ -1,49 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.Protocol.Types;
+﻿using Microsoft.Extensions.Logging;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
 {
    /// <summary>
-   /// Check if the header is a known header
+   /// Check if the header is a known header and if it is, ensures it's not invalid and return the known validated headers, forcing validation to conclude.
+   /// If the header is known and was previously flagged as invalid, returns a failure.
    /// </summary>
-   /// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.HeaderValidationRuleBase" />
-   public class IsKnownHeader : HeaderValidationRuleBase
+   /// <seealso cref="IHeaderValidationRule" />
+   public class IsKnownHeader : IHeaderValidationRule
    {
-      public IsKnownHeader(ILogger<IsKnownHeader> logger) : base(logger) { }
+      readonly ILogger<IsKnownHeader> logger;
 
-      public override bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
+      public IsKnownHeader(ILogger<IsKnownHeader> logger)
       {
-         BlockHeader header = context.Header;
+         this.logger = logger;
+      }
 
+      public bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
+      {
+         HeaderNode? existingHeader = context.KnownHeader;
 
-         return true; //TODO implement the rule properly
+         // check if the tip we want to set is already into our chain
+         if (existingHeader != null)
+         {
+            if (existingHeader.IsInvalid())
+            {
+               validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
+               return false;
+            }
 
-         //var bits = header.Bits.ToBigInteger();
-         //if (bits.CompareTo(BigInteger.Zero) <= 0 || bits.CompareTo(Pow256) >= 0)
-         //   return false;
+            // if the header has been already validated before, we can skip the validation process.
+            context.ForceAsValid("The header we want to accept is already in our headers chain.");
+         }
 
-         //return GetPoWHash() <= this.Bits.ToUInt256();
-
-         //TODO
-
-         //bool fNegative;
-         //bool fOverflow;
-         //arith_uint256 bnTarget;
-
-         //bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
-
-         //// Check range
-         //if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit))
-         //   return false;
-
-         //// Check proof of work matches claimed amount
-         //if (UintToArith256(hash) > bnTarget)
-         //   return false;
-
-         //return true;
+         return true;
       }
    }
 }

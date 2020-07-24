@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Events;
@@ -18,7 +19,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
    /// <summary>
    /// Manage the download blocking
    /// </summary>
-   public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionHandler
+   public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionHandler, IHostedService
    {
       /// <summary>
       /// The <see cref="checkStaleBlockFetchersLoop"/> interval, in seconds.
