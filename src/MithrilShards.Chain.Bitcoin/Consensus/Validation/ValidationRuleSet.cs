@@ -44,6 +44,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
       public void SetupRules()
       {
+         using IDisposable logScope = logger.BeginScope("Setting up validation rules for {ValidationRuleType}", typeof(TValidationRule));
+
          List<RuleDefinition> definitions = this.VerifyValidationRules();
 
          // definitions now contains a list of rule definitions with all data needed to sort them
@@ -61,7 +63,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
          }
 
          var (sorted, cycled) = resolver.Sort();
-         if (cycled != null)
+         if (cycled.Count() > 0)
          {
             string circularDependency = String.Join(", ", cycled.Select(definition => definition.Rule.GetType().Name));
             ThrowHelper.ThrowNotSupportedException($"Error configuring {typeof(TValidationRule).Name} rules, circular dependency detected: {circularDependency}");
@@ -71,6 +73,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
             .OrderBy(definition => definition.level)
             .ThenBy(definition => definition.item.PreferredExecutionOrder)
             .Select(definition => definition.item.Rule).ToList();
+
+         logger.LogDebug("Final sorted rules: {SortedRules}", string.Join(", ", this.rules.Select(rule => rule.GetType().Name)));
       }
 
       /// <summary>

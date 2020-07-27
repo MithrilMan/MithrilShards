@@ -93,6 +93,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          /// When to potentially disconnect the peer for stalling headers download.
          /// </summary>
          public long HeadersSyncTimeout { get; internal set; } = long.MaxValue;
+
+         /// <summary>
+         /// Gets the last accepted block time.
+         /// </summary>
+         public long LastBlockTime { get; internal set; } = 0;
       }
    }
 }

@@ -100,27 +100,27 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockLocator GetTipLocator()
       {
-         using var readMainLock = GlobalLocks.ReadOnMain();
+         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          return this.HeadersTree.GetLocator(this.ChainTip)!;
       }
 
       public bool TryGetBestChainHeaderNode(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         using var readMainLock = GlobalLocks.ReadOnMain();
+         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          return this.HeadersTree.TryGetNode(blockHash, true, out node);
       }
 
       public bool TryGetKnownHeaderNode(UInt256? blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
          //using var readLock = new ReadLock(this.theLock);
-         using var readMainLock = GlobalLocks.ReadOnMain();
+         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          return this.HeadersTree.TryGetNode(blockHash, false, out node);
       }
 
 
       public BlockLocator? GetLocator(HeaderNode headerNode)
       {
-         using var readMainLock = GlobalLocks.ReadOnMain();
+         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          return this.HeadersTree.GetLocator(headerNode);
       }
 
@@ -136,7 +136,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockHeader GetTipHeader()
       {
-         using var readMainLock = GlobalLocks.ReadOnMain();
+         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          if (!this.blockHeaderRepository.TryGet(this.ChainTip.Hash, out BlockHeader? header))
          {
             ThrowHelper.ThrowBlockHeaderRepositoryException($"Unexpected error, cannot fetch the tip at height {this.ChainTip.Height}.");
@@ -147,7 +147,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public HeaderNode FindForkInGlobalIndex(BlockLocator locator)
       {
-         using (GlobalLocks.ReadOnMain())
+         using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
 
             // Find the latest block common to locator and chain - we expect that
@@ -174,7 +174,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public bool TryGetNext(HeaderNode headerNode, [MaybeNullWhen(false)] out HeaderNode nextHeaderNode)
       {
-         using (GlobalLocks.ReadOnMain())
+         using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
             if (this.IsInBestChain(headerNode) && this.HeadersTree.TryGetNodeOnBestChain(headerNode.Height + 1, out nextHeaderNode))
             {
@@ -193,7 +193,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public bool TryGetAtHeight(int height, [MaybeNullWhen(false)] out HeaderNode? headerNode)
       {
-         using (GlobalLocks.ReadOnMain())
+         using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
             return this.HeadersTree.TryGetNodeOnBestChain(height, out headerNode);
          }
@@ -201,7 +201,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public HeaderNode AddToBlockIndex(BlockHeader header)
       {
-         using (GlobalLocks.WriteOnMain())
+         using (GlobalLocks.WriteOnMainAsync().GetAwaiter().GetResult())
          {
 
             // Check for duplicate

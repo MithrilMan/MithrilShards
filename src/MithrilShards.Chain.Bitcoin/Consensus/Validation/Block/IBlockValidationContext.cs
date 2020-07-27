@@ -10,5 +10,13 @@
       /// The block to be validated.
       /// </summary>
       Protocol.Types.Block Block { get; }
+
+      /// <summary>
+      /// When this block has been already validated previously, this property returns the known block instance, null otherwise.
+      /// </summary>
+      /// <value>
+      /// The known block that has been already validated previously.
+      /// </value>
+      Protocol.Types.Block? KnownBlock { get; }
    }
 }

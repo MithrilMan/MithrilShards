@@ -79,6 +79,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          byte flags = 0;
          int size = 0;
 
+         size += writer.WriteInt(tx.Version);
+
          // Consistency check.
          if (allowWitness)
          {

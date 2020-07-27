@@ -35,6 +35,12 @@ namespace MithrilShards.Core.DataAlgorithms
       /// <param name="dependencies">The dependencies.</param>
       public void Add(TItem item, IEnumerable<TItem> dependencies)
       {
+         if (dependencies.Count() == 0 && !map.ContainsKey(item))
+         {
+            map.Add(item, new Relations());
+            return;
+         }
+
          foreach (TItem dependency in dependencies)
          {
             // do not add eventual dependency to itself
@@ -87,7 +93,8 @@ namespace MithrilShards.Core.DataAlgorithms
 
          var cycled = map
             .Where(kvp => kvp.Value.Dependencies != 0)
-            .Select(kvp => kvp.Key).ToList();
+            .Select(kvp => kvp.Key)
+            .ToList();
 
          return (sorted, cycled);
       }

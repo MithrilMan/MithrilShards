@@ -39,6 +39,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private readonly IConsensusParameters consensusParameters;
       private readonly IInitialBlockDownloadTracker ibdState;
       private readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
+      readonly ITransactionHashCalculator transactionHashCalculator;
       readonly IBlockFetcherManager blockFetcherManager;
       readonly ILocalServiceProvider localServiceProvider;
       readonly IChainState chainState;
@@ -56,6 +57,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IConsensusParameters consensusParameters,
                                   IInitialBlockDownloadTracker ibdState,
                                   IBlockHeaderHashCalculator blockHeaderHashCalculator,
+                                  ITransactionHashCalculator transactionHashCalculator,
                                   IBlockFetcherManager blockFetcherManager,
                                   ILocalServiceProvider localServiceProvider,
                                   IChainState chainState,
@@ -70,6 +72,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.consensusParameters = consensusParameters;
          this.ibdState = ibdState;
          this.blockHeaderHashCalculator = blockHeaderHashCalculator;
+         this.transactionHashCalculator = transactionHashCalculator;
          this.blockFetcherManager = blockFetcherManager;
          this.localServiceProvider = localServiceProvider;
          this.chainState = chainState;
@@ -110,6 +113,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          this.RegisterLifeTimeEventHandler<BlockHeaderValidationSucceeded>(this.OnBlockHeaderValidationSucceededAsync, arg => arg.PeerContext == PeerContext);
          this.RegisterLifeTimeEventHandler<BlockHeaderValidationFailed>(this.OnBlockHeaderValidationFailedAsync, arg => arg.PeerContext == PeerContext);
+
+         this.RegisterLifeTimeEventHandler<BlockValidationSucceeded>(this.OnBlockValidationSucceededAsync, arg => arg.PeerContext == PeerContext);
+         this.RegisterLifeTimeEventHandler<BlockValidationFailed>(this.OnBlockValidationFailedAsync, arg => arg.PeerContext == PeerContext);
 
          return base.OnPeerAttachedAsync();
       }
@@ -172,7 +178,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private async Task SyncLoopAsync(CancellationToken cancellationToken)
       {
-         using var readLock = GlobalLocks.ReadOnMain();
+         using var readLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
 
          var bestHeaderNode = this.chainState.BestHeader;
          if (!this.chainState.TryGetBlockHeader(bestHeaderNode, out BlockHeader? bestBlockHeader))
@@ -502,7 +508,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return true;
          }
 
-         using (var readLock = GlobalLocks.ReadOnMain())
+         using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
             if (await this.HandleAsNotConnectingAnnouncement(headers).ConfigureAwait(false))
             {
@@ -536,30 +542,26 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <summary>
       /// The node received a block.
       /// </summary>
-      public ValueTask<bool> ProcessMessageAsync(BlockMessage message, CancellationToken cancellation)
+      public async ValueTask<bool> ProcessMessageAsync(BlockMessage message, CancellationToken cancellation)
       {
+         var protocolVersion = this.PeerContext.NegotiatedProtocolVersion.Version;
+
          BlockHeader header = message.Block!.Header!;
-         bool forceProcessing = false;
-         header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, this.PeerContext.NegotiatedProtocolVersion.Version);
+         header.Hash = this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion);
+
+         // compute transaction hashes in parallel to speed up the operation and check sent headers are sequential.
+         Parallel.ForEach(message.Block.Transactions, transaction =>
+         {
+            transaction.Hash = this.transactionHashCalculator.ComputeHash(transaction, protocolVersion);
+            transaction.WitnessHash = this.transactionHashCalculator.ComputeWitnessHash(transaction, protocolVersion);
+         });
 
          this.eventBus.Publish(new BlockReceived(message.Block!, this.PeerContext, this));
-
-         bool fNewBlock = false;
 
          //enqueue headers for validation
          await this.blockValidator.RequestValidationAsync(new BlockToValidate(message.Block!, PeerContext)).ConfigureAwait(false);
 
-         //chainman.ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
-         //if (fNewBlock)
-         //{
-         //   pfrom.nLastBlockTime = GetTime();
-         //}
-         //else
-         //{
-         //   LOCK(cs_main);
-         //   mapBlockSource.erase(pblock->GetHash());
-         //}
-         return new ValueTask<bool>(true);
+         return true;
       }
 
       /// <summary>
@@ -570,7 +572,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private ValueTask OnBlockHeaderValidationFailedAsync(BlockHeaderValidationFailed arg)
       {
          this.logger.LogDebug("Header Validation failed");
-         this.MisbehaveDuringHeaderValidation(arg.ValidationState, "invalid header received");
+         //this.MisbehaveDuringHeaderValidation(arg.ValidationState, "invalid header received");
 
          return default;
       }
@@ -585,7 +587,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.logger.LogDebug("Header Validation succeeded");
          var lastValidatedHeaderNode = arg.LastValidatedHeaderNode;
 
-         using (var readLock = GlobalLocks.ReadOnMain())
+         using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
             if (this.status.UnconnectingHeaderReceived > 0)
             {
@@ -618,6 +620,27 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
             this.DisconnectPeerIfNotUseful(arg.ValidatedHeadersCount);
          }
+      }
+
+      private ValueTask OnBlockValidationFailedAsync(BlockValidationFailed arg)
+      {
+         this.logger.LogDebug("Header Validation failed");
+         this.Misbehave(20, $"Invalid block received: {arg.ValidationState}", true);
+
+         return default;
+      }
+
+      private ValueTask OnBlockValidationSucceededAsync(BlockValidationSucceeded arg)
+      {
+         this.logger.LogDebug("Block Validation succeeded");
+
+         if (arg.IsNewBlock)
+         {
+            this.logger.LogTrace("Block Validation succeeded");
+            this.status.LastBlockTime = dateTimeProvider.GetTime();
+         }
+
+         return default;
       }
 
       private bool ShouldRequestCompactBlock(HeaderNode lastHeader)

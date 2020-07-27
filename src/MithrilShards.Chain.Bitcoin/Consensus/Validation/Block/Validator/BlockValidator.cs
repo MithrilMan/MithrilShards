@@ -7,6 +7,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Events;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Threading;
@@ -86,81 +87,55 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
       {
          await foreach (BlockToValidate request in blocksToValidate.Reader.ReadAllAsync(cancellation))
          {
-            IDisposable logScope = logger.BeginScope("Validating block {ValidationRuleType}", request.Block.Header!.Hash);
-
-            BlockValidationState? state = null;
-
-            using (var writeLock = GlobalLocks.WriteOnMain())
+            using (IDisposable logScope = logger.BeginScope("Validating block {BlockHash}", request.Block.Header!.Hash))
             {
-               if (!this.AcceptBlockLocked(request.Block, out state, out HeaderNode? validatedHeaderNode, out bool newHeaderFound))
+
+               BlockValidationState? state = null;
+
+               bool isNew = false;
+               using (await GlobalLocks.WriteOnMainAsync())
                {
-                  invalidBlockHeader = header;
-                  break;
+                  this.AcceptBlockLocked(request.Block, out state, out isNew);
                }
 
-               validatedHeaders++;
-               lastValidatedBlockHeader = header;
-               lastValidatedHeaderNode = validatedHeaderNode;
-               if (newHeaderFound) newHeadersFoundCount++;
-            }
-
-            // publish events out of lock
-            if (state!.IsInvalid())
-            {
-               // signal header validation failed
-               this.eventBus.Publish(new BlockHeaderValidationFailed(invalidBlockHeader!, state, request.Peer));
-               //this.MisbehaveDuringHeaderValidation(state, "invalid header received");
-               //return false;
-            }
-            else
-            {
-               // signal header validation succeeded
-               this.eventBus.Publish(new BlockHeaderValidationSucceeded(validatedHeaders,
-                                                                        lastValidatedBlockHeader!,
-                                                                        lastValidatedHeaderNode!,
-                                                                        newHeadersFoundCount,
-                                                                        request.Peer));
+               // publish events out of lock
+               if (state!.IsInvalid())
+               {
+                  // signal header validation failed
+                  this.eventBus.Publish(new BlockValidationFailed(request.Block, state, request.Peer));
+               }
+               else
+               {
+                  // signal header validation succeeded
+                  this.eventBus.Publish(new BlockValidationSucceeded(request.Block, isNew, request.Peer));
+               }
             }
          }
       }
 
 
-      private bool AcceptBlockLocked(Protocol.Types.Block header, out BlockValidationState validationState, [MaybeNullWhen(false)] out HeaderNode processedHeader, out bool isNew)
+      private bool AcceptBlockLocked(Protocol.Types.Block block, out BlockValidationState validationState, out bool isNew)
       {
-         UInt256 headerHash = header.Hash!;
          validationState = new BlockValidationState();
 
-         //don't validate genesis header
-         if (headerHash != this.genesisHash)
+         IBlockValidationContext context = this.blockValidationContextFactory.Create(block);
+
+         foreach (IBlockValidationRule rule in this.blockValidationRules.Rules)
          {
-            IBlockValidationContext context = this.blockValidationContextFactory.Create(header);
-
-            foreach (IHeaderValidationRule rule in this.blockValidationRules.Rules)
+            if (!rule.Check(context, ref validationState))
             {
-               if (!rule.Check(context, ref validationState))
-               {
-                  this.logger.LogDebug("Header validation failed: {HeaderValidationState}", validationState.ToString());
-                  isNew = false;
-                  processedHeader = null;
-                  return false;
-               }
+               this.logger.LogDebug("Block validation failed: {BlockValidationState}", validationState.ToString());
+               isNew = false;
+               return false;
+            }
 
-               if (context.IsForcedAsValid)
-               {
-                  isNew = context.KnownHeader == null;
+            if (context.IsForcedAsValid)
+            {
+               isNew = context.KnownBlock == null;
 
-                  if (!isNew)
-                  {
-                     processedHeader = context.KnownHeader!;
-                     return true;
-                  }
-
-                  break;
-               }
+               break;
             }
          }
-
-         processedHeader = this.chainState.AddToBlockIndex(header);
          isNew = true;
 
          return true;

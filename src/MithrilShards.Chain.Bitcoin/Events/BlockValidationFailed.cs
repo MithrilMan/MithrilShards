@@ -6,15 +6,16 @@ using MithrilShards.Core.Network;
 namespace MithrilShards.Chain.Events
 {
    /// <summary>
-   /// A block header validation failed.
+   /// A block validation failed.
    /// </summary>
    /// <seealso cref="EventBase" />
-   public class BlockHeaderValidationFailed : EventBase
+   public class BlockValidationFailed : EventBase
    {
       /// <summary>
       /// Gets the block header that failed the verification process.
       /// </summary>
-      public BlockHeader FailedBlockHeader { get; }
+      public Block FailedBlock { get; }
+
       public BlockValidationState ValidationState { get; }
 
       /// <summary>
@@ -24,14 +25,14 @@ namespace MithrilShards.Chain.Events
       public IPeerContext? PeerContext { get; }
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="BlockHeaderValidationFailed"/> class.
+      /// Initializes a new instance of the <see cref="BlockHeaderValidationFailed" /> class.
       /// </summary>
-      /// <param name="failedBlockHeader">The block header that failed validation.</param>
+      /// <param name="failedBlock">The block that failed validation.</param>
       /// <param name="validationState">State of the validation.</param>
       /// <param name="peerContext">The peer context.</param>
-      public BlockHeaderValidationFailed(BlockHeader failedBlockHeader, BlockValidationState validationState, IPeerContext? peerContext)
+      public BlockValidationFailed(Block failedBlock, BlockValidationState validationState, IPeerContext? peerContext)
       {
-         this.FailedBlockHeader = failedBlockHeader;
+         this.FailedBlock = failedBlock;
          this.ValidationState = validationState;
          this.PeerContext = peerContext;
       }

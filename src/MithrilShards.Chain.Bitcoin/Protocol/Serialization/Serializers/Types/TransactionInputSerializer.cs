@@ -27,6 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
       {
          int size = writer.WriteWithSerializer(typeInstance.PreviousOutput!, protocolVersion, this.outPointSerializator);
          size += writer.WriteByteArray(typeInstance.SignatureScript);
+         size += writer.WriteUInt(typeInstance.Sequence);
 
          return size;
       }

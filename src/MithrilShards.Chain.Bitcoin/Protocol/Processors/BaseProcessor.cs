@@ -247,12 +247,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return this.PeerContext.NegotiatedProtocolVersion.Version >= minVersion;
       }
 
-
-      protected void MisbehaveDuringHeaderValidation(BlockValidationState state, string reason)
-      {
-         //TODO
-      }
-
       public virtual void Dispose()
       {
          this.eventSubscriptionManager.Dispose();

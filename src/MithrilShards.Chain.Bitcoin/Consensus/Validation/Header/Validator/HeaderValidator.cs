@@ -110,11 +110,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
             /// If during validation a new header is found, this will be set to true.
             /// Once a new header is found, every other new header is expected to be new too
             /// because we don't store unconnecting headers.
-            bool hasNewHeaders = false;
+            //bool hasNewHeaders = false;
 
             int validatedHeaders = 0;
 
-            using (var writeLock = GlobalLocks.WriteOnMain())
+            using (await GlobalLocks.WriteOnMainAsync())
             {
                foreach (BlockHeader header in request.Headers)
                {
@@ -130,7 +130,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
                   lastValidatedHeaderNode = validatedHeaderNode;
                   if (newHeaderFound)
                   {
-                     hasNewHeaders = true;
+                     //hasNewHeaders = true;
                      newValidatedHeaderNodes.Add(validatedHeaderNode);
                   }
                }
@@ -141,8 +141,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
             {
                // signal header validation failed
                this.eventBus.Publish(new BlockHeaderValidationFailed(invalidBlockHeader!, state, request.Peer));
-               //this.MisbehaveDuringHeaderValidation(state, "invalid header received");
-               //return false;
             }
             else
             {

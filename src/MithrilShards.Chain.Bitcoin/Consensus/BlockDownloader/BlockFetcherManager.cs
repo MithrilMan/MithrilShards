@@ -136,7 +136,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
          // subscribe to events we are interested into
          eventSubscriptionManager
-            .RegisterSubscriptions(this.eventBus.Subscribe<BlockHeaderValidationSucceeded>(this.OnBlockHeaderValidationSucceeded))
+            .RegisterSubscriptions(this.eventBus.Subscribe<BlockHeaderValidationSucceeded>(async (args) => await this.OnBlockHeaderValidationSucceeded(args).ConfigureAwait(false)))
             .RegisterSubscriptions(this.eventBus.Subscribe<BlockReceived>(this.OnBlockReceived));
 
          return Task.CompletedTask;
@@ -199,7 +199,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       /// have already, we ensure that the header node validity doesn't have the flag <see cref="HeaderDataAvailability.HasBlockData"/> set.
       /// </remarks>
       /// <param name="obj"></param>
-      private void OnBlockHeaderValidationSucceeded(BlockHeaderValidationSucceeded args)
+      private async Task OnBlockHeaderValidationSucceeded(BlockHeaderValidationSucceeded args)
       {
          HeaderNode currentNode = args.LastValidatedHeaderNode;
 
@@ -220,7 +220,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                return;
             }
 
-
             List<HeaderNode> newNodesToFetch = new List<HeaderNode>();
 
             for (int i = 0; i < args.NewHeadersFoundCount; i++)
@@ -239,6 +238,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                this.blocksToDownload.Enqueue(header);
             }
          }
+
+         await Task.Delay(50).ConfigureAwait(false); // a delay introduced to let the peer adjust it's block availability
 
          DownloadBlocksIfPossible();
       }

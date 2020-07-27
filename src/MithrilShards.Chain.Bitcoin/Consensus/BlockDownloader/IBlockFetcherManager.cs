@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Hosting;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 {
-   public interface IBlockFetcherManager
+   public interface IBlockFetcherManager : IHostedService
    {
       /// <summary>
       /// Determines whether the specified header is downloading.

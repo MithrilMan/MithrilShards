@@ -10,19 +10,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block
       readonly ILogger<BlockValidationContextFactory> logger;
       readonly IInitialBlockDownloadTracker initialBlockDownloadState;
       readonly IChainState chainState;
+      readonly IConsensusParameters consensusParameters;
 
       public BlockValidationContextFactory(ILogger<BlockValidationContextFactory> logger,
                                             IInitialBlockDownloadTracker initialBlockDownloadState,
-                                            IChainState chainState)
+                                            IChainState chainState,
+                                            IConsensusParameters consensusParameters)
       {
          this.logger = logger;
          this.initialBlockDownloadState = initialBlockDownloadState;
          this.chainState = chainState;
+         this.consensusParameters = consensusParameters;
       }
 
       public IBlockValidationContext Create(Protocol.Types.Block block)
       {
-         return new BlockValidationContext(logger, block, this.initialBlockDownloadState.IsDownloadingBlocks(), this.chainState);
+         return new BlockValidationContext(logger, block, this.initialBlockDownloadState.IsDownloadingBlocks(), this.chainState, this.consensusParameters);
       }
    }
 }

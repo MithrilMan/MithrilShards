@@ -8,6 +8,7 @@ using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Block;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules;
@@ -66,9 +67,12 @@ namespace MithrilShards.Chain.Bitcoin
                   .AddSingleton<IBlockHeaderRepository, InMemoryBlockHeaderRepository>()
                   .AddSingleton<IProofOfWorkCalculator, ProofOfWorkCalculator>()
                   .AddSingleton<IBlockFetcherManager, BlockFetcherManager>()
-                  .AddHostedService(sp => (IHostedService)sp.GetRequiredService<IBlockFetcherManager>())
+                  .AddHostedService(sp => sp.GetRequiredService<IBlockFetcherManager>())
                   .AddSingleton<ILocalServiceProvider, LocalServiceProvider>()
                   .AddSingleton<SelfConnectionTracker>()
+                  .AddSingleton<IBlockHeaderHashCalculator, BlockHeaderHashCalculator>()
+                  .AddSingleton<ITransactionHashCalculator, TransactionHashCalculator>()
+                  .AddSingleton<IMerkleRootCalculator, BitcoinFlawedMerkleRootCalculator>()
 
                   .AddPeerGuards()
                   .AddMessageSerializers()
@@ -87,7 +91,7 @@ namespace MithrilShards.Chain.Bitcoin
          services
             .AddSingleton<IValidationRuleSet<IHeaderValidationRule>, ValidationRuleSet<IHeaderValidationRule>>()
             .AddSingleton<IHeaderValidator, HeaderValidator>()
-            .AddHostedService(sp => (IHostedService)sp.GetRequiredService<IHeaderValidator>())
+            .AddHostedService(sp => sp.GetRequiredService<IHeaderValidator>())
             .AddSingleton<IHeaderValidationContextFactory, HeaderValidationContextFactory>()
 
             //validation rules
@@ -105,8 +109,11 @@ namespace MithrilShards.Chain.Bitcoin
          services
             .AddSingleton<IValidationRuleSet<IBlockValidationRule>, ValidationRuleSet<IBlockValidationRule>>()
             .AddSingleton<IBlockValidator, BlockValidator>()
-            .AddHostedService(sp => (IHostedService)sp.GetRequiredService<IBlockValidator>())
+            .AddHostedService(sp => sp.GetRequiredService<IBlockValidator>())
             .AddSingleton<IBlockValidationContextFactory, BlockValidationContextFactory>()
+
+            //validation rules
+            .AddSingleton<IBlockValidationRule, CheckMerkleRoot>()
             ;
 
          return services;
@@ -167,7 +174,6 @@ namespace MithrilShards.Chain.Bitcoin
          services
             .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, BitcoinPeerContextFactory>())
             .Replace(ServiceDescriptor.Singleton<IUserAgentBuilder, BitcoinUserAgentBuilder>())
-            .Replace(ServiceDescriptor.Singleton<IBlockHeaderHashCalculator, BlockHeaderHashCalculator>())
             ;
 
          return services;

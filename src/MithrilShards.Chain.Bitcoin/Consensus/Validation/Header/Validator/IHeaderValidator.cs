@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 {
-   public interface IHeaderValidator
+   public interface IHeaderValidator : IHostedService
    {
       /// <summary>
       /// Requests the header validation process on issued headers.

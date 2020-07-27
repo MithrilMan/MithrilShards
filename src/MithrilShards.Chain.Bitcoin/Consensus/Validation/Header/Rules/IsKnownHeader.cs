@@ -7,6 +7,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
    /// If the header is known and was previously flagged as invalid, returns a failure.
    /// </summary>
    /// <seealso cref="IHeaderValidationRule" />
+   [RulePrecedence(preferredExecutionOrder: 0)]
    public class IsKnownHeader : IHeaderValidationRule
    {
       readonly ILogger<IsKnownHeader> logger;

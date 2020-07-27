@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 
-namespace MithrilShards.Chain.Bitcoin.Consensus
+namespace MithrilShards.Chain.Bitcoin.Protocol
 {
    /// <summary>
    /// Methods to compute required work (PoW)
