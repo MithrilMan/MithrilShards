@@ -20,11 +20,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
       public HeaderValidationContext(ILogger logger,
                                      BlockHeader header,
                                      bool isInInitialBlockDownloadState,
-                                     IChainState chainState,
-                                     IConsensusParameters consensusParameters) : base(logger,
-                                                                                      isInInitialBlockDownloadState,
-                                                                                      chainState,
-                                                                                      consensusParameters)
+                                     IChainState chainState) : base(logger, isInInitialBlockDownloadState, chainState)
       {
          this.Header = header;
          this.ChainState.TryGetKnownHeaderNode(header.Hash, out knownHeader);

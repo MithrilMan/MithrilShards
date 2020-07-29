@@ -26,7 +26,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
          {
             if (existingHeader.IsInvalid())
             {
-               validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
+               validationState.Invalid(BlockValidationStateResults.CachedInvalid, "duplicate", "block marked as invalid");
                return false;
             }
 

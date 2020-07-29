@@ -26,20 +26,24 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
       public override ConsensusParameters ConfigureConsensus()
       {
-         return new ConsensusParameters
-         {
-            GenesisHeader = this.BuildGenesisBlock(),
+         return new ConsensusParameters(
+            genesisHeader: this.BuildGenesisBlock(),
 
-            PowLimit = new Target("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
-            PowTargetTimespan = (uint)TimeSpan.FromDays(14).TotalSeconds, // 2 weeks
-            PowTargetSpacing = (uint)TimeSpan.FromMinutes(10).TotalSeconds,
-            PowAllowMinDifficultyBlocks = false,
-            PowNoRetargeting = false,
+            subsidyHalvingInterval: 210000,
+            maxMoney: 21_000_000 * COIN,
 
-            SubsidyHalvingInterval = 210000,
-            SegwitHeight = 481824, // 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893,
-            MinimumChainWork = new Target("0x000000000000000000000000000000000000000008ea3cf107ae0dec57f03fe8"),
-         };
+            powLimit: new Target("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
+            powTargetTimespan: (uint)TimeSpan.FromDays(14).TotalSeconds, // 2 weeks
+            powTargetSpacing: (uint)TimeSpan.FromMinutes(10).TotalSeconds,
+            powAllowMinDifficultyBlocks: false,
+            powNoRetargeting: false,
+
+            minimumChainWork: new Target("0x000000000000000000000000000000000000000008ea3cf107ae0dec57f03fe8"),
+
+            maxBlockSerializedSize: 4_000_000,
+            witnessScaleFactor: 4,
+            segwitHeight: 481824 // 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893,
+         );
       }
 
       private BlockHeader BuildGenesisBlock()

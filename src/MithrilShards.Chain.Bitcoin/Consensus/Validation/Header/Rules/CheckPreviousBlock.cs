@@ -22,7 +22,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
 
          if (header.PreviousBlockHash == null)
          {
-            validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "prev-hash-null", "previous hash null, allowed only on genesis block");
+            validationState.Invalid(BlockValidationStateResults.InvalidHeader, "prev-hash-null", "previous hash null, allowed only on genesis block");
             return false;
          }
 
@@ -30,13 +30,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
          if (!context.ChainState.TryGetKnownHeaderNode(context.Header.PreviousBlockHash!, out HeaderNode? previousNode))
          {
             //previous tip header not found, abort.
-            validationState.Invalid(BlockValidationFailureContext.BlockMissingPreviousHeader, "prev-blk-not-found", "previous header not found, can't connect headers");
+            validationState.Invalid(BlockValidationStateResults.MissingPreviousHeader, "prev-blk-not-found", "previous header not found, can't connect headers");
             return false;
          }
 
          if (previousNode.IsInvalid())
          {
-            validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "bad-prevblk", "previous block invalid");
+            validationState.Invalid(BlockValidationStateResults.CachedInvalid, "bad-prevblk", "previous block invalid");
             return false;
          }
 

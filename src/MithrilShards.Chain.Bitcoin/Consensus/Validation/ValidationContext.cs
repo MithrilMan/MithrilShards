@@ -8,8 +8,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
    {
       protected readonly ILogger logger;
 
-      public IConsensusParameters ConsensusParameters { get; }
-
       public bool IsInInitialBlockDownloadState { get; }
 
       public IChainState ChainState { get; }
@@ -24,12 +22,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       /// <param name="logger">The logger.</param>
       /// <param name="isInInitialBlockDownloadState">if set to <c>true</c> node is currently in InitialBlockDownload state.</param>
       /// <param name="chainState">State of the chain.</param>
-      public ValidationContext(ILogger logger, bool isInInitialBlockDownloadState, IChainState chainState, IConsensusParameters consensusParameters)
+      public ValidationContext(ILogger logger, bool isInInitialBlockDownloadState, IChainState chainState)
       {
          this.logger = logger;
          this.IsInInitialBlockDownloadState = isInInitialBlockDownloadState;
          this.ChainState = chainState;
-         this.ConsensusParameters = consensusParameters;
       }
 
       public void SetData<T>(string key, T data) where T : notnull

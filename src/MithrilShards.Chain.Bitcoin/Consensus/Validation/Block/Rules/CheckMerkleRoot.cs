@@ -23,15 +23,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
       {
          if (this.IsBlockMalleated(context.Block.Transactions!))
          {
-            validationState.Invalid(BlockValidationFailureContext.BlockMutated, "bad-txns-duplicate", "duplicate transaction");
-            return false;
+            return validationState.Invalid(BlockValidationStateResults.Mutated, "bad-txns-duplicate", "duplicate transaction");
          }
 
          UInt256 computedMerkleRoot = merkleRootCalculator.GetBlockMerkleRoot(context.Block);
          if (context.Block.Header!.MerkleRoot != computedMerkleRoot)
          {
-            validationState.Invalid(BlockValidationFailureContext.BlockMutated, "bad-txnmrklroot", "hashMerkleRoot mismatch");
-            return false;
+            return validationState.Invalid(BlockValidationStateResults.Mutated, "bad-txnmrklroot", "hashMerkleRoot mismatch");
          }
 
          return true;

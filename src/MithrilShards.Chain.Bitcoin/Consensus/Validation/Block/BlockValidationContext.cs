@@ -16,11 +16,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block
       public BlockValidationContext(ILogger logger,
                                     Protocol.Types.Block block,
                                     bool isInInitialBlockDownloadState,
-                                    IChainState chainState,
-                                    IConsensusParameters consensusParameters) : base(logger,
-                                                                                     isInInitialBlockDownloadState,
-                                                                                     chainState,
-                                                                                     consensusParameters)
+                                    IChainState chainState) : base(logger, isInInitialBlockDownloadState, chainState)
       {
          this.Block = block;
 

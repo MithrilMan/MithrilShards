@@ -3,26 +3,63 @@ using MithrilShards.Chain.Bitcoin.Protocol.Types;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
 {
+   /// <summary>
+   /// TODO: split parameters in sections, allowing to set them in bounch of calls like
+   /// SetPowOptions(), SetMonetaryOptions(), etc...
+   /// </summary>
+   /// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.IConsensusParameters" />
    public class ConsensusParameters : IConsensusParameters
    {
-      public BlockHeader GenesisHeader { get; set; } = null!;
+      public BlockHeader GenesisHeader { get; }
 
-      public int SegwitHeight { get; set; }
+      public int SubsidyHalvingInterval { get; }
 
-      public int SubsidyHalvingInterval { get; set; }
+      public Target PowLimit { get; }
 
-      public Target PowLimit { get; set; } = null!;
+      public uint PowTargetTimespan { get; }
 
-      public uint PowTargetTimespan { get; set; }
+      public uint PowTargetSpacing { get; }
 
-      public uint PowTargetSpacing { get; set; }
+      public bool PowAllowMinDifficultyBlocks { get; }
 
-      public bool PowAllowMinDifficultyBlocks { get; set; }
+      public bool PowNoRetargeting { get; }
 
-      public bool PowNoRetargeting { get; set; }
+      public Target MinimumChainWork { get; }
 
-      public Target MinimumChainWork { get; set; } = null!;
+      public uint MaxBlockWeight { get; }
 
-      public long MaxTipAge { get; set; }
+      public int WitnessScaleFactor { get; }
+
+      public int SegwitHeight { get; }
+
+      public long MaxMoney { get; }
+
+      public ConsensusParameters(BlockHeader genesisHeader,
+                                 int subsidyHalvingInterval,
+                                 Target powLimit,
+                                 uint powTargetTimespan,
+                                 uint powTargetSpacing,
+                                 bool powAllowMinDifficultyBlocks,
+                                 bool powNoRetargeting,
+                                 Target minimumChainWork,
+                                 uint maxBlockSerializedSize,
+                                 int witnessScaleFactor,
+                                 int segwitHeight,
+                                 long maxMoney
+         )
+      {
+         this.GenesisHeader = genesisHeader;
+         this.SubsidyHalvingInterval = subsidyHalvingInterval;
+         this.PowLimit = powLimit;
+         this.PowTargetTimespan = powTargetTimespan;
+         this.PowTargetSpacing = powTargetSpacing;
+         this.PowAllowMinDifficultyBlocks = powAllowMinDifficultyBlocks;
+         this.PowNoRetargeting = powNoRetargeting;
+         this.MinimumChainWork = minimumChainWork;
+         this.MaxBlockWeight = maxBlockSerializedSize;
+         this.WitnessScaleFactor = witnessScaleFactor;
+         this.SegwitHeight = segwitHeight;
+         this.MaxMoney = maxMoney;
+      }
    }
 }

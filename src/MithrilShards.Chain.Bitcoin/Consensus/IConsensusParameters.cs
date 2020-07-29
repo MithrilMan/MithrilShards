@@ -76,5 +76,18 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// The minimum chain work.
       /// </value>
       Target MinimumChainWork { get; }
+
+      /// <summary>The maximum allowed size for a serialized block, in bytes (only for buffer size limits). </summary>
+      uint MaxBlockWeight { get; }
+
+      /// <summary>Scale of witness vs other transaction data. e.g. if set to 4,
+      /// then witnesses have 1/4 the weight per byte of other transaction data.
+      /// </summary>
+      int WitnessScaleFactor { get; }
+
+      /// <summary>
+      /// The maximum amount of coins in any transaction.
+      /// </summary>
+      long MaxMoney { get; }
    }
 }

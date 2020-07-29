@@ -8,11 +8,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
    public interface IValidationContext
    {
       /// <summary>
-      /// Gets the chain consensus parameters.
-      /// </summary>
-      IConsensusParameters ConsensusParameters { get; }
-
-      /// <summary>
       /// Gives access to current block chain state and known headers
       /// (TODO: abstract with an interface that acts as a subset of what ChainState can do)
       /// </summary>

@@ -23,7 +23,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
          //if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits, consensusParams))
          if (!this.proofOfWorkCalculator.CheckProofOfWork(header))
          {
-            validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "high-hash", "proof of work failed");
+            validationState.Invalid(BlockValidationStateResults.InvalidHeader, "high-hash", "proof of work failed");
             return false;
          }
 

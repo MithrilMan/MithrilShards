@@ -25,20 +25,24 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
       public override ConsensusParameters ConfigureConsensus()
       {
-         return new ConsensusParameters
-         {
-            GenesisHeader = this.BuildGenesisBlock(),
+         return new ConsensusParameters(
+            genesisHeader: this.BuildGenesisBlock(),
 
-            PowLimit = new Target("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
-            PowTargetTimespan = (uint)TimeSpan.FromDays(14).TotalSeconds, // 2 weeks
-            PowTargetSpacing = (uint)TimeSpan.FromMinutes(10).TotalSeconds,
-            PowAllowMinDifficultyBlocks = true,
-            PowNoRetargeting = true,
+            subsidyHalvingInterval: 150,
+            maxMoney: 21_000_000 * COIN,
 
-            SubsidyHalvingInterval = 150,
-            SegwitHeight = 0, // SEGWIT is always activated on regtest unless overridden
-            MinimumChainWork = Target.Zero,
-         };
+            powLimit: new Target("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
+            powTargetTimespan: (uint)TimeSpan.FromDays(14).TotalSeconds, // 2 weeks
+            powTargetSpacing: (uint)TimeSpan.FromMinutes(10).TotalSeconds,
+            powAllowMinDifficultyBlocks: true,
+            powNoRetargeting: true,
+
+            minimumChainWork: Target.Zero,
+
+            maxBlockSerializedSize: 4_000_000,
+            witnessScaleFactor: 4,
+            segwitHeight: 0 // SEGWIT is always activated on regtest unless overridden
+         );
       }
 
       private BlockHeader BuildGenesisBlock()

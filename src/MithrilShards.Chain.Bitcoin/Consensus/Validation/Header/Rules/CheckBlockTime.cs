@@ -37,14 +37,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
 
          if (context.Header.TimeStamp <= this.headerMedianTimeCalculator.Calculate(previousHeaderNode!.Hash, previousHeaderNode.Height))
          {
-            validationState.Invalid(BlockValidationFailureContext.BlockInvalidHeader, "time-too-old", "block's timestamp is too early");
+            validationState.Invalid(BlockValidationStateResults.InvalidHeader, "time-too-old", "block's timestamp is too early");
             return false;
          }
 
          // Check timestamp.
          if (context.Header.TimeStamp > (this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() + MAX_FUTURE_BLOCK_TIME))
          {
-            validationState.Invalid(BlockValidationFailureContext.BlockTimeFuture, "time-too-new", "block timestamp too far in the future");
+            validationState.Invalid(BlockValidationStateResults.TimeFuture, "time-too-new", "block timestamp too far in the future");
             return false;
          }
 

@@ -30,12 +30,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// </summary>
       public TransactionOutput[]? Outputs { get; set; }
 
-      ///// <summary>
-      ///// A list of witnesses, one for each input.
-      ///// Omitted if the transaction doesn't contains witness data (see <see cref="Flags"/>).
-      ///// </summary>
-      //public TransactionWitness[]? Witnesses { get; set; }
-
       /// <summary>
       /// The block number or timestamp at which this transaction is unlocked:
       /// 0             = Not locked.
@@ -67,6 +61,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// </remarks>
       public UInt256? WitnessHash { get; set; }
 
+
+
+
       public bool HasWitness()
       {
          if (Inputs == null) return false;
@@ -79,6 +76,19 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
             }
          }
          return false;
+      }
+
+      /// <summary>
+      /// Determines whether this transaction represents a coinbase transaction.
+      /// </summary>
+      /// <returns>
+      ///   <c>true</c> if [is coin base]; otherwise, <c>false</c>.
+      /// </returns>
+      public bool IsCoinBase()
+      {
+         return this.Inputs!.Length == 1
+             && this.Inputs[0].PreviousOutput!.IsNull()
+             && this.Outputs!.Length >= 1;
       }
    }
 }

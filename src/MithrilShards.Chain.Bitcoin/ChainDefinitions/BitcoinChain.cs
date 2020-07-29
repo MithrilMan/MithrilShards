@@ -9,6 +9,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 {
    public abstract class BitcoinChain : IChainDefinition
    {
+      protected const long COIN = 100_000_000;
       readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
 
       public INetworkDefinition NetworkDefinition { get; private set; } = null!;

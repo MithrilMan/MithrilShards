@@ -114,6 +114,8 @@ namespace MithrilShards.Chain.Bitcoin
 
             //validation rules
             .AddSingleton<IBlockValidationRule, CheckMerkleRoot>()
+            .AddSingleton<IBlockValidationRule, CheckSize>()
+            .AddSingleton<IBlockValidationRule, CheckCoinbase>()
             ;
 
          return services;
