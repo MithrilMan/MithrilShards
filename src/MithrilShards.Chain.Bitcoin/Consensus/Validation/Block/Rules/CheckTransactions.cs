@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -66,7 +67,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
          long totalOutput = 0;
          foreach (TransactionOutput output in transaction.Outputs)
          {
-
             if (output.Value < 0)
             {
                return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-vout-negative");
@@ -90,6 +90,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
          // of a tx as spent, it does not check if the tx has duplicate inputs.
          // Failure to run this check will result in either a crash or an inflation bug, depending on the implementation of
          // the underlying coins database.
+         HashSet<OutPoint> usedOutPoints = new HashSet<OutPoint>();
+         foreach (TransactionInput? input in transaction.Inputs)
+         {
+            if (!usedOutPoints.Add(input.PreviousOutput!))
+            {
+               return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-inputs-duplicate");
+            }
+         }
 
          return true;
       }
