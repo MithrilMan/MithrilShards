@@ -19,23 +19,20 @@ namespace MithrilShards.Network.Legacy
       readonly IEventBus eventBus;
 
       /// <summary>Provider of time functions.</summary>
-      private readonly IDateTimeProvider dateTimeProvider;
       readonly IPeerContextFactory peerContextFactory;
-      readonly IChainDefinition chainDefinition;
+      readonly INetworkDefinition chainDefinition;
       private readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
 
       public PeerConnectionFactory(ILoggerFactory loggerFactory,
                                    IEventBus eventBus,
-                                   IDateTimeProvider dateTimeProvider,
                                    IPeerContextFactory peerContextFactory,
-                                   IChainDefinition chainDefinition,
+                                   INetworkDefinition chainDefinition,
                                    INetworkMessageProcessorFactory networkMessageProcessorFactory,
                                    INetworkMessageSerializerManager networkMessageSerializerManager)
       {
          this.loggerFactory = loggerFactory;
          this.eventBus = eventBus;
-         this.dateTimeProvider = dateTimeProvider;
          this.peerContextFactory = peerContextFactory;
          this.chainDefinition = chainDefinition;
          this.networkMessageProcessorFactory = networkMessageProcessorFactory;
@@ -48,7 +45,6 @@ namespace MithrilShards.Network.Legacy
          var peer = new PeerConnection(
             this.loggerFactory.CreateLogger<PeerConnection>(),
             this.eventBus,
-            this.dateTimeProvider,
             connectingPeer,
             PeerConnectionDirection.Inbound,
             this.peerContextFactory,

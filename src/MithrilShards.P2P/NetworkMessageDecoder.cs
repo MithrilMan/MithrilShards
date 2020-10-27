@@ -23,13 +23,13 @@ namespace MithrilShards.Network.Legacy
    public class NetworkMessageDecoder
    {
       readonly ILogger<NetworkMessageDecoder> logger;
-      readonly IChainDefinition chainDefinition;
+      readonly INetworkDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
       private IPeerContext peerContext = null!;//set by SetPeerContext
       public ConnectionContextData ContextData { get; }
 
       public NetworkMessageDecoder(ILogger<NetworkMessageDecoder> logger,
-                                   IChainDefinition chainDefinition,
+                                   INetworkDefinition chainDefinition,
                                    INetworkMessageSerializerManager networkMessageSerializerManager,
                                    ConnectionContextData contextData)
       {
@@ -69,8 +69,9 @@ namespace MithrilShards.Network.Legacy
                string commandName = this.ContextData.GetCommandName();
 
                if (this.networkMessageSerializerManager
-                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message))
+                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, this.peerContext, out message))
                {
+                  this.peerContext.Metrics.Received(this.ContextData.GetTotalMessageLength());
                   return true;
                }
                else
@@ -149,12 +150,14 @@ namespace MithrilShards.Network.Legacy
                if (magicRead == this.ContextData.MagicNumber)
                {
                   this.ContextData.MagicNumberRead = true;
-                  this.peerContext.Metrics.Wasted(reader.Position.GetInteger() - 4);
                   return true;
                }
                else
                {
                   reader.Rewind(3);
+                  //TODO check this logic
+                  this.peerContext.Metrics.Wasted(reader.Remaining - prevRemaining);
+                  return false;
                }
             }
             else

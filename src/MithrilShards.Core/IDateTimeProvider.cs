@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace MithrilShards.Core
 {
@@ -39,5 +40,12 @@ namespace MithrilShards.Core
       /// </summary>
       /// <param name="adjustedTimeOffset">Offset to adjust time with.</param>
       void SetAdjustedTimeOffset(TimeSpan adjustedTimeOffset);
+
+      /// <summary>
+      /// Adds a time offset sample in order to compute a new adjusted time offset.
+      /// </summary>
+      /// <param name="timeoffset">The time offset.</param>
+      /// <param name="ipEndPoint">The IP endpoint <paramref name="timeoffset"/> refers to.</param>
+      void AddTimeData(TimeSpan timeoffset, IPEndPoint ipEndPoint);
    }
 }

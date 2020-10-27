@@ -43,6 +43,9 @@ namespace MithrilShards.Core.Network.Protocol.Processors
          Type refType = typeof(INetworkMessageHandler<>);
          foreach (INetworkMessageProcessor processor in processors)
          {
+            // skip processors that aren't enabled
+            if (!processor.Enabled) continue;
+
             Type processorType = processor.GetType();
 
             IEnumerable<Type> handledMessageTypes = processorType.GetInterfaces()

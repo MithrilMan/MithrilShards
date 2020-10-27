@@ -1,18 +1,20 @@
-﻿namespace MithrilShards.Chain.Bitcoin
+﻿using MithrilShards.Chain.Bitcoin.Consensus;
+
+namespace MithrilShards.Chain.Bitcoin
 {
    public enum ConnectHeaderResult
    {
       /// <summary>
       /// Connected successfully
       /// </summary>
-      Connected = 1,
+      Connected,
 
 
       /// <summary>
       /// The header is already current tip.
       /// No operation has been performed.
       /// </summary>
-      SameTip = 2,
+      SameTip,
 
 
 
@@ -20,19 +22,26 @@
       /// The header was already in the chain.
       /// Chain has been rewound.
       /// </summary>
-      Rewinded = 4,
+      Rewinded,
 
 
       /// <summary>
       /// Genesis header has been set as tip.
       /// The headers chain has been resetted to genesis.
       /// </summary>
-      ResettedToGenesis = 5,
+      ResettedToGenesis,
 
 
       /// <summary>
       /// The new tip previous header is missing, cannot connect the new tip.
       /// </summary>
-      MissingPreviousHeader = 6
+      MissingPreviousHeader,
+
+
+      /// <summary>
+      /// The header is invalid.
+      /// A <see cref="BlockValidationState"/> should contain more detail about the invalid data.
+      /// </summary>
+      Invalid
    }
 }

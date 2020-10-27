@@ -45,6 +45,8 @@ namespace MithrilShards.Core.Network
       /// </summary>
       public IPEndPoint RemoteEndPoint { get; }
 
+      public string? UserAgent { get; set; }
+
       public IFeatureCollection Data { get; } = new FeatureCollection();
 
       /// <summary>
@@ -59,6 +61,8 @@ namespace MithrilShards.Core.Network
       public PeerMetrics Metrics { get; } = new PeerMetrics();
 
       public CancellationTokenSource ConnectionCancellationTokenSource { get; } = new CancellationTokenSource();
+
+      public bool IsConnected { get; protected set; } = false;
 
       public PeerContext(ILogger logger,
                          IEventBus eventBus,
@@ -94,6 +98,12 @@ namespace MithrilShards.Core.Network
          this.messageProcessors.Add(messageProcessor);
       }
 
+      public void Disconnect(string reason)
+      {
+         this.IsConnected = false;
+         this.eventBus.Publish(new PeerDisconnectionRequired(this.RemoteEndPoint, reason));
+      }
+
       public void Dispose()
       {
          this.logger.LogDebug("Disposing PeerContext of {PeerId}.", this.PeerId);
@@ -110,6 +120,8 @@ namespace MithrilShards.Core.Network
             }
          }
 
+         this.IsConnected = false;
+         this.ConnectionCancellationTokenSource.Cancel();
          this.eventBus.Publish(new PeerDisconnected(this, "Client disconnected", null));
       }
    }

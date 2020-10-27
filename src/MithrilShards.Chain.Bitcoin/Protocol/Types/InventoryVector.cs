@@ -12,11 +12,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// </summary>
       public uint Type { get; set; }
 
-      public UInt256 Hash { get; set; }
-
-      public InventoryVector()
-      {
-         this.Hash = null!;
-      }
+      public UInt256 Hash { get; set; } = null!;
    }
 }

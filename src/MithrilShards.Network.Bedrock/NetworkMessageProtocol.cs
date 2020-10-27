@@ -24,13 +24,13 @@ namespace MithrilShards.Network.Bedrock
    public class NetworkMessageProtocol : IMessageReader<INetworkMessage>, IMessageWriter<INetworkMessage>
    {
       readonly ILogger<NetworkMessageProtocol> logger;
-      private readonly IChainDefinition chainDefinition;
+      private readonly INetworkDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
       readonly ConnectionContextData contextData;
       private IPeerContext peerContext;
 
       public NetworkMessageProtocol(ILogger<NetworkMessageProtocol> logger,
-                                    IChainDefinition chainDefinition,
+                                    INetworkDefinition chainDefinition,
                                     INetworkMessageSerializerManager networkMessageSerializerManager,
                                     ConnectionContextData contextData)
       {
@@ -47,7 +47,7 @@ namespace MithrilShards.Network.Bedrock
          this.peerContext = peerContext;
       }
 
-      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, [MaybeNullWhen(false)] out INetworkMessage message)
+      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, /*[MaybeNullWhen(false)]*/ out INetworkMessage message)
       {
          var reader = new SequenceReader<byte>(input);
 
@@ -71,8 +71,9 @@ namespace MithrilShards.Network.Bedrock
 
                string commandName = this.contextData.CommandName!;
                if (this.networkMessageSerializerManager
-                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, out message))
+                  .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, this.peerContext, out message!))
                {
+                  this.peerContext.Metrics.Received(this.contextData.GetTotalMessageLength());
                   return true;
                }
                else
@@ -151,12 +152,14 @@ namespace MithrilShards.Network.Bedrock
                if (magicRead == this.contextData.MagicNumber)
                {
                   this.contextData.MagicNumberRead = true;
-                  this.peerContext.Metrics.Wasted(reader.Position.GetInteger() - 4);
                   return true;
                }
                else
                {
                   reader.Rewind(3);
+                  //TODO check this logic
+                  this.peerContext.Metrics.Wasted(reader.Remaining - prevRemaining);
+                  return false;
                }
             }
             else
@@ -243,6 +246,7 @@ namespace MithrilShards.Network.Bedrock
          {
             if (this.networkMessageSerializerManager.TrySerialize(message,
                                                                   this.peerContext.NegotiatedProtocolVersion.Version,
+                                                                  this.peerContext,
                                                                   output,
                                                                   out int sentBytes))
             {

@@ -41,11 +41,11 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
                   );
       }
 
-      public bool TrySerialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output, out int serializedLength)
+      public bool TrySerialize(INetworkMessage message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output, out int serializedLength)
       {
          if (this.serializers.TryGetValue(message.Command, out INetworkMessageSerializer? serializer))
          {
-            serializedLength = serializer.Serialize(message, protocolVersion, output);
+            serializedLength = serializer.Serialize(message, protocolVersion, peerContext, output);
             return true;
          }
 
@@ -53,11 +53,11 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          return false;
       }
 
-      public bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, [MaybeNullWhen(true)]out INetworkMessage message)
+      public bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, IPeerContext peerContext, [MaybeNullWhen(false)] out INetworkMessage message)
       {
          if (this.serializers.TryGetValue(commandName, out INetworkMessageSerializer? serializer))
          {
-            message = serializer.Deserialize(ref data, protocolVersion);
+            message = serializer.Deserialize(ref data, protocolVersion, peerContext);
             return true;
          }
 

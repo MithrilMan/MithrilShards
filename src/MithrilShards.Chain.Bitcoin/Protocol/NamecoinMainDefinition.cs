@@ -4,7 +4,7 @@ using MithrilShards.Core.Network.Protocol;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol
 {
-   public class NamecoinMainDefinition : IChainDefinition
+   public class NamecoinMainDefinition : INetworkDefinition
    {
       public string Name { get; }
 

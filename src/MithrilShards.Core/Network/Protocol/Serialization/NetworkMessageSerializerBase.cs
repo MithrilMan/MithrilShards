@@ -16,9 +16,9 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
 
       private readonly byte[] precookedMagciAndCommand;
 
-      protected readonly IChainDefinition chainDefinition;
+      protected readonly INetworkDefinition chainDefinition;
 
-      public NetworkMessageSerializerBase(IChainDefinition chainDefinition)
+      public NetworkMessageSerializerBase(INetworkDefinition chainDefinition)
       {
          this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
 
@@ -40,16 +40,16 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          #endregion
       }
 
-      public abstract TMessageType Deserialize(ref SequenceReader<byte> reader, int protocolVersion);
+      public abstract TMessageType Deserialize(ref SequenceReader<byte> reader, int protocolVersion, IPeerContext peerContext);
 
-      public abstract void Serialize(TMessageType message, int protocolVersion, IBufferWriter<byte> output);
+      public abstract void Serialize(TMessageType message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output);
 
       public Type GetMessageType()
       {
          return typeof(TMessageType);
       }
 
-      public int Serialize(INetworkMessage message, int protocolVersion, IBufferWriter<byte> output)
+      public int Serialize(INetworkMessage message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output)
       {
          if (message is null)
          {
@@ -57,7 +57,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          }
 
          var payloadOutput = new ArrayBufferWriter<byte>();
-         this.Serialize((TMessageType)message, protocolVersion, payloadOutput);
+         this.Serialize((TMessageType)message, protocolVersion, peerContext, payloadOutput);
 
          output.Write(this.precookedMagciAndCommand);
 
@@ -74,10 +74,10 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          return HEADER_LENGTH + payloadOutput.WrittenCount;
       }
 
-      public INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion)
+      public INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion, IPeerContext peerContext)
       {
          var reader = new SequenceReader<byte>(data);
-         return this.Deserialize(ref reader, protocolVersion);
+         return this.Deserialize(ref reader, protocolVersion, peerContext);
       }
    }
 }

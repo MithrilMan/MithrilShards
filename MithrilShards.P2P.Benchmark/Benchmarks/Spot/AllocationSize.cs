@@ -41,12 +41,12 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public NBitcoin.Target[] TargetsWithInstances() => this.CreateTargets(this.size);
 
-      private Target[] CreateTargets(int size)
+      private NBitcoin.Target[] CreateTargets(int size)
       {
          var array = new NBitcoin.Target[this.size];
          for (int i = 0; i < array.Length; i++)
          {
-            array[i] = new Target(1);
+            array[i] = new NBitcoin.Target(1);
          }
 
          return array;

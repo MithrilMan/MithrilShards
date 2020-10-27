@@ -2,7 +2,7 @@
 
 namespace MithrilShards.Core.Network.Protocol
 {
-   public interface IChainDefinition
+   public interface INetworkDefinition
    {
       /// <summary>
       /// Gets the name of the chain definition (e.g. "Bitcoin Main")
@@ -18,11 +18,6 @@ namespace MithrilShards.Core.Network.Protocol
       /// Byte representation of <see cref="Magic"/>.
       /// </summary>
       byte[] MagicBytes { get; }
-
-      /// <summary>
-      /// Gets the hash of the first block (aka genesis) of the chain.
-      /// </summary>
-      UInt256 Genesis { get; }
 
       /// <summary>
       /// Gets the maximum allowed size of a message payload (in bytes).

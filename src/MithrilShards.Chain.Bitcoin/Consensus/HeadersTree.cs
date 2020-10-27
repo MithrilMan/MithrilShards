@@ -6,7 +6,6 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Threading;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
@@ -19,14 +18,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    /// <remarks>
    /// Internally it uses <see cref="ReaderWriterLockSlim"/> to ensure thread safety on every get and set method.
    /// </remarks>
-   public class HeadersTree
+   public class HeadersTree : IHeadersTree
    {
       private const int INITIAL_ITEMS_ALLOCATED = 16 ^ 2; //this parameter may go into settings, better to be multiple of 2
 
-      private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim();
+      private readonly ReaderWriterLockSlim theLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
       private readonly ILogger<HeadersTree> logger;
-      private readonly IChainDefinition chainDefinition;
+      private readonly IConsensusParameters consensusParameters;
 
       /// <summary>
       /// Known set of hashes, both on forks and on best chains.
@@ -43,75 +42,67 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <summary>
       /// The genesis node.
       /// </summary>
-      private readonly HeaderNode genesisNode;
-
-      public UInt256 Genesis => this.chainDefinition.Genesis;
+      public HeaderNode Genesis { get; }
 
       private int height;
-      public int Height => this.height;
 
-      public UInt256 Tip
-      {
-         get
-         {
-            using (new ReadLock(this.@lock)) return this.bestChain[this.height];
-         }
-      }
-
-      public HeadersTree(ILogger<HeadersTree> logger, IChainDefinition chainDefinition)
+      public HeadersTree(ILogger<HeadersTree> logger, IConsensusParameters consensusParameters)
       {
          this.logger = logger;
-         this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
+         this.consensusParameters = consensusParameters ?? throw new ArgumentNullException(nameof(consensusParameters));
 
-         this.genesisNode = new HeaderNode(0, this.chainDefinition.Genesis, null);
+         this.Genesis = HeaderNode.GenerateGenesis(this.consensusParameters.GenesisHeader);
 
          this.ResetToGenesis();
       }
 
       private void ResetToGenesis()
       {
-         using (new WriteLock(this.@lock))
+         using (new WriteLock(this.theLock))
          {
-            this.height = 0;
             this.bestChain.Clear();
             this.knownHeaders.Clear();
 
-            this.bestChain.Add(this.chainDefinition.Genesis);
-            this.knownHeaders.Add(this.chainDefinition.Genesis, this.genesisNode);
-         }
-      }
-
-      public bool Contains(UInt256 blockHash)
-      {
-         using (new ReadLock(this.@lock))
-         {
-            return this.knownHeaders.ContainsKey(blockHash);
+            this.height = 0;
+            this.bestChain.Add(this.Genesis.Hash);
+            this.knownHeaders.Add(this.Genesis.Hash, this.Genesis);
          }
       }
 
       /// <summary>
-      /// Tries to get the height of an hash.
+      /// Tries to get the <see cref="HeaderNode" /> giving its hash.
       /// </summary>
       /// <param name="blockHash">The block hash.</param>
       /// <param name="onlyBestChain">if set to <c>true</c> check only headers that belong to the best chain.</param>
-      /// <param name="height">The height if found, -1 otherwise.</param>
-      /// <returns><c>true</c> if the result has been found, <see langword="false"/> otherwise.</returns>
-      public bool TryGetNode(UInt256 blockHash, bool onlyBestChain, [MaybeNullWhen(false)] out HeaderNode node)
+      /// <param name="node">The header node having the passed <paramref name="blockHash"/>.</param>
+      /// <returns>
+      ///   <c>true</c> if the result has been found, <see langword="false" /> otherwise.
+      /// </returns>
+      public bool TryGetNode(UInt256? blockHash, bool onlyBestChain, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         using (new ReadLock(this.@lock))
+         if (blockHash == null)
          {
-            return onlyBestChain ? this.knownHeaders.TryGetValue(blockHash, out node!) : this.TryGetNodeOnBestChainNoLock(blockHash, out node!);
+            node = null;
+            return false;
+         }
+
+         using (new ReadLock(this.theLock))
+         {
+            return onlyBestChain ? this.TryGetNodeOnBestChainNoLock(blockHash, out node!) : this.knownHeaders.TryGetValue(blockHash, out node!);
          }
       }
 
       /// <summary>
-      /// Tries to get the node on best chain at a specified height.
+      /// Tries to get the <see cref="HeaderNode" /> on best chain at a specified height.
       /// </summary>
       /// <param name="height">The height.</param>
-      /// <returns></returns>
+      /// <param name="node">The header node having the passed <paramref name="blockHash"/>.</param>
+      /// <returns>
+      ///   <c>true</c> if the result has been found, <see langword="false" /> otherwise.
+      /// </returns>
       public bool TryGetNodeOnBestChain(int height, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             if (height > this.height)
             {
@@ -124,157 +115,140 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
       }
 
-      /// <summary>
-      /// Tries the get hash of a block at the specified height.
-      /// </summary>
-      /// <param name="height">The height.</param>
-      /// <param name="blockHash">The block hash.</param>
-      /// <returns></returns>
-      public bool TryGetHash(int height, [MaybeNullWhen(false)]out UInt256 blockHash)
+      public void Add(in HeaderNode newHeader)
       {
-         using (new ReadLock(this.@lock))
+         using (new WriteLock(this.theLock))
          {
-            if (height > this.height || height < 0)
-            {
-               blockHash = null!;
-               return false;
-            }
-
-            blockHash = this.bestChain[height];
-         }
-
-         return true;
-      }
-
-      /// <summary>
-      /// Set a new tip in the chain
-      /// </summary>
-      /// <param name="newTip">The new tip</param>
-      /// <param name="newTipPreviousHash">The block hash before the new tip</param>
-      public ConnectHeaderResult TrySetTip(in UInt256 newTip, in UInt256? newTipPreviousHash)
-      {
-         using (new WriteLock(this.@lock))
-         {
-            return this.TrySetTipNoLock(newTip, newTipPreviousHash);
+            this.knownHeaders.Add(newHeader.Hash, newHeader);
          }
       }
-
-      public BlockLocator GetTipLocator()
+      public void SetTip(HeaderNode newTip)
       {
-         using (new ReadLock(this.@lock))
-         {
-            return this.GetLocatorNoLock(this.height);
-         }
+         //TODO
+         /// only this method have to alter bestChain, all other place should be removed (except if we implement a RewindTip but even in
+         /// that case it should probably call internally this method
       }
 
-      public BlockLocator? GetLocator(int height)
+
+
+      ///// <summary>
+      ///// Set a new tip in the chain
+      ///// </summary>
+      ///// <param name="newTip">The new tip</param>
+      ///// <param name="newTipPreviousHash">The block hash before the new tip</param>
+      //public ConnectHeaderResult TrySetTip(in BlockHeader newTip, ref BlockValidationState validationState)
+      //{
+      //   UInt256 newTipHash = newTip.Hash!;
+      //   UInt256? newTipPreviousHash = newTip.PreviousBlockHash;
+
+      //   using (new WriteLock(this.theLock))
+      //   {
+      //      // check if the tip we want to set is already into our chain
+      //      if (this.knownHeaders.TryGetValue(newTipHash, out HeaderNode? tipNode))
+      //      {
+      //         if (tipNode.Validity.HasFlag(HeaderValidityStatuses.FailedMask))
+      //         {
+      //            validationState.Invalid(BlockValidationFailureContext.BlockCachedInvalid, "duplicate", "block marked as invalid");
+      //            return this.ValidationFailure(validationState);
+      //         }
+      //      }
+
+
+      //      continue L3612 validation.cpp
+
+      //      // if newTipPreviousHash isn't current tip, means we need to rollback
+      //      bool needRewind = this.height != newTipPreviousHeader.Height;
+      //      if (needRewind)
+      //      {
+      //         int rollingBackHeight = this.height;
+      //         while (rollingBackHeight > newTipPreviousHeader.Height)
+      //         {
+      //            this.knownHeaders.Remove(this.bestChain[rollingBackHeight]);
+      //            this.bestChain.RemoveAt(rollingBackHeight);
+      //            rollingBackHeight--;
+      //         }
+      //         this.height = rollingBackHeight;
+      //      }
+
+      //      // now we can put the tip on top of our chain.
+      //      this.height++;
+      //      this.bestChain.Add(newTipHash);
+      //      this.knownHeaders.Add(newTipHash, new HeaderNode(this.height, newTipHash, newTipPreviousHash));
+      //      this.blockHeaderRepository.TryAdd(newTip);
+
+      //      return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
+      //   }
+      //}
+
+      public BlockLocator? GetLocator(HeaderNode? headerNode)
       {
-         using (new ReadLock(this.@lock))
-         {
-            return (height > this.height || height < 0) ? null : this.GetLocatorNoLock(height);
-         }
-      }
+         using var readLock = new ReadLock(this.theLock);
 
-      public BlockLocator? GetLocator(UInt256 blockHash)
-      {
-         using (new ReadLock(this.@lock))
+         if (headerNode == null)
          {
-            return (!this.knownHeaders.TryGetValue(blockHash, out HeaderNode? node)) ? null : this.GetLocatorNoLock(node.Height);
-         }
-      }
-
-      /// <summary>
-      /// Performing code to generate a <see cref="BlockLocator"/>.
-      /// </summary>
-      /// <param name="height">The height block locator starts from.</param>
-      /// <returns></returns>
-      private BlockLocator GetLocatorNoLock(int height)
-      {
-         int itemsToAdd = height <= 10 ? (height + 1) : (10 + (int)Math.Ceiling(Math.Log2(height)));
-         UInt256[] hashes = new UInt256[itemsToAdd];
-
-         int index = 0;
-         while (index < 10 && height > 0)
-         {
-            hashes[index++] = this.bestChain[height--];
+            headerNode = this.GetTip();
          }
 
+         List<UInt256> hashes = new List<UInt256>(32); //sets initial capacity to a number that can fit usual case
          int step = 1;
-         while (height > 0)
+
+         while (headerNode != null)
          {
-            hashes[index++] = this.bestChain[height];
-            step *= 2;
-            height -= step;
-         }
-         hashes[itemsToAdd - 1] = this.Genesis;
+            hashes.Add(headerNode.Hash);
 
-         return new BlockLocator { BlockLocatorHashes = hashes };
-      }
+            // Stop when we have added the genesis block.
+            if (headerNode.Height == 0) break;
 
-      /// <summary>
-      /// Returns the first common block between our known best chain and the block locator.
-      /// </summary>
-      /// <param name="hashes">Hash to search for</param>
-      /// <returns>First found block or genesis</returns>
-      public HeaderNode GetHighestNodeInBestChainFromBlockLocator(BlockLocator blockLocator)
-      {
-         if (blockLocator == null) throw new ArgumentNullException(nameof(blockLocator));
-
-         using (new ReadLock(this.@lock))
-         {
-            foreach (UInt256 hash in blockLocator.BlockLocatorHashes)
+            // Exponentially larger steps back, plus the genesis block.
+            int height = Math.Max(headerNode.Height - step, 0);
+            if (this.IsInBestChain(headerNode))
             {
-               // ensure that any header we have in common belong to the main chain.
-               if (this.TryGetNodeOnBestChainNoLock(hash, out HeaderNode? node))
-               {
-                  return node;
-               }
+               // Use O(1) CChain index if possible.
+               this.TryGetNodeOnBestChain(height, out headerNode);
             }
+            else
+            {
+               // Otherwise, use O(log n) skiplist.
+               headerNode = headerNode.GetAncestor(height);
+            }
+
+            if (hashes.Count > 10) step *= 2;
          }
 
-         return this.genesisNode;
+         return new BlockLocator { BlockLocatorHashes = hashes.ToArray() };
       }
 
       /// <summary>
       /// Gets the current tip header node.
       /// </summary>
       /// <returns></returns>
-      public HeaderNode GetTipHeaderNode()
+      public HeaderNode GetTip()
       {
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
             return this.GetHeaderNodeNoLock(this.height);
          }
       }
 
       /// <summary>
-      /// Determines whether the specified hash is a known hash.
-      /// May be present on best chain or on a fork.
+      /// Determines whether an header is present in the best chain.
       /// </summary>
-      /// <param name="hash">The hash.</param>
-      /// <returns>
-      ///   <c>true</c> if the specified hash is known; otherwise, <c>false</c>.
-      /// </returns>
-      public bool IsKnown(UInt256? hash)
+      /// <param name="headerNode">The header node to check.</param>
+      public bool IsInBestChain(HeaderNode? headerNode)
       {
-         if (hash == null) return false;
+         if (headerNode == null) return false;
 
-         using (new ReadLock(this.@lock))
+         using (new ReadLock(this.theLock))
          {
-            return this.knownHeaders.ContainsKey(hash);
+            int headerHeight = headerNode.Height;
+            return this.bestChain.Count > headerHeight && this.bestChain[headerHeight] == headerNode.Hash;
          }
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       private HeaderNode GetHeaderNodeNoLock(int height)
       {
-         return new HeaderNode(height, this.bestChain[height], height == 0 ? null : this.bestChain[height - 1]);
-      }
-
-      [MethodImpl(MethodImplOptions.AggressiveInlining)]
-      private HeaderNode GetHeaderNodeNoLock(int height, UInt256 currentHeader)
-      {
-         return new HeaderNode(height, currentHeader, height == 0 ? null : this.bestChain[height - 1]);
+         return this.knownHeaders[this.bestChain[height]];
       }
 
       /// <summary>
@@ -295,68 +269,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             node = null!;
             return false;
          }
-      }
-
-      private ConnectHeaderResult TrySetTipNoLock(in UInt256 newTip, in UInt256? newTipPreviousHash)
-      {
-         if (newTip == this.Genesis)
-         {
-            if (newTipPreviousHash != null)
-            {
-               throw new ArgumentException("Genesis block should not have previous block", nameof(newTipPreviousHash));
-            }
-
-            this.ResetToGenesis();
-
-            return ConnectHeaderResult.ResettedToGenesis;
-         }
-         else
-         {
-            if (newTipPreviousHash == null)
-            {
-               throw new ArgumentNullException(nameof(newTipPreviousHash), "Previous hash null allowed only on genesis block.");
-            }
-         }
-
-         // check if the tip we want to set is already into our chain
-         if (this.knownHeaders.TryGetValue(newTip, out HeaderNode? tipNode))
-         {
-            if (this.bestChain[tipNode.Height - 1] != newTipPreviousHash)
-            {
-               throw new ArgumentException("The new tip is already inserted with a different previous block.");
-            }
-
-            this.logger.LogDebug("The tip we want to set is already in our headers chain.");
-         }
-
-         // ensures tip previous header is present.
-         if (!this.knownHeaders.TryGetValue(newTipPreviousHash, out HeaderNode? newTipPreviousHeader))
-         {
-            //previous tip header not found, abort.
-            this.logger.LogDebug("New Tip previous header not found, can't connect headers.");
-            return ConnectHeaderResult.MissingPreviousHeader;
-         }
-
-         // if newTipPreviousHash isn't current tip, means we need to rollback
-         bool needRewind = this.height != newTipPreviousHeader.Height;
-         if (needRewind)
-         {
-            int rollingBackHeight = this.height;
-            while (rollingBackHeight > newTipPreviousHeader.Height)
-            {
-               this.knownHeaders.Remove(this.bestChain[rollingBackHeight]);
-               this.bestChain.RemoveAt(rollingBackHeight);
-               rollingBackHeight--;
-            }
-            this.height = rollingBackHeight;
-         }
-
-         // now we can put the tip on top of our chain.
-         this.height++;
-         this.bestChain.Add(newTip); //[this.height] = newTip;
-         this.knownHeaders.Add(newTip, new HeaderNode(this.height, newTip, newTipPreviousHash));
-
-         return needRewind ? ConnectHeaderResult.Rewinded : ConnectHeaderResult.Connected;
       }
    }
 }

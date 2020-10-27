@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MithrilShards.Core;
+using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Core.Network;
 
 namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
@@ -12,11 +12,11 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
    /// <seealso cref="ServerPeerConnectionGuardBase" />
    public class InitialBlockDownloadStateGuard : ServerPeerConnectionGuardBase
    {
-      readonly IInitialBlockDownloadState initialBlockDownloadState;
+      readonly IInitialBlockDownloadTracker initialBlockDownloadState;
 
       public InitialBlockDownloadStateGuard(ILogger<InitialBlockDownloadStateGuard> logger,
                                             IOptions<ForgeConnectivitySettings> settings,
-                                            IInitialBlockDownloadState initialBlockDownloadState
+                                            IInitialBlockDownloadTracker initialBlockDownloadState
                                             ) : base(logger, settings)
       {
          this.initialBlockDownloadState = initialBlockDownloadState;
@@ -24,7 +24,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
 
       internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
-         if (this.initialBlockDownloadState.isInIBD)
+         if (this.initialBlockDownloadState.IsDownloadingBlocks())
          {
 
             bool clientIsWhiteListed = this.settings.Listeners

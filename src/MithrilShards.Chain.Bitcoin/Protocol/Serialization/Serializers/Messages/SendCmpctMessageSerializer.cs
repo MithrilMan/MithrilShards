@@ -1,23 +1,23 @@
 ﻿using System.Buffers;
+using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core.Network.Protocol;
-using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages
 {
-   public class SendCmpctMessageSerializer : NetworkMessageSerializerBase<SendCmpctMessage>
+   public class SendCmpctMessageSerializer : BitcoinNetworkMessageSerializerBase<SendCmpctMessage>
    {
-      public SendCmpctMessageSerializer(IChainDefinition chainDefinition) : base(chainDefinition) { }
+      public SendCmpctMessageSerializer(INetworkDefinition chainDefinition) : base(chainDefinition) { }
 
-      public override void Serialize(SendCmpctMessage message, int protocolVersion, IBufferWriter<byte> output)
+      public override void Serialize(SendCmpctMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
       {
-         output.WriteBool(message.HighBandwidthMode);
+         output.WriteBool(message.AnnounceUsingCompactBlock);
          output.WriteULong(message.Version);
       }
 
-      public override SendCmpctMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion)
+      public override SendCmpctMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
-         return new SendCmpctMessage { HighBandwidthMode = reader.ReadBool(), Version = reader.ReadULong() };
+         return new SendCmpctMessage { AnnounceUsingCompactBlock = reader.ReadBool(), Version = reader.ReadULong() };
       }
    }
 }

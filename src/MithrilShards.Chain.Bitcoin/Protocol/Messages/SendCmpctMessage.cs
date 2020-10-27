@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
       private const string COMMAND = "sendcmpct";
       string INetworkMessage.Command => COMMAND;
 
-      public bool HighBandwidthMode { get; set; }
+      public bool AnnounceUsingCompactBlock { get; set; }
 
       public ulong Version { get; set; }
    }

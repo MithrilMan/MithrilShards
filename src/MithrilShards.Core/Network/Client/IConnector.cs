@@ -10,10 +10,16 @@ namespace MithrilShards.Core.Network.Client
    public interface IConnector
    {
       /// <summary>
+      /// Sets the connection manager that will be used by the connector.
+      /// </summary>
+      /// <param name="connectionManager">The connection manager.</param>
+      void SetConnectionManager(IConnectionManager connectionManager);
+
+      /// <summary>
       /// Tries to connect to a peer.
       /// </summary>
       /// <returns></returns>
-      Task StartConnectionLoopAsync(IConnectionManager connectionManager, CancellationToken cancellation);
+      Task StartConnectionLoopAsync(CancellationToken cancellation);
 
       /// <summary>
       /// Compute the delay to apply between next connection attempt.

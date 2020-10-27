@@ -9,6 +9,7 @@ using MithrilShards.Core.Network.PeerBehaviorManager;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using MithrilShards.Core.Statistics;
+using MithrilShards.Core.Threading;
 
 namespace MithrilShards.Core
 {
@@ -26,9 +27,12 @@ namespace MithrilShards.Core
                .AddSingleton<IEventBus, InMemoryEventBus>()
                .AddSingleton<ISubscriptionErrorHandler, DefaultSubscriptionErrorHandler>()
 
+               // async task and tasks managers
+               .AddTransient<IPeriodicWork, PeriodicWork>()
+               .AddSingleton<IPeriodicWorkTracker, PeriodicWorkTracker>()
+               .AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>()
+
                // miscellaneous
-               .AddSingleton<IDateTimeProvider, DateTimeProvider>()
-               .AddSingleton<IInitialBlockDownloadState, InitialBlockDownloadState>()
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IUserAgentBuilder, UserAgentBuilder>()
 

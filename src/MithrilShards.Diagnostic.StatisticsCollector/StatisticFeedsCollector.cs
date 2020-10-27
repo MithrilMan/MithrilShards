@@ -148,23 +148,23 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          {
             var newValues = new List<string?[]>();
 
-            List<object[]>? statisticValues = feed.Source.GetStatisticFeedValues(feedDefinition.FeedId);
+            List<object?[]>? statisticValues = feed.Source.GetStatisticFeedValues(feedDefinition.FeedId);
             if (statisticValues != null)
             {
-               foreach (object[] values in statisticValues)
+               foreach (object?[] values in statisticValues)
                {
-                  for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
-                  {
-                     FieldDefinition field = feedDefinition.FieldsDefinition[i];
-                     // apply formatting if needed
-                     if (field.ValueFormatter != null)
-                     {
-                        values[i] = field.ValueFormatter(values[i]);
-                     }
-                  }
+                  //for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
+                  //{
+                  //   FieldDefinition field = feedDefinition.FieldsDefinition[i];
+                  //   // apply formatting if needed
+                  //   if (field.ValueFormatter != null)
+                  //   {
+                  //      values[i] = field.ValueFormatter((value: values[i], widthHint: field.WidthHint));
+                  //   }
+                  //}
 
                   newValues.Add(feedDefinition.FieldsDefinition
-                     .Select((field, index) => field.ValueFormatter == null ? values[index].ToString() : field.ValueFormatter(values[index]))
+                     .Select((field, index) => field.ValueFormatter?.Invoke((value: values[index], widthHint: field.WidthHint)) ?? values[index]?.ToString())
                      .ToArray()
                      );
                }

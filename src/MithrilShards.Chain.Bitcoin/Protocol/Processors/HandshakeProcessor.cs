@@ -23,9 +23,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private readonly IDateTimeProvider dateTimeProvider;
       private readonly IRandomNumberGenerator randomNumberGenerator;
       private readonly NodeImplementation nodeImplementation;
-      private readonly IInitialBlockDownloadState initialBlockDownloadState;
+      private readonly IInitialBlockDownloadTracker initialBlockDownloadState;
       private readonly IUserAgentBuilder userAgentBuilder;
-      readonly HeadersTree headersTree;
+      readonly ILocalServiceProvider localServiceProvider;
+      readonly IHeadersTree headersTree;
       private readonly SelfConnectionTracker selfConnectionTracker;
 
       public HandshakeProcessor(ILogger<HandshakeProcessor> logger,
@@ -34,9 +35,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                 IRandomNumberGenerator randomNumberGenerator,
                                 NodeImplementation nodeImplementation,
                                 IPeerBehaviorManager peerBehaviorManager,
-                                IInitialBlockDownloadState initialBlockDownloadState,
+                                IInitialBlockDownloadTracker initialBlockDownloadState,
                                 IUserAgentBuilder userAgentBuilder,
-                                HeadersTree headersTree,
+                                ILocalServiceProvider localServiceProvider,
+                                IHeadersTree headersTree,
                                 SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
          this.dateTimeProvider = dateTimeProvider;
@@ -44,6 +46,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          this.nodeImplementation = nodeImplementation;
          this.initialBlockDownloadState = initialBlockDownloadState;
          this.userAgentBuilder = userAgentBuilder;
+         this.localServiceProvider = localServiceProvider;
          this.headersTree = headersTree;
          this.selfConnectionTracker = selfConnectionTracker;
          this.status = new HandshakeProcessorStatus(this);
@@ -70,6 +73,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public async ValueTask<bool> ProcessMessageAsync(VersionMessage version, CancellationToken cancellation)
       {
+         bool peerServiceSupports(NodeServices service)
+         {
+            return (version.Services & (ulong)service) != 0;
+         }
+
          // did peers already handshaked?
          if (this.status.IsHandShaked)
          {
@@ -110,11 +118,20 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          await this.SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
 
          this.PeerContext.TimeOffset = this.dateTimeProvider.GetTimeOffset() - version.Timestamp;
-         if ((version.Services & (ulong)NodeServices.Witness) != 0)
+
+         if (!peerServiceSupports(NodeServices.Network))
          {
-            //TODO
-            // this.SupportedTransactionOptions |= TransactionOptions.Witness;
+            if (!peerServiceSupports(NodeServices.NetworkLimited))
+            {
+               this.PeerContext.IsClient = true;
+            }
+            else
+            {
+               this.PeerContext.IsLimitedNode = true;
+            }
          }
+
+         this.PeerContext.CanServeWitness = peerServiceSupports(NodeServices.Witness);
 
          // will prevent to handle version messages to other Processors
          return false;
@@ -127,7 +144,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns><see langword="false"/> if peer doesn't offer required service, <see langword="true"/> otherwise.</returns>
       private bool PeerDoesntOfferRequiredServices(VersionMessage peerVersion)
       {
-         NodeServices requiredServices = this.initialBlockDownloadState.isInIBD ?
+         NodeServices requiredServices = this.initialBlockDownloadState.IsDownloadingBlocks() ?
             (NodeServices.Network | NodeServices.Witness) : (NodeServices.NetworkLimited | NodeServices.Witness);
 
          var peerServices = (NodeServices)peerVersion.Services;
@@ -184,13 +201,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             /// TODO: it's part of the node settings and depends on the configured features/shards, shouldn't be hard coded
             /// if/when pruned will be implemented, remember to remove Network service flag
             /// ref: https://github.com/bitcoin/bitcoin/blob/99813a9745fe10a58bedd7a4cb721faf14f907a4/src/init.cpp#L1671-L1680
-            Services = (ulong)(NodeServices.Network | NodeServices.NetworkLimited),
+            Services = (ulong)this.localServiceProvider.GetServices(),
             Timestamp = this.dateTimeProvider.GetTimeOffset(),
             ReceiverAddress = new Types.NetworkAddressNoTime { EndPoint = this.PeerContext.RemoteEndPoint },
             SenderAddress = new Types.NetworkAddressNoTime { EndPoint = this.PeerContext.PublicEndPoint ?? this.PeerContext.LocalEndPoint },
             Nonce = this.randomNumberGenerator.GetUint64(),
             UserAgent = this.userAgentBuilder.GetUserAgent(),
-            StartHeight = this.headersTree.GetTipHeaderNode().Height,
+            StartHeight = this.headersTree.GetTip().Height,
             Relay = true //this.IsRelay, TODO: it's part of the node settings
          };
 

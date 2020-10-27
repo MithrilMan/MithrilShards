@@ -20,6 +20,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
       }
 
+      protected override async ValueTask OnPeerHandshakedAsync()
+      {
+         // ask for addresses when the peer handshakes
+         await this.SendMessageAsync(minVersion: KnownVersion.V31402, new GetAddrMessage()).ConfigureAwait(false);
+
+         /// TODO: add a timer that from time to time advertise our peer address and other peer addresses.
+         /// bitcoin core has this code in SendMessages:
+         /// https://github.com/bitcoin/bitcoin/blob/c7ebab12f9419e7d1622494cbb6578302601c7db/src/net_processing.cpp#L3890-L3927
+      }
+
       public async ValueTask<bool> ProcessMessageAsync(GetAddrMessage message, CancellationToken cancellation)
       {
          this.logger.LogDebug("Peer requiring addresses from us.");

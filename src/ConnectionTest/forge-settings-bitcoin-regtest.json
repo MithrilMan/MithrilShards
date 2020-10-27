@@ -5,8 +5,8 @@
       "AllowLoopbackConnection": false,
       "Listeners": [
          {
-            "IsWhitelistingEndpoint": false,
-            "Endpoint": "0.0.0.0:45010"
+            "IsWhitelistingEndpoint": true,
+            "Endpoint": "0.0.0.0:45017"
          },
          {
             "IsWhitelistingEndpoint": true,
@@ -17,6 +17,9 @@
       "Connections": [
          { "Endpoint": "127.0.0.1:19000" }
       ]
+   },
+   "Bitcoin": {
+      "MaxTimeAdjustment": 4200
    },
    "StatisticsCollector": {
       "ContinuousConsoleDisplay": false,

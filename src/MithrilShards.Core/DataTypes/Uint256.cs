@@ -1,22 +1,29 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace MithrilShards.Core.DataTypes
 {
    [StructLayout(LayoutKind.Sequential)]
-   public class UInt256 : IEquatable<UInt256>
+   public partial class UInt256 : IEquatable<UInt256>
    {
-      private const int EXPECTED_SIZE = 32;
+      protected const int EXPECTED_SIZE = 32;
 
       public static UInt256 Zero { get; } = new UInt256("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
 #pragma warning disable IDE0044 // Add readonly modifier
-      private ulong part1;
-      private ulong part2;
-      private ulong part3;
-      private ulong part4;
+      protected ulong part1;
+      protected ulong part2;
+      protected ulong part3;
+      protected ulong part4;
 
 #pragma warning restore IDE0044 // Add readonly modifier
+
+      /// <summary>
+      /// Initializes a new instance of the <see cref="UInt256"/> class.
+      /// Used by derived classes.
+      /// </summary>
+      protected UInt256() { }
 
       /// <summary>
       /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
@@ -26,40 +33,41 @@ namespace MithrilShards.Core.DataTypes
       {
          if (input.Length != EXPECTED_SIZE)
          {
-            throw new FormatException("the byte array should be 32 bytes long");
+            ThrowHelper.ThrowFormatException("the byte array should be 32 bytes long");
          }
 
-         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+         Span<byte> dst = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref this.part1), EXPECTED_SIZE);
          input.CopyTo(dst);
       }
 
       /// <summary>
       /// Initializes a new instance of the <see cref="UInt256"/> class.
       /// Passed hex string must be a valid hex string with 64 char length, or 66 if prefix 0x is used, otherwise an exception is thrown.
+      /// Input data is considered in big endian.
       /// </summary>
       public UInt256(string hexString)
       {
          if (hexString is null)
          {
-            throw new ArgumentNullException(nameof(hexString));
+            ThrowHelper.ThrowArgumentNullException(nameof(hexString));
          }
 
          //account for 0x prefix
          if (hexString.Length < EXPECTED_SIZE * 2)
          {
-            throw new FormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
+            ThrowHelper.ThrowFormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
          }
 
-         ReadOnlySpan<char> hexAsSpan = (hexString[0] == '0' && hexString[1] == 'X') ? hexString.AsSpan(2) : hexString.AsSpan();
+         ReadOnlySpan<char> hexAsSpan = (hexString[0] == '0' && (hexString[1] == 'X' || hexString[1] == 'x')) ? hexString.AsSpan(2) : hexString.AsSpan();
 
-         if (hexString.Length != EXPECTED_SIZE * 2)
+         if (hexAsSpan.Length != EXPECTED_SIZE * 2)
          {
-            throw new FormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
+            ThrowHelper.ThrowFormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
          }
 
          Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
 
-         int i = hexString.Length - 1;
+         int i = hexAsSpan.Length - 1;
          int j = 0;
 
          while (i > 0)
@@ -79,7 +87,7 @@ namespace MithrilShards.Core.DataTypes
             }
             else
             {
-               throw new ArgumentException("Invalid nibble: " + c);
+               ThrowHelper.ThrowArgumentException("Invalid nibble: " + c);
             }
 
             c = hexAsSpan[i--];
@@ -97,7 +105,7 @@ namespace MithrilShards.Core.DataTypes
             }
             else
             {
-               throw new ArgumentException("Invalid nibble: " + c);
+               ThrowHelper.ThrowArgumentException("Invalid nibble: " + c);
             }
 
             j++;
@@ -167,28 +175,12 @@ namespace MithrilShards.Core.DataTypes
 
       public ReadOnlySpan<byte> GetBytes()
       {
-         return MemoryMarshal.AsBytes(MemoryMarshal.CreateReadOnlySpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+         return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, byte>(ref this.part1), EXPECTED_SIZE);
       }
 
       public override int GetHashCode()
       {
          return (int)this.part1;
-      }
-
-      public override bool Equals(object? obj) => ReferenceEquals(this, obj) ? true : this.Equals(obj as UInt256);
-
-      public static bool operator !=(UInt256? a, UInt256? b) => !(a == b);
-
-      public static bool operator ==(UInt256? a, UInt256? b) => a == null ? false : a.Equals(b);
-
-      public bool Equals(UInt256? other)
-      {
-         if (other is null) return false;
-
-         return this.part1 == other.part1
-             && this.part2 == other.part2
-             && this.part3 == other.part3
-             && this.part4 == other.part4;
       }
    }
 }

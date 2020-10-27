@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace MithrilShards.Core.Statistics
 {
@@ -29,7 +30,9 @@ namespace MithrilShards.Core.Statistics
       /// The unit of measure.
       /// </value>
       public string? UnitOfMeasure { get; }
-      public Func<object, string>? ValueFormatter { get; }
+
+      [JsonIgnore]
+      public Func<(object? value, int widthHint), string>? ValueFormatter { get; }
 
       /// <summary>
       /// Initializes a new instance of the <see cref="FieldDefinition"/> class.
@@ -38,7 +41,7 @@ namespace MithrilShards.Core.Statistics
       /// <param name="widthHint">The width hint.</param>
       /// <param name="unitOfMeasure">The unit of measure.</param>
       /// <param name="valueFormatter">The value formatter (null if value doesn't need to be formatted).</param>
-      public FieldDefinition(string label, string description, int widthHint, string? unitOfMeasure = null, Func<object, string>? valueFormatter = null)
+      public FieldDefinition(string label, string description, int widthHint, string? unitOfMeasure = null, Func<(object? value, int widthHint), string>? valueFormatter = null)
       {
          this.Label = label ?? throw new ArgumentNullException(nameof(label));
          this.Description = description ?? throw new ArgumentNullException(nameof(description));

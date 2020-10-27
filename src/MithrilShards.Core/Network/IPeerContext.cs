@@ -33,6 +33,11 @@ namespace MithrilShards.Core.Network
       /// </summary>
       IPEndPoint RemoteEndPoint { get; }
 
+      /// <summary>
+      /// Gets the user agent.
+      /// </summary>
+      public string? UserAgent { get; }
+
       PeerMetrics Metrics { get; }
 
       /// <summary>
@@ -66,5 +71,18 @@ namespace MithrilShards.Core.Network
       /// Gets the connection cancellation token source in order to trigger a manual disconnection.
       /// </summary>
       CancellationTokenSource ConnectionCancellationTokenSource { get; }
+
+      /// <summary>
+      /// Gets or sets a value indicating whether a connection has been established with the peer.
+      /// This flag is set if the peer already passed handshake (where expected by the protocol).
+      /// </summary>
+      public bool IsConnected { get; }
+
+
+      /// <summary>
+      /// Disconnects the peer for the specified reason.
+      /// </summary>
+      /// <param name="reason">The disconnection reason.</param>
+      void Disconnect(string reason);
    }
 }

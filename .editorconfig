@@ -123,3 +123,6 @@ dotnet_diagnostic.CA1040.severity                                 = suggestion
 
 # CA1801: Review Unused Parameters
 dotnet_diagnostic.CA1801.severity                                 = suggestion
+
+# Default severity for all analyzer diagnostics
+dotnet_analyzer_diagnostic.severity = silent
