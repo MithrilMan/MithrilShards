@@ -13,13 +13,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// </summary>
       public int Version { get; set; }
 
-      ///// <summary>
-      ///// Used to communicate which kind of content the transaction exposes.
-      ///// Actually it's not always present.
-      ///// If present, always 0001, and indicates the presence of witness data
-      ///// </summary>
-      //public byte Flags { get; set; }
-
       /// <summary>
       /// A list of 1 or more transaction inputs or sources for coins.
       /// </summary>

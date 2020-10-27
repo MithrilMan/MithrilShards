@@ -1,20 +1,22 @@
 ﻿namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 {
    /// <summary>
-   /// transaction input (tx_in).
+   /// Represents a Transaction Input.
+   /// Transaction Inputs are unspent output used to fund a transaction.
    /// </summary>
+   /// <remarks>BTC-TER: tx_in</remarks>
    public class TransactionInput
    {
       /// <summary>
-      /// The previous output transaction reference
+      /// The previous output transaction reference.
       /// </summary>
+      /// <remarks>In bitcoin core terminology this is called PrevOut.</remarks>
       public OutPoint? PreviousOutput { get; set; }
 
       /// <summary>
-      /// Used to communicate which kind of content the transaction exposes.
-      /// Actually it's not always present.
-      /// If present, always 0001, and indicates the presence of witness data
+      /// The unlocking script that satisfies the conditions placed on the output by the PubKeyScript and is what allows the output to be spent.
       /// </summary>
+      /// <remarks>BTC-TER: scriptSig.</remarks>
       public byte[]? SignatureScript { get; set; }
 
       /// <summary>

@@ -3,7 +3,7 @@
 namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 {
    /// <summary>
-   /// Point to a specific transaction output
+   /// Point to a specific transaction output.
    /// </summary>
    public class OutPoint
    {

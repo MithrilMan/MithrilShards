@@ -91,11 +91,32 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
          // Failure to run this check will result in either a crash or an inflation bug, depending on the implementation of
          // the underlying coins database.
          HashSet<OutPoint> usedOutPoints = new HashSet<OutPoint>();
-         foreach (TransactionInput? input in transaction.Inputs)
+         foreach (TransactionInput input in transaction.Inputs)
          {
             if (!usedOutPoints.Add(input.PreviousOutput!))
             {
                return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-inputs-duplicate");
+            }
+         }
+
+         if (transaction.IsCoinBase())
+         {
+            // ensure coinbase transaction input has a signature script with proper size
+
+            int firstInputScriptSignatureLength = transaction.Inputs[0].SignatureScript!.Length;
+            if (firstInputScriptSignatureLength < 2 || firstInputScriptSignatureLength > 100)
+            {
+               return state.Invalid(TransactionValidationStateResults.Consensus, "bad-cb-length");
+            }
+         }
+         else
+         {
+            foreach (TransactionInput input in transaction.Inputs)
+            {
+               if (input.PreviousOutput!.IsNull())
+               {
+                  return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-prevout-null");
+               }
             }
          }
 
