@@ -28,10 +28,10 @@ namespace MithrilShards.Dev.Controller.Controllers
          this.chainState = chainState;
       }
 
-      [HttpPost]
+      [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [Route("ShowBestHeaderTree")]
-      public ActionResult<string> Connect(PeerManagementConnectRequest request)
+      public ActionResult<string> ShowBestHeaderTree()
       {
          return this.Ok(DumpKnownTree(this.chainState.BestHeader));
       }

@@ -48,7 +48,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       protected override ValueTask OnPeerHandshakedAsync()
       {
          _ = this.periodicPing.StartAsync(
-               label: $"periodicPing-{PeerContext.PeerId}",
+               label: $"{nameof(periodicPing)}-{PeerContext.PeerId}",
                work: PingAsync,
                interval: TimeSpan.FromSeconds(PING_INTERVAL),
                cancellation: PeerContext.ConnectionCancellationTokenSource.Token

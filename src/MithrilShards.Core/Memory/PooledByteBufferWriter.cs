@@ -23,7 +23,7 @@ namespace MithrilShards.Core.Memory
    /// </remarks>
    public sealed class PooledByteBufferWriter : IBufferWriter<byte>, IDisposable
    {
-      private byte[] _rentedBuffer;
+      private byte[]? _rentedBuffer;
       private int _index;
 
       private const int MinimumBufferSize = 256;
@@ -121,17 +121,17 @@ namespace MithrilShards.Core.Memory
          return _rentedBuffer.AsSpan(_index);
       }
 
-#if BUILDING_INBOX_LIBRARY
-        internal ValueTask WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
-        {
-            return destination.WriteAsync(WrittenMemory, cancellationToken);
-        }
-#else
-      internal Task WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
-      {
-         return destination.WriteAsync(_rentedBuffer, 0, _index, cancellationToken);
-      }
-#endif
+//#if BUILDING_INBOX_LIBRARY
+//        internal ValueTask WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
+//        {
+//            return destination.WriteAsync(WrittenMemory, cancellationToken);
+//        }
+//#else
+//      internal Task WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
+//      {
+//         return destination.WriteAsync(_rentedBuffer!, 0, _index, cancellationToken);
+//      }
+//#endif
 
       private void CheckAndResizeBuffer(int sizeHint)
       {
