@@ -12,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
    public class ConnectToLoopbackGuard : ServerPeerConnectionGuardBase
    {
 
-      public ConnectToLoopbackGuard(ILogger<InitialBlockDownloadStateGuard> logger, IOptions<ForgeConnectivitySettings> settings) : base(logger, settings)
+      public ConnectToLoopbackGuard(ILogger<ConnectToLoopbackGuard> logger, IOptions<ForgeConnectivitySettings> settings) : base(logger, settings)
       {
       }
 

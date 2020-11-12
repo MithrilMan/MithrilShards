@@ -6,7 +6,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
 {
    public class BannedPeerGuard : ServerPeerConnectionGuardBase
    {
-      public BannedPeerGuard(ILogger<InitialBlockDownloadStateGuard> logger, IOptions<ForgeConnectivitySettings> settings) : base(logger, settings)
+      public BannedPeerGuard(ILogger<BannedPeerGuard> logger, IOptions<ForgeConnectivitySettings> settings) : base(logger, settings)
       {
       }
 

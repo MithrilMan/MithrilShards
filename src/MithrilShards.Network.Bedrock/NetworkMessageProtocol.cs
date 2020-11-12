@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
+using System.Buffers.Binary;
 using System.Net;
 using Bedrock.Framework.Protocols;
 using Microsoft.Extensions.Logging;
@@ -23,6 +23,12 @@ namespace MithrilShards.Network.Bedrock
    /// </summary>
    public class NetworkMessageProtocol : IMessageReader<INetworkMessage>, IMessageWriter<INetworkMessage>
    {
+      const int SIZE_MAGIC = 4;
+      const int SIZE_COMMAND = 12;
+      const int SIZE_PAYLOAD_LENGTH = 4;
+      const int SIZE_CHECKSUM = 4;
+      const int HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
+
       readonly ILogger<NetworkMessageProtocol> logger;
       private readonly INetworkDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
@@ -242,20 +248,42 @@ namespace MithrilShards.Network.Bedrock
             throw new ArgumentNullException(nameof(message));
          }
 
-         using (this.logger.BeginScope("Serializing and sending '{Command}'", message.Command))
+         string command = message.Command;
+         using (this.logger.BeginScope("Serializing and sending '{Command}'", command))
          {
+            var payloadOutput = new ArrayBufferWriter<byte>();
             if (this.networkMessageSerializerManager.TrySerialize(message,
                                                                   this.peerContext.NegotiatedProtocolVersion.Version,
                                                                   this.peerContext,
-                                                                  output,
-                                                                  out int sentBytes))
+                                                                  payloadOutput))
             {
-               this.peerContext.Metrics.Sent(sentBytes);
-               this.logger.LogDebug("Sent message '{Command}'.", message.Command);
+               int payloadSize = payloadOutput.WrittenCount;
+
+               // write magic bytes (it's expected to be SIZE_MAGIC bytes long)
+               this.chainDefinition.MagicBytes.CopyTo(output.GetSpan(SIZE_MAGIC));
+               output.Advance(SIZE_MAGIC);
+
+               // write command name
+               Span<byte> commandSpan = stackalloc byte[SIZE_COMMAND];
+               System.Text.Encoding.ASCII.GetBytes(command, commandSpan);
+               output.Write(commandSpan);
+
+               // write payload length
+               BinaryPrimitives.TryWriteUInt32LittleEndian(output.GetSpan(SIZE_PAYLOAD_LENGTH), (uint)payloadSize);
+               output.Advance(SIZE_PAYLOAD_LENGTH);
+
+               // write payload checksum
+               output.Write(HashGenerator.DoubleSha256(payloadOutput.WrittenSpan).Slice(0, SIZE_CHECKSUM));
+
+               // write payload
+               output.Write(payloadOutput.WrittenSpan);
+
+               this.peerContext.Metrics.Sent(HEADER_LENGTH + payloadSize);
+               this.logger.LogDebug("Sent message '{Command}' with payload size {PayloadSize}.", command, payloadSize);
             }
             else
             {
-               this.logger.LogError("Serializer for message '{Command}' not found.", message.Command);
+               this.logger.LogError("Serializer for message '{Command}' not found.", command);
             }
          }
       }

@@ -41,15 +41,14 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
                   );
       }
 
-      public bool TrySerialize(INetworkMessage message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output, out int serializedLength)
+      public bool TrySerialize(INetworkMessage message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output)
       {
          if (this.serializers.TryGetValue(message.Command, out INetworkMessageSerializer? serializer))
          {
-            serializedLength = serializer.Serialize(message, protocolVersion, peerContext, output);
+            serializer.Serialize(message, protocolVersion, peerContext, output);
             return true;
          }
 
-         serializedLength = 0;
          return false;
       }
 

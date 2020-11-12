@@ -162,7 +162,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          // starts the header sync loop
          _ = this.headerSyncLoop.StartAsync(
-               label: $"headerSyncLoop-{PeerContext.PeerId}",
+               label: $"{nameof(headerSyncLoop)}-{PeerContext.PeerId}",
                work: SyncLoopAsync,
                interval: TimeSpan.FromMilliseconds(SYNC_LOOP_INTERVAL),
                cancellation: PeerContext.ConnectionCancellationTokenSource.Token

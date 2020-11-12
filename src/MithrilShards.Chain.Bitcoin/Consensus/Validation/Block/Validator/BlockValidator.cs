@@ -60,7 +60,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
 
          // starts the consumer loop of header validation
          this.validationLoop.StartAsync(
-            label: "HeaderValidator",
+            label: nameof(BlockValidator),
             work: ValidationWork,
             interval: TimeSpan.Zero,
             cancellationToken
