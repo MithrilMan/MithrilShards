@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Network.Legacy", "src\MithrilShards.P2P\MithrilShards.Network.Legacy.csproj", "{CA14A138-B31B-4DD5-B227-A78740DE932B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeStyle", "CodeStyle", "{4745214D-E97C-41B1-A1A3-5C8237C59B72}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -63,10 +61,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CA14A138-B31B-4DD5-B227-A78740DE932B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA14A138-B31B-4DD5-B227-A78740DE932B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA14A138-B31B-4DD5-B227-A78740DE932B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA14A138-B31B-4DD5-B227-A78740DE932B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
