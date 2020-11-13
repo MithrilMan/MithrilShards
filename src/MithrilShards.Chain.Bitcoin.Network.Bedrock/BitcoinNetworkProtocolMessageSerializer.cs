@@ -2,14 +2,14 @@
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Net;
-using Bedrock.Framework.Protocols;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Crypto;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
+using MithrilShards.Network.Bedrock;
 
-namespace MithrilShards.Network.Bedrock
+namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
 {
    /// <summary>
    /// Class to handle the common bitcoin-like protocol.
@@ -21,34 +21,28 @@ namespace MithrilShards.Network.Bedrock
    /// 4    | command   |uint32_t   | First 4 bytes of sha256(sha256(payload))
    /// ?    | command   |uchar[]    | The actual data
    /// </summary>
-   public class NetworkMessageProtocol : IMessageReader<INetworkMessage>, IMessageWriter<INetworkMessage>
+   public class BitcoinNetworkProtocolMessageSerializer : INetworkProtocolMessageSerializer
    {
-      const int SIZE_MAGIC = 4;
-      const int SIZE_COMMAND = 12;
-      const int SIZE_PAYLOAD_LENGTH = 4;
-      const int SIZE_CHECKSUM = 4;
-      const int HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
-
-      readonly ILogger<NetworkMessageProtocol> logger;
+      readonly ILogger<BitcoinNetworkProtocolMessageSerializer> logger;
       private readonly INetworkDefinition chainDefinition;
       readonly INetworkMessageSerializerManager networkMessageSerializerManager;
-      readonly ConnectionContextData contextData;
+      /// <summary>
+      /// The deserialization context used to keep track of the ongoing deserialization of a stream.
+      /// </summary>
+      readonly DeserializationContext deserializationContext;
       private IPeerContext peerContext;
 
-      public NetworkMessageProtocol(ILogger<NetworkMessageProtocol> logger,
-                                    INetworkDefinition chainDefinition,
-                                    INetworkMessageSerializerManager networkMessageSerializerManager,
-                                    ConnectionContextData contextData)
+      public BitcoinNetworkProtocolMessageSerializer(ILogger<BitcoinNetworkProtocolMessageSerializer> logger, INetworkDefinition chainDefinition, INetworkMessageSerializerManager networkMessageSerializerManager)
       {
          this.logger = logger;
          this.chainDefinition = chainDefinition;
          this.networkMessageSerializerManager = networkMessageSerializerManager;
-         this.contextData = contextData;
+         this.deserializationContext = new DeserializationContext(chainDefinition.MagicBytes);
 
          this.peerContext = null!; //initialized by SetPeerContext
       }
 
-      internal void SetPeerContext(IPeerContext peerContext)
+      public void SetPeerContext(IPeerContext peerContext)
       {
          this.peerContext = peerContext;
       }
@@ -60,33 +54,33 @@ namespace MithrilShards.Network.Bedrock
          if (this.TryReadHeader(ref reader))
          {
             // now try to read the payload
-            if (reader.Remaining >= this.contextData.PayloadLength)
+            if (reader.Remaining >= this.deserializationContext.PayloadLength)
             {
-               ReadOnlySequence<byte> payload = input.Slice(reader.Position, this.contextData.PayloadLength);
+               ReadOnlySequence<byte> payload = input.Slice(reader.Position, this.deserializationContext.PayloadLength);
 
                //check checksum
                ReadOnlySpan<byte> checksum = HashGenerator.DoubleSha256(payload.ToArray()).Slice(0, 4);
-               if (this.contextData.Checksum != BitConverter.ToUInt32(checksum))
+               if (this.deserializationContext.Checksum != BitConverter.ToUInt32(checksum))
                {
                   throw new ProtocolViolationException("Invalid checksum.");
                }
 
                //we consumed and examined everything, no matter if the message was a known message or not
                examined = consumed = payload.End;
-               this.contextData.ResetFlags();
+               this.deserializationContext.ResetFlags();
 
-               string commandName = this.contextData.CommandName!;
+               string commandName = this.deserializationContext.CommandName!;
                if (this.networkMessageSerializerManager
                   .TryDeserialize(commandName, ref payload, this.peerContext.NegotiatedProtocolVersion.Version, this.peerContext, out message!))
                {
-                  this.peerContext.Metrics.Received(this.contextData.GetTotalMessageLength());
+                  this.peerContext.Metrics.Received(this.deserializationContext.GetTotalMessageLength());
                   return true;
                }
                else
                {
                   this.logger.LogWarning("Serializer for message '{Command}' not found.", commandName);
                   message = new UnknownMessage(commandName, payload.ToArray());
-                  this.peerContext.Metrics.Wasted(this.contextData.GetTotalMessageLength());
+                  this.peerContext.Metrics.Wasted(this.deserializationContext.GetTotalMessageLength());
                   return true;
                }
             }
@@ -101,7 +95,7 @@ namespace MithrilShards.Network.Bedrock
 
       private bool TryReadHeader(ref SequenceReader<byte> reader)
       {
-         if (!this.contextData.MagicNumberRead)
+         if (!this.deserializationContext.MagicNumberRead)
          {
             if (!this.TryReadMagicNumber(ref reader))
             {
@@ -109,7 +103,7 @@ namespace MithrilShards.Network.Bedrock
             }
          }
 
-         if (!this.contextData.CommandRead)
+         if (!this.deserializationContext.CommandRead)
          {
             if (!this.TryReadCommand(ref reader))
             {
@@ -117,7 +111,7 @@ namespace MithrilShards.Network.Bedrock
             }
          }
 
-         if (!this.contextData.PayloadLengthRead)
+         if (!this.deserializationContext.PayloadLengthRead)
          {
             if (!this.TryReadPayloadLenght(ref reader))
             {
@@ -125,7 +119,7 @@ namespace MithrilShards.Network.Bedrock
             }
          }
 
-         if (!this.contextData.ChecksumRead)
+         if (!this.deserializationContext.ChecksumRead)
          {
             if (!this.TryReadChecksum(ref reader))
             {
@@ -150,14 +144,14 @@ namespace MithrilShards.Network.Bedrock
       {
          long prevRemaining = reader.Remaining;
          // advance to the first byte of the magic number.
-         while (reader.TryAdvanceTo(this.contextData.FirstMagicNumberByte, advancePastDelimiter: false))
+         while (reader.TryAdvanceTo(this.deserializationContext.FirstMagicNumberByte, advancePastDelimiter: false))
          {
             //TODO: compare sequence of bytes instead of reading an int
             if (reader.TryReadLittleEndian(out int magicRead))
             {
-               if (magicRead == this.contextData.MagicNumber)
+               if (magicRead == this.deserializationContext.MagicNumber)
                {
-                  this.contextData.MagicNumberRead = true;
+                  this.deserializationContext.MagicNumberRead = true;
                   return true;
                }
                else
@@ -189,11 +183,11 @@ namespace MithrilShards.Network.Bedrock
       /// <returns>true if the command has been read, false otherwise (not enough bytes to read)</returns>
       private bool TryReadCommand(ref SequenceReader<byte> reader)
       {
-         if (reader.Remaining >= ConnectionContextData.SIZE_COMMAND)
+         if (reader.Remaining >= ProtocolDefinition.SIZE_COMMAND)
          {
-            ReadOnlySequence<byte> commandReader = reader.Sequence.Slice(reader.Position, ConnectionContextData.SIZE_COMMAND);
-            this.contextData.SetCommand(ref commandReader);
-            reader.Advance(ConnectionContextData.SIZE_COMMAND);
+            ReadOnlySequence<byte> commandReader = reader.Sequence.Slice(reader.Position, ProtocolDefinition.SIZE_COMMAND);
+            this.deserializationContext.SetCommand(ref commandReader);
+            reader.Advance(ProtocolDefinition.SIZE_COMMAND);
             return true;
          }
          else
@@ -212,7 +206,7 @@ namespace MithrilShards.Network.Bedrock
       {
          if (reader.TryReadLittleEndian(out int payloadLengthBytes))
          {
-            this.contextData.PayloadLength = (uint)payloadLengthBytes;
+            this.deserializationContext.PayloadLength = (uint)payloadLengthBytes;
             return true;
          }
          else
@@ -231,7 +225,7 @@ namespace MithrilShards.Network.Bedrock
       {
          if (reader.TryReadLittleEndian(out int checksumBytes))
          {
-            this.contextData.Checksum = (uint)checksumBytes;
+            this.deserializationContext.Checksum = (uint)checksumBytes;
             return true;
          }
          else
@@ -260,25 +254,25 @@ namespace MithrilShards.Network.Bedrock
                int payloadSize = payloadOutput.WrittenCount;
 
                // write magic bytes (it's expected to be SIZE_MAGIC bytes long)
-               this.chainDefinition.MagicBytes.CopyTo(output.GetSpan(SIZE_MAGIC));
-               output.Advance(SIZE_MAGIC);
+               this.chainDefinition.MagicBytes.CopyTo(output.GetSpan(ProtocolDefinition.SIZE_MAGIC));
+               output.Advance(ProtocolDefinition.SIZE_MAGIC);
 
                // write command name
-               Span<byte> commandSpan = stackalloc byte[SIZE_COMMAND];
+               Span<byte> commandSpan = stackalloc byte[ProtocolDefinition.SIZE_COMMAND];
                System.Text.Encoding.ASCII.GetBytes(command, commandSpan);
                output.Write(commandSpan);
 
                // write payload length
-               BinaryPrimitives.TryWriteUInt32LittleEndian(output.GetSpan(SIZE_PAYLOAD_LENGTH), (uint)payloadSize);
-               output.Advance(SIZE_PAYLOAD_LENGTH);
+               BinaryPrimitives.TryWriteUInt32LittleEndian(output.GetSpan(ProtocolDefinition.SIZE_PAYLOAD_LENGTH), (uint)payloadSize);
+               output.Advance(ProtocolDefinition.SIZE_PAYLOAD_LENGTH);
 
                // write payload checksum
-               output.Write(HashGenerator.DoubleSha256(payloadOutput.WrittenSpan).Slice(0, SIZE_CHECKSUM));
+               output.Write(HashGenerator.DoubleSha256(payloadOutput.WrittenSpan).Slice(0, ProtocolDefinition.SIZE_CHECKSUM));
 
                // write payload
                output.Write(payloadOutput.WrittenSpan);
 
-               this.peerContext.Metrics.Sent(HEADER_LENGTH + payloadSize);
+               this.peerContext.Metrics.Sent(ProtocolDefinition.HEADER_LENGTH + payloadSize);
                this.logger.LogDebug("Sent message '{Command}' with payload size {PayloadSize}.", command, payloadSize);
             }
             else

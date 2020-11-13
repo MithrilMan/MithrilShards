@@ -1,29 +1,39 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
+   <PropertyGroup>
+      <OutputType>Exe</OutputType>
+      <TargetFramework>netcoreapp3.1</TargetFramework>
+      <LangVersion>8.0</LangVersion>
+      <Nullable>enable</Nullable>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="forge-settings-bitcoin-regtest.json" />
-    <None Remove="forge-settings.json" />
-    <None Remove="log-settings-with-seq.json" />
-    <None Remove="log-settings.json" />
-  </ItemGroup>
+   <ItemGroup>
+      <None Remove="forge-settings.json" />
+      <None Remove="forge-settings2.json" />
+      <None Remove="log-settings-with-seq.json" />
+      <None Remove="log-settings2.json" />
+   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="forge-settings-bitcoin-regtest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="forge-settings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="log-settings-with-seq.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="log-settings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+   <ItemGroup>
+      <Content Include="forge-settings2.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="forge-settings.json">
+         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="log-settings-with-seq.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="log-settings2.json">
+         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+   </ItemGroup>
+
+   <ItemGroup>
+      <ProjectReference Include="..\MithrilShards.Diagnostic.StatisticsCollector\MithrilShards.Diagnostic.StatisticsCollector.csproj" />
+      <ProjectReference Include="..\MithrilShards.Example.Network.Bedrock\MithrilShards.Example.Network.Bedrock.csproj" />
+      <ProjectReference Include="..\MithrilShards.Example\MithrilShards.Example.csproj" />
+      <ProjectReference Include="..\MithrilShards.Logging.Serilog\MithrilShards.Logging.Serilog.csproj" />
+   </ItemGroup>
 
 </Project>

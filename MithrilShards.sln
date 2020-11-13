@@ -63,6 +63,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Example", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Example.Node", "src\MithrilShards.Example.Node\MithrilShards.Example.Node.csproj", "{38FAA2E2-D49F-45C2-8342-3B4332D633B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Chain.Bitcoin.Network.Bedrock", "src\MithrilShards.Chain.Bitcoin.Network.Bedrock\MithrilShards.Chain.Bitcoin.Network.Bedrock.csproj", "{26B114D3-71E0-48DC-A46B-67BACDDA1CC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Example.Network.Bedrock", "src\MithrilShards.Example.Network.Bedrock\MithrilShards.Example.Network.Bedrock.csproj", "{45EABAAF-8B71-45CC-8760-F79BCA492082}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +121,14 @@ Global
 		{38FAA2E2-D49F-45C2-8342-3B4332D633B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38FAA2E2-D49F-45C2-8342-3B4332D633B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38FAA2E2-D49F-45C2-8342-3B4332D633B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26B114D3-71E0-48DC-A46B-67BACDDA1CC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26B114D3-71E0-48DC-A46B-67BACDDA1CC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26B114D3-71E0-48DC-A46B-67BACDDA1CC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26B114D3-71E0-48DC-A46B-67BACDDA1CC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45EABAAF-8B71-45CC-8760-F79BCA492082}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45EABAAF-8B71-45CC-8760-F79BCA492082}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45EABAAF-8B71-45CC-8760-F79BCA492082}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45EABAAF-8B71-45CC-8760-F79BCA492082}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -132,6 +144,8 @@ Global
 		{1835C1F7-09DC-4168-8471-55484711C175} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
 		{A188B6A5-1C04-464F-8D64-F105AECABABE} = {1835C1F7-09DC-4168-8471-55484711C175}
 		{38FAA2E2-D49F-45C2-8342-3B4332D633B6} = {1835C1F7-09DC-4168-8471-55484711C175}
+		{26B114D3-71E0-48DC-A46B-67BACDDA1CC5} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
+		{45EABAAF-8B71-45CC-8760-F79BCA492082} = {1835C1F7-09DC-4168-8471-55484711C175}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}

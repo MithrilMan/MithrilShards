@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using MithrilShards.Chain.Bitcoin;
+using MithrilShards.Chain.Bitcoin.Network.Bedrock;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Core.Forge;
 using MithrilShards.Dev.Controller;
@@ -25,7 +26,7 @@ namespace ConnectionTest
       {
          await BuildForge(args)
             .UseSerilog("log-settings-with-seq.json")
-            .UseBedrockForgeServer()
+            .UseBedrockForgeServer<BitcoinNetworkProtocolMessageSerializer>()
             .UseStatisticsCollector()
             .UseDevController()
             .RunConsoleAsync()

@@ -30,6 +30,7 @@ namespace MithrilShards.Example
             {
                services
                   .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
+                  .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                   .AddPeerGuards()
                   .AddMessageSerializers()
                   .AddProtocolTypeSerializers()

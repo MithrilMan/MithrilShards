@@ -6,14 +6,19 @@
          {
             "Name": "Console",
             "Args": {
-               "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss}|{Level} => RequestPath:{RequestPath} => {SourceContext}{NewLine}    {Message}{NewLine}{Exception}"
+               "IncludeScopes": true,
+               "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss}|{Level} => RequestPath:{RequestPath} => {SourceContext}{NewLine}    {Message}{NewLine}{Exception}",
+               "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console"
             }
+         },
+         {
+            "Name": "Seq",
+            "Args": { "serverUrl": "http://localhost:5341" }
          }
       ],
       "MinimumLevel": {
          "Default": "Debug",
          "Override": {
-            "MithrilShards.Core.Network.ConnectionManager": "Warning",
             "Bedrock.Framework": "Warning",
             "Microsoft": "Warning",
             "System": "Warning"

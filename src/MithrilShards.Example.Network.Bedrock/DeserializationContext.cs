@@ -1,24 +1,12 @@
 ﻿using System;
 using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 
-namespace MithrilShards.Network.Bedrock
+namespace MithrilShards.Example.Network.Bedrock
 {
-   public class ConnectionContextData
+   public class DeserializationContext
    {
-      /// <summary>
-      /// The default maximum protocol message length.
-      /// </summary>
-      const uint DEFAULT_MAX_PROTOCOL_MESSAGE_LENGTH = 4_000_000;
-
-      public const int SIZE_MAGIC = 4;
-      public const int SIZE_COMMAND = 12;
-      public const int SIZE_PAYLOAD_LENGTH = 4;
-      public const int SIZE_CHECKSUM = 4;
-      public const int HEADER_LENGTH = SIZE_MAGIC + SIZE_COMMAND + SIZE_PAYLOAD_LENGTH + SIZE_CHECKSUM;
-
       private uint payloadLength;
       private uint checksum;
 
@@ -33,8 +21,7 @@ namespace MithrilShards.Network.Bedrock
 
       public bool CommandRead { get; private set; }
 
-      [DisallowNull]
-      public string? CommandName { get; private set; }
+      public string CommandName { get; private set; } = default!;
 
       public readonly byte FirstMagicNumberByte;
 
@@ -81,7 +68,7 @@ namespace MithrilShards.Network.Bedrock
          }
       }
 
-      public ConnectionContextData(byte[] magicNumberBytesmagicBytes, uint maximumProtocolMessageLength = DEFAULT_MAX_PROTOCOL_MESSAGE_LENGTH)
+      public DeserializationContext(byte[] magicNumberBytesmagicBytes, uint maximumProtocolMessageLength = ProtocolDefinition.DEFAULT_MAX_PROTOCOL_MESSAGE_LENGTH)
       {
          this.MagicNumberBytes = magicNumberBytesmagicBytes;
          this.maximumProtocolMessageLength = maximumProtocolMessageLength;
@@ -114,7 +101,7 @@ namespace MithrilShards.Network.Bedrock
 
       public int GetTotalMessageLength()
       {
-         return HEADER_LENGTH + (int)this.payloadLength;
+         return ProtocolDefinition.HEADER_LENGTH + (int)this.payloadLength;
       }
    }
 }

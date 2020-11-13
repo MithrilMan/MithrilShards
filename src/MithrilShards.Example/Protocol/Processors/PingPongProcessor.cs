@@ -20,7 +20,7 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <summary>
       /// Time between pings automatically sent out for latency probing and keep-alive (in seconds).
       /// </summary>
-      const int PING_INTERVAL = 2 * 60;
+      const int PING_INTERVAL = 10;
 
       /// <summary>
       /// Time after which to disconnect, after waiting for a ping response (in seconds).
@@ -121,7 +121,7 @@ namespace MithrilShards.Example.Protocol.Processors
          if (this.status.PingRequestNonce != 0 && message.PongFancyResponse?.Nonce == this.status.PingRequestNonce)
          {
             var (Nonce, RoundTrip) = this.status.PongReceived(this.dateTimeProvider.GetTimeMicros());
-            this.logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec.", Nonce, RoundTrip);
+            this.logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec. {Quote}", Nonce, RoundTrip, message.PongFancyResponse.Quote);
             this.pingCancellationTokenSource.Cancel();
          }
          else

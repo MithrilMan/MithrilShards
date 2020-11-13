@@ -1,27 +1,26 @@
 ﻿{
    "ForgeConnectivity": {
+      "ForceShutdownAfter": 300,
       "MaxInboundConnections": 25,
+      "AllowLoopbackConnection": false,
       "Listeners": [
          {
-            "IsWhitelistingEndpoint": false,
-            "Endpoint": "127.0.0.1:45010"
+            "IsWhitelistingEndpoint": true,
+            "Endpoint": "0.0.0.0:45051"
          },
          {
             "IsWhitelistingEndpoint": true,
-            "Endpoint": "127.0.0.1:45011",
+            "Endpoint": "127.0.0.1:45052",
             "PublicEndpoint": "98.0.0.1:45011"
          }
-      ],
-      "Connections": [
-         { "Endpoint": "127.0.0.1:36443" },
-         { "Endpoint": "127.0.0.1:36259" }
       ]
    },
-   "StatisticsCollector": {
-      "ContinuousConsoleDisplay": false,
-      "ContinuousConsoleDisplayRate": 30
+   "Example": {
+      "MaxTimeAdjustment": 4200,
+      "Parameter1": 99
    },
-   "DevController": {
-      "EndPoint": "127.0.0.1:45018"
+   "StatisticsCollector": {
+      "ContinuousConsoleDisplay": true,
+      "ContinuousConsoleDisplayRate": 5
    }
 }

@@ -10,12 +10,9 @@ namespace MithrilShards.Core.Network.Events
    {
       public INetworkMessage Message { get; }
 
-      public int MessageSize { get; }
-
-      public PeerMessageReceived(IPeerContext peerContext, INetworkMessage message, int messageSize) : base(peerContext)
+      public PeerMessageReceived(IPeerContext peerContext, INetworkMessage message) : base(peerContext)
       {
          this.Message = message;
-         this.MessageSize = messageSize;
       }
    }
 }
