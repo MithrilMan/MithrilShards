@@ -15,13 +15,13 @@ namespace MithrilShards.Example
    public static class ForgeBuilderExtensions
    {
       /// <summary>
-      /// Uses the bitcoin chain.
+      /// Inject the Example shard.
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
       /// <param name="minimumSupportedVersion">The minimum version local nodes requires in order to connect to other peers.</param>
       /// <param name="currentVersion">The current version local peer aim to use with connected peers.</param>
       /// <returns></returns>
-      public static IForgeBuilder UseBitcoinChain(this IForgeBuilder forgeBuilder, int minimumSupportedVersion, int currentVersion)
+      public static IForgeBuilder UseExample(this IForgeBuilder forgeBuilder, int minimumSupportedVersion, int currentVersion)
       {
          if (forgeBuilder is null) throw new ArgumentNullException(nameof(forgeBuilder));
 

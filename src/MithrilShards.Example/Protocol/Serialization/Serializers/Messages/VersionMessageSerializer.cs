@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Example.Network;
 using MithrilShards.Example.Protocol.Messages;
 
@@ -8,8 +7,6 @@ namespace MithrilShards.Example.Protocol.Serialization.Serializers.Messages
 {
    public class VersionMessageSerializer : ExampleNetworkMessageSerializerBase<VersionMessage>
    {
-      public VersionMessageSerializer(INetworkDefinition chainDefinition) : base(chainDefinition) { }
-
       public override void Serialize(VersionMessage message, int protocolVersion, ExamplePeerContext peerContext, IBufferWriter<byte> output)
       {
          // outgoing version message doesn't have to look into passed protocolVersion but rely on it's message.Version.

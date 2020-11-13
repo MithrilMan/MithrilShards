@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using MithrilShards.Example.Network;
 using MithrilShards.Example.Protocol.Messages;
@@ -16,7 +15,7 @@ namespace MithrilShards.Example.Protocol.Serialization.Serializers.Messages
    {
       readonly IProtocolTypeSerializer<PongFancyResponse> pongFancyResponseSerializator;
 
-      public PongMessageSerializer(INetworkDefinition chainDefinition, IProtocolTypeSerializer<PongFancyResponse> pongFancyResponseSerializator) : base(chainDefinition)
+      public PongMessageSerializer(IProtocolTypeSerializer<PongFancyResponse> pongFancyResponseSerializator)
       {
          /// since the pong message has a complex type that can be reused in other payload (well, this is specific to pong but you get the idea) we are implementing a custom
          /// type serializer and inject it into this message serializer

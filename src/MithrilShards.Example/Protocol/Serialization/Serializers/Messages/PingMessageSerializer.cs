@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Example.Network;
 using MithrilShards.Example.Protocol.Messages;
 
@@ -11,8 +10,6 @@ namespace MithrilShards.Example.Protocol.Serialization.Serializers.Messages
    /// <seealso cref="ExampleNetworkMessageSerializerBase{PingMessage}" />
    public class PingMessageSerializer : ExampleNetworkMessageSerializerBase<PingMessage>
    {
-      public PingMessageSerializer(INetworkDefinition chainDefinition) : base(chainDefinition) { }
-
       public override void Serialize(PingMessage message, int protocolVersion, ExamplePeerContext peerContext, IBufferWriter<byte> output)
       {
          // suppose we created the nonce parameter in version 2, we wouldn't serialize this field if we are talking with a V2 peer
