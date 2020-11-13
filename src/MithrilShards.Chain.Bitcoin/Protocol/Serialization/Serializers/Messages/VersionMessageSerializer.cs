@@ -3,7 +3,6 @@ using System.Buffers;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages
@@ -12,7 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
    {
       private readonly IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer;
 
-      public VersionMessageSerializer(INetworkDefinition chainDefinition, IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer) : base(chainDefinition)
+      public VersionMessageSerializer(IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer)
       {
          this.networkAddressNoTimeSerializer = networkAddressNoTimeSerializer;
       }

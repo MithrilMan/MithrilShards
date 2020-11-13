@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using MithrilShards.Chain.Bitcoin.ChainDefinitions;
 using MithrilShards.Chain.Bitcoin.Consensus;
+using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin
 {
@@ -52,6 +53,11 @@ namespace MithrilShards.Chain.Bitcoin
       public static void ThrowNotSupportedException(string message)
       {
          throw new NotSupportedException(message);
+      }
+
+      public static void ThrowMessageSerializationException(string message)
+      {
+         throw new MessageSerializationException(message);
       }
    }
 }

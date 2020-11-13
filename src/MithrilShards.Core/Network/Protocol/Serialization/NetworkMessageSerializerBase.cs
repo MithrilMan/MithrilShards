@@ -4,14 +4,13 @@ using System.Reflection;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization
 {
-   public abstract class NetworkMessageSerializerBase<TMessageType> : INetworkMessageSerializer where TMessageType : INetworkMessage, new()
+   public abstract class NetworkMessageSerializerBase<TMessageType, TPeerContext> : INetworkMessageSerializer
+      where TMessageType : INetworkMessage, new()
+      where TPeerContext : IPeerContext
    {
-      protected readonly INetworkDefinition chainDefinition;
 
-      public NetworkMessageSerializerBase(INetworkDefinition chainDefinition)
+      public NetworkMessageSerializerBase()
       {
-         this.chainDefinition = chainDefinition ?? throw new ArgumentNullException(nameof(chainDefinition));
-
          Type messageType = typeof(TMessageType);
          NetworkMessageAttribute? networkMessageAttribute = messageType.GetCustomAttribute<NetworkMessageAttribute>();
          if (networkMessageAttribute == null)
@@ -20,9 +19,9 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          }
       }
 
-      public abstract TMessageType Deserialize(ref SequenceReader<byte> reader, int protocolVersion, IPeerContext peerContext);
+      public abstract TMessageType Deserialize(ref SequenceReader<byte> reader, int protocolVersion, TPeerContext peerContext);
 
-      public abstract void Serialize(TMessageType message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output);
+      public abstract void Serialize(TMessageType message, int protocolVersion, TPeerContext peerContext, IBufferWriter<byte> output);
 
       public Type GetMessageType()
       {
@@ -36,13 +35,13 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
             throw new ArgumentNullException(nameof(message));
          }
 
-         this.Serialize((TMessageType)message, protocolVersion, peerContext, output);
+         this.Serialize((TMessageType)message, protocolVersion, (TPeerContext)peerContext, output);
       }
 
       public INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion, IPeerContext peerContext)
       {
          var reader = new SequenceReader<byte>(data);
-         return this.Deserialize(ref reader, protocolVersion, peerContext);
+         return this.Deserialize(ref reader, protocolVersion, (TPeerContext)peerContext);
       }
    }
 }

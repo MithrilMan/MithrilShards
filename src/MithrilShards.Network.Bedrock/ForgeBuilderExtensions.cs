@@ -7,7 +7,15 @@ namespace MithrilShards.Network.Bedrock
 {
    public static class ForgeBuilderExtensions
    {
-      public static IForgeBuilder UseBedrockForgeServer(this IForgeBuilder forgeBuilder)
+      /// <summary>
+      /// Uses the bedrock forge server as connectivity provider.
+      /// </summary>
+      /// <typeparam name="TNetworkProtocolMessageSerializer">The type of the network message protocol to use to serialize and deserialize messages.
+      /// It has to implement <see cref="INetworkProtocolMessageSerializer"/>.</typeparam>
+      /// <param name="forgeBuilder">The forge builder.</param>
+      /// <returns></returns>
+      /// <exception cref="System.ArgumentNullException">forgeBuilder</exception>
+      public static IForgeBuilder UseBedrockForgeServer<TNetworkProtocolMessageSerializer>(this IForgeBuilder forgeBuilder) where TNetworkProtocolMessageSerializer : class, INetworkProtocolMessageSerializer
       {
          if (forgeBuilder is null)
          {
@@ -21,6 +29,7 @@ namespace MithrilShards.Network.Bedrock
                   .Replace(ServiceDescriptor.Singleton<IForgeConnectivity, BedrockForgeConnectivity>())
                   .AddSingleton<IConnectivityPeerStats, ConnectivityPeerStats>()
                   .AddSingleton<MithrilForgeClientConnectionHandler>()
+                  .AddTransient<INetworkProtocolMessageSerializer, TNetworkProtocolMessageSerializer>()
                   ;
             });
 

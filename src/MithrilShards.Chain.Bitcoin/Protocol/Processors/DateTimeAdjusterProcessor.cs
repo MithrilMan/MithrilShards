@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
-using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network.PeerBehaviorManager;
 
@@ -15,7 +14,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
    {
       readonly IDateTimeProvider dateTimeProvider;
 
-      public DateTimeAdjusterProcessor(ILogger<HandshakeProcessor> logger,
+      public DateTimeAdjusterProcessor(ILogger<DateTimeAdjusterProcessor> logger,
                                   IEventBus eventBus,
                                   IPeerBehaviorManager peerBehaviorManager,
                                   IDateTimeProvider dateTimeProvider

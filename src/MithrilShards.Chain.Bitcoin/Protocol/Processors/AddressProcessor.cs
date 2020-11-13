@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       INetworkMessageHandler<AddrMessage>
    {
 
-      public AddressProcessor(ILogger<HandshakeProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager)
+      public AddressProcessor(ILogger<AddressProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
       {
       }

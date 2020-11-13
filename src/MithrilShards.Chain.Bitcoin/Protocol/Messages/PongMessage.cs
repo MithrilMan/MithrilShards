@@ -10,7 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
       string INetworkMessage.Command => COMMAND;
 
       /// <summary>
-      /// A random nonce that identifies the ping request.
+      /// The nonce received from the ping request.
       /// </summary>
       public ulong Nonce { get; set; }
    }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
+namespace MithrilShards.Core.Network.Protocol.Serialization
 {
    [Serializable]
    public class MessageSerializationException : Exception

@@ -2,7 +2,6 @@
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages
@@ -12,7 +11,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
       private static readonly GetDataMessage instance = new GetDataMessage();
       readonly IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer;
 
-      public GetDataMessageSerializer(INetworkDefinition chainDefinition, IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer) : base(chainDefinition)
+      public GetDataMessageSerializer(IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer)
       {
          this.inventoryVectorSerializer = inventoryVectorSerializer;
       }

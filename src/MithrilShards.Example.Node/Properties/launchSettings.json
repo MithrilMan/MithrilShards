@@ -1,0 +1,15 @@
+{
+   "profiles": {
+      "both": {
+         "commandName": "Project"
+      },
+      "node1": {
+         "commandName": "Project",
+         "commandLineArgs": "1"
+      },
+      "node 2": {
+         "commandName": "Project",
+         "commandLineArgs": "2"
+      }
+   }
+}

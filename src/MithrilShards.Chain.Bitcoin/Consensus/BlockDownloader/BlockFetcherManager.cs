@@ -177,7 +177,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                return;
             }
 
-            var currentPending = pendingDownloads.FirstOrDefault(d => d.BlockInDownload.Hash == blockHash);
+            //TODO: pendingDownloads can change during enumeration, so the ToList is used here to prevent that, could be better?
+            var currentPending = pendingDownloads.ToList().FirstOrDefault(d => d.BlockInDownload.Hash == blockHash);
 
             if (currentPending != null)
             {

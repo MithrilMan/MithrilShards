@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
+using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Core
 {
@@ -44,6 +43,11 @@ namespace MithrilShards.Core
       public static void ThrowNullReferenceException(string message)
       {
          throw new NullReferenceException(message);
+      }
+
+      public static void ThrowMessageSerializationException(string message)
+      {
+         throw new MessageSerializationException(message);
       }
    }
 }

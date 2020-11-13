@@ -9,15 +9,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
 {
    public static class IBufferWriterExtensions
    {
-      /// <summary>
-      /// Serialize a <typeparamref name="TItem"/> type.
-      /// </summary>
-      /// <typeparam name="TItem">The type of the item to serialize.</typeparam>
-      /// <param name="writer">The writer used to write the serialized data.</param>
-      /// <param name="item">The item to serialize.</param>
-      /// <returns>The length of bytes serialized.</returns>
-      public delegate int ItemSerializer<TItem>(IBufferWriter<byte> writer, TItem item);
-
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteBool(this IBufferWriter<byte> writer, bool value)
       {
@@ -155,7 +146,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       {
          if (value is null)
          {
-            throw new ArgumentNullException(nameof(value));
+            ThrowHelper.ThrowArgumentNullException(nameof(value));
          }
 
          writer.Write(value);

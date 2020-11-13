@@ -3,7 +3,6 @@ using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages
@@ -13,9 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
       private readonly IProtocolTypeSerializer<BlockLocator> blockLocatorSerializer;
       private readonly IProtocolTypeSerializer<UInt256> uint256Serializer;
 
-      public GetHeadersMessageSerializer(INetworkDefinition chainDefinition,
-                                         IProtocolTypeSerializer<BlockLocator> blockLocatorSerializer,
-                                         IProtocolTypeSerializer<UInt256> uint256Serializer) : base(chainDefinition)
+      public GetHeadersMessageSerializer(IProtocolTypeSerializer<BlockLocator> blockLocatorSerializer, IProtocolTypeSerializer<UInt256> uint256Serializer)
       {
          this.blockLocatorSerializer = blockLocatorSerializer;
          this.uint256Serializer = uint256Serializer;

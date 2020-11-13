@@ -2,7 +2,6 @@
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages
@@ -11,7 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
    {
       private readonly IProtocolTypeSerializer<Block> blockSerializer;
 
-      public BlockMessageSerializer(INetworkDefinition chainDefinition, IProtocolTypeSerializer<Block> blockSerializer) : base(chainDefinition)
+      public BlockMessageSerializer(IProtocolTypeSerializer<Block> blockSerializer)
       {
          this.blockSerializer = blockSerializer;
       }
