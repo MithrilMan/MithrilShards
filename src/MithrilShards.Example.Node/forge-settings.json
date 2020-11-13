@@ -1,0 +1,27 @@
+﻿{
+   "ForgeConnectivity": {
+      "MaxInboundConnections": 25,
+      "Listeners": [
+         {
+            "IsWhitelistingEndpoint": false,
+            "Endpoint": "127.0.0.1:45010"
+         },
+         {
+            "IsWhitelistingEndpoint": true,
+            "Endpoint": "127.0.0.1:45011",
+            "PublicEndpoint": "98.0.0.1:45011"
+         }
+      ],
+      "Connections": [
+         { "Endpoint": "127.0.0.1:36443" },
+         { "Endpoint": "127.0.0.1:36259" }
+      ]
+   },
+   "StatisticsCollector": {
+      "ContinuousConsoleDisplay": false,
+      "ContinuousConsoleDisplayRate": 30
+   },
+   "DevController": {
+      "EndPoint": "127.0.0.1:45018"
+   }
+}

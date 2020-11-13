@@ -1,0 +1,31 @@
+﻿{
+   "ForgeConnectivity": {
+      "ForceShutdownAfter": 300,
+      "MaxInboundConnections": 25,
+      "AllowLoopbackConnection": false,
+      "Listeners": [
+         {
+            "IsWhitelistingEndpoint": true,
+            "Endpoint": "0.0.0.0:45017"
+         },
+         {
+            "IsWhitelistingEndpoint": true,
+            "Endpoint": "127.0.0.1:45011",
+            "PublicEndpoint": "98.0.0.1:45011"
+         }
+      ],
+      "Connections": [
+         { "Endpoint": "127.0.0.1:19000" }
+      ]
+   },
+   "Bitcoin": {
+      "MaxTimeAdjustment": 4200
+   },
+   "StatisticsCollector": {
+      "ContinuousConsoleDisplay": false,
+      "ContinuousConsoleDisplayRate": 5
+   },
+   "DevController": {
+      "EndPoint": "127.0.0.1:45018"
+   }
+}

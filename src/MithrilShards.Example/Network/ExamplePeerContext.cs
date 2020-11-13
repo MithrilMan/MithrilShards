@@ -1,0 +1,47 @@
+﻿using System;
+using System.Net;
+using Microsoft.Extensions.Logging;
+using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Events;
+using MithrilShards.Core.Network.Protocol;
+using MithrilShards.Core.Network.Protocol.Processors;
+
+namespace MithrilShards.Example.Network
+{
+   public class ExamplePeerContext : PeerContext
+   {
+
+      /// <summary>
+      /// The peer time offset.
+      /// </summary>
+      public TimeSpan TimeOffset { get; set; } = TimeSpan.Zero;
+
+      /// <summary>
+      /// Peer permissions.
+      /// </summary>
+      public ExamplePeerPermissions Permissions { get; set; } = new ExamplePeerPermissions();
+
+      public ExamplePeerContext(ILogger logger,
+                                IEventBus eventBus,
+                                PeerConnectionDirection direction,
+                                string peerId,
+                                EndPoint localEndPoint,
+                                EndPoint publicEndPoint,
+                                EndPoint remoteEndPoint,
+                                INetworkMessageWriter messageWriter)
+         : base(logger, eventBus, direction, peerId, localEndPoint, publicEndPoint, remoteEndPoint, messageWriter) { }
+
+      public override void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor)
+      {
+         base.AttachNetworkMessageProcessor(messageProcessor);
+      }
+
+      public void OnHandshakeCompleted(Protocol.Messages.VersionMessage peerVersion)
+      {
+         this.UserAgent = peerVersion.UserAgent;
+         this.IsConnected = true;
+         this.eventBus.Publish(new PeerHandshaked(this));
+      }
+   }
+}
