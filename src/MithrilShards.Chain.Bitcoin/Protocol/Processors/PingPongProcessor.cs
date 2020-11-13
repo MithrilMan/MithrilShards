@@ -32,7 +32,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private CancellationTokenSource pingCancellationTokenSource = null!;
 
-      public PingPongProcessor(ILogger<HandshakeProcessor> logger,
+      public PingPongProcessor(ILogger<PingPongProcessor> logger,
                                IEventBus eventBus,
                                IPeerBehaviorManager peerBehaviorManager,
                                IRandomNumberGenerator randomNumberGenerator,

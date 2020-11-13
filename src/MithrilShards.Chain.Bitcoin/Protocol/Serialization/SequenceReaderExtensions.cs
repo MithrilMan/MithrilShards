@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using MithrilShards.Core.Network.Protocol.Serialization;
@@ -9,26 +8,22 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
 {
    public static class SequenceReaderExtensions
    {
-      /// <summary>
-      /// Deserialize a <typeparamref name="TItem"/> type.
-      /// </summary>
-      /// <typeparam name="TItem">The type of the item to deserialize.</typeparam>
-      /// <param name="reader">The reader from which fetch data.</param>
-      /// <returns>The serialized item.</returns>
-      public delegate TItem ItemDeserializer<TItem>(ref SequenceReader<byte> reader);
-
       private const string NotEnoughBytesLeft = "Cannot read data, not enough bytes left.";
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static bool ReadBool(ref this SequenceReader<byte> reader)
       {
-         return reader.TryRead(out byte value) ? (value > 0) : throw new MessageSerializationException(NotEnoughBytesLeft);
+         if (!reader.TryRead(out byte value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+         return value > 0;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static byte ReadByte(ref this SequenceReader<byte> reader)
       {
-         return reader.TryRead(out byte value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
+         if (!reader.TryRead(out byte value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+         return value;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -36,11 +31,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       {
          if (isBigEndian)
          {
-            return reader.TryReadBigEndian(out short value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadBigEndian(out short value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return value;
          }
          else
          {
-            return reader.TryReadLittleEndian(out short value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadLittleEndian(out short value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return value;
          }
       }
 
@@ -49,11 +48,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       {
          if (isBigEndian)
          {
-            return reader.TryReadBigEndian(out short value) ? (ushort)value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadBigEndian(out short value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return (ushort)value;
          }
          else
          {
-            return reader.TryReadLittleEndian(out short value) ? (ushort)value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadLittleEndian(out short value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return (ushort)value;
          }
       }
 
@@ -62,11 +65,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       {
          if (isBigEndian)
          {
-            return reader.TryReadBigEndian(out int value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadBigEndian(out int value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return value;
          }
          else
          {
-            return reader.TryReadLittleEndian(out int value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadLittleEndian(out int value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return value;
          }
       }
 
@@ -75,11 +82,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       {
          if (isBigEndian)
          {
-            return reader.TryReadBigEndian(out int value) ? (uint)value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadBigEndian(out int value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return (uint)value;
          }
          else
          {
-            return reader.TryReadLittleEndian(out int value) ? (uint)value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadLittleEndian(out int value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return (uint)value;
          }
       }
 
@@ -88,11 +99,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       {
          if (isBigEndian)
          {
-            return reader.TryReadBigEndian(out long value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadBigEndian(out long value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return value;
          }
          else
          {
-            return reader.TryReadLittleEndian(out long value) ? value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadLittleEndian(out long value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return value;
          }
       }
 
@@ -101,11 +116,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       {
          if (isBigEndian)
          {
-            return reader.TryReadBigEndian(out long value) ? (ulong)value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadBigEndian(out long value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return (ulong)value;
          }
          else
          {
-            return reader.TryReadLittleEndian(out long value) ? (ulong)value : throw new MessageSerializationException(NotEnoughBytesLeft);
+            if (!reader.TryReadLittleEndian(out long value)) ThrowHelper.ThrowMessageSerializationException(NotEnoughBytesLeft);
+
+            return (ulong)value;
          }
       }
 
