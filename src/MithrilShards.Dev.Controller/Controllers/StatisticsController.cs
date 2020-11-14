@@ -11,15 +11,16 @@ using MithrilShards.Diagnostic.StatisticsCollector.Models;
 namespace MithrilShards.Dev.Controller.Controllers
 {
    [ApiController]
+   [DevController]
    [TypeFilter(typeof(StatisticOnlyActionFilterAttribute))]
    [Route("[controller]")]
    public class StatisticsController : ControllerBase
    {
-      private readonly ILogger<PeerManagementController> logger;
+      private readonly ILogger<StatisticsController> logger;
       // StatisticOnlyActionFilterAttribute will prevent to use actions in this controller if StatisticFeedsCollector isn't resolved
-      readonly StatisticFeedsCollector statisticFeedsCollector = null!;
+      readonly IStatisticFeedsCollector statisticFeedsCollector = null!;
 
-      public StatisticsController(ILogger<PeerManagementController> logger, StatisticFeedsCollector? statisticFeedsCollector = null)
+      public StatisticsController(ILogger<StatisticsController> logger, IStatisticFeedsCollector statisticFeedsCollector = null)
       {
          this.logger = logger;
          this.statisticFeedsCollector = statisticFeedsCollector!;
@@ -45,7 +46,8 @@ namespace MithrilShards.Dev.Controller.Controllers
             {
                RawStatisticFeedResult result => this.Ok(result),
                TabularStatisticFeedResult result => this.Content(result.Content, "text/plain"),
-               IStatisticFeedResult result => this.Ok(result)
+               IStatisticFeedResult result => this.Ok(result),
+               _ => this.NotFound()
             };
          }
          catch (System.ArgumentException)
@@ -60,12 +62,12 @@ namespace MithrilShards.Dev.Controller.Controllers
       [Route("AvailableFeeds")]
       public IEnumerable<StatisticsGetAvailableFeeds> GetAvailableFeeds()
       {
-         return this.statisticFeedsCollector.GetAvailableFeeds()
+         return this.statisticFeedsCollector.GetRegisteredFeedsDefinitions()
             .Select(feed => new StatisticsGetAvailableFeeds
             {
                FeedId = feed.FeedId,
                Title = feed.Title,
-               Fields = feed.Fields.Select(field => new KeyValuePair<string, string>(field.label, field.description)).ToList()
+               Fields = feed.FieldsDefinition.Select(field => new StatisticsGetAvailableFeeds.StatisticFeedField { Label = field.Label, Description = field.Description }).ToList()
             });
       }
    }

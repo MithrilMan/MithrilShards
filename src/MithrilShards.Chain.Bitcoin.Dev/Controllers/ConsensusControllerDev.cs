@@ -1,27 +1,24 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Core.Network.Client;
-using MithrilShards.Core.Network.Events;
-using MithrilShards.Dev.Controller.Models.Requests;
+using MithrilShards.Dev.Controller;
 
-namespace MithrilShards.Dev.Controller.Controllers
+namespace MithrilShards.Chain.Bitcoin.Dev
 {
    [ApiController]
+   [DevController]
    [Route("[controller]")]
-   public class ConsensusController : ControllerBase
+   public class ConsensusControllerDev : ControllerBase
    {
-      private readonly ILogger<ConsensusController> logger;
+      private readonly ILogger<ConsensusControllerDev> logger;
       readonly IEventBus eventBus;
       readonly IChainState chainState;
 
-      public ConsensusController(ILogger<ConsensusController> logger, IEventBus eventBus, IChainState chainState)
+      public ConsensusControllerDev(ILogger<ConsensusControllerDev> logger, IEventBus eventBus, IChainState chainState)
       {
          this.logger = logger;
          this.eventBus = eventBus;

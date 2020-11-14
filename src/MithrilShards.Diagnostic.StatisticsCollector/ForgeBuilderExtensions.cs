@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using MithrilShards.Core.Forge;
 using MithrilShards.Core.Statistics;
 
@@ -20,9 +19,8 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
             (hostBuildContext, services) =>
             {
                services
-                  .AddSingleton<StatisticFeedsCollector>()
-                  .AddSingleton<IStatisticFeedsCollector>(sp => sp.GetRequiredService<StatisticFeedsCollector>())
-                  .AddSingleton<IHostedService>(sp => sp.GetRequiredService<StatisticFeedsCollector>())
+                  .AddSingleton<IStatisticFeedsCollector, StatisticFeedsCollector>()
+                  .AddHostedService(sp => sp.GetRequiredService<IStatisticFeedsCollector>())
                   ;
             });
 

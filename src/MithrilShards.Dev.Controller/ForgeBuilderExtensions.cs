@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using MithrilShards.Core.Forge;
 
 namespace MithrilShards.Dev.Controller
@@ -15,54 +17,20 @@ namespace MithrilShards.Dev.Controller
       /// Uses the bitcoin chain.
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
-      /// <param name="minimumSupportedVersion">The minimum version local nodes requires in order to connect to other peers.</param>
-      /// <param name="currentVersion">The current version local peer aim to use with connected peers.</param>
+      /// <param name="assemblyScaffoldEnabler">Action to wake up assembly that doesn't have an entry point, allowing to discover Dev Controllers in that assembly.
+      /// Useful to include these assemblies that didn't have an entry point and wouldn't be loaded.</param>
+      /// <param name="configurationFile">The configuration file.</param>
       /// <returns></returns>
-      public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder, string? configurationFile = null)
+      public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder, Action<DevAssemblyScaffolder> assemblyScaffoldEnabler = null, string? configurationFile = null)
       {
+         var scaffolder = new DevAssemblyScaffolder();
+         assemblyScaffoldEnabler?.Invoke(scaffolder);
+
          forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>(
             (hostBuildContext, services) =>
             {
-               //services
-               //   .AddSingleton<StatisticFeedsCollector>()
-               //   .AddSingleton<IStatisticFeedsCollector>(sp => sp.GetRequiredService<StatisticFeedsCollector>())
-               //   .AddSingleton<IHostedService>(sp => sp.GetRequiredService<StatisticFeedsCollector>())
-               //   ;
+               services.AddSingleton<DevAssemblyScaffolder>(scaffolder);
             });
-
-
-         forgeBuilder.ExtendInnerHostBuilder(builder =>
-         {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                  .AddJsonFile(configurationFile ?? forgeBuilder.ConfigurationFileName, true)
-                  .Build();
-
-            var settings = new DevControllerSettings();
-
-            if (!configuration.GetSection(settings.ConfigurationSection).Exists())
-            {
-               return; //skipping host creation but can't log anything at this stage...
-            }
-
-            configuration.Bind(settings.ConfigurationSection, settings);
-
-            if (!IPEndPoint.TryParse(settings.EndPoint, out IPEndPoint iPEndPoint))
-            {
-               throw new ArgumentException($"Wrong configuration parameter for {nameof(settings.EndPoint)}");
-            }
-
-            builder
-            .UseContentRoot(Directory.GetCurrentDirectory())
-            .ConfigureWebHost(webBuilder =>
-            {
-               webBuilder
-                  .UseKestrel(serverOptions =>
-                  {
-                     serverOptions.Listen(iPEndPoint);
-                  })
-                  .UseStartup<Startup>();
-            });
-         });
 
          return forgeBuilder;
       }

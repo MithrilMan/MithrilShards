@@ -26,6 +26,7 @@
       "ContinuousConsoleDisplayRate": 5
    },
    "DevController": {
-      "EndPoint": "127.0.0.1:45018"
+      "EndPoint": "127.0.0.1:45018",
+      "Enabled": true
    }
 }

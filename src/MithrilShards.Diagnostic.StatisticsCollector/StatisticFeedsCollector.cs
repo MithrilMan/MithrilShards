@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.Extensions;
@@ -13,10 +12,11 @@ using MithrilShards.Diagnostic.StatisticsCollector.Models;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector
 {
-   public class StatisticFeedsCollector : IHostedService, IStatisticFeedsCollector
+   public class StatisticFeedsCollector : IStatisticFeedsCollector
    {
-      readonly List<ScheduledStatisticFeed> registeredfeedDefinitions = new List<ScheduledStatisticFeed>();
-      readonly ILogger<StatisticFeedsCollector> logger;
+      private readonly List<ScheduledStatisticFeed> scheduledFeeds = new List<ScheduledStatisticFeed>();
+      private readonly List<StatisticFeedDefinition> registeredfeedDefinitions = new List<StatisticFeedDefinition>();
+      private readonly ILogger<StatisticFeedsCollector> logger;
       private readonly object statisticsFeedsLock = new object();
       private readonly StringBuilder logStringBuilder;
       private readonly StatisticsCollectorSettings settings;
@@ -36,23 +36,16 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
             {
                foreach (StatisticFeedDefinition feed in statisticfeeds)
                {
-                  this.registeredfeedDefinitions.Add(new ScheduledStatisticFeed(statisticSource, feed));
+                  this.registeredfeedDefinitions.Add(feed);
+                  this.scheduledFeeds.Add(new ScheduledStatisticFeed(statisticSource, feed));
                }
             }
          }
       }
 
-      public IEnumerable<(string FeedId, string Title, IEnumerable<(string label, string description)> Fields)> GetAvailableFeeds()
+      public IEnumerable<StatisticFeedDefinition> GetRegisteredFeedsDefinitions()
       {
-         return this.registeredfeedDefinitions.Select(registeredFeed =>
-         {
-            StatisticFeedDefinition feedDefinition = registeredFeed.StatisticFeedDefinition;
-            return (
-               FeedId: feedDefinition.FeedId,
-               Title: feedDefinition.Title,
-               Fields: feedDefinition.FieldsDefinition.Select(field => (field.Label, field.Description))
-               );
-         });
+         return this.registeredfeedDefinitions.AsEnumerable();
       }
 
       /// <summary>
@@ -122,7 +115,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          lock (this.statisticsFeedsLock)
          {
             DateTimeOffset currentTime = DateTimeOffset.Now;
-            foreach (ScheduledStatisticFeed feed in this.registeredfeedDefinitions)
+            foreach (ScheduledStatisticFeed feed in this.scheduledFeeds)
             {
                if (forceFetch || feed.NextPlannedExecution <= currentTime)
                {
@@ -153,16 +146,6 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
             {
                foreach (object?[] values in statisticValues)
                {
-                  //for (int i = 0; i < feedDefinition.FieldsDefinition.Count; i++)
-                  //{
-                  //   FieldDefinition field = feedDefinition.FieldsDefinition[i];
-                  //   // apply formatting if needed
-                  //   if (field.ValueFormatter != null)
-                  //   {
-                  //      values[i] = field.ValueFormatter((value: values[i], widthHint: field.WidthHint));
-                  //   }
-                  //}
-
                   newValues.Add(feedDefinition.FieldsDefinition
                      .Select((field, index) => field.ValueFormatter?.Invoke((value: values[index], widthHint: field.WidthHint)) ?? values[index]?.ToString())
                      .ToArray()
@@ -199,7 +182,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
          lock (this.statisticsFeedsLock)
          {
-            return this.registeredfeedDefinitions.Select(feed => feed.GetLastResultsDump());
+            return this.scheduledFeeds.Select(feed => feed.GetLastResultsDump());
          }
       }
 
@@ -211,7 +194,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public IStatisticFeedResult GetFeedDump(string feedId, bool humanReadable)
       {
-         ScheduledStatisticFeed feed = this.registeredfeedDefinitions.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
+         ScheduledStatisticFeed feed = this.scheduledFeeds.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
          if (feed == null)
          {
             throw new ArgumentException("feedId not found");

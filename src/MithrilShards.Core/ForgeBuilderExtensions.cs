@@ -36,7 +36,6 @@ namespace MithrilShards.Core
                .AddSingleton<IRandomNumberGenerator, DefaultRandomNumberGenerator>()
                .AddSingleton<IUserAgentBuilder, UserAgentBuilder>()
 
-               //fake or null miscellaneous implementations
                .AddSingleton<IStatisticFeedsCollector, StatisticFeedsCollectorNullImplementation>()
 
                .ConfigureNetwork()

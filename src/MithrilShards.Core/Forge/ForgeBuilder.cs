@@ -70,6 +70,7 @@ namespace MithrilShards.Core.Forge
 
             services
                .AddOptions()
+               .AddSingleton<IServiceCollection>(services) // register forge service collection in order to create other sandboxed serviceProviders in other Hosts (e.g. for API purpose)
                .AddSingleton<IForge, TForgeImplementation>()
                .AddHostedService<TForgeImplementation>(serviceProvider => (TForgeImplementation)serviceProvider.GetRequiredService<IForge>())
                .ConfigureForge(context);
