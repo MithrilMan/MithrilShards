@@ -67,7 +67,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Chain.Bitcoin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Example.Network.Bedrock", "src\MithrilShards.Example.Network.Bedrock\MithrilShards.Example.Network.Bedrock.csproj", "{45EABAAF-8B71-45CC-8760-F79BCA492082}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Chain.Bitcoin.Dev", "src\MithrilShards.Chain.Bitcoin.Dev\MithrilShards.Chain.Bitcoin.Dev.csproj", "{B8EF62DB-EF9C-482F-89E6-B126B59C1932}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Chain.Bitcoin.Dev", "src\MithrilShards.Chain.Bitcoin.Dev\MithrilShards.Chain.Bitcoin.Dev.csproj", "{B8EF62DB-EF9C-482F-89E6-B126B59C1932}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Example.Dev", "src\MithrilShards.Example.Dev\MithrilShards.Example.Dev.csproj", "{77FFCAB0-A65D-41AF-846D-7CCB54A5EEC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -135,6 +137,10 @@ Global
 		{B8EF62DB-EF9C-482F-89E6-B126B59C1932}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8EF62DB-EF9C-482F-89E6-B126B59C1932}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8EF62DB-EF9C-482F-89E6-B126B59C1932}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77FFCAB0-A65D-41AF-846D-7CCB54A5EEC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77FFCAB0-A65D-41AF-846D-7CCB54A5EEC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77FFCAB0-A65D-41AF-846D-7CCB54A5EEC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77FFCAB0-A65D-41AF-846D-7CCB54A5EEC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,6 +159,7 @@ Global
 		{26B114D3-71E0-48DC-A46B-67BACDDA1CC5} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
 		{45EABAAF-8B71-45CC-8760-F79BCA492082} = {1835C1F7-09DC-4168-8471-55484711C175}
 		{B8EF62DB-EF9C-482F-89E6-B126B59C1932} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
+		{77FFCAB0-A65D-41AF-846D-7CCB54A5EEC3} = {1835C1F7-09DC-4168-8471-55484711C175}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}

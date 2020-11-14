@@ -106,7 +106,7 @@ namespace MithrilShards.Core.Threading
                   Interlocked.Increment(ref exceptionsCount);
 
                   IPeriodicWorkExceptionHandler.Feedback feedback = new IPeriodicWorkExceptionHandler.Feedback(!stopOnException, false, null);
-                  this.exceptionHandler?.OnException(this, ex, ref feedback);
+                  this.exceptionHandler?.OnPeriodicWorkException(this, ex, ref feedback);
 
                   if (!feedback.ContinueExecution)
                   {
