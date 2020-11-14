@@ -93,7 +93,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          blockRequestLoop.Configure(stopOnException: false, this);
       }
 
-      public void OnException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
+      public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
          string? disconnectionReason = failedWork switch
          {

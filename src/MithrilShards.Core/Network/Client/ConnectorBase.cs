@@ -85,7 +85,7 @@ namespace MithrilShards.Core.Network.Client
       /// <returns></returns>
       protected abstract ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation);
 
-      public void OnException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
+      public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
          if (failedWork == this.connectionLoop)
          {

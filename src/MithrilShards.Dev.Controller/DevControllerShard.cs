@@ -106,8 +106,6 @@ namespace MithrilShards.Dev.Controller
                {
                   mvcBuilder.AddApplicationPart(shardAssembly);
                }
-
-               //.AddApplicationPart(forgeBuilder.sh ;
             }).Build();
 
 
@@ -119,6 +117,7 @@ namespace MithrilShards.Dev.Controller
          if (webHost != null)
          {
             webHost.StartAsync(cancellationToken);
+            this.logger.LogInformation("DevController API started, listening to endpoint {ListenerLocalEndpoint}/swagger.", settings.EndPoint);
          }
 
 

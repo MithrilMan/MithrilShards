@@ -4,7 +4,7 @@ namespace MithrilShards.Core.Threading
 {
    public interface IPeriodicWorkExceptionHandler
    {
-      void OnException(IPeriodicWork failedWork, Exception ex, ref Feedback feedback);
+      void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref Feedback feedback);
 
       public class Feedback
       {

@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using MithrilShards.Core.Forge;
+using MithrilShards.Dev.Controller;
 using MithrilShards.Diagnostic.StatisticsCollector;
+using MithrilShards.Example.Dev;
 using MithrilShards.Example.Network.Bedrock;
 using MithrilShards.Example.Protocol;
 using MithrilShards.Logging.Serilog;
@@ -33,6 +35,11 @@ namespace MithrilShards.Example.Node
               .UseSerilog("log-settings-with-seq.json")
               .UseBedrockForgeServer<ExampleNetworkProtocolMessageSerializer>()
               .UseStatisticsCollector()
+              /// we are injecting ExampleDev type to allow devcontroller to find all the dev controllers defined there
+              /// because only controller in added shard assemblies are discovered automatically.
+              /// Passing ExampleDev will cause dotnet runtime to load the assembly where ExampleDev lies and will be
+              /// scaffolded later into the DevController initialization.
+              .UseDevController(assemblyScaffoldEnabler => assemblyScaffoldEnabler.LoadAssemblyFromType<ExampleDev>())
               .UseExample(KnownVersion.V1, KnownVersion.CurrentVersion)
               .RunConsoleAsync()
               ;

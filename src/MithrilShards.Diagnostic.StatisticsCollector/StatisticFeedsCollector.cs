@@ -74,7 +74,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <summary>
       /// Starts the asynchronous fetching loop and console display of statistic feeds.
       /// </summary>
-      /// <remarks>Use</remarks>
+      /// <remarks>Can't use <see cref="Core.Threading.IPeriodicWork"/> because of circular references.</remarks>
       /// <param name="cancellationToken">The cancellation token.</param>
       public async Task StartFetchingLoopAsync(CancellationToken cancellationToken)
       {

@@ -147,7 +147,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
          return Task.CompletedTask;
       }
 
-      public void OnException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
+      public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
          this.logger.LogCritical("An unhandled exception has been raised in the {0} work.", failedWork.Label);
          feedback.ContinueExecution = false;

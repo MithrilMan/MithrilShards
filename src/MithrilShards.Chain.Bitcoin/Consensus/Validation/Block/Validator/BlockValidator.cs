@@ -46,7 +46,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
          this.validationLoop.Configure(false, this);
       }
 
-      public void OnException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
+      public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
          this.logger.LogCritical("An unhandled exception has been raised in the block validation loop.");
          feedback.IsCritical = true;

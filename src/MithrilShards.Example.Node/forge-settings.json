@@ -22,5 +22,9 @@
    "StatisticsCollector": {
       "ContinuousConsoleDisplay": true,
       "ContinuousConsoleDisplayRate": 5
+   },
+   "DevController": {
+      "Enabled": true,
+      "EndPoint": "127.0.0.1:45013"
    }
 }
