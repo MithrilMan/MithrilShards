@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MithrilShards.Chain.Bitcoin.Dev\MithrilShards.Chain.Bitcoin.Dev.csproj" />
     <ProjectReference Include="..\MithrilShards.Chain.Bitcoin.Network.Bedrock\MithrilShards.Chain.Bitcoin.Network.Bedrock.csproj" />
     <ProjectReference Include="..\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
     <ProjectReference Include="..\MithrilShards.Dev.Controller\MithrilShards.Dev.Controller.csproj" />

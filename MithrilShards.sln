@@ -63,9 +63,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Example", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Example.Node", "src\MithrilShards.Example.Node\MithrilShards.Example.Node.csproj", "{38FAA2E2-D49F-45C2-8342-3B4332D633B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Chain.Bitcoin.Network.Bedrock", "src\MithrilShards.Chain.Bitcoin.Network.Bedrock\MithrilShards.Chain.Bitcoin.Network.Bedrock.csproj", "{26B114D3-71E0-48DC-A46B-67BACDDA1CC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Chain.Bitcoin.Network.Bedrock", "src\MithrilShards.Chain.Bitcoin.Network.Bedrock\MithrilShards.Chain.Bitcoin.Network.Bedrock.csproj", "{26B114D3-71E0-48DC-A46B-67BACDDA1CC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Example.Network.Bedrock", "src\MithrilShards.Example.Network.Bedrock\MithrilShards.Example.Network.Bedrock.csproj", "{45EABAAF-8B71-45CC-8760-F79BCA492082}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Example.Network.Bedrock", "src\MithrilShards.Example.Network.Bedrock\MithrilShards.Example.Network.Bedrock.csproj", "{45EABAAF-8B71-45CC-8760-F79BCA492082}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.Chain.Bitcoin.Dev", "src\MithrilShards.Chain.Bitcoin.Dev\MithrilShards.Chain.Bitcoin.Dev.csproj", "{B8EF62DB-EF9C-482F-89E6-B126B59C1932}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,10 @@ Global
 		{45EABAAF-8B71-45CC-8760-F79BCA492082}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45EABAAF-8B71-45CC-8760-F79BCA492082}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45EABAAF-8B71-45CC-8760-F79BCA492082}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8EF62DB-EF9C-482F-89E6-B126B59C1932}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8EF62DB-EF9C-482F-89E6-B126B59C1932}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8EF62DB-EF9C-482F-89E6-B126B59C1932}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8EF62DB-EF9C-482F-89E6-B126B59C1932}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,7 +144,7 @@ Global
 		{BBD15267-F1C4-4D1E-B4C5-08D7A91B1343} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
 		{C1B18295-7204-48B6-B6B1-5FA036B8ACE8} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
 		{54E1A44C-2EAC-440E-8802-B2EDCC328624} = {BEA3071B-CDD3-4FD7-9B59-71C1F7CF23BB}
-		{7F79C482-85AD-4F12-8484-FBD22D5DDAF9} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
+		{7F79C482-85AD-4F12-8484-FBD22D5DDAF9} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
 		{9B12BFCF-C8D6-4E80-95B9-EB4A314D18D2} = {73FF5914-1F61-48DA-9E72-4A2FA4C82123}
 		{5628DBAE-A281-4E46-A018-88D5337FA5D1} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
 		{1835C1F7-09DC-4168-8471-55484711C175} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
@@ -146,6 +152,7 @@ Global
 		{38FAA2E2-D49F-45C2-8342-3B4332D633B6} = {1835C1F7-09DC-4168-8471-55484711C175}
 		{26B114D3-71E0-48DC-A46B-67BACDDA1CC5} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
 		{45EABAAF-8B71-45CC-8760-F79BCA492082} = {1835C1F7-09DC-4168-8471-55484711C175}
+		{B8EF62DB-EF9C-482F-89E6-B126B59C1932} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}

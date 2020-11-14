@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
+    <ProjectReference Include="..\MithrilShards.Dev.Controller\MithrilShards.Dev.Controller.csproj" />
+  </ItemGroup>
+
+</Project>

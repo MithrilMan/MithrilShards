@@ -13,13 +13,13 @@ namespace MithrilShards.Dev.Controller.Controllers
 {
    [ApiController]
    [Route("[controller]")]
-   public class PeerManagementController : ControllerBase
+   public class PeerManagementControllerDev : ControllerBase
    {
-      private readonly ILogger<PeerManagementController> logger;
+      private readonly ILogger<PeerManagementControllerDev> logger;
       readonly IEventBus eventBus;
       readonly RequiredConnection? requiredConnection;
 
-      public PeerManagementController(ILogger<PeerManagementController> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
+      public PeerManagementControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
       {
          this.logger = logger;
          this.eventBus = eventBus;
