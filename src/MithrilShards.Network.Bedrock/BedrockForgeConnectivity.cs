@@ -161,7 +161,7 @@ namespace MithrilShards.Network.Bedrock
          this.logger.LogDebug("Connection attempt to {RemoteEndPoint}", remoteEndPoint);
          try
          {
-            await using ConnectionContext connection = await this.client.ConnectAsync((IPEndPoint)remoteEndPoint).ConfigureAwait(false);
+            await using ConnectionContext connection = await this.client.ConnectAsync(remoteEndPoint).ConfigureAwait(false);
             this.logger.LogDebug("Connected to {RemoteEndPoint}", connection.RemoteEndPoint);
             await this.clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
          }

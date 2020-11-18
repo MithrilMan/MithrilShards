@@ -66,10 +66,7 @@ namespace MithrilShards.Example.Protocol.Processors
       {
          if (this.isHandshakeAware)
          {
-            this.RegisterLifeTimeSubscription(this.eventBus.Subscribe<PeerHandshaked>(async (receivedEvent) =>
-            {
-               await this.OnPeerHandshakedAsync().ConfigureAwait(false);
-            }));
+            this.RegisterLifeTimeEventHandler<PeerHandshaked>(async (receivedEvent) => await this.OnPeerHandshakedAsync().ConfigureAwait(false), IsCurrentPeer);
          }
 
          return default;
@@ -81,17 +78,6 @@ namespace MithrilShards.Example.Protocol.Processors
       protected virtual ValueTask OnPeerHandshakedAsync()
       {
          return default;
-      }
-
-
-      /// <summary>
-      /// Registers the component life time subscription to an <see cref="IEventBus"/> event that will be automatically
-      /// unregistered once the component gets disposed.
-      /// </summary>
-      /// <param name="subscription">The subscription.</param>
-      protected void RegisterLifeTimeSubscription(SubscriptionToken subscription)
-      {
-         this.eventSubscriptionManager.RegisterSubscriptions(subscription);
       }
 
       /// <summary>
@@ -239,6 +225,16 @@ namespace MithrilShards.Example.Protocol.Processors
       protected bool IsSupported(int minVersion)
       {
          return this.PeerContext.NegotiatedProtocolVersion.Version >= minVersion;
+      }
+
+      /// <summary>
+      /// Helper methods that returns if a specified received peer events (an event that inherit from <see cref="PeerEventBase"/>) belongs to current peer.
+      /// Used usually as the clause for <see cref="RegisterLifeTimeEventHandler"/> to catch only peer events relative to current peer.
+      /// </summary>
+      /// <param name="theEvent">The event.</param>
+      protected bool IsCurrentPeer(PeerEventBase theEvent)
+      {
+         return theEvent.PeerContext == this.PeerContext;
       }
 
       public virtual void Dispose()

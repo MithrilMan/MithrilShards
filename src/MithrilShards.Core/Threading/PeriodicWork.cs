@@ -50,6 +50,7 @@ namespace MithrilShards.Core.Threading
          this.eventBus = eventBus;
 
          this.Id = Guid.NewGuid();
+         logger.LogDebug("Created periodic work {IPeriodicWorkId}", this.Id);
       }
 
       public void Configure(bool stopOnException = false, IPeriodicWorkExceptionHandler? exceptionHandler = null)
