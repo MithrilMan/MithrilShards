@@ -37,6 +37,9 @@ namespace MithrilShards.Network.Bedrock
 
       public override async Task OnConnectedAsync(ConnectionContext connection)
       {
+         // TODO: we could register processors as Scoped per connection and create a scope here
+         //using var serviceProviderScope = serviceProvider.CreateScope();
+
          if (connection is null)
          {
             throw new ArgumentNullException(nameof(connection));
@@ -59,6 +62,7 @@ namespace MithrilShards.Network.Bedrock
          protocol.SetPeerContext(peerContext);
 
          this.eventBus.Publish(new PeerConnected(peerContext));
+
 
          await this.networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
 
