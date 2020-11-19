@@ -128,7 +128,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       protected override async ValueTask OnPeerHandshakedAsync()
       {
-         HandshakeProcessor.HandshakeProcessorStatus handshakeStatus = this.PeerContext.Data.Get<HandshakeProcessor.HandshakeProcessorStatus>();
+         HandshakeProcessor.HandshakeProcessorStatus handshakeStatus = this.PeerContext.Features.Get<HandshakeProcessor.HandshakeProcessorStatus>();
 
          VersionMessage peerVersion = handshakeStatus.PeerVersion!;
 

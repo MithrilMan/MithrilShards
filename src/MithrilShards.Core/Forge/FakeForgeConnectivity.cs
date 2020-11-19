@@ -2,6 +2,8 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Client;
 
 namespace MithrilShards.Core.Forge
 {
@@ -14,24 +16,12 @@ namespace MithrilShards.Core.Forge
    {
       const string error = "A valid concrete implementation of IForgeConnectivity must be registered on a IForgeBuilder.";
 
-      public ValueTask AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
-      {
-         throw new NotImplementedException();
-      }
+      public ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation) => throw new NotImplementedException(error);
 
-      public ValueTask InitializeAsync(CancellationToken cancellationToken)
-      {
-         throw new NotImplementedException(error);
-      }
+      public ValueTask InitializeAsync(CancellationToken cancellationToken) => throw new NotImplementedException(error);
 
-      public ValueTask StartAsync(CancellationToken cancellationToken)
-      {
-         throw new NotImplementedException(error);
-      }
+      public ValueTask StartAsync(CancellationToken cancellationToken) => throw new NotImplementedException(error);
 
-      public ValueTask StopAsync(CancellationToken cancellationToken)
-      {
-         throw new NotImplementedException(error);
-      }
+      public ValueTask StopAsync(CancellationToken cancellationToken) => throw new NotImplementedException(error);
    }
 }

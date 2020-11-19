@@ -43,12 +43,12 @@ namespace MithrilShards.Core.Network.Protocol.Processors
             await processor.AttachAsync(peerContext).ConfigureAwait(false);
          }
 
-         peerContext.Data.Set(new PeerNetworkMessageProcessorContainer(processors));
+         peerContext.Features.Set(new PeerNetworkMessageProcessorContainer(processors));
       }
 
       public async ValueTask ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
       {
-         await peerContext.Data.Get<PeerNetworkMessageProcessorContainer>().ProcessMessageAsync(message, cancellation).ConfigureAwait(false);
+         await peerContext.Features.Get<PeerNetworkMessageProcessorContainer>().ProcessMessageAsync(message, cancellation).ConfigureAwait(false);
       }
    }
 }

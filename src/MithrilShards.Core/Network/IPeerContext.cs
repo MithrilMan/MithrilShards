@@ -52,7 +52,7 @@ namespace MithrilShards.Core.Network
       /// <summary>
       /// Generic container to exchange content between different components that share IPeerContext.
       /// </summary>
-      IFeatureCollection Data { get; }
+      IFeatureCollection Features { get; }
 
       /// <summary>
       /// Gets the message writer used to send a message to the peer.

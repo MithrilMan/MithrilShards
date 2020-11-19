@@ -53,11 +53,10 @@ namespace MithrilShards.Network.Bedrock
          ProtocolReader reader = connection.CreateReader();
          INetworkProtocolMessageSerializer protocol = serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
-         using IPeerContext peerContext = this.peerContextFactory.Create(PeerConnectionDirection.Inbound,
-                                                 connection.ConnectionId,
-                                                 connection.LocalEndPoint.AsIPEndPoint().EnsureIPv6(),
-                                                 connection.RemoteEndPoint.AsIPEndPoint().EnsureIPv6(),
-                                                 new NetworkMessageWriter(protocol, connection.CreateWriter()));
+         using IPeerContext peerContext = this.peerContextFactory.CreateIncomingPeerContext(connection.ConnectionId,
+                                                                                            connection.LocalEndPoint.AsIPEndPoint().EnsureIPv6(),
+                                                                                            connection.RemoteEndPoint.AsIPEndPoint().EnsureIPv6(),
+                                                                                            new NetworkMessageWriter(protocol, connection.CreateWriter()));
 
          using CancellationTokenRegistration cancellationRegistration = peerContext.ConnectionCancellationTokenSource.Token.Register(() =>
          {

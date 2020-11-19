@@ -8,14 +8,16 @@
             "IsWhitelistingEndpoint": true,
             "Endpoint": "0.0.0.0:45061"
          }
-      ],
-      "Connections": [
-         { "Endpoint": "127.0.0.1:45051" }
       ]
    },
    "Example": {
       "MaxTimeAdjustment": 4200,
-      "Parameter2":  "hey ya!"
+      "Connections": [
+         {
+            "Endpoint": "127.0.0.1:45051",
+            "AdditionalInformation": "I'm cool!"
+         }
+      ]
    },
    "StatisticsCollector": {
       "ContinuousConsoleDisplay": false,

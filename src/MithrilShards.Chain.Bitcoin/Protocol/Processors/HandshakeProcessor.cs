@@ -55,7 +55,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       protected override async ValueTask OnPeerAttachedAsync()
       {
          //add the status to the PeerContext, this way other processors may query the status
-         this.PeerContext.Data.Set(this.status);
+         this.PeerContext.Features.Set(this.status);
 
          // ensures the handshake is performed timely
          _ = this.DisconnectIfAsync(() =>

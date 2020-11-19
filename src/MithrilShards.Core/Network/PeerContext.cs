@@ -47,7 +47,7 @@ namespace MithrilShards.Core.Network
 
       public string? UserAgent { get; set; }
 
-      public IFeatureCollection Data { get; } = new FeatureCollection();
+      public IFeatureCollection Features { get; } = new FeatureCollection();
 
       /// <summary>
       /// Gets the version peers agrees to use when their respective version doesn't match.

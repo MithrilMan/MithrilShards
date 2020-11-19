@@ -29,7 +29,7 @@ namespace MithrilShards.Example.Network.Bedrock
       /// The deserialization context used to keep track of the ongoing deserialization of a stream.
       /// </summary>
       readonly DeserializationContext deserializationContext;
-      private IPeerContext peerContext;
+      private ExamplePeerContext peerContext;
 
       public ExampleNetworkProtocolMessageSerializer(ILogger<ExampleNetworkProtocolMessageSerializer> logger, INetworkMessageSerializerManager networkMessageSerializerManager)
       {
@@ -42,7 +42,13 @@ namespace MithrilShards.Example.Network.Bedrock
 
       public void SetPeerContext(IPeerContext peerContext)
       {
-         this.peerContext = peerContext;
+         // we know it's an ExamplePeerContext in our example.
+         this.peerContext = (ExamplePeerContext)peerContext;
+
+         if (this.peerContext.MyExtraInformation != null)
+         {
+            this.logger.LogDebug("I'm ExampleNetworkProtocolMessageSerializer and I know that I've some information for you: {AdditionalInformation}", this.peerContext.MyExtraInformation);
+         }
       }
 
       public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, /*[MaybeNullWhen(false)]*/ out INetworkMessage message)

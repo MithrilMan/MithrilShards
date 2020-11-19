@@ -1,9 +1,9 @@
-﻿using System.Net;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Network.Client;
 
-namespace MithrilShards.Core.Forge
+namespace MithrilShards.Core.Network
 {
    /// <summary>
    /// Manage the forge server, that allow incoming and outcoming connections.
@@ -11,6 +11,6 @@ namespace MithrilShards.Core.Forge
    /// <seealso cref="System.IDisposable" />
    public interface IForgeConnectivity : IMithrilShard
    {
-      ValueTask AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation);
+      ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation);
    }
 }
