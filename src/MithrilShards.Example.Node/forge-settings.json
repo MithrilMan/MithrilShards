@@ -16,8 +16,7 @@
       ]
    },
    "Example": {
-      "MaxTimeAdjustment": 4200,
-      "Parameter1": 99
+      "MaxTimeAdjustment": 4200
    },
    "StatisticsCollector": {
       "ContinuousConsoleDisplay": true,

@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
+using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Protocol;
 
 namespace MithrilShards.Core.Network
@@ -25,11 +26,24 @@ namespace MithrilShards.Core.Network
          this.serverSettings = serverSettings.Value;
       }
 
-      public virtual IPeerContext Create(PeerConnectionDirection direction,
-                                         string peerId,
-                                         EndPoint localEndPoint,
-                                         EndPoint remoteEndPoint,
-                                         INetworkMessageWriter messageWriter)
+      public virtual IPeerContext CreateIncomingPeerContext(string peerId, EndPoint localEndPoint, EndPoint remoteEndPoint, INetworkMessageWriter messageWriter)
+      {
+         return Create(PeerConnectionDirection.Inbound, peerId, localEndPoint, remoteEndPoint, messageWriter);
+      }
+
+      public virtual IPeerContext CreateOutgoingPeerContext(string peerId, EndPoint localEndPoint, OutgoingConnectionEndPoint outgoingConnectionEndPoint, INetworkMessageWriter messageWriter)
+      {
+         IPeerContext peerContext = Create(PeerConnectionDirection.Outbound, peerId, localEndPoint, outgoingConnectionEndPoint.EndPoint, messageWriter);
+         peerContext.Features.Set(outgoingConnectionEndPoint);
+
+         return peerContext;
+      }
+
+      protected virtual IPeerContext Create(PeerConnectionDirection direction,
+                                                      string peerId,
+                                                      EndPoint localEndPoint,
+                                                      EndPoint remoteEndPoint,
+                                                      INetworkMessageWriter messageWriter)
       {
 
          var peerContext = (TPeerContext)System.Activator.CreateInstance(typeof(TPeerContext),

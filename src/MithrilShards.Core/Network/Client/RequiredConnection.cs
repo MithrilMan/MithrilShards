@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
-using MithrilShards.Core.Forge;
 using MithrilShards.Core.Threading;
 
 namespace MithrilShards.Core.Network.Client
@@ -24,23 +23,25 @@ namespace MithrilShards.Core.Network.Client
       private const int MEDIUM_DELAY = 5_000;
       private const int SLOW_DELAY = 15_000;
 
-      readonly IForgeConnectivity forgeConnectivity;
-      public List<IPEndPoint> connectionsToAttempt = new List<IPEndPoint>();
+      private ForgeConnectivitySettings settings;
+
+      public List<OutgoingConnectionEndPoint> connectionsToAttempt = new List<OutgoingConnectionEndPoint>();
 
       public RequiredConnection(ILogger<RequiredConnection> logger,
                                 IEventBus eventBus,
                                 IOptions<ForgeConnectivitySettings> options,
                                 IConnectivityPeerStats serverPeerStats,
                                 IForgeConnectivity forgeConnectivity,
-                                IPeriodicWork connectionLoop) : base(logger, eventBus, options, serverPeerStats, connectionLoop)
+                                IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
       {
+         this.settings = options.Value!;
+
          this.connectionsToAttempt.AddRange(
             from connection in this.settings.Connections
             let endPoint = connection.TryGetIPEndPoint(out IPEndPoint? endPoint) ? endPoint : null
             where endPoint != null
-            select endPoint
+            select new OutgoingConnectionEndPoint(endPoint)
             );
-         this.forgeConnectivity = forgeConnectivity;
       }
 
       public override TimeSpan ComputeDelayAdjustment()
@@ -77,14 +78,14 @@ namespace MithrilShards.Core.Network.Client
 
       protected override async ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation)
       {
-         foreach (IPEndPoint endPoint in this.connectionsToAttempt)
+         foreach (OutgoingConnectionEndPoint remoteEndPoint in this.connectionsToAttempt)
          {
             if (cancellation.IsCancellationRequested) break;
 
-            if (connectionManager.CanConnectTo(endPoint))
+            if (connectionManager.CanConnectTo(remoteEndPoint.EndPoint))
             {
                // note that AttemptConnection is not blocking because it returns when the peer fails to connect or when one of the parties disconnect
-               _ = this.forgeConnectivity.AttemptConnectionAsync(endPoint, cancellation).ConfigureAwait(false);
+               _ = this.forgeConnectivity.AttemptConnectionAsync(remoteEndPoint, cancellation).ConfigureAwait(false);
 
                // apply a delay between attempts to prevent too many connection attempt in a row
                await Task.Delay(INNER_DELAY).ConfigureAwait(false);
@@ -108,7 +109,7 @@ namespace MithrilShards.Core.Network.Client
          }
          else
          {
-            this.connectionsToAttempt.Add(endPoint);
+            this.connectionsToAttempt.Add(new OutgoingConnectionEndPoint(endPoint));
             this.logger.LogDebug("EndPoint {RemoteEndPoint} added to the list of connections attempt.", endPoint);
             return true;
          }
@@ -122,7 +123,7 @@ namespace MithrilShards.Core.Network.Client
       /// <returns><see langword="true"/> if the endpoint has been removed, <see langword="false"/> if the endpoint has not been found.</returns>
       public bool TryRemoveEndPoint(IPEndPoint endPoint)
       {
-         return this.connectionsToAttempt.Remove(endPoint);
+         return this.connectionsToAttempt.RemoveAll(remoteEndPoint => remoteEndPoint.EndPoint == endPoint) > 0;
       }
    }
 }

@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Threading;
 
@@ -10,27 +9,27 @@ namespace MithrilShards.Core.Network.Client
 {
    public abstract class ConnectorBase : IConnector, IPeriodicWorkExceptionHandler
    {
-      protected ILogger<RequiredConnection> logger;
+      protected ILogger logger;
       protected IEventBus eventBus;
       protected readonly IConnectivityPeerStats peerStats;
-      readonly IPeriodicWork connectionLoop;
-      protected readonly ForgeConnectivitySettings settings;
+      protected readonly IForgeConnectivity forgeConnectivity;
+      protected readonly IPeriodicWork connectionLoop;
 
       protected IConnectionManager? connectionManager;
 
       public TimeSpan DefaultDelayBetweenAttempts { get; protected set; }
 
-      public ConnectorBase(ILogger<RequiredConnection> logger,
+      public ConnectorBase(ILogger logger,
                            IEventBus eventBus,
-                           IOptions<ForgeConnectivitySettings> options,
                            IConnectivityPeerStats serverPeerStats,
+                           IForgeConnectivity forgeConnectivity,
                            IPeriodicWork connectionLoop)
       {
          this.logger = logger;
          this.eventBus = eventBus;
          this.peerStats = serverPeerStats;
+         this.forgeConnectivity = forgeConnectivity;
          this.connectionLoop = connectionLoop;
-         this.settings = options.Value;
 
          this.DefaultDelayBetweenAttempts = TimeSpan.FromSeconds(15);
 

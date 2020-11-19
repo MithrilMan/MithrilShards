@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MithrilShards.Example\MithrilShards.Example.csproj" />
     <ProjectReference Include="..\MithrilShards.Network.Bedrock\MithrilShards.Network.Bedrock.csproj" />
   </ItemGroup>
 

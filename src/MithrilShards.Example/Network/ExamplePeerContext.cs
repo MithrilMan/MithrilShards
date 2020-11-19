@@ -22,6 +22,12 @@ namespace MithrilShards.Example.Network
       /// </summary>
       public ExamplePeerPermissions Permissions { get; set; } = new ExamplePeerPermissions();
 
+      /// <summary>
+      /// Gets or sets my extra information.
+      /// This information is set only for outgoing connections
+      /// </summary>
+      public string? MyExtraInformation { get; set; } = default;
+
       public ExamplePeerContext(ILogger logger,
                                 IEventBus eventBus,
                                 PeerConnectionDirection direction,

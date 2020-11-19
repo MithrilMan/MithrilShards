@@ -4,10 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MithrilShards.Core.Forge;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Protocol.Processors;
 using MithrilShards.Core.Network.Protocol.Serialization;
 using MithrilShards.Core.Network.Server.Guards;
 using MithrilShards.Example.Network;
+using MithrilShards.Example.Network.Client;
 using MithrilShards.Example.Network.Server.Guards;
 
 namespace MithrilShards.Example
@@ -102,6 +104,20 @@ namespace MithrilShards.Example
          services
             .Replace(ServiceDescriptor.Singleton<IPeerContextFactory, ExamplePeerContextFactory>())
             ;
+
+         /// Replace extension is useful when we want to replace an implementation that's only used as a single entry when resolved, and not as IEnumerable,
+         /// because Replace, as per documentation, replaces the first registered service type with the provided ServiceDescriptor.
+         /// when we have different implementation of the same service type, when we resolve a single instance then the last registered implementation is used,
+         /// while if we resolve as IEnumerable then all known implementations are returned. This mean that when we are registered something to be resolved as
+         /// IEnumerable we can't replace one of them at will so we have to fall back to the Remove method and then add the one implementation we want, back into
+         /// the IServiceCollection.
+
+         // in this scenario, we are looking for the ServiceDescriptor that registers our RequiredConnection implementation of IConnector
+         var requiredConnectionDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IConnector) && descriptor.ImplementationType == typeof(RequiredConnection));
+         // remove it
+         services.Remove(requiredConnectionDescriptor);
+         // and add back our implementation
+         services.AddSingleton<IConnector, ExampleRequiredConnection>();
 
          return services;
       }

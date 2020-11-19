@@ -10,8 +10,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
-using MithrilShards.Core.Forge;
 using MithrilShards.Core.Network;
+using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Core.Network.Server;
 using MithrilShards.Core.Network.Server.Guards;
@@ -154,14 +154,17 @@ namespace MithrilShards.Network.Bedrock
                                     .Build();
       }
 
-      public async ValueTask AttemptConnectionAsync(EndPoint remoteEndPoint, CancellationToken cancellation)
+      public async ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation)
       {
          using IDisposable logScope = this.logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
-         this.eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.AsIPEndPoint()));
+         this.eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()));
          this.logger.LogDebug("Connection attempt to {RemoteEndPoint}", remoteEndPoint);
          try
          {
-            await using ConnectionContext connection = await this.client.ConnectAsync(remoteEndPoint).ConfigureAwait(false);
+            await using ConnectionContext connection = await this.client.ConnectAsync(remoteEndPoint.EndPoint).ConfigureAwait(false);
+            // we store the RemoteEndPoint class as a feature of the connection so we can then copy it into the PeerContext in the ClientConnectionHandler.OnConnectedAsync
+            connection.Features.Set(remoteEndPoint);
+
             this.logger.LogDebug("Connected to {RemoteEndPoint}", connection.RemoteEndPoint);
             await this.clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
          }
