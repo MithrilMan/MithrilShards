@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.MithrilShards;
@@ -49,7 +50,6 @@ namespace MithrilShards.Core.Forge
       private void CreateDefaultConfigurationFile(FileLoadExceptionContext fileContext)
       {
          this.createDefaultConfigurationFileNeeded = true;
-         this.ConfigurationFileName = fileContext.Provider.Source.Path;
 
          logger.LogWarning($"Missing configuration file {this.ConfigurationFileName}, creating one with default values.");
 
@@ -204,12 +204,19 @@ namespace MithrilShards.Core.Forge
 
       private IForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE)
       {
-         this.ConfigurationFileName = configurationFile ?? CONFIGURATION_FILE;
+         this.ConfigurationFileName = Path.GetFullPath(configurationFile ?? CONFIGURATION_FILE);
+         string absoluteDirectoryPath = Path.GetDirectoryName(this.ConfigurationFileName)!;
+         if (!Directory.Exists(absoluteDirectoryPath))
+         {
+            logger.LogWarning($"Creating directory structure to store configuration file {this.ConfigurationFileName}.");
+            Directory.CreateDirectory(absoluteDirectoryPath);
+         }
+         var configurationFileProvider = new PhysicalFileProvider(absoluteDirectoryPath);
 
          _ = this.hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
          {
             // do not change optional to true, because there is SetFileLoadExceptionHandler that will create a default file if missing.
-            config.AddJsonFile(this.ConfigurationFileName, optional: false, reloadOnChange: true);
+            config.AddJsonFile(configurationFileProvider, Path.GetFileName(this.ConfigurationFileName), optional: false, reloadOnChange: true);
 
             config.AddEnvironmentVariables("FORGE_");
 
