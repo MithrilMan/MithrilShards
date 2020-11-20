@@ -204,7 +204,7 @@ namespace MithrilShards.Core.Network
          // ensures I'm not already connected to the same endpoint
          if (this.outboundPeers.Values.ToList().Any(peer => peer.RemoteEndPoint.Equals(endPoint.EnsureIPv6())))
          {
-            this.logger.LogDebug("Already connected to peer {RemoteEndPoint}", endPoint);
+            this.logger.LogTrace("Already connected to peer {RemoteEndPoint}", endPoint);
             return false;
          }
 

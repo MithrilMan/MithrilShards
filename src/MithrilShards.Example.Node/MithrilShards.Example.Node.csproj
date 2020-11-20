@@ -9,24 +9,20 @@
 
    <ItemGroup>
       <None Remove="forge-settings.json" />
-      <None Remove="forge-settings2.json" />
       <None Remove="log-settings-with-seq.json" />
-      <None Remove="log-settings2.json" />
    </ItemGroup>
 
    <ItemGroup>
-      <Content Include="forge-settings2.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <Content Include="forge-settings.json">
          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="log-settings-with-seq.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
-      <Content Include="log-settings2.json">
-         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+   </ItemGroup>
+
+   <ItemGroup>
+     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20371.2" />
    </ItemGroup>
 
    <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 using MithrilShards.Core.Forge;
 using MithrilShards.Dev.Controller;
@@ -14,25 +15,34 @@ namespace MithrilShards.Example.Node
 {
    static class Program
    {
-      static void Main(string[] args)
+      static async Task Main(string[] args)
       {
-         bool runNode1 = args.Contains("1");
-         bool runNode2 = args.Contains("2");
 
-         // if no node 1 and node 2 are specified by args, run both in a single process
-         if (runNode1 == false && runNode2 == false)
+         // Create a root command with some options
+         var rootCommand = new RootCommand {
+            new Option<string>(
+               "--settings",
+               getDefaultValue: () => "forge-settings.json",
+               description: "Specify the path to the forge settings file."),
+            new Option<string?>(
+               "--log-settings",
+               getDefaultValue: () => null,
+               description: "Specify the path to the forge log settings file. If not specified, try to get logging information from the main forge settings file."),
+            new Option<int>(
+               "--protocol-version",
+               getDefaultValue: () => KnownVersion.CurrentVersion,
+               description: "Specify the path to the forge settings file.")
+         };
+
+         rootCommand.Description = "Example App";
+         rootCommand.TreatUnmatchedTokensAsErrors = false;
+
+         // Note that the parameters of the handler method are matched according to the names of the options
+         rootCommand.Handler = CommandHandler.Create<string, string, int>(async (settings, logSettings, protocolVersion) =>
          {
-            runNode1 = runNode2 = true;
-         }
-
-         Task node1 = Task.CompletedTask;
-         Task node2 = Task.CompletedTask;
-
-         if (runNode1)
-         {
-            node1 = new ForgeBuilder()
-              .UseForge<DefaultForge>(args)
-              .UseSerilog("log-settings-with-seq.json")
+            await new ForgeBuilder()
+              .UseForge<DefaultForge>(args, settings)
+              .UseSerilog(logSettings)
               .UseBedrockForgeServer<ExampleNetworkProtocolMessageSerializer>()
               .UseStatisticsCollector()
               /// we are injecting ExampleDev type to allow devcontroller to find all the dev controllers defined there
@@ -40,24 +50,12 @@ namespace MithrilShards.Example.Node
               /// Passing ExampleDev will cause dotnet runtime to load the assembly where ExampleDev lies and will be
               /// scaffolded later into the DevController initialization.
               .UseDevController(assemblyScaffoldEnabler => assemblyScaffoldEnabler.LoadAssemblyFromType<ExampleDev>())
-              .UseExample(KnownVersion.V1, KnownVersion.CurrentVersion)
+              .UseExample(KnownVersion.V1, protocolVersion)
               .RunConsoleAsync()
-              ;
-         }
+              .ConfigureAwait(false);
+         });
 
-         if (runNode2)
-         {
-            node2 = new ForgeBuilder()
-           .UseForge<DefaultForge>(args, "forge-settings2.json")
-           .UseSerilog("log-settings2.json")
-           .UseBedrockForgeServer<ExampleNetworkProtocolMessageSerializer>()
-           .UseStatisticsCollector()
-           .UseExample(KnownVersion.V1, KnownVersion.CurrentVersion)
-           .RunConsoleAsync()
-           ;
-         }
-
-         Task.WaitAll(node1, node2);
+         await rootCommand.InvokeAsync(args).ConfigureAwait(false);
       }
    }
 }

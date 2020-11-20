@@ -158,7 +158,7 @@ namespace MithrilShards.Network.Bedrock
       {
          using IDisposable logScope = this.logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
          this.eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()));
-         this.logger.LogDebug("Connection attempt to {RemoteEndPoint}", remoteEndPoint);
+         this.logger.LogDebug("Connection attempt to {RemoteEndPoint}", remoteEndPoint.EndPoint);
          try
          {
             await using ConnectionContext connection = await this.client.ConnectAsync(remoteEndPoint.EndPoint).ConfigureAwait(false);
