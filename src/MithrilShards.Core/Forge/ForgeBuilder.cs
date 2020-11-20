@@ -14,13 +14,22 @@ namespace MithrilShards.Core.Forge
    {
       const string CONFIGURATION_FILE = "forge-settings.json";
 
-      public readonly HostBuilder hostBuilder;
+      /// <summary>
+      /// A temporary console logger that can be used to report to user errors that may happens for example with missing configuration files and we don't have yet proper logger registration.
+      /// </summary>
+      private readonly ILogger<ForgeBuilder> logger;
       private bool isForgeSet = false;
       private bool createDefaultConfigurationFileNeeded = false;
+
+      public readonly HostBuilder hostBuilder;
       public string ConfigurationFileName { get; private set; } = null!; //set to something meaningful during initialization
 
       public ForgeBuilder()
       {
+         // create a temporary logger that logs on console to communicate pre-initialization errors that may happens for example with missing configuration files
+         ILoggerFactory loggerFactory = LoggerFactory.Create(logging => logging.SetMinimumLevel(LogLevel.Warning).AddConsole());
+         logger = loggerFactory.CreateLogger<ForgeBuilder>();
+
          this.hostBuilder = new HostBuilder();
 
          // Add a new service provider configuration
@@ -42,6 +51,8 @@ namespace MithrilShards.Core.Forge
          this.createDefaultConfigurationFileNeeded = true;
          this.ConfigurationFileName = fileContext.Provider.Source.Path;
 
+         logger.LogWarning($"Missing configuration file {this.ConfigurationFileName}, creating one with default values.");
+
          //default file created, no need to throw error
          fileContext.Ignore = true;
       }
@@ -55,7 +66,6 @@ namespace MithrilShards.Core.Forge
 
          _ = this.hostBuilder.ConfigureServices((context, services) =>
          {
-
             if (this.createDefaultConfigurationFileNeeded)
             {
                services.AddSingleton<DefaultConfigurationWriter>(services =>
@@ -198,7 +208,6 @@ namespace MithrilShards.Core.Forge
 
          _ = this.hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
          {
-
             // do not change optional to true, because there is SetFileLoadExceptionHandler that will create a default file if missing.
             config.AddJsonFile(this.ConfigurationFileName, optional: false, reloadOnChange: true);
 
@@ -209,7 +218,7 @@ namespace MithrilShards.Core.Forge
                config.AddCommandLine(commandLineArgs);
             }
 
-            config.SetFileLoadExceptionHandler(context => this.CreateDefaultConfigurationFile(context));
+            config.SetFileLoadExceptionHandler(CreateDefaultConfigurationFile);
          });
 
          return this;
