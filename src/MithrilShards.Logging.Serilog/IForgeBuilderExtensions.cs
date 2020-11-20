@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using MithrilShards.Core.Forge;
 using Serilog;
 
@@ -14,22 +16,26 @@ namespace MithrilShards.Logging.Serilog
 
                builder.UseSerilog((hostingContext, loggerConfiguration) =>
                {
+                  //set default logging if the log file is missing
+                  loggerConfiguration
+                     .MinimumLevel.Information()
+                     .WriteTo.Console();
+
+                  configurationFile ??= forgeBuilder.ConfigurationFileName;
+
+                  string absoluteDirectoryPath = Path.GetDirectoryName(Path.GetFullPath(configurationFile))!;
+                  var configurationFileProvider = new PhysicalFileProvider(absoluteDirectoryPath);
 
                   IConfigurationRoot logConfiguration = new ConfigurationBuilder()
-                  .AddJsonFile(configurationFile ?? forgeBuilder.ConfigurationFileName, false, true)
+                  .AddJsonFile(configurationFileProvider, Path.GetFileName(configurationFile), false, true)
                   .SetFileLoadExceptionHandler(fileContext =>
                   {
-                     //set default logging if the log file is missing
-                     loggerConfiguration
-                        .MinimumLevel.Warning()
-                        .WriteTo.Console();
-
                      using global::Serilog.Core.Logger logger = new LoggerConfiguration()
                         .MinimumLevel.Warning()
                         .WriteTo.Console()
                         .CreateLogger();
 
-                     logger.Warning("Missing log configuration file {MissingLogFileName}, using console and warning level", fileContext.Provider.Source.Path);
+                     logger.Warning("Missing log configuration file {MissingLogFileName}, using console and Information level", fileContext.Provider.Source.Path);
 
                      fileContext.Ignore = true;
                   })

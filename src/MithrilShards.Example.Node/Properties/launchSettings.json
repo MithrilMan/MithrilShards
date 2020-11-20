@@ -1,15 +1,12 @@
 {
-   "profiles": {
-      "both": {
-         "commandName": "Project"
-      },
-      "node1": {
-         "commandName": "Project",
-         "commandLineArgs": "1"
-      },
-      "node 2": {
-         "commandName": "Project",
-         "commandLineArgs": "2"
-      }
-   }
+  "profiles": {
+    "node1": {
+      "commandName": "Project",
+      "commandLineArgs": "--settings=forge-settings.json"
+    },
+    "node 2": {
+      "commandName": "Project",
+      "commandLineArgs": "--settings=forge-settings2.json"
+    }
+  }
 }

@@ -21,16 +21,18 @@ namespace MithrilShards.Chain.Bitcoin.Converters
          return base.CanConvertTo(context, destinationType);
       }
 
-      public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+      public override object? ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
       {
          if (destinationType != typeof(string)) return base.ConvertTo(context, culture, value, destinationType);
 
-         return value?.ToString() ?? string.Empty;
+         return value?.ToString();
       }
 
-      public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+      public override object? ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
       {
          if (!(value is string)) return base.ConvertFrom(context, culture, value);
+
+         if (((string)value).Trim().Length == 0) return null;
 
          return new Target((string)value);
       }

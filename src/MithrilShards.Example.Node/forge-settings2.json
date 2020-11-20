@@ -15,12 +15,16 @@
       "Connections": [
          {
             "Endpoint": "127.0.0.1:45051",
-            "AdditionalInformation": "I'm cool!"
+            "AdditionalInformation": "I'm cool too!"
          }
       ]
    },
    "StatisticsCollector": {
-      "ContinuousConsoleDisplay": false,
+      "ContinuousConsoleDisplay": true,
       "ContinuousConsoleDisplayRate": 5
+   },
+   "DevController": {
+      "Enabled": true,
+      "EndPoint": "127.0.0.1:45013"
    }
 }

@@ -16,7 +16,13 @@
       ]
    },
    "Example": {
-      "MaxTimeAdjustment": 4200
+      "MaxTimeAdjustment": 4200,
+      "Connections": [
+         {
+            "Endpoint": "127.0.0.1:45061",
+            "AdditionalInformation": "I'm cool!"
+         }
+      ]
    },
    "StatisticsCollector": {
       "ContinuousConsoleDisplay": true,
@@ -25,5 +31,31 @@
    "DevController": {
       "Enabled": true,
       "EndPoint": "127.0.0.1:45013"
+   },
+
+   "Serilog": {
+      "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.Seq" ],
+      "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+      "WriteTo": [
+         {
+            "Name": "Console",
+            "Args": {
+               "IncludeScopes": true,
+               "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console"
+            }
+         },
+         {
+            "Name": "Seq",
+            "Args": { "serverUrl": "http://localhost:5341" }
+         }
+      ],
+      "MinimumLevel": {
+         "Default": "Debug",
+         "Override": {
+            "Bedrock.Framework": "Warning",
+            "Microsoft": "Warning",
+            "System": "Warning"
+         }
+      }
    }
 }
