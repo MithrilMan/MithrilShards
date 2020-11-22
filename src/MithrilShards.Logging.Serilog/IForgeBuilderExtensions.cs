@@ -25,11 +25,6 @@ namespace MithrilShards.Logging.Serilog
                   .AddJsonFile(configurationFileProvider, Path.GetFileName(configurationFile), false, true)
                   .SetFileLoadExceptionHandler(fileContext =>
                   {
-                     //set default logging if the log file is missing
-                     loggerConfiguration
-                        .MinimumLevel.Information()
-                        .WriteTo.Console();
-
                      using global::Serilog.Core.Logger logger = new LoggerConfiguration()
                         .MinimumLevel.Warning()
                         .WriteTo.Console()

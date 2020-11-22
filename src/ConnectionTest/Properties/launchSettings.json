@@ -6,7 +6,7 @@
     },
     "bitcoin-regtest": {
       "commandName": "Project",
-      "commandLineArgs": "--network=bitcoin-regtesta --log-settings=log-settings-with-seq.json --settings=forge-settings-bitcoin-regtest.json"
+      "commandLineArgs": "--network=bitcoin-regtest --log-settings=log-settings-with-seq.json --settings=forge-settings-bitcoin-regtest.json"
     }
   }
 }
