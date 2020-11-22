@@ -24,7 +24,7 @@
          Error
       }
 
-      private InnerState mode = InnerState.Valid;
+      private InnerState _mode = InnerState.Valid;
 
       public TValidationResult Result { get; private set; }
 
@@ -32,30 +32,30 @@
 
       public string? DebugMessage { get; private set; }
 
-      public bool IsValid() => this.mode == InnerState.Valid;
+      public bool IsValid() => this._mode == InnerState.Valid;
 
-      public bool IsInvalid() => this.mode == InnerState.Invalid;
+      public bool IsInvalid() => this._mode == InnerState.Invalid;
 
-      public bool IsError() => this.mode == InnerState.Error;
+      public bool IsError() => this._mode == InnerState.Error;
 
       public bool Invalid(TValidationResult result, string reason, string? debugMessage = null)
       {
          this.Result = result;
          this.RejectReason = reason;
          this.DebugMessage = debugMessage;
-         this.mode = InnerState.Invalid;
+         this._mode = InnerState.Invalid;
 
          return false;
       }
 
       public bool Error(string reason)
       {
-         if (this.mode == InnerState.Valid)
+         if (this._mode == InnerState.Valid)
          {
             this.RejectReason = reason;
          }
 
-         this.mode = InnerState.Error;
+         this._mode = InnerState.Error;
 
          return false;
       }

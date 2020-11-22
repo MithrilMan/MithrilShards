@@ -13,14 +13,14 @@ namespace MithrilShards.Core.Forge
    /// <seealso cref="MithrilShards.Core.Forge.IForgeServer" />
    public sealed class FakeForgeConnectivity : IForgeConnectivity
    {
-      const string error = "A valid concrete implementation of IForgeConnectivity must be registered on a IForgeBuilder.";
+      const string ERROR = "A valid concrete implementation of IForgeConnectivity must be registered on a IForgeBuilder.";
 
-      public ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation) => throw new NotImplementedException(error);
+      public ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation) => throw new NotImplementedException(ERROR);
 
-      public ValueTask InitializeAsync(CancellationToken cancellationToken) => throw new NotImplementedException(error);
+      public ValueTask InitializeAsync(CancellationToken cancellationToken) => throw new NotImplementedException(ERROR);
 
-      public ValueTask StartAsync(CancellationToken cancellationToken) => throw new NotImplementedException(error);
+      public ValueTask StartAsync(CancellationToken cancellationToken) => throw new NotImplementedException(ERROR);
 
-      public ValueTask StopAsync(CancellationToken cancellationToken) => throw new NotImplementedException(error);
+      public ValueTask StopAsync(CancellationToken cancellationToken) => throw new NotImplementedException(ERROR);
    }
 }

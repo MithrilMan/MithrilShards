@@ -14,7 +14,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 {
    public static class Helper
    {
-      private static readonly DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+      private static readonly DateTime _unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
       internal static byte[] ToArray(this SecureString s)
       {
@@ -237,12 +237,12 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
       public static uint ToTimestamp(this DateTime time)
       {
-         return (uint)(time.ToUniversalTime() - unixEpoch).TotalSeconds;
+         return (uint)(time.ToUniversalTime() - _unixEpoch).TotalSeconds;
       }
 
       public static ulong ToTimestampMS(this DateTime time)
       {
-         return (ulong)(time.ToUniversalTime() - unixEpoch).TotalMilliseconds;
+         return (ulong)(time.ToUniversalTime() - _unixEpoch).TotalMilliseconds;
       }
 
       /// <summary>

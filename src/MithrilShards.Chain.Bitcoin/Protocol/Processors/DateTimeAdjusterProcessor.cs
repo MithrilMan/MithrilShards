@@ -12,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
    /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.Processors.BaseProcessor" />
    public partial class DateTimeAdjusterProcessor : BaseProcessor
    {
-      readonly IDateTimeProvider dateTimeProvider;
+      readonly IDateTimeProvider _dateTimeProvider;
 
       public DateTimeAdjusterProcessor(ILogger<DateTimeAdjusterProcessor> logger,
                                   IEventBus eventBus,
@@ -21,7 +21,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                  )
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
-         this.dateTimeProvider = dateTimeProvider;
+         this._dateTimeProvider = dateTimeProvider;
       }
 
       /// <summary>
@@ -32,7 +32,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       protected override ValueTask OnPeerHandshakedAsync()
       {
-         this.dateTimeProvider.AddTimeData(this.PeerContext.TimeOffset, this.PeerContext.RemoteEndPoint);
+         this._dateTimeProvider.AddTimeData(this.PeerContext.TimeOffset, this.PeerContext.RemoteEndPoint);
 
          return default;
       }

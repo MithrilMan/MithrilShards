@@ -12,39 +12,39 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Params(47, 83, 131)]
       public int N;
 
-      private readonly byte[] data1 = new byte[32];
-      Core.DataTypes.UInt256 reference1;
+      private readonly byte[] _data1 = new byte[32];
+      Core.DataTypes.UInt256 _reference1;
 
-      private readonly byte[] data2 = new byte[32];
-      Core.DataTypes.UInt256 reference2;
+      private readonly byte[] _data2 = new byte[32];
+      Core.DataTypes.UInt256 _reference2;
 
       [GlobalSetup]
       public void Setup()
       {
          var random = new Random(this.N);
-         random.NextBytes(this.data1);
-         this.reference1 = new Core.DataTypes.UInt256(this.data1);
+         random.NextBytes(this._data1);
+         this._reference1 = new Core.DataTypes.UInt256(this._data1);
 
-         random.NextBytes(this.data2);
-         this.reference2 = new Core.DataTypes.UInt256(this.data2);
+         random.NextBytes(this._data2);
+         this._reference2 = new Core.DataTypes.UInt256(this._data2);
       }
 
       [Benchmark]
       public bool As256()
       {
-         return  DoubleSha512AsUInt256(this.data1) < (this.reference2);
+         return  DoubleSha512AsUInt256(this._data1) < (this._reference2);
       }
 
       [Benchmark]
       public bool As256FromBytes()
       {
-         return new Core.DataTypes.UInt256(DoubleSha512AsBytes(this.data1)) < (this.reference2);
+         return new Core.DataTypes.UInt256(DoubleSha512AsBytes(this._data1)) < (this._reference2);
       }
 
       [Benchmark]
       public bool AsBytes()
       {
-         return DoubleSha512AsBytes(this.data1).SequenceCompareTo(data2) == -1;
+         return DoubleSha512AsBytes(this._data1).SequenceCompareTo(_data2) == -1;
       }
 
 

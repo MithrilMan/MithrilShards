@@ -19,23 +19,23 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       protected readonly ILogger<BaseProcessor> logger;
       protected readonly IEventBus eventBus;
-      private readonly IPeerBehaviorManager peerBehaviorManager;
-      private readonly bool isHandshakeAware;
-      private readonly bool receiveMessagesOnlyIfHandshaked;
-      private bool isHandshaked = false;
-      private INetworkMessageWriter messageWriter = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
+      private readonly IPeerBehaviorManager _peerBehaviorManager;
+      private readonly bool _isHandshakeAware;
+      private readonly bool _receiveMessagesOnlyIfHandshaked;
+      private bool _isHandshaked = false;
+      private INetworkMessageWriter _messageWriter = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// </summary>
-      private readonly EventSubscriptionManager eventSubscriptionManager = new EventSubscriptionManager();
+      private readonly EventSubscriptionManager _eventSubscriptionManager = new EventSubscriptionManager();
 
       public BitcoinPeerContext PeerContext { get; private set; } = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
 
       public virtual bool Enabled { get; private set; } = true;
 
       /// <inheritdoc/>
-      public virtual bool CanReceiveMessages => isHandshaked || this.receiveMessagesOnlyIfHandshaked == false;
+      public virtual bool CanReceiveMessages => _isHandshaked || this._receiveMessagesOnlyIfHandshaked == false;
 
       /// <summary>Initializes a new instance of the <see cref="BaseProcessor"/> class.</summary>
       /// <param name="logger">The logger.</param>
@@ -47,15 +47,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          this.logger = logger;
          this.eventBus = eventBus;
-         this.peerBehaviorManager = peerBehaviorManager;
-         this.isHandshakeAware = isHandshakeAware;
-         this.receiveMessagesOnlyIfHandshaked = receiveMessagesOnlyIfHandshaked;
+         this._peerBehaviorManager = peerBehaviorManager;
+         this._isHandshakeAware = isHandshakeAware;
+         this._receiveMessagesOnlyIfHandshaked = receiveMessagesOnlyIfHandshaked;
       }
 
       public async ValueTask AttachAsync(IPeerContext peerContext)
       {
          this.PeerContext = peerContext as BitcoinPeerContext ?? throw new ArgumentException("Expected BitcoinPeerContext", nameof(peerContext));
-         this.messageWriter = this.PeerContext.GetMessageWriter();
+         this._messageWriter = this.PeerContext.GetMessageWriter();
 
          await this.OnPeerAttachedAsync().ConfigureAwait(false);
       }
@@ -68,9 +68,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          this.RegisterLifeTimeEventHandler<PeerHandshaked>(async (receivedEvent) =>
          {
-            this.isHandshaked = true;
+            this._isHandshaked = true;
 
-            if (this.isHandshakeAware)
+            if (this._isHandshakeAware)
             {
                await this.OnPeerHandshakedAsync().ConfigureAwait(false);
             }
@@ -80,7 +80,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return default;
       }
 
-      /// <summary>Method invoked when the peer handshakes and <see cref="isHandshakeAware"/> is set to <see langword="true"/>.</summary>
+      /// <summary>Method invoked when the peer handshakes and <see cref="_isHandshakeAware"/> is set to <see langword="true"/>.</summary>
       /// <param name="event">The event.</param>
       /// <returns></returns>
       protected virtual ValueTask OnPeerHandshakedAsync()
@@ -95,7 +95,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <param name="subscription">The subscription.</param>
       protected void RegisterLifeTimeEventHandler<TEventBase>(Func<TEventBase, ValueTask> handler, Func<TEventBase, bool>? clause = null) where TEventBase : EventBase
       {
-         this.eventSubscriptionManager.RegisterSubscriptions(this.eventBus.Subscribe<TEventBase>(async (message) =>
+         this._eventSubscriptionManager.RegisterSubscriptions(this.eventBus.Subscribe<TEventBase>(async (message) =>
          {
             // ensure we listen only to events we are interested into
             if (clause != null && !clause(message)) return;
@@ -140,7 +140,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          //   return false;
          //}
 
-         await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
+         await this._messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
          return true;
       }
 
@@ -220,7 +220,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <param name="disconnect">if set to <c>true</c> [disconnect].</param>
       protected void Misbehave(uint penalty, string reason, bool disconnect = false)
       {
-         this.peerBehaviorManager.Misbehave(this.PeerContext, penalty, reason);
+         this._peerBehaviorManager.Misbehave(this.PeerContext, penalty, reason);
          if (disconnect)
          {
             this.PeerContext.Disconnect(reason);
@@ -254,7 +254,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public virtual void Dispose()
       {
-         this.eventSubscriptionManager.Dispose();
+         this._eventSubscriptionManager.Dispose();
 
          //not sure it's needed this.PeerContext?.ConnectionCancellationTokenSource.Cancel();
       }

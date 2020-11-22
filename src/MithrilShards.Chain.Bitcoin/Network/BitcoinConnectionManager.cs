@@ -14,9 +14,9 @@ namespace MithrilShards.Chain.Bitcoin.Network
 {
    public class BitcoinConnectionManager : ConnectionManager
    {
-      private readonly TimeSpan inactivityThreshold = TimeSpan.FromSeconds(2 * 60);
-      readonly IRandomNumberGenerator randomNumberGenerator;
-      readonly IPeriodicWork periodicPeerHealthCheck;
+      private readonly TimeSpan _inactivityThreshold = TimeSpan.FromSeconds(2 * 60);
+      readonly IRandomNumberGenerator _randomNumberGenerator;
+      readonly IPeriodicWork _periodicPeerHealthCheck;
 
       public BitcoinConnectionManager(ILogger<ConnectionManager> logger, IEventBus eventBus,
                                       IStatisticFeedsCollector statisticFeedsCollector,
@@ -24,14 +24,14 @@ namespace MithrilShards.Chain.Bitcoin.Network
                                       IRandomNumberGenerator randomNumberGenerator,
                                       IPeriodicWork periodicPeerHealthCheck) : base(logger, eventBus, statisticFeedsCollector, connectors)
       {
-         this.randomNumberGenerator = randomNumberGenerator;
-         this.periodicPeerHealthCheck = periodicPeerHealthCheck;
+         this._randomNumberGenerator = randomNumberGenerator;
+         this._periodicPeerHealthCheck = periodicPeerHealthCheck;
       }
 
       public override Task StartAsync(CancellationToken cancellationToken)
       {
-         _ = this.periodicPeerHealthCheck.StartAsync(
-               label: nameof(periodicPeerHealthCheck),
+         _ = this._periodicPeerHealthCheck.StartAsync(
+               label: nameof(_periodicPeerHealthCheck),
                work: this.StartCheckingPeerHealthAsync,
                interval: TimeSpan.FromSeconds(10),
                cancellation: cancellationToken

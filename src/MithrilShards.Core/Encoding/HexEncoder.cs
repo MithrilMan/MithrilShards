@@ -4,14 +4,14 @@ namespace MithrilShards.Core.Encoding
 {
    public static class HexEncoder
    {
-      const string HexValues = "0123456789ABCDEF";
+      const string HEX_VALUES = "0123456789ABCDEF";
 
       public static string ToHexString(ReadOnlySpan<byte> rawData, bool reverse = false)
       {
          int length = rawData.Length;
          return string.Create(2 * rawData.Length, rawData.ToArray(), (dst, src) =>
          {
-            string hexDigits = HexValues; //JIT optimization
+            string hexDigits = HEX_VALUES; //JIT optimization
             int i = src.Length - 1;
 
             if (reverse)

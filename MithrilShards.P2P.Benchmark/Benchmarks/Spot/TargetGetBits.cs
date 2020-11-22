@@ -11,32 +11,32 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser, PlainExporter]
    public class TargetGetBits
    {
-      uint perfectCompactValue = 0x03123456;
+      uint _perfectCompactValue = 0x03123456;
 
-      MSTarget target;
+      MSTarget _target;
 
       [GlobalSetup]
       public void Setup()
       {
-         target = new MSTarget(perfectCompactValue);
+         _target = new MSTarget(_perfectCompactValue);
       }
 
       [Benchmark]
       public int WithBitOperations()
       {
-         return target.WithBitOperations();
+         return _target.WithBitOperations();
       }
 
       [Benchmark]
       public int AsBitcoin()
       {
-         return target.AsBitcoin();
+         return _target.AsBitcoin();
       }
 
       [Benchmark]
       public int AsNBitcoin()
       {
-         return target.AsNBitcoin();
+         return _target.AsNBitcoin();
       }
 
 

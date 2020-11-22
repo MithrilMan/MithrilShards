@@ -6,13 +6,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 {
    public class BlockSerializer : IProtocolTypeSerializer<Block>
    {
-      private readonly IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer;
-      readonly IProtocolTypeSerializer<Transaction> transactionSerializer;
+      private readonly IProtocolTypeSerializer<BlockHeader> _blockHeaderSerializer;
+      readonly IProtocolTypeSerializer<Transaction> _transactionSerializer;
 
       public BlockSerializer(IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer, IProtocolTypeSerializer<Transaction> transactionSerializer)
       {
-         this.blockHeaderSerializer = blockHeaderSerializer;
-         this.transactionSerializer = transactionSerializer;
+         this._blockHeaderSerializer = blockHeaderSerializer;
+         this._transactionSerializer = transactionSerializer;
       }
 
       public Block Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
@@ -22,8 +22,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 
          return new Block
          {
-            Header = reader.ReadWithSerializer(protocolVersion, this.blockHeaderSerializer, options),
-            Transactions = reader.ReadArray(protocolVersion, this.transactionSerializer, options)
+            Header = reader.ReadWithSerializer(protocolVersion, this._blockHeaderSerializer, options),
+            Transactions = reader.ReadArray(protocolVersion, this._transactionSerializer, options)
          };
       }
 
@@ -33,8 +33,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
             .Set(SerializerOptions.HEADER_IN_BLOCK, false);
 
          int size = 0;
-         size += writer.WriteWithSerializer(typeInstance.Header!, protocolVersion, this.blockHeaderSerializer, options);
-         size += writer.WriteArray(typeInstance.Transactions!, protocolVersion, this.transactionSerializer, options);
+         size += writer.WriteWithSerializer(typeInstance.Header!, protocolVersion, this._blockHeaderSerializer, options);
+         size += writer.WriteArray(typeInstance.Transactions!, protocolVersion, this._transactionSerializer, options);
 
          return size;
       }

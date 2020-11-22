@@ -131,11 +131,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          VersionMessage peerVersion = handshakeStatus.PeerVersion!;
 
-         this.status.IsLimitedNode = this.PeerContext.IsLimitedNode;
-         this.status.IsClient = this.PeerContext.IsClient;
+         this._status.IsLimitedNode = this.PeerContext.IsLimitedNode;
+         this._status.IsClient = this.PeerContext.IsClient;
 
-         this.status.PeerStartingHeight = peerVersion.StartHeight;
-         this.status.CanServeWitness = this.PeerContext.CanServeWitness;
+         this._status.PeerStartingHeight = peerVersion.StartHeight;
+         this._status.CanServeWitness = this.PeerContext.CanServeWitness;
 
          await this.SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
 
@@ -154,7 +154,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
 
          // if this peer is able to serve blocks, register it
-         if (!status.IsClient)
+         if (!_status.IsClient)
          {
             this._blockFetcherManager.RegisterFetcher(this);
          }
@@ -185,10 +185,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             ThrowHelper.ThrowNotSupportedException("BestHeader should always be available, this should never happen");
          }
 
-         if (!this.status.IsSynchronizingHeaders)
+         if (!this._status.IsSynchronizingHeaders)
          {
-            status.IsSynchronizingHeaders = true;
-            status.HeadersSyncTimeout =
+            _status.IsSynchronizingHeaders = true;
+            _status.HeadersSyncTimeout =
                this._dateTimeProvider.GetTimeMicros()
                + HEADERS_DOWNLOAD_TIMEOUT_BASE
                + HEADERS_DOWNLOAD_TIMEOUT_PER_HEADER * (
@@ -204,7 +204,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                got back an empty response.  */
             HeaderNode? pindexStart = bestHeaderNode.Previous ?? bestHeaderNode;
 
-            this.logger.LogDebug("Starting syncing headers from height {LocatorHeight} (peer startheight: {startheight})", pindexStart.Height, this.status.PeerStartingHeight);
+            this.logger.LogDebug("Starting syncing headers from height {LocatorHeight} (peer startheight: {startheight})", pindexStart.Height, this._status.PeerStartingHeight);
 
             var newGetHeaderRequest = new GetHeadersMessage
             {
@@ -224,14 +224,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private void CheckSyncStallingLocked(BlockHeader bestHeader)
       {
          // Check for headers sync timeouts
-         if (status.IsSynchronizingHeaders && status.HeadersSyncTimeout < long.MaxValue)
+         if (_status.IsSynchronizingHeaders && _status.HeadersSyncTimeout < long.MaxValue)
          {
             long now = this._dateTimeProvider.GetTimeMicros();
             // Detect whether this is a stalling initial-headers-sync peer
             if (bestHeader.TimeStamp <= this._dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() - 24 * 60 * 60)
             {
                bool isTheOnlyPeerSynching = true; //nSyncStarted == 1 && (nPreferredDownload - state.fPreferredDownload >= 1)
-               if (now > status.HeadersSyncTimeout && isTheOnlyPeerSynching)
+               if (now > _status.HeadersSyncTimeout && isTheOnlyPeerSynching)
                {
                   // Disconnect a (non-whitelisted) peer if it is our only sync peer,
                   // and we have others we could be using instead.
@@ -251,15 +251,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                      // Note: this will also result in at least one more
                      // getheaders message to be sent to
                      // this peer (eventually).
-                     status.IsSynchronizingHeaders = false;
-                     status.HeadersSyncTimeout = 0;
+                     _status.IsSynchronizingHeaders = false;
+                     _status.HeadersSyncTimeout = 0;
                   }
                }
             }
             else
             {
                // After we've caught up once, reset the timeout so we can't trigger disconnect later.
-               status.HeadersSyncTimeout = long.MaxValue;
+               _status.HeadersSyncTimeout = long.MaxValue;
             }
          }
       }
@@ -354,7 +354,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// </summary>
       public ValueTask<bool> ProcessMessageAsync(SendHeadersMessage message, CancellationToken cancellation)
       {
-         this.status.AnnounceNewBlockUsingSendHeaders = true;
+         this._status.AnnounceNewBlockUsingSendHeaders = true;
          return new ValueTask<bool>(true);
       }
 
@@ -365,27 +365,27 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (message.Version == 1 || (this._localServiceProvider.HasServices(NodeServices.Witness) && message.Version == 2))
          {
-            if (!this.status.ProvidesHeaderAndIDs)
+            if (!this._status.ProvidesHeaderAndIDs)
             {
-               this.status.ProvidesHeaderAndIDs = true;
-               this.status.WantsCompactWitness = message.Version == 2;
+               this._status.ProvidesHeaderAndIDs = true;
+               this._status.WantsCompactWitness = message.Version == 2;
             }
 
             // ignore later version announces
-            if (this.status.WantsCompactWitness = (message.Version == 2))
+            if (this._status.WantsCompactWitness = (message.Version == 2))
             {
-               this.status.AnnounceUsingCompactBlock = message.AnnounceUsingCompactBlock;
+               this._status.AnnounceUsingCompactBlock = message.AnnounceUsingCompactBlock;
             }
 
-            if (!this.status.SupportsDesiredCompactVersion)
+            if (!this._status.SupportsDesiredCompactVersion)
             {
                if (this._localServiceProvider.HasServices(NodeServices.Witness))
                {
-                  this.status.SupportsDesiredCompactVersion = (message.Version == 2);
+                  this._status.SupportsDesiredCompactVersion = (message.Version == 2);
                }
                else
                {
-                  this.status.SupportsDesiredCompactVersion = (message.Version == 1);
+                  this._status.SupportsDesiredCompactVersion = (message.Version == 1);
                }
             }
          }
@@ -588,10 +588,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
-            if (this.status.UnconnectingHeaderReceived > 0)
+            if (this._status.UnconnectingHeaderReceived > 0)
             {
-               this.logger.LogDebug("Resetting UnconnectingHeaderReceived, was {UnconnectingHeaderReceived}.", this.status.UnconnectingHeaderReceived);
-               this.status.UnconnectingHeaderReceived = 0;
+               this.logger.LogDebug("Resetting UnconnectingHeaderReceived, was {UnconnectingHeaderReceived}.", this._status.UnconnectingHeaderReceived);
+               this._status.UnconnectingHeaderReceived = 0;
             }
 
             this.UpdateBlockAvailability(lastValidatedHeaderNode!.Hash);
@@ -599,7 +599,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             if (arg.NewHeadersFoundCount > 0 && lastValidatedHeaderNode.ChainWork > this._chainState.GetTip().ChainWork)
             {
                // we received the new tip of the chain
-               this.status.LastBlockAnnouncement = this._dateTimeProvider.GetTime();
+               this._status.LastBlockAnnouncement = this._dateTimeProvider.GetTime();
             }
 
             if (arg.ValidatedHeadersCount == MAX_HEADERS)
@@ -607,7 +607,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                // We received the maximum number of headers per protocol definition, the peer may have more headers.
                // TODO: optimize: if pindexLast is an ancestor of ::ChainActive().Tip or pindexBestHeader, continue
                // from there instead.
-               this.logger.LogDebug("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastValidatedHeaderNode.Height, this.status.PeerStartingHeight);
+               this.logger.LogDebug("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastValidatedHeaderNode.Height, this._status.PeerStartingHeight);
                var newGetHeaderRequest = new GetHeadersMessage
                {
                   Version = (uint)this.PeerContext.NegotiatedProtocolVersion.Version,
@@ -636,7 +636,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          if (arg.IsNewBlock)
          {
             this.logger.LogTrace("Block Validation succeeded");
-            this.status.LastBlockTime = _dateTimeProvider.GetTime();
+            this._status.LastBlockTime = _dateTimeProvider.GetTime();
          }
 
          return default;
@@ -644,7 +644,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private bool ShouldRequestCompactBlock(HeaderNode lastHeader)
       {
-         return this.status.SupportsDesiredCompactVersion
+         return this._status.SupportsDesiredCompactVersion
             //TODO fix     && this.blockFetcherManager.BlocksInDownload == 0
             && lastHeader.Previous?.IsValid(HeaderValidityStatuses.ValidChain) == true;
       }
@@ -661,7 +661,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          if (this._ibdState.IsDownloadingBlocks() && headersCount != MAX_HEADERS)
          {
             // When nCount < MAX_HEADERS_RESULTS, we know we have no more headers to fetch from this peer.
-            if (this.status.BestKnownHeader != null && this.status.BestKnownHeader.ChainWork < _minimumChainWork)
+            if (this._status.BestKnownHeader != null && this._status.BestKnownHeader.ChainWork < _minimumChainWork)
             {
                /// This peer has too little work on their headers chain to help us sync so disconnect if it's using an outbound
                /// slot, unless the peer is whitelisted or addnode.
@@ -699,8 +699,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (!this._chainState.TryGetKnownHeaderNode(headers[0].PreviousBlockHash, out _) && headers.Length < MAX_BLOCKS_TO_ANNOUNCE)
          {
-            this.status.UnconnectingHeaderReceived++;
-            if (this.status.UnconnectingHeaderReceived % MAX_UNCONNECTING_HEADERS == 0)
+            this._status.UnconnectingHeaderReceived++;
+            if (this._status.UnconnectingHeaderReceived % MAX_UNCONNECTING_HEADERS == 0)
             {
                this.Misbehave(20, "Exceeded maximum number of received unconnecting headers.");
             }
@@ -732,7 +732,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private uint GetFetchFlags()
       {
          uint nFetchFlags = 0;
-         if (this._localServiceProvider.HasServices(NodeServices.Witness) && this.status.CanServeWitness)
+         if (this._localServiceProvider.HasServices(NodeServices.Witness) && this._status.CanServeWitness)
          {
             nFetchFlags |= InventoryType.MSG_WITNESS_FLAG;
          }
@@ -760,15 +760,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          if (this._chainState.TryGetKnownHeaderNode(headerHash, out HeaderNode? headerNode) && headerNode.ChainWork > Target.Zero)
          {
             // A better block header was announced.
-            if (this.status.BestKnownHeader == null || headerNode.ChainWork >= this.status.BestKnownHeader.ChainWork)
+            if (this._status.BestKnownHeader == null || headerNode.ChainWork >= this._status.BestKnownHeader.ChainWork)
             {
-               this.status.BestKnownHeader = headerNode;
+               this._status.BestKnownHeader = headerNode;
             }
          }
          else
          {
             // An unknown block header was announced, assuming it's the best one.
-            this.status.LastUnknownBlockHash = headerHash;
+            this._status.LastUnknownBlockHash = headerHash;
          }
       }
 
@@ -781,15 +781,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// </remarks>
       private void ProcessBlockAvailability()
       {
-         if (this.status.LastUnknownBlockHash != null)
+         if (this._status.LastUnknownBlockHash != null)
          {
-            if (this._chainState.TryGetKnownHeaderNode(this.status.LastUnknownBlockHash, out HeaderNode? headerNode) && headerNode.ChainWork > Target.Zero)
+            if (this._chainState.TryGetKnownHeaderNode(this._status.LastUnknownBlockHash, out HeaderNode? headerNode) && headerNode.ChainWork > Target.Zero)
             {
-               if (this.status.BestKnownHeader == null || headerNode.ChainWork >= this.status.BestKnownHeader.ChainWork)
+               if (this._status.BestKnownHeader == null || headerNode.ChainWork >= this._status.BestKnownHeader.ChainWork)
                {
-                  this.status.BestKnownHeader = headerNode;
+                  this._status.BestKnownHeader = headerNode;
                }
-               this.status.LastUnknownBlockHash = null;
+               this._status.LastUnknownBlockHash = null;
             }
          }
       }

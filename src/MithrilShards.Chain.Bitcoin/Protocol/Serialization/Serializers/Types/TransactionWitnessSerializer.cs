@@ -6,24 +6,24 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 {
    public class TransactionWitnessSerializer : IProtocolTypeSerializer<TransactionWitness>
    {
-      readonly IProtocolTypeSerializer<TransactionWitnessComponent> transactionWitnessComponentSerializer;
+      readonly IProtocolTypeSerializer<TransactionWitnessComponent> _transactionWitnessComponentSerializer;
 
       public TransactionWitnessSerializer(IProtocolTypeSerializer<TransactionWitnessComponent> transactionWitnessComponentSerializer)
       {
-         this.transactionWitnessComponentSerializer = transactionWitnessComponentSerializer;
+         this._transactionWitnessComponentSerializer = transactionWitnessComponentSerializer;
       }
 
       public TransactionWitness Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
       {
          return new TransactionWitness
          {
-            Components = reader.ReadArray(protocolVersion, this.transactionWitnessComponentSerializer)
+            Components = reader.ReadArray(protocolVersion, this._transactionWitnessComponentSerializer)
          };
       }
 
       public int Serialize(TransactionWitness typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
       {
-         return writer.WriteArray(typeInstance.Components, protocolVersion, this.transactionWitnessComponentSerializer);
+         return writer.WriteArray(typeInstance.Components, protocolVersion, this._transactionWitnessComponentSerializer);
       }
    }
 }

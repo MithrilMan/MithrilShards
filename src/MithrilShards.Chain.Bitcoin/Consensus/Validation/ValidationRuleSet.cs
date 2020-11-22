@@ -15,9 +15,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
          public uint PreferredExecutionOrder { get; }
 
-         private readonly HashSet<TValidationRule> executeAfter = new HashSet<TValidationRule>();
+         private readonly HashSet<TValidationRule> _executeAfter = new HashSet<TValidationRule>();
 
-         public IEnumerable<TValidationRule> GetDependencies() => executeAfter;
+         public IEnumerable<TValidationRule> GetDependencies() => _executeAfter;
 
          public RuleDefinition(TValidationRule rule, uint preferredExecutionOrder)
          {
@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
          public void ExecuteAfter(TValidationRule rule)
          {
-            this.executeAfter.Add(rule);
+            this._executeAfter.Add(rule);
          }
       }
 
@@ -65,7 +65,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
          (IEnumerable<(ValidationRuleSet<TValidationRule>.RuleDefinition item, int level)> sorted, IEnumerable<ValidationRuleSet<TValidationRule>.RuleDefinition> cycled) = resolver.Sort();
          if (cycled.Count() > 0)
          {
-            string circularDependency = String.Join(", ", cycled.Select(definition => definition.Rule.GetType().Name));
+            string circularDependency = string.Join(", ", cycled.Select(definition => definition.Rule.GetType().Name));
             ThrowHelper.ThrowNotSupportedException($"Error configuring {typeof(TValidationRule).Name} rules, circular dependency detected: {circularDependency}");
          }
 
@@ -100,7 +100,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
          foreach (TValidationRule rule in this.rules)
          {
             RulePrecedenceAttribute? precedenceAttribute = rule.GetType().GetCustomAttribute<RulePrecedenceAttribute>();
-            var definition = new RuleDefinition(rule, precedenceAttribute?.PreferredExecutionOrder ?? RulePrecedenceAttribute.DefaultExecutionOrder);
+            var definition = new RuleDefinition(rule, precedenceAttribute?.PreferredExecutionOrder ?? RulePrecedenceAttribute.DEFAULT_EXECUTION_ORDER);
             definitions.Add(definition);
 
             if (precedenceAttribute != null)

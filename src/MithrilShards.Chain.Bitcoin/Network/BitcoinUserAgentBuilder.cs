@@ -9,16 +9,16 @@ namespace MithrilShards.Chain.Bitcoin.Network
    /// <seealso cref="MithrilShards.Core.Network.UserAgentBuilder" />
    public class BitcoinUserAgentBuilder : UserAgentBuilder
    {
-      private readonly string bitcoinShardVersion;
+      private readonly string _bitcoinShardVersion;
 
       public BitcoinUserAgentBuilder(IForge forge) : base(forge)
       {
-         this.bitcoinShardVersion = $"BitcoinShard:{typeof(BitcoinShard).Assembly.GetName().Version?.ToString(3) ?? "-"}";
+         this._bitcoinShardVersion = $"BitcoinShard:{typeof(BitcoinShard).Assembly.GetName().Version?.ToString(3) ?? "-"}";
       }
 
       public override string GetUserAgent()
       {
-         return $"/{this.forgeVersion}/{this.bitcoinShardVersion}/";
+         return $"/{this.forgeVersion}/{this._bitcoinShardVersion}/";
       }
    }
 }

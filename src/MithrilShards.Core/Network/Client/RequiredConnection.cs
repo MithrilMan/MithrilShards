@@ -23,7 +23,7 @@ namespace MithrilShards.Core.Network.Client
       private const int MEDIUM_DELAY = 5_000;
       private const int SLOW_DELAY = 15_000;
 
-      private readonly ForgeConnectivitySettings settings;
+      private readonly ForgeConnectivitySettings _settings;
 
       public List<OutgoingConnectionEndPoint> connectionsToAttempt = new List<OutgoingConnectionEndPoint>();
 
@@ -34,10 +34,10 @@ namespace MithrilShards.Core.Network.Client
                                 IForgeConnectivity forgeConnectivity,
                                 IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
       {
-         this.settings = options.Value!;
+         this._settings = options.Value!;
 
          this.connectionsToAttempt.AddRange(
-            from connection in this.settings.Connections
+            from connection in this._settings.Connections
             let endPoint = connection.TryGetIPEndPoint(out IPEndPoint? endPoint) ? endPoint : null
             where endPoint != null
             select new OutgoingConnectionEndPoint(endPoint)
@@ -52,13 +52,13 @@ namespace MithrilShards.Core.Network.Client
          {
             fillRatioPercentage = 0;
          }
-         else if (this.settings.MaxOutboundConnections == 0)
+         else if (this._settings.MaxOutboundConnections == 0)
          {
             fillRatioPercentage = 0.5f;
          }
          else
          {
-            fillRatioPercentage = this.settings.MaxOutboundConnections / this.peerStats.ConnectedOutboundPeersCount;
+            fillRatioPercentage = this._settings.MaxOutboundConnections / this.peerStats.ConnectedOutboundPeersCount;
          }
 
          if (fillRatioPercentage < 0.25)

@@ -11,45 +11,45 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser, PlainExporter]
    public class Uint256_Study
    {
-      private readonly byte[] data = new byte[32];
-      AltUInt256.UInt256 u1, u2;
-      AltUInt256.UInt256_Updated aU1, aU2;
+      private readonly byte[] _data = new byte[32];
+      AltUInt256.UInt256 _u1, _u2;
+      AltUInt256.UInt256_Updated _aU1, _aU2;
 
       [GlobalSetup]
       public void Setup()
       {
-         new Random(47).NextBytes(this.data);
+         new Random(47).NextBytes(this._data);
 
-         u1 = new AltUInt256.UInt256(this.data);
-         aU1 = new AltUInt256.UInt256_Updated(this.data);
+         _u1 = new AltUInt256.UInt256(this._data);
+         _aU1 = new AltUInt256.UInt256_Updated(this._data);
 
-         new Random(53).NextBytes(this.data);
-         u2 = new AltUInt256.UInt256(this.data);
-         aU2 = new AltUInt256.UInt256_Updated(this.data);
+         new Random(53).NextBytes(this._data);
+         _u2 = new AltUInt256.UInt256(this._data);
+         _aU2 = new AltUInt256.UInt256_Updated(this._data);
       }
 
       [Benchmark]
       public object Create_UInt256()
       {
-         return new AltUInt256.UInt256(this.data);
+         return new AltUInt256.UInt256(this._data);
       }
 
       [Benchmark]
       public object Create_AltUInt256()
       {
-         return new AltUInt256.UInt256(this.data);
+         return new AltUInt256.UInt256(this._data);
       }
 
       [Benchmark]
       public ReadOnlySpan<byte> GetBytes_UInt256()
       {
-         return u1.GetBytes();
+         return _u1.GetBytes();
       }
 
       [Benchmark]
       public ReadOnlySpan<byte> GetBytes_AltUInt256()
       {
-         return aU1.GetBytes();
+         return _aU1.GetBytes();
       }
    }
 }

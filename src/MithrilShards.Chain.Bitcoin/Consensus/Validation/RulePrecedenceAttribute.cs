@@ -20,7 +20,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       /// <summary>
       /// The default execution order when no execution order is specified.
       /// </summary>
-      public const uint DefaultExecutionOrder = 100;
+      public const uint DEFAULT_EXECUTION_ORDER = 100;
 
       /// <summary>
       /// Specify when the target rule should be executed.
@@ -43,7 +43,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       /// </summary>
       /// <param name="preferredExecutionOrder">The preferred execution order (the lower, the earlier we want to execute the rule).</param>
       /// <param name="mustBeExecutedAfter">An optional list of other rules that have to be executed after the target rule.</param>
-      public RulePrecedenceAttribute(uint preferredExecutionOrder = DefaultExecutionOrder, params Type[] mustBeExecutedAfter)
+      public RulePrecedenceAttribute(uint preferredExecutionOrder = DEFAULT_EXECUTION_ORDER, params Type[] mustBeExecutedAfter)
       {
          this.PreferredExecutionOrder = preferredExecutionOrder;
          this.MustBeExecutedAfter = mustBeExecutedAfter;

@@ -6,7 +6,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 {
    public abstract class ConfigurableNetworkMessageBase : INetworkMessage
    {
-      private Dictionary<string, object>? serializationOptions;
+      private Dictionary<string, object>? _serializationOptions;
 
       protected abstract string Command { get; }
 
@@ -14,28 +14,28 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 
       protected void SetSerializationOptions(params (string Key, object Value)[] options)
       {
-         if (this.serializationOptions != null)
+         if (this._serializationOptions != null)
          {
-            this.serializationOptions.Clear();
+            this._serializationOptions.Clear();
          }
 
          if ((options?.Length ?? 0) == 0) return;
 
-         this.serializationOptions ??= new Dictionary<string, object>();
+         this._serializationOptions ??= new Dictionary<string, object>();
 
          foreach ((string Key, object Value) option in options!)
          {
-            this.serializationOptions.Add(option.Key, option.Value);
+            this._serializationOptions.Add(option.Key, option.Value);
          }
       }
 
       public void PopulateSerializerOption(ref ProtocolTypeSerializerOptions? options)
       {
-         if (this.serializationOptions == null) return;
+         if (this._serializationOptions == null) return;
 
          options ??= new ProtocolTypeSerializerOptions();
 
-         foreach (KeyValuePair<string, object> option in this.serializationOptions)
+         foreach (KeyValuePair<string, object> option in this._serializationOptions)
          {
             options.Set(option.Key, option.Value);
          }

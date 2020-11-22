@@ -9,37 +9,37 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
    /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.ILocalServiceProvider" />
    public class LocalServiceProvider : ILocalServiceProvider
    {
-      readonly ILogger<LocalServiceProvider> logger;
+      readonly ILogger<LocalServiceProvider> _logger;
 
-      private NodeServices availableServices;
+      private NodeServices _availableServices;
 
       public LocalServiceProvider(ILogger<LocalServiceProvider> logger)
       {
-         this.logger = logger;
+         this._logger = logger;
 
          this.AddServices(NodeServices.Network | NodeServices.NetworkLimited | NodeServices.Witness);
       }
 
       public void AddServices(NodeServices services)
       {
-         this.logger.LogDebug("Adding services {NodeServices}", services);
-         this.availableServices |= services;
+         this._logger.LogDebug("Adding services {NodeServices}", services);
+         this._availableServices |= services;
       }
 
       public void RemoveServices(NodeServices services)
       {
-         this.logger.LogDebug("Removing services {NodeServices}", services);
-         this.availableServices &= ~services;
+         this._logger.LogDebug("Removing services {NodeServices}", services);
+         this._availableServices &= ~services;
       }
 
       public NodeServices GetServices()
       {
-         return this.availableServices;
+         return this._availableServices;
       }
 
       public bool HasServices(NodeServices service)
       {
-         return this.availableServices.HasFlag(service);
+         return this._availableServices.HasFlag(service);
       }
    }
 }

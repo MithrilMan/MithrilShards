@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
    [TypeConverter(typeof(TargetConverter))]
    public partial class Target : UInt256
    {
-      private static readonly BigInteger Pow256 = BigInteger.Pow(new BigInteger(2), 256);
+      private static readonly BigInteger _pow256 = BigInteger.Pow(new BigInteger(2), 256);
 
       public static new Target Zero { get; } = new Target("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
@@ -175,14 +175,14 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          //but we can using BigInteger (less performant, could be improved)
 
          var asBigInt = new BigInteger(this.GetBytes());
-         if (this <= Zero || asBigInt >= Pow256)
+         if (this <= Zero || asBigInt >= _pow256)
             return Zero;
 
 
          var proof = new Target();
          Span<byte> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref proof.part1), EXPECTED_SIZE);
          data.Clear();
-         (Pow256 / (asBigInt + 1)).TryWriteBytes(data, out _);
+         (_pow256 / (asBigInt + 1)).TryWriteBytes(data, out _);
 
          return proof;
       }

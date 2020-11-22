@@ -10,7 +10,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
    public class SHA256
    {
 
-      private byte[] data;
+      private byte[] _data;
 
       [Params(1000)]
       public int Payload;
@@ -18,21 +18,21 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         this.data = new byte[this.Payload];
-         new Random().NextBytes(this.data);
+         this._data = new byte[this.Payload];
+         new Random().NextBytes(this._data);
       }
 
 
       [Benchmark]
       public NBitcoin.uint256 NBitcoin_Hash256()
       {
-         return NBitcoin.Crypto.Hashes.Hash256(this.data);
+         return NBitcoin.Crypto.Hashes.Hash256(this._data);
       }
 
       [Benchmark]
       public Core.DataTypes.UInt256 MithrilShards_DoubleSha256()
       {
-         return new Core.DataTypes.UInt256(HashGenerator.DoubleSha256(this.data));
+         return new Core.DataTypes.UInt256(HashGenerator.DoubleSha256(this._data));
       }
    }
 }

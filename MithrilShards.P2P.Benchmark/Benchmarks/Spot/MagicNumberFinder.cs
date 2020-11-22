@@ -9,10 +9,10 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class MagicNumberFinder
    {
-      readonly byte[] magicNumberBytes = BitConverter.GetBytes(0x0709110B);
-      readonly int magicNumber = 0x0709110B;
+      readonly byte[] _magicNumberBytes = BitConverter.GetBytes(0x0709110B);
+      readonly int _magicNumber = 0x0709110B;
 
-      private ReadOnlySequence<byte> input;
+      private ReadOnlySequence<byte> _input;
 
       [Params(100, 10000)]
       //[Params(1_000_000)]
@@ -33,7 +33,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
          for (int i = 0; i < data.Length; i++)
          {
             byte b = data[i];
-            if (b == this.magicNumberBytes[0])
+            if (b == this._magicNumberBytes[0])
             {
                data[i] = (byte)'\0';
             }
@@ -41,27 +41,27 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
          // insert magic packet at the right position
          int position = (int)(data.Length * this.MagicPacketRelativePosition);
-         position = Math.Min(position, data.Length - (this.magicNumberBytes.Length + 1));
-         for (int i = 0; i < this.magicNumberBytes.Length; i++)
+         position = Math.Min(position, data.Length - (this._magicNumberBytes.Length + 1));
+         for (int i = 0; i < this._magicNumberBytes.Length; i++)
          {
-            data[position + i] = this.magicNumberBytes[i];
+            data[position + i] = this._magicNumberBytes[i];
          }
 
-         this.input = new ReadOnlySequence<byte>(data);
+         this._input = new ReadOnlySequence<byte>(data);
       }
 
 
       [Benchmark]
       public bool FindWithTryAdvanceTo()
       {
-         var reader = new SequenceReader<byte>(this.input);
+         var reader = new SequenceReader<byte>(this._input);
          return this.FindWithTryAdvanceTo(ref reader);
       }
 
       [Benchmark]
       public bool FindWithForLoop()
       {
-         var reader = new SequenceReader<byte>(this.input);
+         var reader = new SequenceReader<byte>(this._input);
          return this.FindWithForLoop(ref reader);
       }
 
@@ -71,11 +71,11 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       private bool FindWithTryAdvanceTo(ref SequenceReader<byte> reader)
       {
          // advance to the first byte of the magic number.
-         while (reader.TryAdvanceTo(this.magicNumberBytes[0], advancePastDelimiter: false))
+         while (reader.TryAdvanceTo(this._magicNumberBytes[0], advancePastDelimiter: false))
          {
             if (reader.TryReadLittleEndian(out int magicRead))
             {
-               if (magicRead == this.magicNumber)
+               if (magicRead == this._magicNumber)
                {
                   return true;
                }
@@ -97,9 +97,9 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
       private bool FindWithForLoop(ref SequenceReader<byte> reader)
       {
-         for (int i = 0; i < this.magicNumberBytes.Length; i++)
+         for (int i = 0; i < this._magicNumberBytes.Length; i++)
          {
-            byte expectedByte = this.magicNumberBytes[i];
+            byte expectedByte = this._magicNumberBytes[i];
 
             if (reader.TryRead(out byte receivedByte))
             {
@@ -112,7 +112,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
                   // with the second byte. Otherwise, we set index to -1
                   // here, which means that after the loop incrementation,
                   // we will start from first byte of magic.
-                  i = receivedByte == this.magicNumberBytes[0] ? 0 : -1;
+                  i = receivedByte == this._magicNumberBytes[0] ? 0 : -1;
                }
             }
             else

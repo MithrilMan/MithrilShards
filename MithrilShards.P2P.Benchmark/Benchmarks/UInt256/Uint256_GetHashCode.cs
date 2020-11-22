@@ -9,12 +9,12 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class Uint256_GetHashCode
    {
-      private NBitcoin.uint256 NBitcoinData;
-      private MithrilShards.Core.DataTypes.UInt256 MithrilShardsData;
-      private long long1;
-      private long long2;
-      private long long3;
-      private long long4;
+      private NBitcoin.uint256 _nBitcoinData;
+      private MithrilShards.Core.DataTypes.UInt256 _mithrilShardsData;
+      private long _long1;
+      private long _long2;
+      private long _long3;
+      private long _long4;
 
       [GlobalSetup]
       public void Setup()
@@ -22,37 +22,37 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
          var value = new Span<byte>(new byte[32]);
          new Random().NextBytes(value);
 
-         this.NBitcoinData = new uint256(value.ToArray());
-         this.MithrilShardsData = new Core.DataTypes.UInt256(value);
+         this._nBitcoinData = new uint256(value.ToArray());
+         this._mithrilShardsData = new Core.DataTypes.UInt256(value);
 
-         this.long1 = (long)new Random().NextDouble();
-         this.long2 = (long)new Random().NextDouble();
-         this.long3 = (long)new Random().NextDouble();
-         this.long4 = (long)new Random().NextDouble();
+         this._long1 = (long)new Random().NextDouble();
+         this._long2 = (long)new Random().NextDouble();
+         this._long3 = (long)new Random().NextDouble();
+         this._long4 = (long)new Random().NextDouble();
       }
 
       [Benchmark(Baseline = true)]
       public int NBitcoin()
       {
-         return this.NBitcoinData.GetHashCode();
+         return this._nBitcoinData.GetHashCode();
       }
 
       [Benchmark]
       public int MithrilShards()
       {
-         return this.MithrilShardsData.GetHashCode();
+         return this._mithrilShardsData.GetHashCode();
       }
 
       [Benchmark]
       public int Direct()
       {
-         return (int)this.long1;
+         return (int)this._long1;
       }
 
       [Benchmark]
       public int Combine()
       {
-         return (int)HashCode.Combine(this.long1, this.long2, this.long3, this.long4);
+         return (int)HashCode.Combine(this._long1, this._long2, this._long3, this._long4);
       }
    }
 }

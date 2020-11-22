@@ -9,9 +9,9 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class Uint256_Equals
    {
-      private NBitcoin.uint256 NBitcoinData, NBitcoinData2;
-      private MithrilShards.Core.DataTypes.UInt256 MithrilShardsData, MithrilShardsData2;
-      private MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256 NeoData, NeoData2;
+      private NBitcoin.uint256 _nBitcoinData, _nBitcoinData2;
+      private MithrilShards.Core.DataTypes.UInt256 _mithrilShardsData, _mithrilShardsData2;
+      private MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256 _neoData, _neoData2;
 
       [GlobalSetup]
       public void Setup()
@@ -19,33 +19,33 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
          var value = new Span<byte>(new byte[32]);
          new Random().NextBytes(value);
 
-         this.NBitcoinData = new uint256(value.ToArray());
-         this.MithrilShardsData = new Core.DataTypes.UInt256(value);
-         this.NeoData = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(value);
+         this._nBitcoinData = new uint256(value.ToArray());
+         this._mithrilShardsData = new Core.DataTypes.UInt256(value);
+         this._neoData = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(value);
 
          new Random().NextBytes(value);
 
-         this.NBitcoinData2 = new uint256(value.ToArray());
-         this.MithrilShardsData2 = new Core.DataTypes.UInt256(value);
-         this.NeoData2 = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(value);
+         this._nBitcoinData2 = new uint256(value.ToArray());
+         this._mithrilShardsData2 = new Core.DataTypes.UInt256(value);
+         this._neoData2 = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(value);
       }
 
       [Benchmark(Baseline = true)]
       public bool NBitcoin()
       {
-         return this.NBitcoinData.Equals(this.NBitcoinData2);
+         return this._nBitcoinData.Equals(this._nBitcoinData2);
       }
 
       [Benchmark]
       public bool Neo()
       {
-         return this.NeoData.Equals(this.NeoData2);
+         return this._neoData.Equals(this._neoData2);
       }
 
       [Benchmark]
       public bool MithrilShards()
       {
-         return this.MithrilShardsData.Equals(this.MithrilShardsData2);
+         return this._mithrilShardsData.Equals(this._mithrilShardsData2);
       }
    }
 }

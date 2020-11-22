@@ -9,11 +9,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class VersionMessageSerializer : BitcoinNetworkMessageSerializerBase<VersionMessage>
    {
-      private readonly IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer;
+      private readonly IProtocolTypeSerializer<NetworkAddressNoTime> _networkAddressNoTimeSerializer;
 
       public VersionMessageSerializer(IProtocolTypeSerializer<NetworkAddressNoTime> networkAddressNoTimeSerializer)
       {
-         this.networkAddressNoTimeSerializer = networkAddressNoTimeSerializer;
+         this._networkAddressNoTimeSerializer = networkAddressNoTimeSerializer;
       }
 
       public override void Serialize(VersionMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
@@ -24,14 +24,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
          output.WriteInt(message.Version);
          output.WriteULong(message.Services);
          output.WriteLong(message.Timestamp.ToUnixTimeSeconds());
-         output.WriteWithSerializer(message.ReceiverAddress!, protocolVersion, this.networkAddressNoTimeSerializer);
+         output.WriteWithSerializer(message.ReceiverAddress!, protocolVersion, this._networkAddressNoTimeSerializer);
 
          if (protocolVersion < KnownVersion.V106)
          {
             return;
          }
 
-         output.WriteWithSerializer(message.SenderAddress!, protocolVersion, this.networkAddressNoTimeSerializer);
+         output.WriteWithSerializer(message.SenderAddress!, protocolVersion, this._networkAddressNoTimeSerializer);
          output.WriteULong(message.Nonce);
          output.WriteVarString(message.UserAgent!);
          output.WriteInt(message.StartHeight);
@@ -51,7 +51,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
             Version = reader.ReadInt(),
             Services = reader.ReadULong(),
             Timestamp = DateTimeOffset.FromUnixTimeSeconds(reader.ReadLong()),
-            ReceiverAddress = reader.ReadWithSerializer(protocolVersion, this.networkAddressNoTimeSerializer)
+            ReceiverAddress = reader.ReadWithSerializer(protocolVersion, this._networkAddressNoTimeSerializer)
          };
 
          if (message.Version < KnownVersion.V106)
@@ -59,7 +59,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
             return message;
          }
 
-         message.SenderAddress = reader.ReadWithSerializer(protocolVersion, this.networkAddressNoTimeSerializer);
+         message.SenderAddress = reader.ReadWithSerializer(protocolVersion, this._networkAddressNoTimeSerializer);
          message.Nonce = reader.ReadULong();
          message.UserAgent = reader.ReadVarString();
          message.StartHeight = reader.ReadInt();

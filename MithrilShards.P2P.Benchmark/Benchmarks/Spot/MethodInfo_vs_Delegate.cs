@@ -35,19 +35,19 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
          }
       }
 
-      private Foo classInstance;
-      private MethodInfo method;
-      private Delegate computedDelegate;
-      private Func<object, object[], object> lambdaWrapper;
-      private readonly Message1 messageInstance = new Message1();
-      private readonly Message2 messageInstance2 = new Message2();
+      private Foo _classInstance;
+      private MethodInfo _method;
+      private Delegate _computedDelegate;
+      private Func<object, object[], object> _lambdaWrapper;
+      private readonly Message1 _messageInstance = new Message1();
+      private readonly Message2 _messageInstance2 = new Message2();
 
 
 
       [GlobalSetup]
       public void Setup()
       {
-         this.classInstance = new Foo();
+         this._classInstance = new Foo();
 
          Type refType = typeof(IFoo<>);
          Type processorType = typeof(Foo);
@@ -56,7 +56,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
             .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == refType)
             .Select(i => i.GetGenericArguments().First());
 
-         Type handledMessageType = this.messageInstance.GetType();
+         Type handledMessageType = this._messageInstance.GetType();
          Type concreteMessageHandlerType = refType.MakeGenericType(handledMessageType);
 
          MethodInfo method = processorType.GetInterfaceMap(concreteMessageHandlerType).TargetMethods
@@ -65,41 +65,41 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
             .First();
 
          Type delegateType = Expression.GetFuncType(handledMessageType, typeof(CancellationToken), typeof(ValueTask<bool>));
-         this.method = method;
-         this.computedDelegate = Delegate.CreateDelegate(delegateType, this.classInstance, method);
+         this._method = method;
+         this._computedDelegate = Delegate.CreateDelegate(delegateType, this._classInstance, method);
 
-         this.lambdaWrapper = createWrapperFunc(this.method);
+         this._lambdaWrapper = createWrapperFunc(this._method);
       }
 
 
       [Benchmark]
       public object DirectCall()
       {
-         return this.classInstance.ProcessMessageAsync(this.messageInstance, default);
+         return this._classInstance.ProcessMessageAsync(this._messageInstance, default);
       }
 
       [Benchmark]
       public object UsingMethodInfo()
       {
-         return this.method.Invoke(this.classInstance, new object[] { this.messageInstance, default });
+         return this._method.Invoke(this._classInstance, new object[] { this._messageInstance, default });
       }
 
       [Benchmark]
       public void UsingDelegate()
       {
-         this.computedDelegate.DynamicInvoke(this.messageInstance, default);
+         this._computedDelegate.DynamicInvoke(this._messageInstance, default);
       }
 
       [Benchmark]
       public void UsingDelegateMethod()
       {
-         this.computedDelegate.Method.Invoke(this.classInstance, new object[] { this.messageInstance, default });
+         this._computedDelegate.Method.Invoke(this._classInstance, new object[] { this._messageInstance, default });
       }
 
       [Benchmark]
       public void UsingLambdaWrapper()
       {
-         this.lambdaWrapper.Invoke(this.classInstance, new object[] { this.messageInstance, (CancellationToken)default });
+         this._lambdaWrapper.Invoke(this._classInstance, new object[] { this._messageInstance, (CancellationToken)default });
       }
 
       private static Func<object, object[], object> createWrapperFunc(MethodInfo method)

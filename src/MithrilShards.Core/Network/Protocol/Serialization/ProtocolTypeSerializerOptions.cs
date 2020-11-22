@@ -5,11 +5,11 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
 {
    public class ProtocolTypeSerializerOptions
    {
-      private readonly Dictionary<string, object> options = new Dictionary<string, object>();
+      private readonly Dictionary<string, object> _options = new Dictionary<string, object>();
 
       public bool HasOption(string key)
       {
-         return this.options.ContainsKey(key);
+         return this._options.ContainsKey(key);
       }
 
       public ProtocolTypeSerializerOptions(params (string Key, object Value)[] values)
@@ -18,7 +18,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          {
             foreach ((string Key, object Value) item in values)
             {
-               this.options.Add(item.Key, item.Value);
+               this._options.Add(item.Key, item.Value);
             }
          }
       }
@@ -34,7 +34,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
       [return: MaybeNull]
       public T Get<T>(string key, T defaultValue = default)
       {
-         if (!this.options.TryGetValue(key, out object? value)) return defaultValue;
+         if (!this._options.TryGetValue(key, out object? value)) return defaultValue;
 
          return (T)value;
       }
@@ -46,7 +46,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
       /// <param name="value">The value.</param>
       public ProtocolTypeSerializerOptions Set(string key, object value)
       {
-         this.options.Add(key, value);
+         this._options.Add(key, value);
          return this;
       }
    }

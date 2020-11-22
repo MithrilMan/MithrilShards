@@ -6,18 +6,18 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
 {
    public class MaxConnectionThresholdGuard : ServerPeerConnectionGuardBase
    {
-      readonly IConnectivityPeerStats peerStats;
+      readonly IConnectivityPeerStats _peerStats;
 
       public MaxConnectionThresholdGuard(ILogger<MaxConnectionThresholdGuard> logger,
                                          IOptions<ForgeConnectivitySettings> settings,
                                          IConnectivityPeerStats serverPeerStats) : base(logger, settings)
       {
-         this.peerStats = serverPeerStats;
+         this._peerStats = serverPeerStats;
       }
 
       internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
-         if (this.peerStats.ConnectedInboundPeersCount >= this.settings.MaxInboundConnections)
+         if (this._peerStats.ConnectedInboundPeersCount >= this.settings.MaxInboundConnections)
          {
             /// TODO: try to evict eventual bad connection to let a space for this connection
             /// ref: https://github.com/bitcoin/bitcoin/blob/e8e79958a7b2a0bf1b02adcce9f4d811eac37dfc/src/net.cpp#L995-L1003

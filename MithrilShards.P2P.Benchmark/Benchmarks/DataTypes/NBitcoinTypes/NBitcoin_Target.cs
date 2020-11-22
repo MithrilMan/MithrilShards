@@ -12,12 +12,12 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
    /// </summary>
    public class NBitcoin_Target
    {
-      static NBitcoin_Target _Difficulty1 = new NBitcoin_Target(new byte[] { 0x1d, 0x00, 0xff, 0xff });
+      static NBitcoin_Target _difficulty1 = new NBitcoin_Target(new byte[] { 0x1d, 0x00, 0xff, 0xff });
       public static NBitcoin_Target Difficulty1
       {
          get
          {
-            return _Difficulty1;
+            return _difficulty1;
          }
       }
 
@@ -40,7 +40,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
 
 
 
-      BigInteger _Target;
+      BigInteger _target;
 
       public NBitcoin_Target(byte[] compact)
       {
@@ -48,7 +48,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
          {
             var exp = compact[0];
             var val = new BigInteger(compact.SafeSubarray(1, 3));
-            _Target = val.ShiftLeft(8 * (exp - 3));
+            _target = val.ShiftLeft(8 * (exp - 3));
          }
          else
             throw new FormatException("Invalid number of bytes");
@@ -56,13 +56,13 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
 
       public NBitcoin_Target(BigInteger target)
       {
-         _Target = target;
-         _Target = new NBitcoin_Target(this.ToCompact())._Target;
+         _target = target;
+         _target = new NBitcoin_Target(this.ToCompact())._target;
       }
       public NBitcoin_Target(uint256 target)
       {
-         _Target = new BigInteger(target.ToBytes(false));
-         _Target = new NBitcoin_Target(this.ToCompact())._Target;
+         _target = new BigInteger(target.ToBytes(false));
+         _target = new NBitcoin_Target(this.ToCompact())._target;
       }
 
       public static implicit operator NBitcoin_Target(uint a)
@@ -71,7 +71,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
       }
       public static implicit operator uint(NBitcoin_Target a)
       {
-         var bytes = a._Target.ToByteArray();
+         var bytes = a._target.ToByteArray();
          var val = bytes.SafeSubarray(0, Math.Min(bytes.Length, 3));
          Array.Reverse(val);
          var exp = (byte)(bytes.Length);
@@ -85,15 +85,15 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
          return (uint)val[0] + (uint)(val[1] << 8) + (uint)(val[2] << 16) + (uint)(exp << 24);
       }
 
-      double? _Difficulty;
+      double? _difficulty;
 
       public double Difficulty
       {
          get
          {
-            if (_Difficulty == null)
+            if (_difficulty == null)
             {
-               var qr = Difficulty1._Target.DivideAndRemainder(_Target);
+               var qr = Difficulty1._target.DivideAndRemainder(_target);
                var quotient = qr[0];
                var remainder = qr[1];
                var decimalPart = BigInteger.Zero;
@@ -105,20 +105,20 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
                builder.Append('.');
                for (int i = 0; i < precision; i++)
                {
-                  var div = (remainder.Multiply(BigInteger.Ten)).Divide(_Target);
+                  var div = (remainder.Multiply(BigInteger.Ten)).Divide(_target);
                   decimalPart = decimalPart.Multiply(BigInteger.Ten);
                   decimalPart = decimalPart.Add(div);
 
-                  remainder = remainder.Multiply(BigInteger.Ten).Subtract(div.Multiply(_Target));
+                  remainder = remainder.Multiply(BigInteger.Ten).Subtract(div.Multiply(_target));
                }
                builder.Append(decimalPart.ToString().PadLeft(precision, '0'));
-               _Difficulty = double.Parse(builder.ToString(), new NumberFormatInfo()
+               _difficulty = double.Parse(builder.ToString(), new NumberFormatInfo()
                {
                   NegativeSign = "-",
                   NumberDecimalSeparator = "."
                });
             }
-            return _Difficulty.Value;
+            return _difficulty.Value;
          }
       }
 
@@ -129,7 +129,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
          var item = obj as NBitcoin_Target;
          if (item == null)
             return false;
-         return _Target.Equals(item._Target);
+         return _target.Equals(item._target);
       }
       public static bool operator ==(NBitcoin_Target a, NBitcoin_Target b)
       {
@@ -137,7 +137,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
             return true;
          if (((object)a == null) || ((object)b == null))
             return false;
-         return a._Target.Equals(b._Target);
+         return a._target.Equals(b._target);
       }
 
       public static bool operator !=(NBitcoin_Target a, NBitcoin_Target b)
@@ -147,12 +147,12 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
 
       public override int GetHashCode()
       {
-         return _Target.GetHashCode();
+         return _target.GetHashCode();
       }
 
       public BigInteger ToBigInteger()
       {
-         return _Target;
+         return _target;
       }
 
       public uint ToCompact()
@@ -162,7 +162,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
 
       public uint256 ToUInt256()
       {
-         return ToUInt256(_Target);
+         return ToUInt256(_target);
       }
 
       internal static uint256 ToUInt256(BigInteger input)

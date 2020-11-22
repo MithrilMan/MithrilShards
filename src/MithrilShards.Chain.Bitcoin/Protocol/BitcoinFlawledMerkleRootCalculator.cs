@@ -57,11 +57,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
    /// <seealso cref="Consensus.IMerkleRootCalculator" />
    public class BitcoinFlawedMerkleRootCalculator : IMerkleRootCalculator
    {
-      readonly ILogger<BitcoinFlawedMerkleRootCalculator> logger;
+      readonly ILogger<BitcoinFlawedMerkleRootCalculator> _logger;
 
       public BitcoinFlawedMerkleRootCalculator(ILogger<BitcoinFlawedMerkleRootCalculator> logger)
       {
-         this.logger = logger;
+         this._logger = logger;
       }
 
       public UInt256 ComputeMerkleRoot(IList<UInt256> hashes)

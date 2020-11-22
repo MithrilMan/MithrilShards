@@ -4,7 +4,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
    public partial class PingPongProcessor
    {
-      private readonly Status status = new Status();
+      private readonly Status _status = new Status();
 
       public class Status
       {

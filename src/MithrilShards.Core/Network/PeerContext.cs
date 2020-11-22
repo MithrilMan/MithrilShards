@@ -14,7 +14,7 @@ namespace MithrilShards.Core.Network
 {
    public class PeerContext : IPeerContext
    {
-      private readonly List<INetworkMessageProcessor> messageProcessors = new List<INetworkMessageProcessor>();
+      private readonly List<INetworkMessageProcessor> _messageProcessors = new List<INetworkMessageProcessor>();
       protected readonly ILogger logger;
       protected readonly IEventBus eventBus;
       protected readonly INetworkMessageWriter messageWriter;
@@ -90,12 +90,12 @@ namespace MithrilShards.Core.Network
 
       public virtual void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor)
       {
-         if (this.messageProcessors.Exists(p => p.GetType() == messageProcessor.GetType()))
+         if (this._messageProcessors.Exists(p => p.GetType() == messageProcessor.GetType()))
          {
             throw new ArgumentException($"Cannot add multiple processors of the same type. Trying to attack {messageProcessor.GetType().Name} multiple times");
          }
 
-         this.messageProcessors.Add(messageProcessor);
+         this._messageProcessors.Add(messageProcessor);
       }
 
       public void Disconnect(string reason)
@@ -107,7 +107,7 @@ namespace MithrilShards.Core.Network
       public void Dispose()
       {
          this.logger.LogDebug("Disposing PeerContext of {PeerId}.", this.PeerId);
-         foreach (INetworkMessageProcessor messageProcessor in this.messageProcessors)
+         foreach (INetworkMessageProcessor messageProcessor in this._messageProcessors)
          {
             try
             {

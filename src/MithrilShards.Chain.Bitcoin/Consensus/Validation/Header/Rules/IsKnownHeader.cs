@@ -10,11 +10,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
    [RulePrecedence(preferredExecutionOrder: 0)]
    public class IsKnownHeader : IHeaderValidationRule
    {
-      readonly ILogger<IsKnownHeader> logger;
+      readonly ILogger<IsKnownHeader> _logger;
 
       public IsKnownHeader(ILogger<IsKnownHeader> logger)
       {
-         this.logger = logger;
+         this._logger = logger;
       }
 
       public bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)

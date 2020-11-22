@@ -9,8 +9,8 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class Uint256_ToHex
    {
-      private NBitcoin.uint256 NBitcoinData;
-      private MithrilShards.Core.DataTypes.UInt256 MithrilShardsData;
+      private NBitcoin.uint256 _nBitcoinData;
+      private MithrilShards.Core.DataTypes.UInt256 _mithrilShardsData;
 
       [GlobalSetup]
       public void Setup()
@@ -18,20 +18,20 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
          var value = new Span<byte>(new byte[32]);
          new Random().NextBytes(value);
 
-         this.NBitcoinData = new uint256(value.ToArray());
-         this.MithrilShardsData = new Core.DataTypes.UInt256(value);
+         this._nBitcoinData = new uint256(value.ToArray());
+         this._mithrilShardsData = new Core.DataTypes.UInt256(value);
       }
 
       [Benchmark(Baseline = true)]
       public void UInt256_ToString_NBitcoin()
       {
-         _ = this.NBitcoinData.ToString();
+         _ = this._nBitcoinData.ToString();
       }
 
       [Benchmark]
       public void UInt256_ToString_MithrilShards()
       {
-         _ = this.MithrilShardsData.ToString();
+         _ = this._mithrilShardsData.ToString();
       }
    }
 }

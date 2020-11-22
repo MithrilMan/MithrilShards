@@ -9,42 +9,42 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class Uint256_FromBytes_Fight_Finalists
    {
-      private readonly byte[] data = new byte[32];
+      private readonly byte[] _data = new byte[32];
 
       [GlobalSetup]
       public void Setup()
       {
-         new Random().NextBytes(this.data);
+         new Random().NextBytes(this._data);
       }
 
       [Benchmark]
       public void UInt256_Neo_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(this.data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(this._data);
       }
 
       [Benchmark]
       public void uint256_NBitcoin_FromBytes()
       {
-         _ = new uint256(new ReadOnlySpan<byte>(this.data));
+         _ = new uint256(new ReadOnlySpan<byte>(this._data));
       }
 
       [Benchmark]
       public void uint256_Unsafe_MithrilShards4Longs_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256As4Long(this.data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256As4Long(this._data);
       }
 
       [Benchmark]
       public void uint256_Unsafe_MithrilShardsUInt256As4Jhon_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Jhon(this.data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Jhon(this._data);
       }
 
       [Benchmark]
       public void uint256_Unsafe_MithrilShards_CurrentImplementation()
       {
-         _ = new MithrilShards.Core.DataTypes.UInt256(this.data);
+         _ = new MithrilShards.Core.DataTypes.UInt256(this._data);
       }
    }
 }
