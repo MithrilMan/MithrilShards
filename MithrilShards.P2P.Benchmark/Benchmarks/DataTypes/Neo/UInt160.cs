@@ -26,7 +26,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
       {
          fixed (ulong* p = &value1)
          {
-            Span<byte> dst = new Span<byte>(p, Length);
+            var dst = new Span<byte>(p, Length);
             value[..Length].CopyTo(dst);
          }
       }

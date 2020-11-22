@@ -9,17 +9,17 @@ namespace MithrilShards.Core.Threading
    /// <seealso cref="System.IDisposable" />
    public class WriteLock : IDisposable
    {
-      private readonly ReaderWriterLockSlim theLock;
+      private readonly ReaderWriterLockSlim _theLock;
 
       public WriteLock(ReaderWriterLockSlim theLock)
       {
-         this.theLock = theLock;
-         this.theLock.EnterWriteLock();
+         this._theLock = theLock;
+         this._theLock.EnterWriteLock();
       }
 
       public void Dispose()
       {
-         this.theLock.ExitWriteLock();
+         this._theLock.ExitWriteLock();
       }
    }
 }

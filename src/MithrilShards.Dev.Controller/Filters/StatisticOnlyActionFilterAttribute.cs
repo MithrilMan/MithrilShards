@@ -6,16 +6,16 @@ namespace MithrilShards.Dev.Controller
 {
    public class StatisticOnlyActionFilterAttribute : ActionFilterAttribute
    {
-      readonly IStatisticFeedsCollector? statisticFeedsCollector;
+      readonly IStatisticFeedsCollector? _statisticFeedsCollector;
 
       public StatisticOnlyActionFilterAttribute(IStatisticFeedsCollector? statisticFeedsCollector = null)
       {
-         this.statisticFeedsCollector = statisticFeedsCollector;
+         this._statisticFeedsCollector = statisticFeedsCollector;
       }
 
       public override void OnActionExecuting(ActionExecutingContext context)
       {
-         if (this.statisticFeedsCollector == null || this.statisticFeedsCollector is StatisticFeedsCollectorNullImplementation)
+         if (this._statisticFeedsCollector == null || this._statisticFeedsCollector is StatisticFeedsCollectorNullImplementation)
          {
             context.Result = new NotFoundObjectResult($"Cannot produce output because {nameof(IStatisticFeedsCollector)} is not available");
             return;

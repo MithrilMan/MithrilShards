@@ -7,8 +7,8 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
 {
    public class DeserializationContext
    {
-      private uint payloadLength;
-      private uint checksum;
+      private uint _payloadLength;
+      private uint _checksum;
 
       public bool ChecksumRead { get; private set; }
       public byte[] MagicNumberBytes { get; }
@@ -28,7 +28,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
       /// <summary>
       /// The maximum allowed protocol message length.
       /// </summary>
-      private readonly uint maximumProtocolMessageLength;
+      private readonly uint _maximumProtocolMessageLength;
 
       /// <summary>
       /// Gets or sets the length of the last parsed INetworkMessage payload (message length - header length).
@@ -39,14 +39,14 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
       /// </value>
       public uint PayloadLength
       {
-         get => this.payloadLength;
+         get => this._payloadLength;
          set
          {
-            if (value > this.maximumProtocolMessageLength)
+            if (value > this._maximumProtocolMessageLength)
             {
-               throw new ProtocolViolationException($"Message size exceeds the maximum value {this.maximumProtocolMessageLength}.");
+               throw new ProtocolViolationException($"Message size exceeds the maximum value {this._maximumProtocolMessageLength}.");
             }
-            this.payloadLength = value;
+            this._payloadLength = value;
             this.PayloadLengthRead = true;
          }
       }
@@ -60,10 +60,10 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
       /// </value>
       public uint Checksum
       {
-         get => this.checksum;
+         get => this._checksum;
          set
          {
-            this.checksum = value;
+            this._checksum = value;
             this.ChecksumRead = true;
          }
       }
@@ -71,7 +71,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
       public DeserializationContext(byte[] magicNumberBytesmagicBytes, uint maximumProtocolMessageLength = ProtocolDefinition.DEFAULT_MAX_PROTOCOL_MESSAGE_LENGTH)
       {
          this.MagicNumberBytes = magicNumberBytesmagicBytes;
-         this.maximumProtocolMessageLength = maximumProtocolMessageLength;
+         this._maximumProtocolMessageLength = maximumProtocolMessageLength;
          this.MagicNumber = BitConverter.ToInt32(magicNumberBytesmagicBytes);
          this.FirstMagicNumberByte = magicNumberBytesmagicBytes[0];
 
@@ -101,7 +101,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
 
       public int GetTotalMessageLength()
       {
-         return ProtocolDefinition.HEADER_LENGTH + (int)this.payloadLength;
+         return ProtocolDefinition.HEADER_LENGTH + (int)this._payloadLength;
       }
    }
 }

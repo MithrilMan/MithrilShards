@@ -1,35 +1,35 @@
-﻿using Xunit;
-using Xunit.Abstractions;
-using MithrilShards.Chain.Bitcoin.ChainDefinitions;
-using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Chain.Bitcoin.Consensus;
-using System;
+﻿using System;
 using System.Numerics;
+using MithrilShards.Chain.Bitcoin.ChainDefinitions;
+using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace MithrilShards.Chain.BitcoinTests
 {
    public class ProofOfWorkCalculatorTests
    {
-      private XunitLogger<ProofOfWorkCalculator> logger;
-      private IConsensusParameters consensusParameters;
+      private readonly XunitLogger<ProofOfWorkCalculator> _logger;
+      private readonly IConsensusParameters _consensusParameters;
 
       public ProofOfWorkCalculatorTests(ITestOutputHelper output)
       {
-         logger = new XunitLogger<ProofOfWorkCalculator>(output); // or new NullLogger<ProofOfWorkCalculator>
+         _logger = new XunitLogger<ProofOfWorkCalculator>(output); // or new NullLogger<ProofOfWorkCalculator>
 
          var headerHashCalculator = new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()));
-         consensusParameters = new BitcoinMainDefinition(headerHashCalculator).ConfigureConsensus();
+         _consensusParameters = new BitcoinMainDefinition(headerHashCalculator).ConfigureConsensus();
       }
 
       [Theory]
       [JsonFileData("_data/ProofOfWorkCalculatorTests.json", "CalculateNextWorkRequired")]
       public void CalculateNextWorkRequiredTest(uint lastRetargetTime, int height, uint blockTime, uint bits, uint expectedResult)
       {
-         ProofOfWorkCalculator powCalculator = new ProofOfWorkCalculator(
-            logger,
-            consensusParameters,
+         var powCalculator = new ProofOfWorkCalculator(
+            _logger,
+            _consensusParameters,
             null
             );
 
@@ -39,7 +39,7 @@ namespace MithrilShards.Chain.BitcoinTests
             Bits = bits
          };
 
-         var result = powCalculator.CalculateNextWorkRequired(header, lastRetargetTime);
+         uint result = powCalculator.CalculateNextWorkRequired(header, lastRetargetTime);
          Assert.Equal(expectedResult, result);
       }
 
@@ -53,24 +53,24 @@ namespace MithrilShards.Chain.BitcoinTests
             Bits = bits
          };
 
-         var result = NBitcoinCalculateNextWorkRequired(header, lastRetargetTime);
+         NBitcoin.Target result = NBitcoinCalculateNextWorkRequired(header, lastRetargetTime);
          Assert.Equal(expectedResult, result.ToCompact());
       }
 
       public NBitcoin.Target NBitcoinCalculateNextWorkRequired(BlockHeader header, uint lastRetargetTime)
       {
-         var consensus = NBitcoin.Network.Main.Consensus;
+         NBitcoin.Consensus consensus = NBitcoin.Network.Main.Consensus;
 
          // Limit adjustment step
-         TimeSpan nActualTimespan = TimeSpan.FromSeconds(header.TimeStamp - lastRetargetTime);
+         var nActualTimespan = TimeSpan.FromSeconds(header.TimeStamp - lastRetargetTime);
          if (nActualTimespan < TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks / 4))
             nActualTimespan = TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks / 4);
          if (nActualTimespan > TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks * 4))
             nActualTimespan = TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks * 4);
 
          // Retarget
-         BigInteger bnNew = new NBitcoin.Target(header.Bits).ToBigInteger();
-         var cmp = new NBitcoin.Target(bnNew).ToCompact();
+         var bnNew = new NBitcoin.Target(header.Bits).ToBigInteger();
+         uint cmp = new NBitcoin.Target(bnNew).ToCompact();
          bnNew = bnNew * (new BigInteger((long)nActualTimespan.TotalSeconds));
          bnNew = bnNew / (new BigInteger((long)consensus.PowTargetTimespan.TotalSeconds));
          var newTarget = new NBitcoin.Target(bnNew);

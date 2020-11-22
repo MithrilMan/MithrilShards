@@ -1,6 +1,4 @@
-﻿using System;
-using System.Buffers;
-using System.Collections.Generic;
+﻿using System.Buffers;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
@@ -18,16 +16,16 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Params(100, 1_000, 2_000)]
       public int N;
 
-      BlockHeaderHashCalculator hashCalculator = new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()));
+      BlockHeaderHashCalculator _hashCalculator = new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()));
 
-      BlockHeader[] headers;
+      BlockHeader[] _headers;
 
-      NBitcoin.BlockHeader[] headersNBitcoin;
+      NBitcoin.BlockHeader[] _headersNBitcoin;
 
       [GlobalSetup]
       public void Setup()
       {
-         this.headers = Enumerable.Range(0, N)
+         this._headers = Enumerable.Range(0, N)
             .Select(n => new BlockHeader
             {
                PreviousBlockHash = Core.DataTypes.UInt256.Zero,
@@ -35,7 +33,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
             })
             .ToArray();
 
-         this.headersNBitcoin = Enumerable.Range(0, N)
+         this._headersNBitcoin = Enumerable.Range(0, N)
 #pragma warning disable CS0618 // Type or member is obsolete
            .Select(n => new NBitcoin.BlockHeader()
            {
@@ -49,9 +47,9 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public object Sequential()
       {
-         foreach (var header in headers)
+         foreach (var header in _headers)
          {
-            header.Hash = this.hashCalculator.ComputeHash(header, KnownVersion.CurrentVersion);
+            header.Hash = this._hashCalculator.ComputeHash(header, KnownVersion.CurrentVersion);
          }
          return null;
       }
@@ -59,13 +57,13 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public object Parallelized()
       {
-         return Parallel.ForEach(headers, header => header.Hash = this.hashCalculator.ComputeHash(header, KnownVersion.CurrentVersion));
+         return Parallel.ForEach(_headers, header => header.Hash = this._hashCalculator.ComputeHash(header, KnownVersion.CurrentVersion));
       }
 
       [Benchmark]
       public object SequentialNBitcoin()
       {
-         foreach (var header in headersNBitcoin)
+         foreach (var header in _headersNBitcoin)
          {
             header.GetHash();
          }
@@ -75,7 +73,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public object ParallelizedNBitcoin()
       {
-         return Parallel.ForEach(headersNBitcoin, header => header.GetHash());
+         return Parallel.ForEach(_headersNBitcoin, header => header.GetHash());
       }
    }
 }

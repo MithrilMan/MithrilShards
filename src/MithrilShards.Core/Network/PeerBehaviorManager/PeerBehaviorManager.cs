@@ -14,17 +14,17 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
    public partial class DefaultPeerBehaviorManager : IPeerBehaviorManager, IDisposable
    {
       private const int INITIAL_SCORE = 0;
-      private readonly ILogger<DefaultPeerBehaviorManager> logger;
-      private readonly IEventBus eventBus;
-      private readonly ForgeConnectivitySettings connectivitySettings;
-      private readonly IPeerAddressBook peerAddressBook;
+      private readonly ILogger<DefaultPeerBehaviorManager> _logger;
+      private readonly IEventBus _eventBus;
+      private readonly ForgeConnectivitySettings _connectivitySettings;
+      private readonly IPeerAddressBook _peerAddressBook;
 
-      private readonly Dictionary<string, PeerScore> connectedPeers = new Dictionary<string, PeerScore>();
+      private readonly Dictionary<string, PeerScore> _connectedPeers = new Dictionary<string, PeerScore>();
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// </summary>
-      private readonly EventSubscriptionManager eventSubscriptionManager = new EventSubscriptionManager();
+      private readonly EventSubscriptionManager _eventSubscriptionManager = new EventSubscriptionManager();
 
       public DefaultPeerBehaviorManager(ILogger<DefaultPeerBehaviorManager> logger,
                                         IEventBus eventBus,
@@ -32,19 +32,19 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
                                         IOptions<ForgeConnectivitySettings> connectivityOptions,
                                         IPeerAddressBook peerAddressBook)
       {
-         this.logger = logger;
-         this.eventBus = eventBus;
-         this.statisticFeedsCollector = statisticFeedsCollector;
-         this.connectivitySettings = connectivityOptions.Value;
-         this.peerAddressBook = peerAddressBook;
+         this._logger = logger;
+         this._eventBus = eventBus;
+         this._statisticFeedsCollector = statisticFeedsCollector;
+         this._connectivitySettings = connectivityOptions.Value;
+         this._peerAddressBook = peerAddressBook;
       }
 
       public Task StartAsync(CancellationToken cancellationToken)
       {
          this.RegisterStatisticFeeds();
-         this.eventSubscriptionManager.RegisterSubscriptions(
-            this.eventBus.Subscribe<PeerConnected>(this.AddConnectedPeer),
-            this.eventBus.Subscribe<PeerDisconnected>(this.RemoveConnectedPeer)
+         this._eventSubscriptionManager.RegisterSubscriptions(
+            this._eventBus.Subscribe<PeerConnected>(this.AddConnectedPeer),
+            this._eventBus.Subscribe<PeerDisconnected>(this.RemoveConnectedPeer)
             );
 
          return Task.CompletedTask;
@@ -64,42 +64,42 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
             return;
          }
 
-         if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
+         if (!this._connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
          {
-            this.logger.LogWarning("Cannot attribute bad behavior to the peer {PeerId} because the peer isn't connected.", peerContext.PeerId);
+            this._logger.LogWarning("Cannot attribute bad behavior to the peer {PeerId} because the peer isn't connected.", peerContext.PeerId);
             // did we have to add it to banned peers anyway?
             return;
          }
 
-         this.logger.LogDebug("Peer {PeerId} misbehave: {MisbehaveReason}.", peerContext.PeerId, reason);
+         this._logger.LogDebug("Peer {PeerId} misbehave: {MisbehaveReason}.", peerContext.PeerId, reason);
          int currentResult = score.UpdateScore(-(int)penality);
 
-         if (currentResult < connectivitySettings.BanScore)
+         if (currentResult < _connectivitySettings.BanScore)
          {
             //if threshold of bad behavior has been exceeded, this peer need to be banned
-            this.logger.LogDebug("Peer {RemoteEndPoint} BAN threshold exceeded.", peerContext.RemoteEndPoint);
-            this.peerAddressBook.Ban(peerContext, DateTimeOffset.UtcNow + TimeSpan.FromSeconds(connectivitySettings.MisbehavingBanTime), "Peer Misbehaving");
+            this._logger.LogDebug("Peer {RemoteEndPoint} BAN threshold exceeded.", peerContext.RemoteEndPoint);
+            this._peerAddressBook.Ban(peerContext, DateTimeOffset.UtcNow + TimeSpan.FromSeconds(_connectivitySettings.MisbehavingBanTime), "Peer Misbehaving");
          }
       }
 
       public void AddBonus(IPeerContext peerContext, uint bonus, string reason)
       {
-         if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
+         if (!this._connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
          {
-            this.logger.LogWarning("Cannot attribute positive points to the peer {PeerId} because the peer isn't connected.", peerContext.PeerId);
+            this._logger.LogWarning("Cannot attribute positive points to the peer {PeerId} because the peer isn't connected.", peerContext.PeerId);
          }
          else
          {
-            this.logger.LogDebug("Peer {PeerId} got a bonus {PeerBonus}: {MisbehaveReason}.", peerContext.PeerId, bonus, reason);
+            this._logger.LogDebug("Peer {PeerId} got a bonus {PeerBonus}: {MisbehaveReason}.", peerContext.PeerId, bonus, reason);
             score.UpdateScore((int)bonus);
          }
       }
 
       public int GetScore(IPeerContext peerContext)
       {
-         if (!this.connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
+         if (!this._connectedPeers.TryGetValue(peerContext.PeerId, out PeerScore? score))
          {
-            this.logger.LogWarning("Peer {PeerId} not found, returning neutral score.", peerContext.PeerId);
+            this._logger.LogWarning("Peer {PeerId} not found, returning neutral score.", peerContext.PeerId);
             return 0;
          }
          else
@@ -114,8 +114,8 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       /// <param name="peerContext">The peer context.</param>
       private void AddConnectedPeer(PeerConnected @event)
       {
-         this.connectedPeers[@event.PeerContext.PeerId] = new PeerScore(@event.PeerContext, INITIAL_SCORE);
-         this.logger.LogDebug("Added peer {PeerId} to the list of PeerBehaviorManager connected peers", @event.PeerContext.PeerId);
+         this._connectedPeers[@event.PeerContext.PeerId] = new PeerScore(@event.PeerContext, INITIAL_SCORE);
+         this._logger.LogDebug("Added peer {PeerId} to the list of PeerBehaviorManager connected peers", @event.PeerContext.PeerId);
       }
 
       /// <summary>
@@ -124,19 +124,19 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       /// <param name="peerContext">The peer context.</param>
       private void RemoveConnectedPeer(PeerDisconnected @event)
       {
-         if (!this.connectedPeers.Remove(@event.PeerContext.PeerId))
+         if (!this._connectedPeers.Remove(@event.PeerContext.PeerId))
          {
-            this.logger.LogWarning("Cannot remove peer {PeerId}, peer not found", @event.PeerContext.PeerId);
+            this._logger.LogWarning("Cannot remove peer {PeerId}, peer not found", @event.PeerContext.PeerId);
          }
          else
          {
-            this.logger.LogInformation("Peer {PeerId} disconnected from PeerBehaviorManager.", @event.PeerContext.PeerId);
+            this._logger.LogInformation("Peer {PeerId} disconnected from PeerBehaviorManager.", @event.PeerContext.PeerId);
          }
       }
 
       public void Dispose()
       {
-         this.eventSubscriptionManager.Dispose();
+         this._eventSubscriptionManager.Dispose();
       }
    }
 }

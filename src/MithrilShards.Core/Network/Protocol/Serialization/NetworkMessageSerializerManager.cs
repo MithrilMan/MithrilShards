@@ -9,15 +9,15 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
 {
    public class NetworkMessageSerializerManager : INetworkMessageSerializerManager
    {
-      readonly ILogger<NetworkMessageSerializerManager> logger;
-      readonly IEnumerable<INetworkMessageSerializer> messageSerializers;
-      private Dictionary<string, INetworkMessageSerializer> serializers;
+      readonly ILogger<NetworkMessageSerializerManager> _logger;
+      readonly IEnumerable<INetworkMessageSerializer> _messageSerializers;
+      private Dictionary<string, INetworkMessageSerializer> _serializers;
 
       public NetworkMessageSerializerManager(ILogger<NetworkMessageSerializerManager> logger, IEnumerable<INetworkMessageSerializer> messageSerializers)
       {
-         this.logger = logger;
-         this.messageSerializers = messageSerializers;
-         this.serializers = null!; //will be serialized in InitializeMessageSerializers
+         this._logger = logger;
+         this._messageSerializers = messageSerializers;
+         this._serializers = null!; //will be serialized in InitializeMessageSerializers
 
          this.InitializeMessageSerializers();
       }
@@ -25,8 +25,8 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
 
       private void InitializeMessageSerializers()
       {
-         this.serializers = (
-            from serializer in this.messageSerializers
+         this._serializers = (
+            from serializer in this._messageSerializers
             let managedMessageType = serializer.GetMessageType()
             let networkMessageAttribute = managedMessageType.GetCustomAttribute<NetworkMessageAttribute>()
             where networkMessageAttribute != null
@@ -34,16 +34,16 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          ).ToDictionary(reg => reg.Command, reg => reg.Serializer);
 
 
-         this.logger.LogInformation(
+         this._logger.LogInformation(
                   "Using {NetworkMessageSerializersCount} message network serializers: {NetworkMessageSerializers}.",
-                  this.serializers.Count,
-                  this.serializers.Keys.ToArray()
+                  this._serializers.Count,
+                  this._serializers.Keys.ToArray()
                   );
       }
 
       public bool TrySerialize(INetworkMessage message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output)
       {
-         if (this.serializers.TryGetValue(message.Command, out INetworkMessageSerializer? serializer))
+         if (this._serializers.TryGetValue(message.Command, out INetworkMessageSerializer? serializer))
          {
             serializer.Serialize(message, protocolVersion, peerContext, output);
             return true;
@@ -54,7 +54,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
 
       public bool TryDeserialize(string commandName, ref ReadOnlySequence<byte> data, int protocolVersion, IPeerContext peerContext, [MaybeNullWhen(false)] out INetworkMessage message)
       {
-         if (this.serializers.TryGetValue(commandName, out INetworkMessageSerializer? serializer))
+         if (this._serializers.TryGetValue(commandName, out INetworkMessageSerializer? serializer))
          {
             message = serializer.Deserialize(ref data, protocolVersion, peerContext);
             return true;

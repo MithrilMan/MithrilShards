@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    {
       protected readonly ILogger<ChainState> logger;
 
-      readonly IBlockHeaderRepository blockHeaderRepository;
+      readonly IBlockHeaderRepository _blockHeaderRepository;
 
       /// <summary>
       /// The current chain of block headers we consult and build on.
@@ -30,7 +30,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </value>
       protected private readonly ICoinsView coinsView;
 
-      readonly IConsensusParameters consensusParameters;
+      readonly IConsensusParameters _consensusParameters;
 
       /// <summary>
       /// Gets or sets the block sequence identifier.
@@ -82,12 +82,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.logger = logger;
          this.HeadersTree = headersTree;
          this.coinsView = coinsView;
-         this.blockHeaderRepository = blockHeaderRepository;
-         this.consensusParameters = consensusParameters;
+         this._blockHeaderRepository = blockHeaderRepository;
+         this._consensusParameters = consensusParameters;
          this.ChainTip = headersTree.Genesis;
          this.BestHeader = headersTree.Genesis;
 
-         this.blockHeaderRepository.TryAdd(consensusParameters.GenesisHeader);
+         this._blockHeaderRepository.TryAdd(consensusParameters.GenesisHeader);
       }
 
       /// <summary>
@@ -100,27 +100,27 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockLocator GetTipLocator()
       {
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          return this.HeadersTree.GetLocator(this.ChainTip)!;
       }
 
       public bool TryGetBestChainHeaderNode(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          return this.HeadersTree.TryGetNode(blockHash, true, out node);
       }
 
       public bool TryGetKnownHeaderNode(UInt256? blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
          //using var readLock = new ReadLock(this.theLock);
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          return this.HeadersTree.TryGetNode(blockHash, false, out node);
       }
 
 
       public BlockLocator? GetLocator(HeaderNode headerNode)
       {
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
          return this.HeadersTree.GetLocator(headerNode);
       }
 
@@ -136,8 +136,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockHeader GetTipHeader()
       {
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
-         if (!this.blockHeaderRepository.TryGet(this.ChainTip.Hash, out BlockHeader? header))
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         if (!this._blockHeaderRepository.TryGet(this.ChainTip.Hash, out BlockHeader? header))
          {
             ThrowHelper.ThrowBlockHeaderRepositoryException($"Unexpected error, cannot fetch the tip at height {this.ChainTip.Height}.");
          }
@@ -188,7 +188,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public bool TryGetBlockHeader(HeaderNode headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader)
       {
-         return this.blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader);
+         return this._blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader);
       }
 
       public bool TryGetAtHeight(int height, [MaybeNullWhen(false)] out HeaderNode? headerNode)
@@ -223,7 +223,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             }
 
             this.HeadersTree.Add(headerNode);
-            this.blockHeaderRepository.TryAdd(header);
+            this._blockHeaderRepository.TryAdd(header);
 
             return headerNode;
          }

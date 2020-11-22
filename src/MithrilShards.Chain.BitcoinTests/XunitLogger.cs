@@ -6,7 +6,7 @@ namespace MithrilShards.Chain.BitcoinTests
 {
    public class XunitLogger<T> : ILogger<T>, IDisposable
    {
-      private ITestOutputHelper _output;
+      private readonly ITestOutputHelper _output;
 
       public XunitLogger(ITestOutputHelper output)
       {

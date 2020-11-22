@@ -10,20 +10,20 @@ namespace MithrilShards.Core.Network
 {
    public class PeerContextFactory<TPeerContext> : IPeerContextFactory where TPeerContext : IPeerContext
    {
-      readonly ILogger<PeerContextFactory<TPeerContext>> logger;
-      private readonly IEventBus eventBus;
-      readonly ILoggerFactory loggerFactory;
-      readonly ForgeConnectivitySettings serverSettings;
+      readonly ILogger<PeerContextFactory<TPeerContext>> _logger;
+      private readonly IEventBus _eventBus;
+      readonly ILoggerFactory _loggerFactory;
+      readonly ForgeConnectivitySettings _serverSettings;
 
       public PeerContextFactory(ILogger<PeerContextFactory<TPeerContext>> logger,
                                 IEventBus eventBus,
                                 ILoggerFactory loggerFactory,
                                 IOptions<ForgeConnectivitySettings> serverSettings)
       {
-         this.logger = logger;
-         this.eventBus = eventBus;
-         this.loggerFactory = loggerFactory;
-         this.serverSettings = serverSettings.Value;
+         this._logger = logger;
+         this._eventBus = eventBus;
+         this._loggerFactory = loggerFactory;
+         this._serverSettings = serverSettings.Value;
       }
 
       public virtual IPeerContext CreateIncomingPeerContext(string peerId, EndPoint localEndPoint, EndPoint remoteEndPoint, INetworkMessageWriter messageWriter)
@@ -47,8 +47,8 @@ namespace MithrilShards.Core.Network
       {
 
          var peerContext = (TPeerContext)System.Activator.CreateInstance(typeof(TPeerContext),
-            this.loggerFactory.CreateLogger<IPeerContext>(),
-            this.eventBus,
+            this._loggerFactory.CreateLogger<IPeerContext>(),
+            this._eventBus,
             direction,
             peerId,
             localEndPoint,
@@ -62,7 +62,7 @@ namespace MithrilShards.Core.Network
 
       protected EndPoint GetPublicEndPoint(EndPoint localEndPoint)
       {
-         return this.serverSettings.Listeners
+         return this._serverSettings.Listeners
             .Where(binding =>
             {
                if (!IPEndPoint.TryParse(binding.EndPoint, out IPEndPoint parsedEndPoint))

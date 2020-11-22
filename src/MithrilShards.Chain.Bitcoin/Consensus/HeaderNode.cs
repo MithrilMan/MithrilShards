@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
@@ -16,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <summary>
       /// Represents validity and availability statuses, used for example by <see cref="IsValid"/> and IsAvailable.
       /// </summary>
-      private int status;
+      private int _status;
 
       /// <summary>
       /// Gets the height this node takes in the tree representation of the whole hierarchy of headers.
@@ -73,7 +72,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.Previous = null;
          this.ChainWork = Target.Zero;
          this.Skip = null;
-         this.status = (int)HeaderValidityStatuses.ValidMask;
+         this._status = (int)HeaderValidityStatuses.ValidMask;
       }
 
       internal HeaderNode(BlockHeader header, HeaderNode previous)
@@ -86,7 +85,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          this.Previous = previous;
          this.ChainWork = previous.ChainWork + new Target(header.Bits).GetBlockProof();
          this.Skip = previous.GetAncestor(GetSkipHeight(this.Height));
-         this.status = (int)HeaderValidityStatuses.ValidTree;
+         this._status = (int)HeaderValidityStatuses.ValidTree;
 
          //pindexNew.TimeMax = (pindexNew->pprev ? std::max(pindexNew->pprev.TimeMax, pindexNew.Time) : pindexNew.Time);
       }
@@ -131,24 +130,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          // if some failed flag is on, it's not valid.
          if (IsInvalid()) return false;
 
-         return (this.status & (int)HeaderValidityStatuses.ValidMask) >= (int)upTo;
+         return (this._status & (int)HeaderValidityStatuses.ValidMask) >= (int)upTo;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public bool IsInvalid()
       {
-         return (this.status & (int)HeaderValidityStatuses.FailedMask) != 0;
+         return (this._status & (int)HeaderValidityStatuses.FailedMask) != 0;
       }
 
       //! Raise the validity level of this block index entry.
       //! Returns true if the validity was changed.
       bool RaiseValidity(HeaderValidityStatuses upTo)
       {
-         if ((status & (int)HeaderValidityStatuses.FailedMask) != 0) return false;
+         if ((_status & (int)HeaderValidityStatuses.FailedMask) != 0) return false;
 
-         if ((status & (int)HeaderValidityStatuses.ValidMask) < (int)upTo)
+         if ((_status & (int)HeaderValidityStatuses.ValidMask) < (int)upTo)
          {
-            status = (status & ~(int)HeaderValidityStatuses.ValidMask) | (int)upTo;
+            _status = (_status & ~(int)HeaderValidityStatuses.ValidMask) | (int)upTo;
             return true;
          }
          return false;
@@ -159,7 +158,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       public bool HasAvailability(HeaderDataAvailability availability)
       {
-         return (this.status & (int)availability) == (int)availability;
+         return (this._status & (int)availability) == (int)availability;
       }
 
       /// <summary>
@@ -167,7 +166,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       public void AddAvailability(HeaderDataAvailability availability)
       {
-         this.status |= (int)availability;
+         this._status |= (int)availability;
       }
 
       /// <summary>
@@ -175,7 +174,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       public void RemoveAvailability(HeaderDataAvailability availability)
       {
-         this.status &= ~(int)availability;
+         this._status &= ~(int)availability;
       }
 
       internal HeaderNode LastCommonAncestor(HeaderNode otherHeaderNode)

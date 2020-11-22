@@ -15,7 +15,7 @@ namespace MithrilShards.Core.DataAlgorithms
          public HashSet<TItem> Dependents = new HashSet<TItem>();
       }
 
-      private Dictionary<TItem, Relations> map = new Dictionary<TItem, Relations>();
+      private readonly Dictionary<TItem, Relations> _map = new Dictionary<TItem, Relations>();
 
 
       /// <summary>
@@ -35,9 +35,9 @@ namespace MithrilShards.Core.DataAlgorithms
       /// <param name="dependencies">The dependencies.</param>
       public void Add(TItem item, IEnumerable<TItem> dependencies)
       {
-         if (dependencies.Count() == 0 && !map.ContainsKey(item))
+         if (dependencies.Count() == 0 && !_map.ContainsKey(item))
          {
-            map.Add(item, new Relations());
+            _map.Add(item, new Relations());
             return;
          }
 
@@ -46,21 +46,21 @@ namespace MithrilShards.Core.DataAlgorithms
             // do not add eventual dependency to itself
             if (dependency.Equals(item)) continue;
 
-            if (!map.ContainsKey(dependency))
+            if (!_map.ContainsKey(dependency))
             {
-               map.Add(dependency, new Relations());
+               _map.Add(dependency, new Relations());
             }
 
-            var dependents = map[dependency].Dependents;
+            HashSet<TItem>? dependents = _map[dependency].Dependents;
 
-            if (!map.ContainsKey(item))
+            if (!_map.ContainsKey(item))
             {
-               map.Add(item, new Relations());
+               _map.Add(item, new Relations());
             }
 
             if (dependents.Add(item))
             {
-               map[item].Dependencies++;
+               _map[item].Dependencies++;
             }
          }
       }
@@ -73,10 +73,10 @@ namespace MithrilShards.Core.DataAlgorithms
       /// <returns></returns>
       public (IEnumerable<(TItem item, int level)> sorted, IEnumerable<TItem> cycled) Sort()
       {
-         Dictionary<TItem, TopologicalSorter<TItem>.Relations> map = this.map.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+         var map = this._map.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
          // first add all nodes
-         List<(TItem item, int level)> sorted = map.Where(item => item.Value.Dependencies == 0).Select(kvp => (item: kvp.Key, level: 0)).ToList();
+         var sorted = map.Where(item => item.Value.Dependencies == 0).Select(kvp => (item: kvp.Key, level: 0)).ToList();
 
          // then iteratively add items with less dependency
          for (int idx = 0; idx < sorted.Count; idx++)
@@ -101,7 +101,7 @@ namespace MithrilShards.Core.DataAlgorithms
 
       public void Clear()
       {
-         map.Clear();
+         _map.Clear();
       }
    }
 }

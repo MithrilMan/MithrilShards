@@ -7,22 +7,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block
    /// </summary>
    public class BlockValidationContextFactory : IBlockValidationContextFactory
    {
-      readonly ILogger<BlockValidationContextFactory> logger;
-      readonly IInitialBlockDownloadTracker initialBlockDownloadState;
-      readonly IChainState chainState;
+      readonly ILogger<BlockValidationContextFactory> _logger;
+      readonly IInitialBlockDownloadTracker _initialBlockDownloadState;
+      readonly IChainState _chainState;
 
       public BlockValidationContextFactory(ILogger<BlockValidationContextFactory> logger,
                                             IInitialBlockDownloadTracker initialBlockDownloadState,
                                             IChainState chainState)
       {
-         this.logger = logger;
-         this.initialBlockDownloadState = initialBlockDownloadState;
-         this.chainState = chainState;
+         this._logger = logger;
+         this._initialBlockDownloadState = initialBlockDownloadState;
+         this._chainState = chainState;
       }
 
       public IBlockValidationContext Create(Protocol.Types.Block block)
       {
-         return new BlockValidationContext(logger, block, this.initialBlockDownloadState.IsDownloadingBlocks(), this.chainState);
+         return new BlockValidationContext(_logger, block, this._initialBlockDownloadState.IsDownloadingBlocks(), this._chainState);
       }
    }
 }

@@ -70,7 +70,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
          // starts the consumer loop of header validation
          this.validationLoop.StartAsync(
             label: nameof(HeaderValidator),
-            work: ValidationWork,
+            work: ValidationWorkAsync,
             interval: TimeSpan.Zero,
             cancellationToken
             );
@@ -92,7 +92,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
       /// The consumer that perform validation.
       /// </summary>
       /// <param name="cancellation">The cancellation.</param>
-      private async Task ValidationWork(CancellationToken cancellation)
+      private async Task ValidationWorkAsync(CancellationToken cancellation)
       {
          await foreach (HeadersToValidate request in headersToValidate.Reader.ReadAllAsync(cancellation))
          {
@@ -100,7 +100,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 
             this.logger.LogDebug("Validating {HeadersCount} headers", request.Headers.Count);
 
-            List<HeaderNode> newValidatedHeaderNodes = new List<HeaderNode>();
+            var newValidatedHeaderNodes = new List<HeaderNode>();
 
             HeaderNode? lastValidatedHeaderNode = null;
             BlockHeader? lastValidatedBlockHeader = null;

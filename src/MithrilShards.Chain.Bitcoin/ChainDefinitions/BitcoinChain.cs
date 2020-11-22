@@ -10,7 +10,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
    public abstract class BitcoinChain : IChainDefinition
    {
       protected const long COIN = 100_000_000;
-      readonly IBlockHeaderHashCalculator blockHeaderHashCalculator;
+      readonly IBlockHeaderHashCalculator _blockHeaderHashCalculator;
 
       public INetworkDefinition NetworkDefinition { get; private set; } = null!;
 
@@ -19,7 +19,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
       public BitcoinChain(IBlockHeaderHashCalculator blockHeaderHashCalculator)
       {
-         this.blockHeaderHashCalculator = blockHeaderHashCalculator;
+         this._blockHeaderHashCalculator = blockHeaderHashCalculator;
 
          this.Initialize();
       }
@@ -36,7 +36,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
       protected UInt256 ComputeHash(BlockHeader header)
       {
-         return this.blockHeaderHashCalculator.ComputeHash(header, protocolVersion: 0); //protocol version doesn't matter for hash
+         return this._blockHeaderHashCalculator.ComputeHash(header, protocolVersion: 0); //protocol version doesn't matter for hash
       }
    }
 }

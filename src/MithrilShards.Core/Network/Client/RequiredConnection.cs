@@ -23,7 +23,7 @@ namespace MithrilShards.Core.Network.Client
       private const int MEDIUM_DELAY = 5_000;
       private const int SLOW_DELAY = 15_000;
 
-      private ForgeConnectivitySettings settings;
+      private readonly ForgeConnectivitySettings settings;
 
       public List<OutgoingConnectionEndPoint> connectionsToAttempt = new List<OutgoingConnectionEndPoint>();
 

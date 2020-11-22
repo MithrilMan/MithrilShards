@@ -13,9 +13,9 @@ namespace MithrilShards.Dev.Controller
 
       public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
       {
-         foreach (var part in parts.OfType<IApplicationPartTypeProvider>())
+         foreach (IApplicationPartTypeProvider? part in parts.OfType<IApplicationPartTypeProvider>())
          {
-            foreach (var type in part.Types)
+            foreach (TypeInfo? type in part.Types)
             {
                if (IsDevController(type) && !feature.Controllers.Contains(type))
                {

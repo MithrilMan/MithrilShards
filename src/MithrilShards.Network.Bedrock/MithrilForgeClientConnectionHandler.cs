@@ -17,11 +17,11 @@ namespace MithrilShards.Network.Bedrock
 {
    public class MithrilForgeClientConnectionHandler : ConnectionHandler
    {
-      private readonly ILogger logger;
-      private readonly IServiceProvider serviceProvider;
-      private readonly IEventBus eventBus;
-      private readonly INetworkMessageProcessorFactory networkMessageProcessorFactory;
-      private readonly IPeerContextFactory peerContextFactory;
+      private readonly ILogger _logger;
+      private readonly IServiceProvider _serviceProvider;
+      private readonly IEventBus _eventBus;
+      private readonly INetworkMessageProcessorFactory _networkMessageProcessorFactory;
+      private readonly IPeerContextFactory _peerContextFactory;
 
       public MithrilForgeClientConnectionHandler(ILogger<MithrilForgeClientConnectionHandler> logger,
                                                  IServiceProvider serviceProvider,
@@ -29,11 +29,11 @@ namespace MithrilShards.Network.Bedrock
                                                  INetworkMessageProcessorFactory networkMessageProcessorFactory,
                                                  IPeerContextFactory peerContextFactory)
       {
-         this.logger = logger;
-         this.serviceProvider = serviceProvider;
-         this.eventBus = eventBus;
-         this.networkMessageProcessorFactory = networkMessageProcessorFactory;
-         this.peerContextFactory = peerContextFactory;
+         this._logger = logger;
+         this._serviceProvider = serviceProvider;
+         this._eventBus = eventBus;
+         this._networkMessageProcessorFactory = networkMessageProcessorFactory;
+         this._peerContextFactory = peerContextFactory;
       }
 
       public override async Task OnConnectedAsync(ConnectionContext connection)
@@ -46,12 +46,12 @@ namespace MithrilShards.Network.Bedrock
             throw new ArgumentNullException(nameof(connection));
          }
 
-         using IDisposable logScope = this.logger.BeginScope("Peer {PeerId} connected to outbound {PeerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
+         using IDisposable logScope = this._logger.BeginScope("Peer {PeerId} connected to outbound {PeerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
 
          ProtocolReader reader = connection.CreateReader();
-         INetworkProtocolMessageSerializer protocol = serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
+         INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
-         using IPeerContext peerContext = this.peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
+         using IPeerContext peerContext = this._peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
                                                                                             connection.LocalEndPoint,
                                                                                             connection.Features.Get<OutgoingConnectionEndPoint>(),
                                                                                             new NetworkMessageWriter(protocol, connection.CreateWriter()));
@@ -61,10 +61,10 @@ namespace MithrilShards.Network.Bedrock
 
          protocol.SetPeerContext(peerContext);
 
-         this.eventBus.Publish(new PeerConnected(peerContext));
+         this._eventBus.Publish(new PeerConnected(peerContext));
 
 
-         await this.networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
+         await this._networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
 
 
          while (true)
@@ -102,12 +102,12 @@ namespace MithrilShards.Network.Bedrock
 
       private async Task ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
       {
-         using IDisposable logScope = this.logger.BeginScope("Processing message '{Command}'", message.Command);
+         using IDisposable logScope = this._logger.BeginScope("Processing message '{Command}'", message.Command);
 
          if (!(message is UnknownMessage))
          {
-            await this.networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
-            this.eventBus.Publish(new PeerMessageReceived(peerContext, message));
+            await this._networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
+            this._eventBus.Publish(new PeerMessageReceived(peerContext, message));
          }
       }
    }

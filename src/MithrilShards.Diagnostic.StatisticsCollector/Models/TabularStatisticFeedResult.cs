@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using MithrilShards.Core.Statistics;
+﻿using MithrilShards.Core.Statistics;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector.Models
 {

@@ -17,7 +17,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public UInt256 ComputeHash(BlockHeader header, int protocolVersion)
       {
-         ArrayBufferWriter<byte> buffer = new ArrayBufferWriter<byte>(80);
+         var buffer = new ArrayBufferWriter<byte>(80);
          this.blockHeaderSerializer.Serialize(header, protocolVersion, buffer);
 
          //slicing first 80 bytes because the header includes the tx varint value that doesn't need to be included to compute the hash

@@ -20,14 +20,14 @@ namespace MithrilShards.Network.Bedrock
 {
    public class BedrockForgeConnectivity : IForgeConnectivity
    {
-      readonly ILogger<BedrockForgeConnectivity> logger;
-      readonly IEventBus eventBus;
-      private readonly IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards;
-      private readonly IServiceProvider serviceProvider;
-      readonly MithrilForgeClientConnectionHandler clientConnectionHandler;
-      private readonly ForgeConnectivitySettings settings;
-      private readonly List<Server> serverPeers;
-      private Client client = null!;//initialized by InitializeAsync
+      readonly ILogger<BedrockForgeConnectivity> _logger;
+      readonly IEventBus _eventBus;
+      private readonly IEnumerable<IServerPeerConnectionGuard> _serverPeerConnectionGuards;
+      private readonly IServiceProvider _serviceProvider;
+      readonly MithrilForgeClientConnectionHandler _clientConnectionHandler;
+      private readonly ForgeConnectivitySettings _settings;
+      private readonly List<Server> _serverPeers;
+      private Client _client = null!;//initialized by InitializeAsync
 
       public BedrockForgeConnectivity(ILogger<BedrockForgeConnectivity> logger,
                                 IEventBus eventBus,
@@ -36,13 +36,13 @@ namespace MithrilShards.Network.Bedrock
                                 IServiceProvider serviceProvider,
                                 MithrilForgeClientConnectionHandler clientConnectionHandler)
       {
-         this.logger = logger;
-         this.eventBus = eventBus;
-         this.serverPeerConnectionGuards = serverPeerConnectionGuards;
-         this.serviceProvider = serviceProvider;
-         this.clientConnectionHandler = clientConnectionHandler;
-         this.settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
-         this.serverPeers = new List<Server>();
+         this._logger = logger;
+         this._eventBus = eventBus;
+         this._serverPeerConnectionGuards = serverPeerConnectionGuards;
+         this._serviceProvider = serviceProvider;
+         this._clientConnectionHandler = clientConnectionHandler;
+         this._settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
+         this._serverPeers = new List<Server>();
       }
 
       public ValueTask InitializeAsync(CancellationToken cancellationToken)
@@ -54,7 +54,7 @@ namespace MithrilShards.Network.Bedrock
 
       public ValueTask StartAsync(CancellationToken cancellationToken)
       {
-         foreach (Server serverPeer in this.serverPeers)
+         foreach (Server serverPeer in this._serverPeers)
          {
             _ = serverPeer.StartAsync(cancellationToken);
          }
@@ -64,7 +64,7 @@ namespace MithrilShards.Network.Bedrock
 
       public ValueTask StopAsync(CancellationToken cancellationToken)
       {
-         foreach (Server serverPeer in this.serverPeers)
+         foreach (Server serverPeer in this._serverPeers)
          {
             _ = serverPeer.StopAsync();
          }
@@ -74,33 +74,33 @@ namespace MithrilShards.Network.Bedrock
 
       private void CreateServerInstances()
       {
-         using (this.logger.BeginScope("CreateServerInstances"))
+         using (this._logger.BeginScope("CreateServerInstances"))
          {
-            this.logger.LogInformation("Loading Forge Server listeners configuration.");
+            this._logger.LogInformation("Loading Forge Server listeners configuration.");
 
-            if (this.serverPeerConnectionGuards.Any())
+            if (this._serverPeerConnectionGuards.Any())
             {
-               this.logger.LogInformation(
+               this._logger.LogInformation(
                   "Using {PeerConnectionGuardsCount} peer connection guards: {PeerConnectionGuards}.",
-                  this.serverPeerConnectionGuards.Count(),
-                  this.serverPeerConnectionGuards.Select(guard => guard.GetType().Name)
+                  this._serverPeerConnectionGuards.Count(),
+                  this._serverPeerConnectionGuards.Select(guard => guard.GetType().Name)
                   );
             }
             else
             {
-               this.logger.LogWarning("No peer connection guards detected.");
+               this._logger.LogWarning("No peer connection guards detected.");
             }
 
-            if (this.settings.Listeners?.Count > 0)
+            if (this._settings.Listeners?.Count > 0)
             {
-               this.logger.LogInformation("Found {ConfiguredListeners} listeners in configuration.", this.serverPeers.Count);
+               this._logger.LogInformation("Found {ConfiguredListeners} listeners in configuration.", this._serverPeers.Count);
 
-               ServerBuilder builder = new ServerBuilder(this.serviceProvider)
+               ServerBuilder builder = new ServerBuilder(this._serviceProvider)
                   .UseSockets(sockets =>
                   {
                      sockets.Options.NoDelay = true;
 
-                     foreach (ServerPeerBinding binding in this.settings.Listeners)
+                     foreach (ServerPeerBinding binding in this._settings.Listeners)
                      {
                         if (!binding.IsValidEndpoint(out IPEndPoint? parsedEndpoint))
                         {
@@ -120,7 +120,7 @@ namespace MithrilShards.Network.Bedrock
                         var localEndPoint = IPEndPoint.Parse(binding.EndPoint);
                         var publicEndPoint = IPEndPoint.Parse(binding.PublicEndPoint);
 
-                        this.logger.LogInformation("Added listener to local endpoint {ListenerLocalEndpoint}. (remote {ListenerPublicEndpoint})", localEndPoint, publicEndPoint);
+                        this._logger.LogInformation("Added listener to local endpoint {ListenerLocalEndpoint}. (remote {ListenerPublicEndpoint})", localEndPoint, publicEndPoint);
 
                         sockets.Listen(
                            localEndPoint.Address,
@@ -133,22 +133,22 @@ namespace MithrilShards.Network.Bedrock
                   }
                );
 
-               builder.ShutdownTimeout = TimeSpan.FromSeconds(this.settings.ForceShutdownAfter);
+               builder.ShutdownTimeout = TimeSpan.FromSeconds(this._settings.ForceShutdownAfter);
 
                Server server = builder.Build();
 
-               this.serverPeers.Add(server);
+               this._serverPeers.Add(server);
             }
             else
             {
-               this.logger.LogWarning("No binding information found in configuration file, no Forge Servers available.");
+               this._logger.LogWarning("No binding information found in configuration file, no Forge Servers available.");
             }
          }
       }
 
       private void CreateClientBuilder()
       {
-         this.client = new ClientBuilder(this.serviceProvider)
+         this._client = new ClientBuilder(this._serviceProvider)
                                     .UseSockets()
                                     .UseConnectionLogging()
                                     .Build();
@@ -156,25 +156,25 @@ namespace MithrilShards.Network.Bedrock
 
       public async ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation)
       {
-         using IDisposable logScope = this.logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
-         this.eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()));
-         this.logger.LogDebug("Connection attempt to {RemoteEndPoint}", remoteEndPoint.EndPoint);
+         using IDisposable logScope = this._logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
+         this._eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()));
+         this._logger.LogDebug("Connection attempt to {RemoteEndPoint}", remoteEndPoint.EndPoint);
          try
          {
-            await using ConnectionContext connection = await this.client.ConnectAsync(remoteEndPoint.EndPoint).ConfigureAwait(false);
+            await using ConnectionContext connection = await this._client.ConnectAsync(remoteEndPoint.EndPoint).ConfigureAwait(false);
             // we store the RemoteEndPoint class as a feature of the connection so we can then copy it into the PeerContext in the ClientConnectionHandler.OnConnectedAsync
             connection.Features.Set(remoteEndPoint);
 
-            this.logger.LogDebug("Connected to {RemoteEndPoint}", connection.RemoteEndPoint);
-            await this.clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
+            this._logger.LogDebug("Connected to {RemoteEndPoint}", connection.RemoteEndPoint);
+            await this._clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
          }
          catch (OperationCanceledException)
          {
-            this.logger.LogDebug("Operation cancelled.");
+            this._logger.LogDebug("Operation cancelled.");
          }
          catch (Exception ex)
          {
-            this.logger.LogDebug(ex, "Unexpected connection terminated because of {DisconnectionReason}.", ex.Message);
+            this._logger.LogDebug(ex, "Unexpected connection terminated because of {DisconnectionReason}.", ex.Message);
          }
       }
    }

@@ -9,7 +9,6 @@ using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
-using MithrilShards.Core.Network;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
@@ -34,19 +33,19 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public async Task<bool> TryFetchAsync(HeaderNode blockToDownload, uint minimumScore)
       {
-         var blockScore = GetFetchBlockScore(blockToDownload);
+         uint blockScore = GetFetchBlockScore(blockToDownload);
          if (blockScore < minimumScore || blockScore == 0)
          {
             this.logger.LogDebug("Cannot download the block, score {BlockScore} doesn't satisfy requirement {MinimumScore}", blockScore, minimumScore);
             return false;
          }
 
-         await FetchBlock(blockToDownload).ConfigureAwait(false);
+         await FetchBlockAsync(blockToDownload).ConfigureAwait(false);
          return true;
       }
 
 
-      public Task BlockRequestLoop(CancellationToken cancellation)
+      public Task BlockRequestLoopAsync(CancellationToken cancellation)
       {
          return Task.CompletedTask;
          //implement this way if I fail to distribute work among peers
@@ -82,7 +81,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          //}
       }
 
-      private async Task FetchBlock(HeaderNode blockToDownload)
+      private async Task FetchBlockAsync(HeaderNode blockToDownload)
       {
          #region Code that was into the headers processor to request block in place
          //if (!currentHeader.Validity.HasFlag(HeaderDataAvailability.HasBlockData)  // we don't have data for this block
@@ -161,7 +160,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns>Blocks to download</returns>
       public List<HeaderNode>? FindNextBlocksToDownload(out IBlockFetcher? staller)
       {
-         List<HeaderNode> blocksToDownload = new List<HeaderNode>(MAX_BLOCKS_IN_TRANSIT_PER_PEER);
+         var blocksToDownload = new List<HeaderNode>(MAX_BLOCKS_IN_TRANSIT_PER_PEER);
 
          staller = null;
 
@@ -172,8 +171,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          ProcessBlockAvailability();
 
          if (status.BestKnownHeader == null
-            || status.BestKnownHeader.ChainWork < this.chainState.GetTip().ChainWork
-            || status.BestKnownHeader.ChainWork < this.minimumChainWork)
+            || status.BestKnownHeader.ChainWork < this._chainState.GetTip().ChainWork
+            || status.BestKnownHeader.ChainWork < this._minimumChainWork)
          {
             // This peer has nothing interesting.
             return null;
@@ -183,7 +182,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             // Bootstrap quickly by guessing a parent of our best tip is the forking point.
             // Guessing wrong in either direction is not a problem.
-            this.chainState.TryGetAtHeight(Math.Min(status.BestKnownHeader.Height, this.chainState.GetTip().Height), out HeaderNode? headerNode);
+            this._chainState.TryGetAtHeight(Math.Min(status.BestKnownHeader.Height, this._chainState.GetTip().Height), out HeaderNode? headerNode);
             fetcherStatus.LastCommonBlock = headerNode;
          }
 
@@ -195,7 +194,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return null;
          }
 
-         List<HeaderNode> vToFetch = new List<HeaderNode>(128);
+         var vToFetch = new List<HeaderNode>(128);
          HeaderNode pindexWalk = this.fetcherStatus.LastCommonBlock;
          // Never fetch further than the best block we know the peer has, or more than BLOCK_DOWNLOAD_WINDOW + 1 beyond the last
          // linked block we have in common with this peer. The +1 is so we can detect stalling, namely if we would be able to
@@ -235,14 +234,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                   return blocksToDownload;
                }
 
-               if (pindex.HasAvailability(HeaderDataAvailability.HasBlockData) || this.chainState.IsInBestChain(pindex))
+               if (pindex.HasAvailability(HeaderDataAvailability.HasBlockData) || this._chainState.IsInBestChain(pindex))
                {
                   if (pindex.HaveTxsDownloaded())
                   {
                      fetcherStatus.LastCommonBlock = pindex;
                   }
                }
-               else if (!this.blockFetcherManager.TryGetFetcher(pindex.Hash, out IBlockFetcher? fetcherDownloadingBlock)) //nobody is fetching yet this block
+               else if (!this._blockFetcherManager.TryGetFetcher(pindex.Hash, out IBlockFetcher? fetcherDownloadingBlock)) //nobody is fetching yet this block
                {
                   // The block is not already downloaded, and not yet in flight.
                   if (pindex.Height > nWindowEnd)
@@ -272,11 +271,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return blocksToDownload;
       }
 
-
-
-
-
-      BlockFetcherStatistics fetcherStatus = new BlockFetcherStatistics();
+      readonly BlockFetcherStatistics fetcherStatus = new BlockFetcherStatistics();
 
       public class BlockFetcherStatistics
       {

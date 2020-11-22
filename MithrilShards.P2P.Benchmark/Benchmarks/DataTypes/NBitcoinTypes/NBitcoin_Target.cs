@@ -1,9 +1,9 @@
-﻿using NBitcoin;
-using NBitcoin.BouncyCastle.Math;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using NBitcoin;
+using NBitcoin.BouncyCastle.Math;
 
 namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
 {
@@ -100,7 +100,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
 
                var quotientStr = quotient.ToString();
                int precision = 12;
-               StringBuilder builder = new StringBuilder(quotientStr.Length + 1 + precision);
+               var builder = new StringBuilder(quotientStr.Length + 1 + precision);
                builder.Append(quotientStr);
                builder.Append('.');
                for (int i = 0; i < precision; i++)
@@ -126,7 +126,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
 
       public override bool Equals(object obj)
       {
-         NBitcoin_Target item = obj as NBitcoin_Target;
+         var item = obj as NBitcoin_Target;
          if (item == null)
             return false;
          return _Target.Equals(item._Target);

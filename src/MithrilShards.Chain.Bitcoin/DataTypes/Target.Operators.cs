@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.DataTypes
@@ -172,7 +170,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
             ThrowHelper.ThrowArgumentException("Division by zero");
          }
 
-         BigInteger dividend = new BigInteger(this.GetBytes());
+         var dividend = new BigInteger(this.GetBytes());
 
          Span<byte> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref this.part1), EXPECTED_SIZE);
          data.Clear();

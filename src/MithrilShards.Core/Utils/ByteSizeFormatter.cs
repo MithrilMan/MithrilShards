@@ -16,8 +16,8 @@ namespace MithrilShards.Core.Utils
             return $"{bytes} B";
          }
 
-         var exp = (int)(Math.Log(bytes) / Math.Log(unit));
-         var value = bytes / Math.Pow(unit, exp);
+         int exp = (int)(Math.Log(bytes) / Math.Log(unit));
+         double value = bytes / Math.Pow(unit, exp);
 
          return si ? $"{value:F2} {SI_UNITS[exp - 1]}B" : $"{value:F2} {UNITS[exp - 1]}iB";
       }

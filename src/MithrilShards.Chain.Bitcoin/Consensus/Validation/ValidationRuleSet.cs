@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
          public uint PreferredExecutionOrder { get; }
 
-         private HashSet<TValidationRule> executeAfter = new HashSet<TValidationRule>();
+         private readonly HashSet<TValidationRule> executeAfter = new HashSet<TValidationRule>();
 
          public IEnumerable<TValidationRule> GetDependencies() => executeAfter;
 
@@ -51,7 +51,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
          // definitions now contains a list of rule definitions with all data needed to sort them
          // use topological sorting to solve dependency graph
 
-         TopologicalSorter<RuleDefinition> resolver = new TopologicalSorter<RuleDefinition>();
+         var resolver = new TopologicalSorter<RuleDefinition>();
          foreach (RuleDefinition definition in definitions)
          {
             resolver.Add(
@@ -62,7 +62,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
                );
          }
 
-         var (sorted, cycled) = resolver.Sort();
+         (IEnumerable<(ValidationRuleSet<TValidationRule>.RuleDefinition item, int level)> sorted, IEnumerable<ValidationRuleSet<TValidationRule>.RuleDefinition> cycled) = resolver.Sort();
          if (cycled.Count() > 0)
          {
             string circularDependency = String.Join(", ", cycled.Select(definition => definition.Rule.GetType().Name));
@@ -105,9 +105,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
             if (precedenceAttribute != null)
             {
-               foreach (var ruleToExecuteBefore in precedenceAttribute.MustBeExecutedAfter)
+               foreach (Type? ruleToExecuteBefore in precedenceAttribute.MustBeExecutedAfter)
                {
-                  var ruleInstance = rules.FirstOrDefault(rule => ruleToExecuteBefore.IsAssignableFrom(rule.GetType()));
+                  TValidationRule? ruleInstance = rules.FirstOrDefault(rule => ruleToExecuteBefore.IsAssignableFrom(rule.GetType()));
                }
             }
 
@@ -119,7 +119,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
                   ThrowHelper.ThrowArgumentException($"{nameof(ruleType)} must implement {validationRulesType.Name}.");
                }
 
-               var requiredRuleInstance = rules.FirstOrDefault(rule => requiredRule.IsAssignableFrom(rule.GetType()));
+               TValidationRule? requiredRuleInstance = rules.FirstOrDefault(rule => requiredRule.IsAssignableFrom(rule.GetType()));
                if (requiredRuleInstance == null)
                {
                   ThrowHelper.ThrowArgumentException($"{nameof(ruleType)} requires '{requiredRule.Name}' but the rule (or a subclass of that rule) is not registered.");

@@ -8,22 +8,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
    /// </summary>
    public class HeaderValidationContextFactory : IHeaderValidationContextFactory
    {
-      readonly ILogger<HeaderValidationContextFactory> logger;
-      readonly IInitialBlockDownloadTracker initialBlockDownloadState;
-      readonly IChainState chainState;
+      readonly ILogger<HeaderValidationContextFactory> _logger;
+      readonly IInitialBlockDownloadTracker _initialBlockDownloadState;
+      readonly IChainState _chainState;
 
       public HeaderValidationContextFactory(ILogger<HeaderValidationContextFactory> logger,
                                             IInitialBlockDownloadTracker initialBlockDownloadState,
                                             IChainState chainState)
       {
-         this.logger = logger;
-         this.initialBlockDownloadState = initialBlockDownloadState;
-         this.chainState = chainState;
+         this._logger = logger;
+         this._initialBlockDownloadState = initialBlockDownloadState;
+         this._chainState = chainState;
       }
 
       public IHeaderValidationContext Create(BlockHeader header)
       {
-         return new HeaderValidationContext(logger, header, this.initialBlockDownloadState.IsDownloadingBlocks(), this.chainState);
+         return new HeaderValidationContext(_logger, header, this._initialBlockDownloadState.IsDownloadingBlocks(), this._chainState);
       }
    }
 }

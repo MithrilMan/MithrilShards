@@ -67,7 +67,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
          Span<byte> span1 = arr;
 
          byte[] arr2 = new byte[20];
-         Span<byte> span2 = new Span<byte>(arr2, 0, 10);
+         var span2 = new Span<byte>(arr2, 0, 10);
 
          span2.CopyTo(span1);
       }

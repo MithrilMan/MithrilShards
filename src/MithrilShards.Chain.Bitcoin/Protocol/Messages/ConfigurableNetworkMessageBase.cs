@@ -23,7 +23,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 
          this.serializationOptions ??= new Dictionary<string, object>();
 
-         foreach (var option in options!)
+         foreach ((string Key, object Value) option in options!)
          {
             this.serializationOptions.Add(option.Key, option.Value);
          }
@@ -35,7 +35,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 
          options ??= new ProtocolTypeSerializerOptions();
 
-         foreach (var option in this.serializationOptions)
+         foreach (KeyValuePair<string, object> option in this.serializationOptions)
          {
             options.Set(option.Key, option.Value);
          }

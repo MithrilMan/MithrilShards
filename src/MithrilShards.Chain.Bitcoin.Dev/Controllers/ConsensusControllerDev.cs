@@ -14,15 +14,15 @@ namespace MithrilShards.Chain.Bitcoin.Dev
    [Route("[controller]")]
    public class ConsensusControllerDev : ControllerBase
    {
-      private readonly ILogger<ConsensusControllerDev> logger;
-      readonly IEventBus eventBus;
-      readonly IChainState chainState;
+      private readonly ILogger<ConsensusControllerDev> _logger;
+      readonly IEventBus _eventBus;
+      readonly IChainState _chainState;
 
       public ConsensusControllerDev(ILogger<ConsensusControllerDev> logger, IEventBus eventBus, IChainState chainState)
       {
-         this.logger = logger;
-         this.eventBus = eventBus;
-         this.chainState = chainState;
+         this._logger = logger;
+         this._eventBus = eventBus;
+         this._chainState = chainState;
       }
 
       [HttpGet]
@@ -30,15 +30,15 @@ namespace MithrilShards.Chain.Bitcoin.Dev
       [Route("ShowBestHeaderTree")]
       public ActionResult<string> ShowBestHeaderTree()
       {
-         return this.Ok(DumpKnownTree(this.chainState.BestHeader));
+         return this.Ok(DumpKnownTree(this._chainState.BestHeader));
       }
 
 
       public static string DumpKnownTree(HeaderNode tip)
       {
-         StringBuilder stringBuilder = new StringBuilder();
+         var stringBuilder = new StringBuilder();
 
-         List<HeaderNode> nodes = new List<HeaderNode>(tip.Height + 1);
+         var nodes = new List<HeaderNode>(tip.Height + 1);
          HeaderNode? current = tip;
 
          do

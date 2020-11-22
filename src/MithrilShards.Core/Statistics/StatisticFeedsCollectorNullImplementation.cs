@@ -18,13 +18,13 @@ namespace MithrilShards.Core.Statistics
          public NullStatisticFeedResult() : base(string.Empty, DateTimeOffset.Now) { }
       }
 
-      readonly ILogger<StatisticFeedsCollectorNullImplementation> logger;
+      readonly ILogger<StatisticFeedsCollectorNullImplementation> _logger;
 
       public StatisticFeedsCollectorNullImplementation(ILogger<StatisticFeedsCollectorNullImplementation> logger)
       {
-         this.logger = logger;
+         this._logger = logger;
 
-         this.logger.LogWarning($"No statistic feed collector available, using {nameof(StatisticFeedsCollectorNullImplementation)}");
+         this._logger.LogWarning($"No statistic feed collector available, using {nameof(StatisticFeedsCollectorNullImplementation)}");
       }
 
       public IStatisticFeedResult GetFeedDump(string feedId, bool humanReadable)

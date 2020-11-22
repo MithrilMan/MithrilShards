@@ -10,14 +10,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    /// </summary>
    public class InitialBlockDownloadTracker : IInitialBlockDownloadTracker
    {
-      readonly ILogger<InitialBlockDownloadTracker> logger;
-      readonly IEventBus eventBus;
-      readonly IChainState chainState;
-      readonly IConsensusParameters consensusParameters;
-      readonly IDateTimeProvider dateTimeProvider;
-      private Target? minimumChainWork;
-      private long maxTipAge;
-      readonly EventSubscriptionManager subscriptionManager = new EventSubscriptionManager();
+      readonly ILogger<InitialBlockDownloadTracker> _logger;
+      readonly IEventBus _eventBus;
+      readonly IChainState _chainState;
+      readonly IConsensusParameters _consensusParameters;
+      readonly IDateTimeProvider _dateTimeProvider;
+      private readonly Target? _minimumChainWork;
+      private readonly long _maxTipAge;
+      readonly EventSubscriptionManager _subscriptionManager = new EventSubscriptionManager();
 
       public InitialBlockDownloadTracker(ILogger<InitialBlockDownloadTracker> logger,
                                          IEventBus eventBus,
@@ -26,28 +26,28 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                                          IOptions<BitcoinSettings> options,
                                          IDateTimeProvider dateTimeProvider)
       {
-         this.logger = logger;
-         this.eventBus = eventBus;
-         this.chainState = chainState;
-         this.consensusParameters = consensusParameters;
-         this.dateTimeProvider = dateTimeProvider;
+         this._logger = logger;
+         this._eventBus = eventBus;
+         this._chainState = chainState;
+         this._consensusParameters = consensusParameters;
+         this._dateTimeProvider = dateTimeProvider;
 
          //TODO register to tip advance
          //this.subscriptionManager.RegisterSubscriptions(this.eventBus.Subscribe())
 
-         minimumChainWork = options.Value.MinimumChainWork ?? this.consensusParameters.MinimumChainWork;
-         if (minimumChainWork < this.consensusParameters.MinimumChainWork)
+         _minimumChainWork = options.Value.MinimumChainWork ?? this._consensusParameters.MinimumChainWork;
+         if (_minimumChainWork < this._consensusParameters.MinimumChainWork)
          {
-            this.logger.LogWarning($"{nameof(minimumChainWork)} set below default value of {this.consensusParameters.MinimumChainWork}");
+            this._logger.LogWarning($"{nameof(_minimumChainWork)} set below default value of {this._consensusParameters.MinimumChainWork}");
          }
 
-         this.maxTipAge = options.Value.MaxTipAge;
+         this._maxTipAge = options.Value.MaxTipAge;
       }
 
       public bool IsDownloadingBlocks()
       {
-         return this.chainState.ChainTip.ChainWork < minimumChainWork
-            || (this.chainState.GetTipHeader().TimeStamp < (this.dateTimeProvider.GetTime() - this.maxTipAge));
+         return this._chainState.ChainTip.ChainWork < _minimumChainWork
+            || (this._chainState.GetTipHeader().TimeStamp < (this._dateTimeProvider.GetTime() - this._maxTipAge));
       }
    }
 }

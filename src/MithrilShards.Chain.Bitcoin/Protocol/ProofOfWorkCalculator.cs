@@ -99,7 +99,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
          }
 
          // retarget
-         Target bnNew = new Target(previousHeader.Bits);
+         var bnNew = new Target(previousHeader.Bits);
          bnNew.Multiply(actualTimespan);
          bnNew.Divide(this.consensusParameters.PowTargetTimespan);
 
@@ -124,7 +124,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public bool CheckProofOfWork(BlockHeader header)
       {
-         Target blockTarget = new Target(header.Bits, out bool isNegative, out bool isOverflow);
+         var blockTarget = new Target(header.Bits, out bool isNegative, out bool isOverflow);
 
          // check range
          if (isNegative || blockTarget == Target.Zero || isOverflow || blockTarget > this.consensusParameters.PowLimit)

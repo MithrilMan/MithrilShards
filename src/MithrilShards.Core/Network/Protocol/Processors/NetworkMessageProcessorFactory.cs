@@ -12,14 +12,14 @@ namespace MithrilShards.Core.Network.Protocol.Processors
    /// </summary>
    public class NetworkMessageProcessorFactory : INetworkMessageProcessorFactory
    {
-      readonly ILogger<INetworkMessageProcessorFactory> logger;
-      readonly IServiceProvider serviceProvider;
+      readonly ILogger<INetworkMessageProcessorFactory> _logger;
+      readonly IServiceProvider _serviceProvider;
 
       public NetworkMessageProcessorFactory(ILogger<INetworkMessageProcessorFactory> logger,
                                             IServiceProvider serviceProvider)
       {
-         this.logger = logger;
-         this.serviceProvider = serviceProvider;
+         this._logger = logger;
+         this._serviceProvider = serviceProvider;
       }
 
       /// <summary>
@@ -33,7 +33,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
             ThrowHelper.ThrowArgumentNullException(nameof(peerContext));
          }
 
-         IEnumerable<INetworkMessageProcessor> processors = this.serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>();
+         IEnumerable<INetworkMessageProcessor> processors = this._serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>();
          foreach (INetworkMessageProcessor processor in processors)
          {
             // skip processors that aren't enabled

@@ -14,9 +14,9 @@ namespace MithrilShards.Example.Network.Client
    {
       private const int INNER_DELAY = 500;
 
-      private ExampleSettings settings;
+      private readonly ExampleSettings _settings;
 
-      private readonly List<OutgoingConnectionEndPoint> connectionsToAttempt = new List<OutgoingConnectionEndPoint>();
+      private readonly List<OutgoingConnectionEndPoint> _connectionsToAttempt = new List<OutgoingConnectionEndPoint>();
 
       public ExampleRequiredConnection(ILogger<ExampleRequiredConnection> logger,
                                 IEventBus eventBus,
@@ -25,9 +25,9 @@ namespace MithrilShards.Example.Network.Client
                                 IForgeConnectivity forgeConnectivity,
                                 IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
       {
-         this.settings = options.Value!;
+         this._settings = options.Value!;
 
-         foreach (ExampleClientPeerBinding peerBinding in this.settings.Connections)
+         foreach (ExampleClientPeerBinding peerBinding in this._settings.Connections)
          {
             if (!peerBinding.TryGetExampleEndPoint(out ExampleEndPoint? endPoint))
             {
@@ -37,13 +37,13 @@ namespace MithrilShards.Example.Network.Client
 
             var remoteEndPoint = new OutgoingConnectionEndPoint(endPoint);
             remoteEndPoint.Items[nameof(endPoint.MyExtraInformation)] = endPoint.MyExtraInformation;
-            this.connectionsToAttempt.Add(remoteEndPoint);
+            this._connectionsToAttempt.Add(remoteEndPoint);
          }
       }
 
       protected override async ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation)
       {
-         foreach (OutgoingConnectionEndPoint endPoint in this.connectionsToAttempt)
+         foreach (OutgoingConnectionEndPoint endPoint in this._connectionsToAttempt)
          {
             if (cancellation.IsCancellationRequested) break;
 

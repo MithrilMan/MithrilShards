@@ -12,11 +12,11 @@ namespace MithrilShards.Core.EventBus
       /// <summary>
       /// The action to invoke when a subscripted event type is published.
       /// </summary>
-      private readonly Action<TEventBase> action;
+      private readonly Action<TEventBase> _action;
 
       public Subscription(Action<TEventBase> action, SubscriptionToken token)
       {
-         this.action = action ?? throw new ArgumentNullException(nameof(action));
+         this._action = action ?? throw new ArgumentNullException(nameof(action));
          this.SubscriptionToken = token ?? throw new ArgumentNullException(nameof(token));
       }
 
@@ -29,7 +29,7 @@ namespace MithrilShards.Core.EventBus
             throw new ArgumentException("Event Item is not the correct type.");
          }
 
-         this.action.Invoke((TEventBase)eventItem);
+         this._action.Invoke((TEventBase)eventItem);
       }
    }
 }

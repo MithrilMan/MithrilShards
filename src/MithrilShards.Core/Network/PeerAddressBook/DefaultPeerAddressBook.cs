@@ -7,12 +7,12 @@ namespace MithrilShards.Core.Network.PeerAddressBook
 {
    public class DefaultPeerAddressBook : IPeerAddressBook
    {
-      private readonly ILogger<DefaultPeerAddressBook> logger;
+      private readonly ILogger<DefaultPeerAddressBook> _logger;
 
 
       public DefaultPeerAddressBook(ILogger<DefaultPeerAddressBook> logger)
       {
-         this.logger = logger;
+         this._logger = logger;
       }
 
       /// <inheritdoc/>
@@ -30,7 +30,7 @@ namespace MithrilShards.Core.Network.PeerAddressBook
       /// <inheritdoc/>
       public void Ban(IPeerContext peer, DateTimeOffset until, string reason)
       {
-         this.logger.LogDebug("Banning peer {RemoteEndPoint}: {BanReason}", peer.RemoteEndPoint, reason);
+         this._logger.LogDebug("Banning peer {RemoteEndPoint}: {BanReason}", peer.RemoteEndPoint, reason);
          this.LogNotImplementedWarning();
       }
 
@@ -57,7 +57,7 @@ namespace MithrilShards.Core.Network.PeerAddressBook
 
       private void LogNotImplementedWarning([CallerMemberName] string methodName = null!)
       {
-         this.logger.LogWarning($"{methodName} not implemented ");
+         this._logger.LogWarning($"{methodName} not implemented ");
       }
    }
 }

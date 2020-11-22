@@ -15,15 +15,15 @@ namespace MithrilShards.Dev.Controller.Controllers
    [Route("[controller]")]
    public class PeerManagementControllerDev : ControllerBase
    {
-      private readonly ILogger<PeerManagementControllerDev> logger;
-      readonly IEventBus eventBus;
-      readonly RequiredConnection? requiredConnection;
+      private readonly ILogger<PeerManagementControllerDev> _logger;
+      readonly IEventBus _eventBus;
+      readonly RequiredConnection? _requiredConnection;
 
       public PeerManagementControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
       {
-         this.logger = logger;
-         this.eventBus = eventBus;
-         this.requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
+         this._logger = logger;
+         this._eventBus = eventBus;
+         this._requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
       }
 
       [HttpPost]
@@ -33,7 +33,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       [Route("Connect")]
       public ActionResult<bool> Connect(PeerManagementConnectRequest request)
       {
-         if (this.requiredConnection == null)
+         if (this._requiredConnection == null)
          {
             return this.NotFound($"Cannot produce output because {nameof(RequiredConnection)} is not available");
          }
@@ -43,7 +43,7 @@ namespace MithrilShards.Dev.Controller.Controllers
             return this.BadRequest("Incorrect endpoint");
          }
 
-         return this.Ok(this.requiredConnection.TryAddEndPoint(ipEndPoint));
+         return this.Ok(this._requiredConnection.TryAddEndPoint(ipEndPoint));
       }
 
       [HttpPost]
@@ -57,7 +57,7 @@ namespace MithrilShards.Dev.Controller.Controllers
             return this.BadRequest("Incorrect endpoint");
          }
 
-         this.eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));
+         this._eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));
          return true;
       }
    }

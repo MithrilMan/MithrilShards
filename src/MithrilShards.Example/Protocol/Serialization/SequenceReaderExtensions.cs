@@ -222,7 +222,7 @@ namespace MithrilShards.Example.Protocol.Serialization
       {
          ulong itemsCount = reader.ReadVarInt();
 
-         TSerializableType[] result = new TSerializableType[itemsCount];
+         var result = new TSerializableType[itemsCount];
 
          for (ulong i = 0; i < itemsCount; i++)
          {

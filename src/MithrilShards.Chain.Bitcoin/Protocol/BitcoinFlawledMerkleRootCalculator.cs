@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.Crypto;
 using MithrilShards.Core.DataTypes;
-using MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol
 {
@@ -71,7 +71,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
          bool oddHashes = (hashes.Count & 1) == 1;
          //ensure to allocate one more item if hashes are odd.
-         List<UInt256> hashesList = new List<UInt256>(oddHashes ? hashes.Count + 1 : hashes.Count);
+         var hashesList = new List<UInt256>(oddHashes ? hashes.Count + 1 : hashes.Count);
 
          for (int i = 0; i < hashes.Count; i++)
          {

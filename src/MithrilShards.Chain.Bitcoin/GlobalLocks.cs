@@ -1,8 +1,5 @@
 ﻿using System.Threading;
-using MithrilShards.Core.Threading;
 using Microsoft.VisualStudio.Threading;
-using System;
-using System.Threading.Tasks;
 
 namespace MithrilShards.Chain.Bitcoin
 {
@@ -11,8 +8,8 @@ namespace MithrilShards.Chain.Bitcoin
    /// </summary>
    public static class GlobalLocks
    {
-      private static readonly ReaderWriterLockSlim cs_main = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-      private static readonly AsyncReaderWriterLock cs_main_async = new AsyncReaderWriterLock(false);
+      private static readonly ReaderWriterLockSlim _cs_main = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+      private static readonly AsyncReaderWriterLock _cs_main_async = new AsyncReaderWriterLock(false);
 
 
       //public static WriteLock WriteOnMain()
@@ -27,12 +24,12 @@ namespace MithrilShards.Chain.Bitcoin
 
       public static AsyncReaderWriterLock.Awaitable WriteOnMainAsync()
       {
-         return cs_main_async.WriteLockAsync();
+         return _cs_main_async.WriteLockAsync();
       }
 
       public static AsyncReaderWriterLock.Awaitable ReadOnMainAsync()
       {
-         return cs_main_async.ReadLockAsync();
+         return _cs_main_async.ReadLockAsync();
       }
    }
 }

@@ -8,18 +8,18 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    public class HeaderMedianTimeCalculator : IHeaderMedianTimeCalculator
    {
       /// <summary>Header length for calculating median timespan.</summary>
-      private const int medianTimeSpan = 11;
-      readonly ILogger<HeaderMedianTimeCalculator> logger;
-      readonly IBlockHeaderRepository blockHeaderRepository;
+      private const int MEDIAN_TIMESPAN = 11;
+      readonly ILogger<HeaderMedianTimeCalculator> _logger;
+      readonly IBlockHeaderRepository _blockHeaderRepository;
 
       public HeaderMedianTimeCalculator(ILogger<HeaderMedianTimeCalculator> logger, IBlockHeaderRepository blockHeaderRepository)
       {
-         this.logger = logger;
-         this.blockHeaderRepository = blockHeaderRepository;
+         this._logger = logger;
+         this._blockHeaderRepository = blockHeaderRepository;
       }
 
       /// <summary>
-      /// Calculate (backward) the median block time over <see cref="medianTimeSpan" /> window from this entry in the chain.
+      /// Calculate (backward) the median block time over <see cref="MEDIAN_TIMESPAN" /> window from this entry in the chain.
       /// </summary>
       /// <param name="startingBlockHash">The starting block hash.</param>
       /// <param name="startingBlockHeight">Height of the starting block.</param>
@@ -33,10 +33,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             ThrowHelper.ThrowArgumentException("{startingBlockHeight} must be greater or equal than 0");
          }
 
-         int samplesLenght = startingBlockHeight > medianTimeSpan ? medianTimeSpan : startingBlockHeight + 1;
-         var median = new uint[samplesLenght];
+         int samplesLenght = startingBlockHeight > MEDIAN_TIMESPAN ? MEDIAN_TIMESPAN : startingBlockHeight + 1;
+         uint[]? median = new uint[samplesLenght];
 
-         if (!this.blockHeaderRepository.TryGet(startingBlockHash, out BlockHeader? currentHeader))
+         if (!this._blockHeaderRepository.TryGet(startingBlockHash, out BlockHeader? currentHeader))
          {
             ThrowHelper.ThrowNotSupportedException("Fatal exception, shouldn't happen, repository may be corrupted.");
          }
@@ -45,7 +45,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          {
             median[i] = currentHeader.TimeStamp;
 
-            if (!this.blockHeaderRepository.TryGet(currentHeader.PreviousBlockHash!, out currentHeader))
+            if (!this._blockHeaderRepository.TryGet(currentHeader.PreviousBlockHash!, out currentHeader))
             {
                ThrowHelper.ThrowNotSupportedException("Fatal exception, shouldn't happen, repository may be corrupted.");
             }

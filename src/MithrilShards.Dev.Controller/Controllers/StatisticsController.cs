@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Statistics;
 using MithrilShards.Dev.Controller.Models.Responses;
-using MithrilShards.Diagnostic.StatisticsCollector;
 using MithrilShards.Diagnostic.StatisticsCollector.Models;
 
 namespace MithrilShards.Dev.Controller.Controllers
@@ -16,14 +15,14 @@ namespace MithrilShards.Dev.Controller.Controllers
    [Route("[controller]")]
    public class StatisticsController : ControllerBase
    {
-      private readonly ILogger<StatisticsController> logger;
+      private readonly ILogger<StatisticsController> _logger;
       // StatisticOnlyActionFilterAttribute will prevent to use actions in this controller if StatisticFeedsCollector isn't resolved
-      readonly IStatisticFeedsCollector statisticFeedsCollector = null!;
+      readonly IStatisticFeedsCollector _statisticFeedsCollector = null!;
 
-      public StatisticsController(ILogger<StatisticsController> logger, IStatisticFeedsCollector statisticFeedsCollector = null)
+      public StatisticsController(ILogger<StatisticsController> logger, IStatisticFeedsCollector statisticFeedsCollector)
       {
-         this.logger = logger;
-         this.statisticFeedsCollector = statisticFeedsCollector!;
+         this._logger = logger;
+         this._statisticFeedsCollector = statisticFeedsCollector!;
       }
 
       [HttpGet]
@@ -31,7 +30,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       [ProducesResponseType(StatusCodes.Status404NotFound)]
       public IActionResult GetStats()
       {
-         return this.Ok(this.statisticFeedsCollector.GetFeedsDump());
+         return this.Ok(this._statisticFeedsCollector.GetFeedsDump());
       }
 
       [HttpGet]
@@ -42,7 +41,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       {
          try
          {
-            return this.statisticFeedsCollector.GetFeedDump(feedId, humanReadable) switch
+            return this._statisticFeedsCollector.GetFeedDump(feedId, humanReadable) switch
             {
                RawStatisticFeedResult result => this.Ok(result),
                TabularStatisticFeedResult result => this.Content(result.Content, "text/plain"),
@@ -62,7 +61,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       [Route("AvailableFeeds")]
       public IEnumerable<StatisticsGetAvailableFeeds> GetAvailableFeeds()
       {
-         return this.statisticFeedsCollector.GetRegisteredFeedsDefinitions()
+         return this._statisticFeedsCollector.GetRegisteredFeedsDefinitions()
             .Select(feed => new StatisticsGetAvailableFeeds
             {
                FeedId = feed.FeedId,

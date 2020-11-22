@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
    [TypeConverter(typeof(TargetConverter))]
    public partial class Target : UInt256
    {
-      private static BigInteger Pow256 = BigInteger.Pow(new BigInteger(2), 256);
+      private static readonly BigInteger Pow256 = BigInteger.Pow(new BigInteger(2), 256);
 
       public static new Target Zero { get; } = new Target("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
@@ -154,8 +154,8 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       public BigInteger ToBigInteger()
       {
          uint compact = ToCompact();
-         var exp = compact >> 24;
-         var value = compact & 0x00FFFFFF;
+         uint exp = compact >> 24;
+         uint value = compact & 0x00FFFFFF;
          return new BigInteger(value) << (8 * ((int)exp - 3));
       }
 

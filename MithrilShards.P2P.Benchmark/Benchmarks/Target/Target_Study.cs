@@ -1,18 +1,14 @@
 ﻿using System;
+using System.Numerics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using NBitcoin_Target = NBitcoin.Target;
-using MS_Target = MithrilShards.Chain.Bitcoin.DataTypes.Target;
-using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using System.Numerics;
-using MithrilShards.Chain.Bitcoin.Consensus;
-using BenchmarkDotNet.Loggers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MithrilShards.Chain.Bitcoin.ChainDefinitions;
-using Perfolizer.Mathematics.Randomization;
-using System.Security.Cryptography;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types;
+using MithrilShards.Chain.Bitcoin.Protocol.Types;
+using MS_Target = MithrilShards.Chain.Bitcoin.DataTypes.Target;
+using NBitcoin_Target = NBitcoin.Target;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.Target
 {
@@ -98,14 +94,14 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
             return header.Bits;
 
          // Limit adjustment step
-         TimeSpan nActualTimespan = TimeSpan.FromSeconds(header.TimeStamp - lastRetargetTime);
+         var nActualTimespan = TimeSpan.FromSeconds(header.TimeStamp - lastRetargetTime);
          if (nActualTimespan < TimeSpan.FromTicks(nbitcoin_consensus.PowTargetTimespan.Ticks / 4))
             nActualTimespan = TimeSpan.FromTicks(nbitcoin_consensus.PowTargetTimespan.Ticks / 4);
          if (nActualTimespan > TimeSpan.FromTicks(nbitcoin_consensus.PowTargetTimespan.Ticks * 4))
             nActualTimespan = TimeSpan.FromTicks(nbitcoin_consensus.PowTargetTimespan.Ticks * 4);
 
          // Retarget
-         BigInteger bnNew = new NBitcoin_Target(header.Bits).ToBigInteger();
+         var bnNew = new NBitcoin_Target(header.Bits).ToBigInteger();
          var cmp = new NBitcoin_Target(bnNew).ToCompact();
          bnNew = bnNew * (new BigInteger((long)nActualTimespan.TotalSeconds));
          bnNew = bnNew / (new BigInteger((long)nbitcoin_consensus.PowTargetTimespan.TotalSeconds));

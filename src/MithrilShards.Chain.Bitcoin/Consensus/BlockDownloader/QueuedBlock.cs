@@ -1,7 +1,4 @@
-﻿using MithrilShards.Core.DataTypes;
-using MithrilShards.Core.Network;
-
-namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
+﻿namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 {
    /// <summary>
    /// Represents a block queued to be downloaded.

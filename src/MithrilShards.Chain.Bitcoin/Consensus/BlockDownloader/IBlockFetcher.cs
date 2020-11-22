@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 {

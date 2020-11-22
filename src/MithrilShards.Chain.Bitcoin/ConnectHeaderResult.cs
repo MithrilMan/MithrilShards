@@ -1,6 +1,4 @@
-﻿using MithrilShards.Chain.Bitcoin.Consensus;
-
-namespace MithrilShards.Chain.Bitcoin
+﻿namespace MithrilShards.Chain.Bitcoin
 {
    public enum ConnectHeaderResult
    {

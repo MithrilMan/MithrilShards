@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Statistics;
 
@@ -12,23 +11,22 @@ namespace MithrilShards.Core.Threading
    {
       private const string FEED_PERIODIC_WORKS = "PeriodicWorks";
 
-      readonly ILogger<PeriodicWorkTracker> logger;
-      readonly IStatisticFeedsCollector statisticFeedsCollector;
-
-      ConcurrentDictionary<Guid, IPeriodicWork> works = new ConcurrentDictionary<Guid, IPeriodicWork>();
+      readonly ILogger<PeriodicWorkTracker> _logger;
+      readonly IStatisticFeedsCollector _statisticFeedsCollector;
+      readonly ConcurrentDictionary<Guid, IPeriodicWork> _works = new ConcurrentDictionary<Guid, IPeriodicWork>();
 
       public PeriodicWorkTracker(ILogger<PeriodicWorkTracker> logger, IStatisticFeedsCollector statisticFeedsCollector)
       {
-         this.logger = logger;
-         this.statisticFeedsCollector = statisticFeedsCollector;
+         this._logger = logger;
+         this._statisticFeedsCollector = statisticFeedsCollector;
 
          this.RegisterStatisticFeeds();
       }
 
       public void StartTracking(IPeriodicWork work)
       {
-         this.works[work.Id] = work;
-         this.logger.LogDebug("Start tracking IPeriodicWork {IPeriodicWorkId} ({IPeriodicWorkLabel})", work.Id, work.Label);
+         this._works[work.Id] = work;
+         this._logger.LogDebug("Start tracking IPeriodicWork {IPeriodicWorkId} ({IPeriodicWorkLabel})", work.Id, work.Label);
       }
 
       public void StopTracking(IPeriodicWork work)
@@ -38,15 +36,15 @@ namespace MithrilShards.Core.Threading
             ThrowHelper.ThrowArgumentNullException(nameof(work));
          }
 
-         if (this.works.TryRemove(work.Id, out IPeriodicWork? removedItem))
+         if (this._works.TryRemove(work.Id, out IPeriodicWork? removedItem))
          {
-            this.logger.LogDebug("Stop tracking IPeriodicWork {IPeriodicWorkId} ({IPeriodicWorkLabel})", removedItem.Id, removedItem.Label);
+            this._logger.LogDebug("Stop tracking IPeriodicWork {IPeriodicWorkId} ({IPeriodicWorkLabel})", removedItem.Id, removedItem.Label);
          }
       }
 
       public void RegisterStatisticFeeds()
       {
-         this.statisticFeedsCollector.RegisterStatisticFeeds(this,
+         this._statisticFeedsCollector.RegisterStatisticFeeds(this,
             new StatisticFeedDefinition(
                FEED_PERIODIC_WORKS,
                "Periodic Works",
@@ -97,7 +95,7 @@ namespace MithrilShards.Core.Threading
          switch (feedId)
          {
             case FEED_PERIODIC_WORKS:
-               return this.works.Values
+               return this._works.Values
                   .ToList() //copy values
                   .Select(w => new object?[] {
                      w.Id,

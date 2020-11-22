@@ -7,6 +7,41 @@ indent_size = 3
 indent_style = space
 
 [*.cs]
+
+########## Naming Styles
+##### Naming Rules
+# name all constant fields using UPPERCASE
+dotnet_naming_rule.constant_fields_should_be_upper_case.severity  = error
+dotnet_naming_rule.constant_fields_should_be_upper_case.symbols   = constant_fields
+dotnet_naming_rule.constant_fields_should_be_upper_case.style     = upper_case_style
+
+# name all private fields using camelCase and underscore prefix
+dotnet_naming_rule.private_members_with_underscore.symbols        = private_fields
+dotnet_naming_rule.private_members_with_underscore.style          = prefix_underscore
+dotnet_naming_rule.private_members_with_underscore.severity       = error
+##### End Naming Rules
+
+##### End Symbol Specifications
+dotnet_naming_symbols.constant_fields.applicable_kinds            = field
+dotnet_naming_symbols.constant_fields.required_modifiers          = const
+
+dotnet_naming_symbols.private_fields.applicable_kinds             = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities   = private
+##### End Symbol Specifications
+
+
+##### End Naming Styles
+dotnet_naming_style.upper_case_style.capitalization               = all_upper
+dotnet_naming_style.upper_case_style.word_separator               = _
+
+dotnet_naming_style.prefix_underscore.capitalization              = camel_case
+dotnet_naming_style.prefix_underscore.required_prefix             = _
+##### End Naming Styles
+########## End Naming Styles
+
+
+
+
 dotnet_sort_system_directives_first                               = true
 dotnet_style_coalesce_expression                                  = true : error
 dotnet_style_collection_initializer                               = true : suggestion
@@ -125,4 +160,7 @@ dotnet_diagnostic.CA1040.severity                                 = suggestion
 dotnet_diagnostic.CA1801.severity                                 = suggestion
 
 # Default severity for all analyzer diagnostics
-dotnet_analyzer_diagnostic.severity = silent
+dotnet_analyzer_diagnostic.severity                               = silent
+
+# IDE1006: Naming Styles
+dotnet_diagnostic.IDE1006.severity                                = error

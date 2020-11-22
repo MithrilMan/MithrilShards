@@ -29,7 +29,7 @@ namespace MithrilShards.Core.Network.Server
       /// <returns></returns>
       public bool Matches(IPEndPoint otherEndpoint)
       {
-         IPEndPoint endpoint = IPEndPoint.Parse(this.EndPoint);
+         var endpoint = IPEndPoint.Parse(this.EndPoint);
          if (endpoint.IsAnyIP())
          {
             return endpoint.Port == otherEndpoint.Port;

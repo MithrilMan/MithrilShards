@@ -11,8 +11,8 @@ namespace MithrilShards.Core.EventBus
    /// <seealso cref="System.IDisposable" />
    public class EventSubscriptionManager : IDisposable
    {
-      private readonly object subscriptionsLock = new object();
-      private readonly List<SubscriptionToken> subscriptionTokens = new List<SubscriptionToken>();
+      private readonly object _subscriptionsLock = new object();
+      private readonly List<SubscriptionToken> _subscriptionTokens = new List<SubscriptionToken>();
 
       /// <summary>
       /// Registers the provided subscriptions.
@@ -21,36 +21,36 @@ namespace MithrilShards.Core.EventBus
       /// <param name="subscriptions">The subscription action.</param>
       public EventSubscriptionManager RegisterSubscriptions(params SubscriptionToken[] subscriptions)
       {
-         if (this.disposedValue) throw new ObjectDisposedException(nameof(EventSubscriptionManager));
+         if (this._disposedValue) throw new ObjectDisposedException(nameof(EventSubscriptionManager));
 
-         lock (this.subscriptionsLock)
+         lock (this._subscriptionsLock)
          {
-            this.subscriptionTokens.AddRange(subscriptions);
+            this._subscriptionTokens.AddRange(subscriptions);
          }
 
          return this;
       }
 
       #region IDisposable Support
-      private bool disposedValue = false;
+      private bool _disposedValue = false;
 
       protected virtual void Dispose(bool disposing)
       {
-         if (!this.disposedValue)
+         if (!this._disposedValue)
          {
             if (disposing)
             {
-               lock (this.subscriptionsLock)
+               lock (this._subscriptionsLock)
                {
-                  foreach (SubscriptionToken token in this.subscriptionTokens)
+                  foreach (SubscriptionToken token in this._subscriptionTokens)
                   {
                      token?.Dispose();
                   }
-                  this.subscriptionTokens.Clear();
+                  this._subscriptionTokens.Clear();
                }
             }
 
-            this.disposedValue = true;
+            this._disposedValue = true;
          }
       }
 

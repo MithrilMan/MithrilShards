@@ -22,7 +22,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
             throw new NullReferenceException();
          if (s.Length == 0)
             return Array.Empty<byte>();
-         List<byte> result = new List<byte>();
+         var result = new List<byte>();
          IntPtr ptr = SecureStringMarshal.SecureStringToGlobalAllocAnsi(s);
          try
          {
@@ -213,7 +213,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
       public static string ToHexString(this byte[] value)
       {
-         StringBuilder sb = new StringBuilder();
+         var sb = new StringBuilder();
          foreach (byte b in value)
             sb.AppendFormat("{0:x2}", b);
          return sb.ToString();
@@ -221,7 +221,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
       public static string ToHexString(this byte[] value, bool reverse = false)
       {
-         StringBuilder sb = new StringBuilder();
+         var sb = new StringBuilder();
          for (int i = 0; i < value.Length; i++)
             sb.AppendFormat("{0:x2}", value[reverse ? value.Length - i - 1 : i]);
          return sb.ToString();
@@ -229,7 +229,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
       public static string ToHexString(this ReadOnlySpan<byte> value)
       {
-         StringBuilder sb = new StringBuilder();
+         var sb = new StringBuilder();
          foreach (byte b in value)
             sb.AppendFormat("{0:x2}", b);
          return sb.ToString();

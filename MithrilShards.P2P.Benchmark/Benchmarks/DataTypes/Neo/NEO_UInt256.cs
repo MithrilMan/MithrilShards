@@ -11,15 +11,15 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
    public class NEO_UInt256 : UIntBase, IComparable<NEO_UInt256>, IEquatable<NEO_UInt256>
    {
 
-      public const int Length = 32;
+      public const int LENGTH = 32;
       public static readonly NEO_UInt256 Zero = new NEO_UInt256();
 
-      private ulong value1;
-      private ulong value2;
-      private ulong value3;
-      private ulong value4;
+      private ulong _value1;
+      private ulong _value2;
+      private ulong _value3;
+      private ulong _value4;
 
-      public override int Size => Length;
+      public override int Size => LENGTH;
 
       public NEO_UInt256()
       {
@@ -27,10 +27,10 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
       public unsafe NEO_UInt256(ReadOnlySpan<byte> value)
       {
-         fixed (ulong* p = &value1)
+         fixed (ulong* p = &_value1)
          {
-            Span<byte> dst = new Span<byte>(p, Length);
-            value[..Length].CopyTo(dst);
+            var dst = new Span<byte>(p, LENGTH);
+            value[..LENGTH].CopyTo(dst);
          }
       }
 
@@ -41,21 +41,21 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
       /// </summary>
       public int CompareTo(NEO_UInt256 other)
       {
-         int result = value4.CompareTo(other.value4);
+         int result = _value4.CompareTo(other._value4);
          if (result != 0) return result;
-         result = value3.CompareTo(other.value3);
+         result = _value3.CompareTo(other._value3);
          if (result != 0) return result;
-         result = value2.CompareTo(other.value2);
+         result = _value2.CompareTo(other._value2);
          if (result != 0) return result;
-         return value1.CompareTo(other.value1);
+         return _value1.CompareTo(other._value1);
       }
 
       public override void Deserialize(BinaryReader reader)
       {
-         value1 = reader.ReadUInt64();
-         value2 = reader.ReadUInt64();
-         value3 = reader.ReadUInt64();
-         value4 = reader.ReadUInt64();
+         _value1 = reader.ReadUInt64();
+         _value2 = reader.ReadUInt64();
+         _value3 = reader.ReadUInt64();
+         _value4 = reader.ReadUInt64();
       }
 
       /// <summary>
@@ -73,15 +73,15 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
       public bool Equals(NEO_UInt256 other)
       {
          if (other is null) return false;
-         return value1 == other.value1
-             && value2 == other.value2
-             && value3 == other.value3
-             && value4 == other.value4;
+         return _value1 == other._value1
+             && _value2 == other._value2
+             && _value3 == other._value3
+             && _value4 == other._value4;
       }
 
       public override int GetHashCode()
       {
-         return (int)value1;
+         return (int)_value1;
       }
 
       /// <summary>
@@ -94,7 +94,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
             throw new ArgumentNullException();
          if (s.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
             s = s.Substring(2);
-         if (s.Length != Length * 2)
+         if (s.Length != LENGTH * 2)
             throw new FormatException();
          byte[] data = s.HexToBytes();
          Array.Reverse(data);
@@ -103,10 +103,10 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
       public override void Serialize(BinaryWriter writer)
       {
-         writer.Write(value1);
-         writer.Write(value2);
-         writer.Write(value3);
-         writer.Write(value4);
+         writer.Write(_value1);
+         writer.Write(_value2);
+         writer.Write(_value3);
+         writer.Write(_value4);
       }
 
       /// <summary>
@@ -122,13 +122,13 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
          }
          if (s.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
             s = s.Substring(2);
-         if (s.Length != Length * 2)
+         if (s.Length != LENGTH * 2)
          {
             result = null;
             return false;
          }
-         byte[] data = new byte[Length];
-         for (int i = 0; i < Length; i++)
+         byte[] data = new byte[LENGTH];
+         for (int i = 0; i < LENGTH; i++)
             if (!byte.TryParse(s.Substring(i * 2, 2), NumberStyles.AllowHexSpecifier, null, out data[i]))
             {
                result = null;
@@ -196,13 +196,13 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
 
 
-      private static readonly NBitcoin.DataEncoders.HexEncoder Encoder = new NBitcoin.DataEncoders.HexEncoder();
+      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new NBitcoin.DataEncoders.HexEncoder();
       public override string ToString()
       {
-         ulong[] arr = new ulong[] { this.value1, this.value2, this.value3, this.value4 };
+         ulong[] arr = new ulong[] { this._value1, this._value2, this._value3, this._value4 };
          Span<byte> toBeReversed = MemoryMarshal.Cast<ulong, byte>(arr).ToArray();
          toBeReversed.Reverse();
-         return Encoder.EncodeData(toBeReversed.ToArray());
+         return _encoder.EncodeData(toBeReversed.ToArray());
       }
    }
 }

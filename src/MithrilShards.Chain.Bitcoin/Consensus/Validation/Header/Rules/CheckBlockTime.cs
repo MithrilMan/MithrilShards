@@ -14,17 +14,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
       /// current network-adjusted time before the block will be accepted.
       /// </summary>
       const uint MAX_FUTURE_BLOCK_TIME = 2 * 60 * 60;
-      readonly ILogger<CheckPreviousBlock> logger;
-      readonly IHeaderMedianTimeCalculator headerMedianTimeCalculator;
-      readonly IDateTimeProvider dateTimeProvider;
+      readonly ILogger<CheckPreviousBlock> _logger;
+      readonly IHeaderMedianTimeCalculator _headerMedianTimeCalculator;
+      readonly IDateTimeProvider _dateTimeProvider;
 
       public CheckBlockTime(ILogger<CheckPreviousBlock> logger,
                             IHeaderMedianTimeCalculator headerMedianTimeCalculator,
                             IDateTimeProvider dateTimeProvider)
       {
-         this.logger = logger;
-         this.headerMedianTimeCalculator = headerMedianTimeCalculator;
-         this.dateTimeProvider = dateTimeProvider;
+         this._logger = logger;
+         this._headerMedianTimeCalculator = headerMedianTimeCalculator;
+         this._dateTimeProvider = dateTimeProvider;
       }
 
       public bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
@@ -35,14 +35,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
             return false;
          }
 
-         if (context.Header.TimeStamp <= this.headerMedianTimeCalculator.Calculate(previousHeaderNode!.Hash, previousHeaderNode.Height))
+         if (context.Header.TimeStamp <= this._headerMedianTimeCalculator.Calculate(previousHeaderNode!.Hash, previousHeaderNode.Height))
          {
             validationState.Invalid(BlockValidationStateResults.InvalidHeader, "time-too-old", "block's timestamp is too early");
             return false;
          }
 
          // Check timestamp.
-         if (context.Header.TimeStamp > (this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() + MAX_FUTURE_BLOCK_TIME))
+         if (context.Header.TimeStamp > (this._dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() + MAX_FUTURE_BLOCK_TIME))
          {
             validationState.Invalid(BlockValidationStateResults.TimeFuture, "time-too-new", "block timestamp too far in the future");
             return false;

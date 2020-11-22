@@ -19,7 +19,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       [GlobalSetup]
       public void Setup()
       {
-         Span<byte> value = new Span<byte>(new byte[32]);
+         var value = new Span<byte>(new byte[32]);
          new Random().NextBytes(value);
 
          this.NBitcoinData = new uint256(value.ToArray());

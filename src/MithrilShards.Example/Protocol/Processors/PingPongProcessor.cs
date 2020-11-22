@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -28,11 +27,11 @@ namespace MithrilShards.Example.Protocol.Processors
       /// </summary>
       const int TIMEOUT_INTERVAL = 20 * 60;
 
-      readonly IRandomNumberGenerator randomNumberGenerator;
-      readonly IDateTimeProvider dateTimeProvider;
-      readonly IPeriodicWork periodicPing;
-      readonly IQuoteService quoteService;
-      private CancellationTokenSource pingCancellationTokenSource = null!;
+      readonly IRandomNumberGenerator _randomNumberGenerator;
+      readonly IDateTimeProvider _dateTimeProvider;
+      readonly IPeriodicWork _periodicPing;
+      readonly IQuoteService _quoteService;
+      private CancellationTokenSource _pingCancellationTokenSource = null!;
 
       public PingPongProcessor(ILogger<PingPongProcessor> logger,
                                IEventBus eventBus,
@@ -43,16 +42,16 @@ namespace MithrilShards.Example.Protocol.Processors
                                IQuoteService quoteService)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
-         this.randomNumberGenerator = randomNumberGenerator;
-         this.dateTimeProvider = dateTimeProvider;
-         this.periodicPing = periodicPing;
-         this.quoteService = quoteService;
+         this._randomNumberGenerator = randomNumberGenerator;
+         this._dateTimeProvider = dateTimeProvider;
+         this._periodicPing = periodicPing;
+         this._quoteService = quoteService;
       }
 
       protected override ValueTask OnPeerHandshakedAsync()
       {
-         _ = this.periodicPing.StartAsync(
-               label: $"{nameof(periodicPing)}-{PeerContext.PeerId}",
+         _ = this._periodicPing.StartAsync(
+               label: $"{nameof(_periodicPing)}-{PeerContext.PeerId}",
                work: PingAsync,
                interval: TimeSpan.FromSeconds(PING_INTERVAL),
                cancellation: PeerContext.ConnectionCancellationTokenSource.Token
@@ -64,21 +63,21 @@ namespace MithrilShards.Example.Protocol.Processors
       private async Task PingAsync(CancellationToken cancellationToken)
       {
          var ping = new PingMessage();
-         ping.Nonce = this.randomNumberGenerator.GetUint64();
+         ping.Nonce = this._randomNumberGenerator.GetUint64();
 
          await this.SendMessageAsync(ping).ConfigureAwait(false);
 
-         this.status.PingSent(this.dateTimeProvider.GetTimeMicros(), ping);
-         this.logger.LogDebug("Sent ping request with nonce {PingNonce}", this.status.PingRequestNonce);
+         this._status.PingSent(this._dateTimeProvider.GetTimeMicros(), ping);
+         this.logger.LogDebug("Sent ping request with nonce {PingNonce}", this._status.PingRequestNonce);
 
          //in case of memory leak, investigate this.
-         this.pingCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+         this._pingCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
          // ensures the handshake is performed timely
          await this.DisconnectIfAsync(() =>
          {
-            return new ValueTask<bool>(this.status.PingResponseTime == 0);
-         }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", this.pingCancellationTokenSource.Token).ConfigureAwait(false);
+            return new ValueTask<bool>(this._status.PingResponseTime == 0);
+         }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", this._pingCancellationTokenSource.Token).ConfigureAwait(false);
       }
 
       public async ValueTask<bool> ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
@@ -88,7 +87,7 @@ namespace MithrilShards.Example.Protocol.Processors
             PongFancyResponse = new PongFancyResponse
             {
                Nonce = message.Nonce,
-               Quote = quoteService.GetRandomQuote()
+               Quote = _quoteService.GetRandomQuote()
             }
          }).ConfigureAwait(false);
 
@@ -97,15 +96,15 @@ namespace MithrilShards.Example.Protocol.Processors
 
       public ValueTask<bool> ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
       {
-         if (this.status.PingRequestNonce != 0 && message.PongFancyResponse?.Nonce == this.status.PingRequestNonce)
+         if (this._status.PingRequestNonce != 0 && message.PongFancyResponse?.Nonce == this._status.PingRequestNonce)
          {
-            var (Nonce, RoundTrip) = this.status.PongReceived(this.dateTimeProvider.GetTimeMicros());
+            (ulong Nonce, long RoundTrip) = this._status.PongReceived(this._dateTimeProvider.GetTimeMicros());
             this.logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec. {Quote}", Nonce, RoundTrip, message.PongFancyResponse.Quote);
-            this.pingCancellationTokenSource.Cancel();
+            this._pingCancellationTokenSource.Cancel();
          }
          else
          {
-            this.logger.LogDebug("Received pong with wrong nonce: {PingNonce}", this.status.PingRequestNonce);
+            this.logger.LogDebug("Received pong with wrong nonce: {PingNonce}", this._status.PingRequestNonce);
          }
 
          return new ValueTask<bool>(true);

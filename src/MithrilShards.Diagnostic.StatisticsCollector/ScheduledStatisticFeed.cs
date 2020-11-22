@@ -15,13 +15,13 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <value>
       /// The table builder.
       /// </value>
-      private readonly TableBuilder tableBuilder;
+      private readonly TableBuilder _tableBuilder;
 
 
       /// <summary>
       /// The string builder that will hold human readable output;
       /// </summary>
-      private readonly StringBuilder stringBuilder = new StringBuilder();
+      private readonly StringBuilder _stringBuilder = new StringBuilder();
 
       /// <summary>
       /// Gets the source of the feed.
@@ -64,7 +64,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          this.StatisticFeedDefinition = statisticFeedDefinition ?? throw new ArgumentNullException(nameof(statisticFeedDefinition));
          this.NextPlannedExecution = DateTime.Now + statisticFeedDefinition.FrequencyTarget;
 
-         this.tableBuilder = this.CreateTableBuilder();
+         this._tableBuilder = this.CreateTableBuilder();
       }
 
       /// <summary>
@@ -74,7 +74,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       private TableBuilder CreateTableBuilder()
       {
-         var tableBuilder = new TableBuilder(this.stringBuilder);
+         var tableBuilder = new TableBuilder(this._stringBuilder);
 
          foreach (FieldDefinition field in this.StatisticFeedDefinition.FieldsDefinition)
          {
@@ -115,11 +115,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public string GetTabularFeed()
       {
-         this.stringBuilder.Clear();
-         this.tableBuilder.Start($"{this.LastResultsDate.LocalDateTime} - {this.StatisticFeedDefinition.Title}");
-         this.lastResults.ForEach(row => this.tableBuilder.DrawRow(row));
-         this.tableBuilder.End();
-         return this.stringBuilder.ToString();
+         this._stringBuilder.Clear();
+         this._tableBuilder.Start($"{this.LastResultsDate.LocalDateTime} - {this.StatisticFeedDefinition.Title}");
+         this.lastResults.ForEach(row => this._tableBuilder.DrawRow(row));
+         this._tableBuilder.End();
+         return this._stringBuilder.ToString();
       }
    }
 }

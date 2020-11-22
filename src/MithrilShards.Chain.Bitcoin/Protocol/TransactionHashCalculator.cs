@@ -19,7 +19,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public UInt256 ComputeHash(Transaction transaction, int protocolVersion)
       {
-         ArrayBufferWriter<byte> buffer = new ArrayBufferWriter<byte>();
+         var buffer = new ArrayBufferWriter<byte>();
          this.transactionSerializer.Serialize(transaction,
                                               protocolVersion,
                                               buffer,
@@ -30,7 +30,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public UInt256 ComputeWitnessHash(Transaction transaction, int protocolVersion)
       {
-         ArrayBufferWriter<byte> buffer = new ArrayBufferWriter<byte>();
+         var buffer = new ArrayBufferWriter<byte>();
          this.transactionSerializer.Serialize(transaction,
                                               protocolVersion,
                                               buffer,

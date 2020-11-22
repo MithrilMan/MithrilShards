@@ -44,7 +44,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
       private static string ConvertAsNEO(byte[] value)
       {
-         StringBuilder sb = new StringBuilder();
+         var sb = new StringBuilder();
          foreach (byte b in value)
             sb.AppendFormat("{0:x2}", b);
          return sb.ToString();

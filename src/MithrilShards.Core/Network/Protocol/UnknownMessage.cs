@@ -6,16 +6,16 @@ namespace MithrilShards.Core.Network.Protocol
    /// </summary>
    public sealed class UnknownMessage : INetworkMessage
    {
-      readonly byte[] payload;
+      readonly byte[] _payload;
 
       public string Command { get; }
 
-      public ReadOnlySpan<byte> Payload => this.payload;
+      public ReadOnlySpan<byte> Payload => this._payload;
 
       public UnknownMessage(string command, byte[] payload)
       {
          this.Command = command ?? throw new ArgumentNullException(nameof(command));
-         this.payload = payload;
+         this._payload = payload;
       }
    }
 }

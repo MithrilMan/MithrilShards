@@ -1,5 +1,4 @@
-﻿using System;
-using MithrilShards.Core.DataTypes;
+﻿using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 {

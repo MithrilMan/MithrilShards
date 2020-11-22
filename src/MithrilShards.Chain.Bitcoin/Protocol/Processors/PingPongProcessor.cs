@@ -94,7 +94,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       {
          if (this.status.PingRequestNonce != 0 && message.Nonce == this.status.PingRequestNonce)
          {
-            var (Nonce, RoundTrip) = this.status.PongReceived(this.dateTimeProvider.GetTimeMicros());
+            (ulong Nonce, long RoundTrip) = this.status.PongReceived(this.dateTimeProvider.GetTimeMicros());
             this.logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec.", Nonce, RoundTrip);
             this.pingCancellationTokenSource.Cancel();
          }

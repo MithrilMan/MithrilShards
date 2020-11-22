@@ -116,11 +116,11 @@ namespace MithrilShards.Core.Extensions
          return isIPv4 && (bytes[15 - 3] == 169 && bytes[15 - 2] == 254);
       }
 
-      private static readonly byte[] pchRFC4862 = new byte[] { 0xFE, 0x80, 0, 0, 0, 0, 0, 0 };
+      private static readonly byte[] _pchRFC4862 = new byte[] { 0xFE, 0x80, 0, 0, 0, 0, 0, 0 };
       private static bool IsRFC4862(this ref ReadOnlySpan<byte> bytes)
       {
          //TODO: test correctness of my changes
-         return bytes.Slice(0, pchRFC4862.Length).SequenceEqual(pchRFC4862);
+         return bytes.Slice(0, _pchRFC4862.Length).SequenceEqual(_pchRFC4862);
       }
 
       private static bool IsRFC4193(this ReadOnlySpan<byte> bytes)
@@ -128,10 +128,10 @@ namespace MithrilShards.Core.Extensions
          return (bytes[15 - 15] & 0xFE) == 0xFC;
       }
 
-      private static readonly byte[] pchOnionCat = new byte[] { 0xFD, 0x87, 0xD8, 0x7E, 0xEB, 0x43 };
+      private static readonly byte[] _pchOnionCat = new byte[] { 0xFD, 0x87, 0xD8, 0x7E, 0xEB, 0x43 };
       private static bool IsTor(this ReadOnlySpan<byte> bytes)
       {
-         return bytes.Slice(0, pchOnionCat.Length).SequenceEqual(pchOnionCat);
+         return bytes.Slice(0, _pchOnionCat.Length).SequenceEqual(_pchOnionCat);
       }
 
       private static bool IsRFC4843(this ReadOnlySpan<byte> bytes)
@@ -150,14 +150,14 @@ namespace MithrilShards.Core.Extensions
             bytes[15 - 12] == 0xB8;
       }
 
-      private static readonly byte[] anyIPv6 = IPAddress.Parse("::").GetAddressBytes();
-      private static readonly byte[] anyIPv4 = IPAddress.Parse("0.0.0.0").MapToIPv6().GetAddressBytes();
-      private static readonly byte[] INADDR_NONE = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF };
+      private static readonly byte[] _anyIPv6 = IPAddress.Parse("::").GetAddressBytes();
+      private static readonly byte[] _anyIPv4 = IPAddress.Parse("0.0.0.0").MapToIPv6().GetAddressBytes();
+      private static readonly byte[] _iNADDR_NONE = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF };
       //private static readonly byte[]  = new byte[] { 0x00, 0x00, 0x00, 0x00 };
       private static bool IsValid(this ReadOnlySpan<byte> bytes, bool isIPv4)
       {
          // unspecified IPv6 address (::)
-         if (bytes.SequenceEqual(anyIPv6))
+         if (bytes.SequenceEqual(_anyIPv6))
          {
             return false;
          }
@@ -171,13 +171,13 @@ namespace MithrilShards.Core.Extensions
          if (isIPv4)
          {
             //// INADDR_NONE
-            if (bytes.Slice(12, 4).SequenceEqual(INADDR_NONE))
+            if (bytes.Slice(12, 4).SequenceEqual(_iNADDR_NONE))
             {
                return false;
             }
 
             //// 0
-            if (bytes.Slice(12, 4).SequenceEqual(anyIPv4))
+            if (bytes.Slice(12, 4).SequenceEqual(_anyIPv4))
             {
                return false;
             }

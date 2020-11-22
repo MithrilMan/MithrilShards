@@ -17,15 +17,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    /// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.IBlockHeaderRepository" />
    public class InMemoryBlockHeaderRepository : IBlockHeaderRepository
    {
-      private readonly Dictionary<UInt256, BlockHeader> headers = new Dictionary<UInt256, BlockHeader>();
-      private readonly ReaderWriterLockSlim theLock = new ReaderWriterLockSlim();
-      readonly ILogger<InMemoryBlockHeaderRepository> logger;
-      readonly IEventBus eventBus;
+      private readonly Dictionary<UInt256, BlockHeader> _headers = new Dictionary<UInt256, BlockHeader>();
+      private readonly ReaderWriterLockSlim _theLock = new ReaderWriterLockSlim();
+      readonly ILogger<InMemoryBlockHeaderRepository> _logger;
+      readonly IEventBus _eventBus;
 
       public InMemoryBlockHeaderRepository(ILogger<InMemoryBlockHeaderRepository> logger, IEventBus eventBus)
       {
-         this.logger = logger;
-         this.eventBus = eventBus;
+         this._logger = logger;
+         this._eventBus = eventBus;
       }
 
       /// <summary>
@@ -45,22 +45,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          if (hash == null) throw new NullReferenceException("Block Header hash cannot be null");
 
          bool success;
-         using (new WriteLock(this.theLock))
+         using (new WriteLock(this._theLock))
          {
-            if (this.headers.ContainsKey(hash))
+            if (this._headers.ContainsKey(hash))
             {
                success = false;
             }
             else
             {
-               this.headers[hash] = header;
+               this._headers[hash] = header;
                success = true;
             }
          }
 
          if (success)
          {
-            this.eventBus.Publish(new BlockHeaderAddedToRepository(header));
+            this._eventBus.Publish(new BlockHeaderAddedToRepository(header));
          }
 
          return success;
@@ -78,9 +78,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          if (hash is null) throw new ArgumentNullException(nameof(hash));
 
-         using (new ReadLock(this.theLock))
+         using (new ReadLock(this._theLock))
          {
-            return this.headers.TryGetValue(hash, out header!);
+            return this._headers.TryGetValue(hash, out header!);
          }
       }
    }

@@ -25,7 +25,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public override BlockMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
-         ProtocolTypeSerializerOptions options = new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, peerContext.CanServeWitness));
+         var options = new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, peerContext.CanServeWitness));
 
          return new BlockMessage { Block = reader.ReadWithSerializer(protocolVersion, this.blockSerializer, options) };
       }
