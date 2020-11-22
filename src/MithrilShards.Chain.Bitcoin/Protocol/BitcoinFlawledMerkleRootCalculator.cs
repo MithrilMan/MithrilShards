@@ -61,7 +61,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public BitcoinFlawedMerkleRootCalculator(ILogger<BitcoinFlawedMerkleRootCalculator> logger)
       {
-         this._logger = logger;
+         _logger = logger;
       }
 
       public UInt256 ComputeMerkleRoot(IList<UInt256> hashes)

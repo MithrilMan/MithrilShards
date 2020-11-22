@@ -10,7 +10,7 @@
 
       public PeerConnectionAttemptFailed(IPeerContext peerContext, string reason) : base(peerContext)
       {
-         this.Reason = reason;
+         Reason = reason;
       }
    }
 }

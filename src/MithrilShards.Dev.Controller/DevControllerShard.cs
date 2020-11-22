@@ -30,19 +30,19 @@ namespace MithrilShards.Dev.Controller
 
       public DevControllerShard(ILogger<DevControllerShard> logger, IOptions<DevControllerSettings> options, IServiceCollection registeredServices, IServiceProvider serviceProvider, IHostApplicationLifetime hostApplicationLifetime, DevAssemblyScaffolder devAssemblyScaffolder)
       {
-         this._logger = logger;
-         this._registeredServices = registeredServices;
-         this._serviceProvider = serviceProvider;
-         this._hostApplicationLifetime = hostApplicationLifetime;
-         this._devAssemblyScaffolder = devAssemblyScaffolder;
-         this._settings = options.Value;
+         _logger = logger;
+         _registeredServices = registeredServices;
+         _serviceProvider = serviceProvider;
+         _hostApplicationLifetime = hostApplicationLifetime;
+         _devAssemblyScaffolder = devAssemblyScaffolder;
+         _settings = options.Value;
       }
 
       public ValueTask InitializeAsync(CancellationToken cancellationToken)
       {
          if (!_settings.Enabled)
          {
-            this._logger.LogWarning($"{nameof(DevControllerSettings)} disabled, Dev API will not be available");
+            _logger.LogWarning($"{nameof(DevControllerSettings)} disabled, Dev API will not be available");
 
             return default;
          }
@@ -53,7 +53,7 @@ namespace MithrilShards.Dev.Controller
          }
 
 
-         this._webHost = new WebHostBuilder()
+         _webHost = new WebHostBuilder()
             .UseContentRoot(Directory.GetCurrentDirectory())
             .UseKestrel(serverOptions => { serverOptions.Listen(iPEndPoint); })
             .Configure(app => app
@@ -100,9 +100,9 @@ namespace MithrilShards.Dev.Controller
                   })
                   .AddMvcOptions(options => options.Conventions.Add(new DevControllerConvetion()));
 
-               IEnumerable<Assembly> assembliesToScaffold = this._serviceProvider.GetService<IEnumerable<IMithrilShard>>()
+               IEnumerable<Assembly> assembliesToScaffold = _serviceProvider.GetService<IEnumerable<IMithrilShard>>()
                   .Select(shard => shard.GetType().Assembly)
-                  .Concat(this._devAssemblyScaffolder?.GetAssemblies());
+                  .Concat(_devAssemblyScaffolder?.GetAssemblies());
 
                foreach (Assembly shardAssembly in assembliesToScaffold)
                {
@@ -122,7 +122,7 @@ namespace MithrilShards.Dev.Controller
               {
                  try
                  {
-                    this._logger.LogInformation("DevController API started, listening to endpoint {ListenerLocalEndpoint}/swagger.", _settings.EndPoint);
+                    _logger.LogInformation("DevController API started, listening to endpoint {ListenerLocalEndpoint}/swagger.", _settings.EndPoint);
                     await _webHost.StartAsync(cancellationToken).ConfigureAwait(false);
                  }
                  catch (OperationCanceledException)
@@ -131,7 +131,7 @@ namespace MithrilShards.Dev.Controller
                  }
                  catch (Exception ex)
                  {
-                    this._logger.LogCritical(ex, "DevController API exception, {DevControllerException}. App will still run, without DevController funtionality", ex.Message);
+                    _logger.LogCritical(ex, "DevController API exception, {DevControllerException}. App will still run, without DevController funtionality", ex.Message);
                     // if we want to stop the application in case of exception, uncomment line below
                     // hostApplicationLifetime.StopApplication();
                  }

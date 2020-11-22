@@ -54,11 +54,11 @@ namespace MithrilShards.Chain.Events
                                             int newHeadersFoundCount,
                                             IPeerContext? peerContext)
       {
-         this.ValidatedHeadersCount = validatedHeaders;
-         this.LastValidatedBlockHeader = lastValidatedBlockHeader;
-         this.LastValidatedHeaderNode = lastValidatedHeaderNode;
-         this.NewHeadersFoundCount = newHeadersFoundCount;
-         this.PeerContext = peerContext;
+         ValidatedHeadersCount = validatedHeaders;
+         LastValidatedBlockHeader = lastValidatedBlockHeader;
+         LastValidatedHeaderNode = lastValidatedHeaderNode;
+         NewHeadersFoundCount = newHeadersFoundCount;
+         PeerContext = peerContext;
       }
    }
 }

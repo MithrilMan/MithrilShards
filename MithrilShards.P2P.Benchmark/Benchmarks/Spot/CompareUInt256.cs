@@ -21,30 +21,30 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         var random = new Random(this.N);
-         random.NextBytes(this._data1);
-         this._reference1 = new Core.DataTypes.UInt256(this._data1);
+         var random = new Random(N);
+         random.NextBytes(_data1);
+         _reference1 = new Core.DataTypes.UInt256(_data1);
 
-         random.NextBytes(this._data2);
-         this._reference2 = new Core.DataTypes.UInt256(this._data2);
+         random.NextBytes(_data2);
+         _reference2 = new Core.DataTypes.UInt256(_data2);
       }
 
       [Benchmark]
       public bool As256()
       {
-         return  DoubleSha512AsUInt256(this._data1) < (this._reference2);
+         return  DoubleSha512AsUInt256(_data1) < (_reference2);
       }
 
       [Benchmark]
       public bool As256FromBytes()
       {
-         return new Core.DataTypes.UInt256(DoubleSha512AsBytes(this._data1)) < (this._reference2);
+         return new Core.DataTypes.UInt256(DoubleSha512AsBytes(_data1)) < (_reference2);
       }
 
       [Benchmark]
       public bool AsBytes()
       {
-         return DoubleSha512AsBytes(this._data1).SequenceCompareTo(_data2) == -1;
+         return DoubleSha512AsBytes(_data1).SequenceCompareTo(_data2) == -1;
       }
 
 

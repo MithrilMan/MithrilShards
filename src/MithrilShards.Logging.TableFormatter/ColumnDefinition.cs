@@ -10,9 +10,9 @@ namespace MithrilShards.Logging.TableFormatter
 
       public ColumnDefinition()
       {
-         this.Label = String.Empty;
-         this.Width = 20;
-         this.Alignment = ColumnAlignment.Left;
+         Label = String.Empty;
+         Width = 20;
+         Alignment = ColumnAlignment.Left;
       }
    }
 }

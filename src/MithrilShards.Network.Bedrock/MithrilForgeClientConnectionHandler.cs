@@ -29,11 +29,11 @@ namespace MithrilShards.Network.Bedrock
                                                  INetworkMessageProcessorFactory networkMessageProcessorFactory,
                                                  IPeerContextFactory peerContextFactory)
       {
-         this._logger = logger;
-         this._serviceProvider = serviceProvider;
-         this._eventBus = eventBus;
-         this._networkMessageProcessorFactory = networkMessageProcessorFactory;
-         this._peerContextFactory = peerContextFactory;
+         _logger = logger;
+         _serviceProvider = serviceProvider;
+         _eventBus = eventBus;
+         _networkMessageProcessorFactory = networkMessageProcessorFactory;
+         _peerContextFactory = peerContextFactory;
       }
 
       public override async Task OnConnectedAsync(ConnectionContext connection)
@@ -46,12 +46,12 @@ namespace MithrilShards.Network.Bedrock
             throw new ArgumentNullException(nameof(connection));
          }
 
-         using IDisposable logScope = this._logger.BeginScope("Peer {PeerId} connected to outbound {PeerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
+         using IDisposable logScope = _logger.BeginScope("Peer {PeerId} connected to outbound {PeerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
 
          ProtocolReader reader = connection.CreateReader();
          INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
-         using IPeerContext peerContext = this._peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
+         using IPeerContext peerContext = _peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
                                                                                             connection.LocalEndPoint,
                                                                                             connection.Features.Get<OutgoingConnectionEndPoint>(),
                                                                                             new NetworkMessageWriter(protocol, connection.CreateWriter()));
@@ -61,10 +61,10 @@ namespace MithrilShards.Network.Bedrock
 
          protocol.SetPeerContext(peerContext);
 
-         this._eventBus.Publish(new PeerConnected(peerContext));
+         _eventBus.Publish(new PeerConnected(peerContext));
 
 
-         await this._networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
+         await _networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
 
 
          while (true)
@@ -83,7 +83,7 @@ namespace MithrilShards.Network.Bedrock
                   break;
                }
 
-               await this.ProcessMessageAsync(result.Message, peerContext, connection.ConnectionClosed)
+               await ProcessMessageAsync(result.Message, peerContext, connection.ConnectionClosed)
                   .WithCancellationAsync(connection.ConnectionClosed)
                   .ConfigureAwait(false);
             }
@@ -102,12 +102,12 @@ namespace MithrilShards.Network.Bedrock
 
       private async Task ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
       {
-         using IDisposable logScope = this._logger.BeginScope("Processing message '{Command}'", message.Command);
+         using IDisposable logScope = _logger.BeginScope("Processing message '{Command}'", message.Command);
 
          if (!(message is UnknownMessage))
          {
-            await this._networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
-            this._eventBus.Publish(new PeerMessageReceived(peerContext, message));
+            await _networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
+            _eventBus.Publish(new PeerMessageReceived(peerContext, message));
          }
       }
    }

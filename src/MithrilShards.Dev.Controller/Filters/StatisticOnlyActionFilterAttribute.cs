@@ -10,12 +10,12 @@ namespace MithrilShards.Dev.Controller
 
       public StatisticOnlyActionFilterAttribute(IStatisticFeedsCollector? statisticFeedsCollector = null)
       {
-         this._statisticFeedsCollector = statisticFeedsCollector;
+         _statisticFeedsCollector = statisticFeedsCollector;
       }
 
       public override void OnActionExecuting(ActionExecutingContext context)
       {
-         if (this._statisticFeedsCollector == null || this._statisticFeedsCollector is StatisticFeedsCollectorNullImplementation)
+         if (_statisticFeedsCollector == null || _statisticFeedsCollector is StatisticFeedsCollectorNullImplementation)
          {
             context.Result = new NotFoundObjectResult($"Cannot produce output because {nameof(IStatisticFeedsCollector)} is not available");
             return;

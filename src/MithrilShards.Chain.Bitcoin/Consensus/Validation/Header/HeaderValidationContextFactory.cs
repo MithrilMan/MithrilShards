@@ -16,14 +16,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
                                             IInitialBlockDownloadTracker initialBlockDownloadState,
                                             IChainState chainState)
       {
-         this._logger = logger;
-         this._initialBlockDownloadState = initialBlockDownloadState;
-         this._chainState = chainState;
+         _logger = logger;
+         _initialBlockDownloadState = initialBlockDownloadState;
+         _chainState = chainState;
       }
 
       public IHeaderValidationContext Create(BlockHeader header)
       {
-         return new HeaderValidationContext(_logger, header, this._initialBlockDownloadState.IsDownloadingBlocks(), this._chainState);
+         return new HeaderValidationContext(_logger, header, _initialBlockDownloadState.IsDownloadingBlocks(), _chainState);
       }
    }
 }

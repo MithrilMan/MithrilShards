@@ -24,15 +24,15 @@ namespace MithrilShards.Chain.Bitcoin.Network
                                       IRandomNumberGenerator randomNumberGenerator,
                                       IPeriodicWork periodicPeerHealthCheck) : base(logger, eventBus, statisticFeedsCollector, connectors)
       {
-         this._randomNumberGenerator = randomNumberGenerator;
-         this._periodicPeerHealthCheck = periodicPeerHealthCheck;
+         _randomNumberGenerator = randomNumberGenerator;
+         _periodicPeerHealthCheck = periodicPeerHealthCheck;
       }
 
       public override Task StartAsync(CancellationToken cancellationToken)
       {
-         _ = this._periodicPeerHealthCheck.StartAsync(
+         _ = _periodicPeerHealthCheck.StartAsync(
                label: nameof(_periodicPeerHealthCheck),
-               work: this.StartCheckingPeerHealthAsync,
+               work: StartCheckingPeerHealthAsync,
                interval: TimeSpan.FromSeconds(10),
                cancellation: cancellationToken
             );

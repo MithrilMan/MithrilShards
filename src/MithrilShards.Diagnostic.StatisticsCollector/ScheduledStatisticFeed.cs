@@ -60,11 +60,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
       public ScheduledStatisticFeed(IStatisticFeedsProvider source, StatisticFeedDefinition statisticFeedDefinition)
       {
-         this.Source = source ?? throw new ArgumentNullException(nameof(source));
-         this.StatisticFeedDefinition = statisticFeedDefinition ?? throw new ArgumentNullException(nameof(statisticFeedDefinition));
-         this.NextPlannedExecution = DateTime.Now + statisticFeedDefinition.FrequencyTarget;
+         Source = source ?? throw new ArgumentNullException(nameof(source));
+         StatisticFeedDefinition = statisticFeedDefinition ?? throw new ArgumentNullException(nameof(statisticFeedDefinition));
+         NextPlannedExecution = DateTime.Now + statisticFeedDefinition.FrequencyTarget;
 
-         this._tableBuilder = this.CreateTableBuilder();
+         _tableBuilder = CreateTableBuilder();
       }
 
       /// <summary>
@@ -74,9 +74,9 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       private TableBuilder CreateTableBuilder()
       {
-         var tableBuilder = new TableBuilder(this._stringBuilder);
+         var tableBuilder = new TableBuilder(_stringBuilder);
 
-         foreach (FieldDefinition field in this.StatisticFeedDefinition.FieldsDefinition)
+         foreach (FieldDefinition field in StatisticFeedDefinition.FieldsDefinition)
          {
             tableBuilder.AddColumn(new ColumnDefinition { Label = field.Label, Width = field.WidthHint, Alignment = ColumnAlignment.Left });
          }
@@ -94,18 +94,18 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       {
          return System.Text.Json.JsonSerializer.Serialize(new
          {
-            Title = this.StatisticFeedDefinition.Title,
-            Time = this.LastResultsDate,
-            Labels = from fieldDefinition in this.StatisticFeedDefinition.FieldsDefinition select fieldDefinition.Label,
-            Values = this.lastResults
+            Title = StatisticFeedDefinition.Title,
+            Time = LastResultsDate,
+            Labels = from fieldDefinition in StatisticFeedDefinition.FieldsDefinition select fieldDefinition.Label,
+            Values = lastResults
          });
       }
 
       public void SetLastResults(IEnumerable<string?[]> results)
       {
-         this.lastResults.Clear();
-         this.lastResults.AddRange(results);
-         this.LastResultsDate = DateTime.Now;
+         lastResults.Clear();
+         lastResults.AddRange(results);
+         LastResultsDate = DateTime.Now;
       }
 
 
@@ -115,11 +115,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public string GetTabularFeed()
       {
-         this._stringBuilder.Clear();
-         this._tableBuilder.Start($"{this.LastResultsDate.LocalDateTime} - {this.StatisticFeedDefinition.Title}");
-         this.lastResults.ForEach(row => this._tableBuilder.DrawRow(row));
-         this._tableBuilder.End();
-         return this._stringBuilder.ToString();
+         _stringBuilder.Clear();
+         _tableBuilder.Start($"{LastResultsDate.LocalDateTime} - {StatisticFeedDefinition.Title}");
+         lastResults.ForEach(row => _tableBuilder.DrawRow(row));
+         _tableBuilder.End();
+         return _stringBuilder.ToString();
       }
    }
 }

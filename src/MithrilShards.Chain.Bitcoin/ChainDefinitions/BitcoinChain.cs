@@ -19,15 +19,15 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
       public BitcoinChain(IBlockHeaderHashCalculator blockHeaderHashCalculator)
       {
-         this._blockHeaderHashCalculator = blockHeaderHashCalculator;
+         _blockHeaderHashCalculator = blockHeaderHashCalculator;
 
-         this.Initialize();
+         Initialize();
       }
 
       protected void Initialize()
       {
-         this.NetworkDefinition = this.ConfigureNetwork();
-         this.Consensus = this.ConfigureConsensus();
+         NetworkDefinition = ConfigureNetwork();
+         Consensus = ConfigureConsensus();
       }
 
       public abstract BitcoinNetworkDefinition ConfigureNetwork();
@@ -36,7 +36,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
 
       protected UInt256 ComputeHash(BlockHeader header)
       {
-         return this._blockHeaderHashCalculator.ComputeHash(header, protocolVersion: 0); //protocol version doesn't matter for hash
+         return _blockHeaderHashCalculator.ComputeHash(header, protocolVersion: 0); //protocol version doesn't matter for hash
       }
    }
 }

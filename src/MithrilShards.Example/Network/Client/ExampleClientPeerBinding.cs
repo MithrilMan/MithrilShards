@@ -17,7 +17,7 @@ namespace MithrilShards.Example.Network.Client
       {
          endPoint = null;
 
-         if (!IPEndPoint.TryParse(this.EndPoint, out IPEndPoint ipEndPoint))
+         if (!IPEndPoint.TryParse(EndPoint, out IPEndPoint ipEndPoint))
          {
             return false;
          }

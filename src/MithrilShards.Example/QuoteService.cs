@@ -14,8 +14,8 @@ namespace MithrilShards.Example
 
       public QuoteService(ILogger<QuoteService> logger, IRandomNumberGenerator randomNumberGenerator)
       {
-         this._logger = logger;
-         this._randomNumberGenerator = randomNumberGenerator;
+         _logger = logger;
+         _randomNumberGenerator = randomNumberGenerator;
       }
 
       public List<string> Quotes { get; } = new List<string>

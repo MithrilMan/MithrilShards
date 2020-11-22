@@ -25,9 +25,9 @@ namespace MithrilShards.Example.Network.Client
                                 IForgeConnectivity forgeConnectivity,
                                 IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
       {
-         this._settings = options.Value!;
+         _settings = options.Value!;
 
-         foreach (ExampleClientPeerBinding peerBinding in this._settings.Connections)
+         foreach (ExampleClientPeerBinding peerBinding in _settings.Connections)
          {
             if (!peerBinding.TryGetExampleEndPoint(out ExampleEndPoint? endPoint))
             {
@@ -37,20 +37,20 @@ namespace MithrilShards.Example.Network.Client
 
             var remoteEndPoint = new OutgoingConnectionEndPoint(endPoint);
             remoteEndPoint.Items[nameof(endPoint.MyExtraInformation)] = endPoint.MyExtraInformation;
-            this._connectionsToAttempt.Add(remoteEndPoint);
+            _connectionsToAttempt.Add(remoteEndPoint);
          }
       }
 
       protected override async ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation)
       {
-         foreach (OutgoingConnectionEndPoint endPoint in this._connectionsToAttempt)
+         foreach (OutgoingConnectionEndPoint endPoint in _connectionsToAttempt)
          {
             if (cancellation.IsCancellationRequested) break;
 
             if (connectionManager.CanConnectTo(endPoint.EndPoint))
             {
                // note that AttemptConnection is not blocking because it returns when the peer fails to connect or when one of the parties disconnect
-               _ = this.forgeConnectivity.AttemptConnectionAsync(endPoint, cancellation).ConfigureAwait(false);
+               _ = forgeConnectivity.AttemptConnectionAsync(endPoint, cancellation).ConfigureAwait(false);
 
                // apply a delay between attempts to prevent too many connection attempt in a row
                await Task.Delay(INNER_DELAY).ConfigureAwait(false);

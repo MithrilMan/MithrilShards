@@ -23,8 +23,8 @@
 
       public NodeImplementation(int minimumSupportedVersion, int implementationVersion)
       {
-         this.MinimumSupportedVersion = minimumSupportedVersion;
-         this.ImplementationVersion = implementationVersion;
+         MinimumSupportedVersion = minimumSupportedVersion;
+         ImplementationVersion = implementationVersion;
       }
    }
 }

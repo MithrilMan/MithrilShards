@@ -16,8 +16,8 @@ namespace MithrilShards.Core.EventBus
 
       public Subscription(Action<TEventBase> action, SubscriptionToken token)
       {
-         this._action = action ?? throw new ArgumentNullException(nameof(action));
-         this.SubscriptionToken = token ?? throw new ArgumentNullException(nameof(token));
+         _action = action ?? throw new ArgumentNullException(nameof(action));
+         SubscriptionToken = token ?? throw new ArgumentNullException(nameof(token));
       }
 
       public void Publish(EventBase eventItem)
@@ -29,7 +29,7 @@ namespace MithrilShards.Core.EventBus
             throw new ArgumentException("Event Item is not the correct type.");
          }
 
-         this._action.Invoke((TEventBase)eventItem);
+         _action.Invoke((TEventBase)eventItem);
       }
    }
 }

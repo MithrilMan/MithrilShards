@@ -24,8 +24,8 @@
 
       public QueuedBlock(HeaderNode headerNode, IBlockFetcher fetcher /*TODO: ,PartiallyDownloadedBlock partialBlock*/)
       {
-         this.HeaderNode = headerNode;
-         this.Fetcher = fetcher;
+         HeaderNode = headerNode;
+         Fetcher = fetcher;
       }
    }
 }

@@ -31,9 +31,9 @@ namespace MithrilShards.Chain.Events
       /// <param name="peerContext">The peer context.</param>
       public BlockHeaderValidationFailed(BlockHeader failedBlockHeader, BlockValidationState validationState, IPeerContext? peerContext)
       {
-         this.FailedBlockHeader = failedBlockHeader;
-         this.ValidationState = validationState;
-         this.PeerContext = peerContext;
+         FailedBlockHeader = failedBlockHeader;
+         ValidationState = validationState;
+         PeerContext = peerContext;
       }
    }
 }

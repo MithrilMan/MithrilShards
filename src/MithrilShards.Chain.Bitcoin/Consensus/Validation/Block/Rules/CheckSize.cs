@@ -15,9 +15,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
 
       public CheckSize(ILogger<CheckSize> logger, IProtocolTypeSerializer<Protocol.Types.Block> blockSerializer, IConsensusParameters consensusParameters)
       {
-         this._logger = logger;
-         this._blockSerializer = blockSerializer;
-         this._consensusParameters = consensusParameters;
+         _logger = logger;
+         _blockSerializer = blockSerializer;
+         _consensusParameters = consensusParameters;
       }
 
 
@@ -41,7 +41,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
       {
          var buffer = new PooledByteBufferWriter(block.Transactions!.Length * 256);
 
-         return this._blockSerializer.Serialize(
+         return _blockSerializer.Serialize(
             block,
             KnownVersion.CurrentVersion,
             new PooledByteBufferWriter(block.Transactions!.Length * 256),

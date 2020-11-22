@@ -14,13 +14,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public TransactionHashCalculator(IProtocolTypeSerializer<Transaction> transactionSerializer)
       {
-         this._transactionSerializer = transactionSerializer;
+         _transactionSerializer = transactionSerializer;
       }
 
       public UInt256 ComputeHash(Transaction transaction, int protocolVersion)
       {
          var buffer = new ArrayBufferWriter<byte>();
-         this._transactionSerializer.Serialize(transaction,
+         _transactionSerializer.Serialize(transaction,
                                               protocolVersion,
                                               buffer,
                                               new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
@@ -31,7 +31,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
       public UInt256 ComputeWitnessHash(Transaction transaction, int protocolVersion)
       {
          var buffer = new ArrayBufferWriter<byte>();
-         this._transactionSerializer.Serialize(transaction,
+         _transactionSerializer.Serialize(transaction,
                                               protocolVersion,
                                               buffer,
                                               new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, transaction.HasWitness())));

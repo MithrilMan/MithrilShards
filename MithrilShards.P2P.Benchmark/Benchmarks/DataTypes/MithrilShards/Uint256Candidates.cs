@@ -16,8 +16,8 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
       /// <param name="input">The data.</param>
       public unsafe UnsafeUInt256(ReadOnlySpan<byte> input)
       {
-         this._bytes = new byte[EXPECTED_SIZE];
-         fixed (byte* p = this._bytes)
+         _bytes = new byte[EXPECTED_SIZE];
+         fixed (byte* p = _bytes)
          {
             var span = new Span<byte>(p, EXPECTED_SIZE);
             input[..EXPECTED_SIZE].CopyTo(span);
@@ -27,7 +27,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
       public override string ToString()
       {
          Span<byte> span = stackalloc byte[32];
-         this._bytes.CopyTo(span);
+         _bytes.CopyTo(span);
          span.Reverse();
          return _encoder.EncodeData(span.ToArray());
       }
@@ -51,12 +51,12 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
             throw new FormatException("the byte array should be 32 bytes long");
          }
 
-         this._data = MemoryMarshal.Cast<byte, long>(input).ToArray();
+         _data = MemoryMarshal.Cast<byte, long>(input).ToArray();
       }
 
       public override string ToString()
       {
-         Span<byte> toBeReversed = MemoryMarshal.Cast<long, byte>(this._data).ToArray();
+         Span<byte> toBeReversed = MemoryMarshal.Cast<long, byte>(_data).ToArray();
          toBeReversed.Reverse();
          return _encoder.EncodeData(toBeReversed.ToArray());
       }
@@ -79,13 +79,13 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
       /// <param name="data">The data.</param>
       public UInt256As4Jhon(ReadOnlySpan<byte> input)
       {
-         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this._part1, EXPECTED_SIZE / sizeof(ulong)));
+         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _part1, EXPECTED_SIZE / sizeof(ulong)));
          input[..EXPECTED_SIZE].CopyTo(dst);
       }
 
       public override string ToString()
       {
-         ulong[] arr = new ulong[] { this._part1, this._part2, this._part3, this._part4 };
+         ulong[] arr = new ulong[] { _part1, _part2, _part3, _part4 };
          Span<byte> toBeReversed = MemoryMarshal.Cast<ulong, byte>(arr).ToArray();
          toBeReversed.Reverse();
          return _encoder.EncodeData(toBeReversed.ToArray());
@@ -109,7 +109,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
       /// <param name="data">The data.</param>
       public unsafe UnsafeUInt256As4Long(ReadOnlySpan<byte> input)
       {
-         fixed (ulong* p = &this._data1)
+         fixed (ulong* p = &_data1)
          {
             var dst = new Span<byte>(p, EXPECTED_SIZE);
             input[..EXPECTED_SIZE].CopyTo(dst);

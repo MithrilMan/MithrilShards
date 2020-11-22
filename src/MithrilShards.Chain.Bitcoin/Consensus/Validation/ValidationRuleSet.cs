@@ -21,20 +21,20 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
          public RuleDefinition(TValidationRule rule, uint preferredExecutionOrder)
          {
-            this.Rule = rule;
-            this.PreferredExecutionOrder = preferredExecutionOrder;
+            Rule = rule;
+            PreferredExecutionOrder = preferredExecutionOrder;
          }
 
          public void ExecuteAfter(TValidationRule rule)
          {
-            this._executeAfter.Add(rule);
+            _executeAfter.Add(rule);
          }
       }
 
       protected readonly ILogger<ValidationRuleSet<TValidationRule>> logger;
       protected List<TValidationRule> rules;
 
-      public IEnumerable<TValidationRule> Rules => this.rules;
+      public IEnumerable<TValidationRule> Rules => rules;
 
       public ValidationRuleSet(ILogger<ValidationRuleSet<TValidationRule>> logger, IEnumerable<TValidationRule> rules)
       {
@@ -46,7 +46,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       {
          using IDisposable logScope = logger.BeginScope("Setting up validation rules for {ValidationRuleType}", typeof(TValidationRule));
 
-         List<RuleDefinition> definitions = this.VerifyValidationRules();
+         List<RuleDefinition> definitions = VerifyValidationRules();
 
          // definitions now contains a list of rule definitions with all data needed to sort them
          // use topological sorting to solve dependency graph
@@ -69,12 +69,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
             ThrowHelper.ThrowNotSupportedException($"Error configuring {typeof(TValidationRule).Name} rules, circular dependency detected: {circularDependency}");
          }
 
-         this.rules = sorted
+         rules = sorted
             .OrderBy(definition => definition.level)
             .ThenBy(definition => definition.item.PreferredExecutionOrder)
             .Select(definition => definition.item.Rule).ToList();
 
-         logger.LogDebug("Final sorted rules: {SortedRules}", string.Join(", ", this.rules.Select(rule => rule.GetType().Name)));
+         logger.LogDebug("Final sorted rules: {SortedRules}", string.Join(", ", rules.Select(rule => rule.GetType().Name)));
       }
 
       /// <summary>
@@ -97,7 +97,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
          Type validationRulesType = typeof(TValidationRule);
 
          using IDisposable logScope = logger.BeginScope("Verifying validation rules for {ValidationRuleType}", validationRulesType.Name);
-         foreach (TValidationRule rule in this.rules)
+         foreach (TValidationRule rule in rules)
          {
             RulePrecedenceAttribute? precedenceAttribute = rule.GetType().GetCustomAttribute<RulePrecedenceAttribute>();
             var definition = new RuleDefinition(rule, precedenceAttribute?.PreferredExecutionOrder ?? RulePrecedenceAttribute.DEFAULT_EXECUTION_ORDER);

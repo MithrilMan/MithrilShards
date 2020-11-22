@@ -14,12 +14,12 @@ namespace MithrilShards.Core.EventBus
       public EventBase()
       {
          // Assigns an unique id to the event.
-         this.CorrelationId = Guid.NewGuid();
+         CorrelationId = Guid.NewGuid();
       }
 
       public override string ToString()
       {
-         return $"{this.CorrelationId.ToString()} - {this.GetType().Name}";
+         return $"{CorrelationId.ToString()} - {GetType().Name}";
       }
    }
 }

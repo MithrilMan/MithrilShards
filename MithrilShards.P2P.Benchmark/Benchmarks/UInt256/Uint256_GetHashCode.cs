@@ -22,37 +22,37 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
          var value = new Span<byte>(new byte[32]);
          new Random().NextBytes(value);
 
-         this._nBitcoinData = new uint256(value.ToArray());
-         this._mithrilShardsData = new Core.DataTypes.UInt256(value);
+         _nBitcoinData = new uint256(value.ToArray());
+         _mithrilShardsData = new Core.DataTypes.UInt256(value);
 
-         this._long1 = (long)new Random().NextDouble();
-         this._long2 = (long)new Random().NextDouble();
-         this._long3 = (long)new Random().NextDouble();
-         this._long4 = (long)new Random().NextDouble();
+         _long1 = (long)new Random().NextDouble();
+         _long2 = (long)new Random().NextDouble();
+         _long3 = (long)new Random().NextDouble();
+         _long4 = (long)new Random().NextDouble();
       }
 
       [Benchmark(Baseline = true)]
       public int NBitcoin()
       {
-         return this._nBitcoinData.GetHashCode();
+         return _nBitcoinData.GetHashCode();
       }
 
       [Benchmark]
       public int MithrilShards()
       {
-         return this._mithrilShardsData.GetHashCode();
+         return _mithrilShardsData.GetHashCode();
       }
 
       [Benchmark]
       public int Direct()
       {
-         return (int)this._long1;
+         return (int)_long1;
       }
 
       [Benchmark]
       public int Combine()
       {
-         return (int)HashCode.Combine(this._long1, this._long2, this._long3, this._long4);
+         return (int)HashCode.Combine(_long1, _long2, _long3, _long4);
       }
    }
 }

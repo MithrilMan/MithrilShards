@@ -14,15 +14,15 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public GetBlocksMessageSerializer(IProtocolTypeSerializer<BlockLocator> blockLocatorSerializer, IProtocolTypeSerializer<UInt256> uint256Serializer)
       {
-         this._blockLocatorSerializer = blockLocatorSerializer;
-         this._uint256Serializer = uint256Serializer;
+         _blockLocatorSerializer = blockLocatorSerializer;
+         _uint256Serializer = uint256Serializer;
       }
 
       public override void Serialize(GetBlocksMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
       {
          output.WriteUInt(message.Version);
-         output.WriteWithSerializer(message.BlockLocator!, protocolVersion, this._blockLocatorSerializer);
-         output.WriteWithSerializer(message.HashStop!, protocolVersion, this._uint256Serializer);
+         output.WriteWithSerializer(message.BlockLocator!, protocolVersion, _blockLocatorSerializer);
+         output.WriteWithSerializer(message.HashStop!, protocolVersion, _uint256Serializer);
       }
 
       public override GetBlocksMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
@@ -30,8 +30,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
          var message = new GetBlocksMessage
          {
             Version = reader.ReadUInt(),
-            BlockLocator = reader.ReadWithSerializer(protocolVersion, this._blockLocatorSerializer),
-            HashStop = reader.ReadWithSerializer(protocolVersion, this._uint256Serializer)
+            BlockLocator = reader.ReadWithSerializer(protocolVersion, _blockLocatorSerializer),
+            HashStop = reader.ReadWithSerializer(protocolVersion, _uint256Serializer)
          };
 
          return message;

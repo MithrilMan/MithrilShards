@@ -38,13 +38,13 @@ namespace MithrilShards.Core.Network
 
       public void Received(long amount)
       {
-         this.ReceivedBytes += amount;
-         this.LastActivity = DateTimeOffset.UtcNow;
+         ReceivedBytes += amount;
+         LastActivity = DateTimeOffset.UtcNow;
       }
       public void Sent(long amount)
       {
-         this.SentBytes += amount;
-         this.LastActivity = DateTimeOffset.UtcNow;
+         SentBytes += amount;
+         LastActivity = DateTimeOffset.UtcNow;
       }
 
       /// <summary>
@@ -53,8 +53,8 @@ namespace MithrilShards.Core.Network
       /// <param name="amount">The amount.</param>
       public void Wasted(long amount)
       {
-         this.ReceivedBytes += amount;
-         this.WastedBytes += amount;
+         ReceivedBytes += amount;
+         WastedBytes += amount;
       }
    }
 }

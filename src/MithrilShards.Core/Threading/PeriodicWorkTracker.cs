@@ -17,16 +17,16 @@ namespace MithrilShards.Core.Threading
 
       public PeriodicWorkTracker(ILogger<PeriodicWorkTracker> logger, IStatisticFeedsCollector statisticFeedsCollector)
       {
-         this._logger = logger;
-         this._statisticFeedsCollector = statisticFeedsCollector;
+         _logger = logger;
+         _statisticFeedsCollector = statisticFeedsCollector;
 
-         this.RegisterStatisticFeeds();
+         RegisterStatisticFeeds();
       }
 
       public void StartTracking(IPeriodicWork work)
       {
-         this._works[work.Id] = work;
-         this._logger.LogDebug("Start tracking IPeriodicWork {IPeriodicWorkId} ({IPeriodicWorkLabel})", work.Id, work.Label);
+         _works[work.Id] = work;
+         _logger.LogDebug("Start tracking IPeriodicWork {IPeriodicWorkId} ({IPeriodicWorkLabel})", work.Id, work.Label);
       }
 
       public void StopTracking(IPeriodicWork work)
@@ -36,15 +36,15 @@ namespace MithrilShards.Core.Threading
             ThrowHelper.ThrowArgumentNullException(nameof(work));
          }
 
-         if (this._works.TryRemove(work.Id, out IPeriodicWork? removedItem))
+         if (_works.TryRemove(work.Id, out IPeriodicWork? removedItem))
          {
-            this._logger.LogDebug("Stop tracking IPeriodicWork {IPeriodicWorkId} ({IPeriodicWorkLabel})", removedItem.Id, removedItem.Label);
+            _logger.LogDebug("Stop tracking IPeriodicWork {IPeriodicWorkId} ({IPeriodicWorkLabel})", removedItem.Id, removedItem.Label);
          }
       }
 
       public void RegisterStatisticFeeds()
       {
-         this._statisticFeedsCollector.RegisterStatisticFeeds(this,
+         _statisticFeedsCollector.RegisterStatisticFeeds(this,
             new StatisticFeedDefinition(
                FEED_PERIODIC_WORKS,
                "Periodic Works",
@@ -95,7 +95,7 @@ namespace MithrilShards.Core.Threading
          switch (feedId)
          {
             case FEED_PERIODIC_WORKS:
-               return this._works.Values
+               return _works.Values
                   .ToList() //copy values
                   .Select(w => new object?[] {
                      w.Id,

@@ -9,7 +9,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
 
       public CheckCoinbase(ILogger<CheckCoinbase> logger)
       {
-         this._logger = logger;
+         _logger = logger;
       }
 
 

@@ -10,12 +10,12 @@ namespace MithrilShards.Core.Network.Protocol
 
       public string Command { get; }
 
-      public ReadOnlySpan<byte> Payload => this._payload;
+      public ReadOnlySpan<byte> Payload => _payload;
 
       public UnknownMessage(string command, byte[] payload)
       {
-         this.Command = command ?? throw new ArgumentNullException(nameof(command));
-         this._payload = payload;
+         Command = command ?? throw new ArgumentNullException(nameof(command));
+         _payload = payload;
       }
    }
 }

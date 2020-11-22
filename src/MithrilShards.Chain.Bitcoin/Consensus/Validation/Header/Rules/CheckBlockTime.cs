@@ -22,9 +22,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
                             IHeaderMedianTimeCalculator headerMedianTimeCalculator,
                             IDateTimeProvider dateTimeProvider)
       {
-         this._logger = logger;
-         this._headerMedianTimeCalculator = headerMedianTimeCalculator;
-         this._dateTimeProvider = dateTimeProvider;
+         _logger = logger;
+         _headerMedianTimeCalculator = headerMedianTimeCalculator;
+         _dateTimeProvider = dateTimeProvider;
       }
 
       public bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
@@ -35,14 +35,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
             return false;
          }
 
-         if (context.Header.TimeStamp <= this._headerMedianTimeCalculator.Calculate(previousHeaderNode!.Hash, previousHeaderNode.Height))
+         if (context.Header.TimeStamp <= _headerMedianTimeCalculator.Calculate(previousHeaderNode!.Hash, previousHeaderNode.Height))
          {
             validationState.Invalid(BlockValidationStateResults.InvalidHeader, "time-too-old", "block's timestamp is too early");
             return false;
          }
 
          // Check timestamp.
-         if (context.Header.TimeStamp > (this._dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() + MAX_FUTURE_BLOCK_TIME))
+         if (context.Header.TimeStamp > (_dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() + MAX_FUTURE_BLOCK_TIME))
          {
             validationState.Invalid(BlockValidationStateResults.TimeFuture, "time-too-new", "block timestamp too far in the future");
             return false;

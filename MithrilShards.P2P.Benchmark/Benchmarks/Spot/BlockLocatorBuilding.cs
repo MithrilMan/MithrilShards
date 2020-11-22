@@ -16,11 +16,11 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public Span<int> Log()
       {
-         int itemsToAdd = this.top_height <= 10 ? (this.top_height + 1) : (10 + (int)Math.Ceiling(Math.Log2(this.top_height)));
+         int itemsToAdd = top_height <= 10 ? (top_height + 1) : (10 + (int)Math.Ceiling(Math.Log2(top_height)));
          var indexes = new Span<int>(ArrayPool<int>.Shared.Rent(itemsToAdd), 0, itemsToAdd);
 
          int index = 0;
-         int current = this.top_height;
+         int current = top_height;
          while (index < 10 && current > 0)
          {
             indexes[index++] = current--;
@@ -46,7 +46,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
          var indexes = new List<int>();
 
          // Start at the top of the chain and work backwards.
-         for (int index = this.top_height; index > 0; index -= step)
+         for (int index = top_height; index > 0; index -= step)
          {
             // Push top 10 indexes first, then back off exponentially.
             if (indexes.Count >= 10)

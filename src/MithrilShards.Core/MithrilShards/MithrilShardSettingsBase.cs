@@ -16,7 +16,7 @@ namespace MithrilShards.Core.MithrilShards
          get
          {
             const string partToRemove = "settings";
-            string name = this.GetType().Name;
+            string name = GetType().Name;
             if (name.EndsWith(partToRemove, true, CultureInfo.InvariantCulture))
             {
                name = name.Substring(0, name.Length - partToRemove.Length);

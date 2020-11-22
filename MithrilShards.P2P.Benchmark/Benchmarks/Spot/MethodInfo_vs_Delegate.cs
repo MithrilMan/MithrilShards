@@ -47,7 +47,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         this._classInstance = new Foo();
+         _classInstance = new Foo();
 
          Type refType = typeof(IFoo<>);
          Type processorType = typeof(Foo);
@@ -56,7 +56,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
             .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == refType)
             .Select(i => i.GetGenericArguments().First());
 
-         Type handledMessageType = this._messageInstance.GetType();
+         Type handledMessageType = _messageInstance.GetType();
          Type concreteMessageHandlerType = refType.MakeGenericType(handledMessageType);
 
          MethodInfo method = processorType.GetInterfaceMap(concreteMessageHandlerType).TargetMethods
@@ -65,41 +65,41 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
             .First();
 
          Type delegateType = Expression.GetFuncType(handledMessageType, typeof(CancellationToken), typeof(ValueTask<bool>));
-         this._method = method;
-         this._computedDelegate = Delegate.CreateDelegate(delegateType, this._classInstance, method);
+         _method = method;
+         _computedDelegate = Delegate.CreateDelegate(delegateType, _classInstance, method);
 
-         this._lambdaWrapper = createWrapperFunc(this._method);
+         _lambdaWrapper = createWrapperFunc(_method);
       }
 
 
       [Benchmark]
       public object DirectCall()
       {
-         return this._classInstance.ProcessMessageAsync(this._messageInstance, default);
+         return _classInstance.ProcessMessageAsync(_messageInstance, default);
       }
 
       [Benchmark]
       public object UsingMethodInfo()
       {
-         return this._method.Invoke(this._classInstance, new object[] { this._messageInstance, default });
+         return _method.Invoke(_classInstance, new object[] { _messageInstance, default });
       }
 
       [Benchmark]
       public void UsingDelegate()
       {
-         this._computedDelegate.DynamicInvoke(this._messageInstance, default);
+         _computedDelegate.DynamicInvoke(_messageInstance, default);
       }
 
       [Benchmark]
       public void UsingDelegateMethod()
       {
-         this._computedDelegate.Method.Invoke(this._classInstance, new object[] { this._messageInstance, default });
+         _computedDelegate.Method.Invoke(_classInstance, new object[] { _messageInstance, default });
       }
 
       [Benchmark]
       public void UsingLambdaWrapper()
       {
-         this._lambdaWrapper.Invoke(this._classInstance, new object[] { this._messageInstance, (CancellationToken)default });
+         _lambdaWrapper.Invoke(_classInstance, new object[] { _messageInstance, (CancellationToken)default });
       }
 
       private static Func<object, object[], object> createWrapperFunc(MethodInfo method)

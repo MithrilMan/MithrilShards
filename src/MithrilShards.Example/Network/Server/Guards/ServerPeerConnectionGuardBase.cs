@@ -13,15 +13,15 @@ namespace MithrilShards.Example.Network.Server.Guards
       public ServerPeerConnectionGuardBase(ILogger logger, IOptions<ForgeConnectivitySettings> options)
       {
          this.logger = logger;
-         this.settings = options.Value;
+         settings = options.Value;
       }
 
       public ServerPeerConnectionGuardResult Check(IPeerContext peerContext)
       {
-         string? denyReason = this.TryGetDenyReason(peerContext);
+         string? denyReason = TryGetDenyReason(peerContext);
          if (!string.IsNullOrEmpty(denyReason))
          {
-            this.logger.LogDebug("Peer connection guard not passed: {denyReason}", denyReason);
+            logger.LogDebug("Peer connection guard not passed: {denyReason}", denyReason);
             return ServerPeerConnectionGuardResult.Deny(denyReason);
          }
 

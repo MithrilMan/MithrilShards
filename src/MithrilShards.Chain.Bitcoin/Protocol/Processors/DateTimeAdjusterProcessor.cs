@@ -21,7 +21,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                  )
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
-         this._dateTimeProvider = dateTimeProvider;
+         _dateTimeProvider = dateTimeProvider;
       }
 
       /// <summary>
@@ -32,7 +32,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       protected override ValueTask OnPeerHandshakedAsync()
       {
-         this._dateTimeProvider.AddTimeData(this.PeerContext.TimeOffset, this.PeerContext.RemoteEndPoint);
+         _dateTimeProvider.AddTimeData(PeerContext.TimeOffset, PeerContext.RemoteEndPoint);
 
          return default;
       }

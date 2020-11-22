@@ -36,7 +36,7 @@ namespace MithrilShards.Core.DataTypes
             ThrowHelper.ThrowFormatException("the byte array should be 32 bytes long");
          }
 
-         Span<byte> dst = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref this.part1), EXPECTED_SIZE);
+         Span<byte> dst = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref part1), EXPECTED_SIZE);
          input.CopyTo(dst);
       }
 
@@ -65,7 +65,7 @@ namespace MithrilShards.Core.DataTypes
             ThrowHelper.ThrowFormatException($"the hex string should be {EXPECTED_SIZE * 2} chars long or {(EXPECTED_SIZE * 2) + 4} if prefixed with 0x.");
          }
 
-         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
 
          int i = hexAsSpan.Length - 1;
          int j = 0;
@@ -175,12 +175,12 @@ namespace MithrilShards.Core.DataTypes
 
       public ReadOnlySpan<byte> GetBytes()
       {
-         return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, byte>(ref this.part1), EXPECTED_SIZE);
+         return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, byte>(ref part1), EXPECTED_SIZE);
       }
 
       public override int GetHashCode()
       {
-         return (int)this.part1;
+         return (int)part1;
       }
    }
 }

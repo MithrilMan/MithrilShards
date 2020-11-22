@@ -11,8 +11,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 
       public BlockSerializer(IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer, IProtocolTypeSerializer<Transaction> transactionSerializer)
       {
-         this._blockHeaderSerializer = blockHeaderSerializer;
-         this._transactionSerializer = transactionSerializer;
+         _blockHeaderSerializer = blockHeaderSerializer;
+         _transactionSerializer = transactionSerializer;
       }
 
       public Block Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
@@ -22,8 +22,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 
          return new Block
          {
-            Header = reader.ReadWithSerializer(protocolVersion, this._blockHeaderSerializer, options),
-            Transactions = reader.ReadArray(protocolVersion, this._transactionSerializer, options)
+            Header = reader.ReadWithSerializer(protocolVersion, _blockHeaderSerializer, options),
+            Transactions = reader.ReadArray(protocolVersion, _transactionSerializer, options)
          };
       }
 
@@ -33,8 +33,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
             .Set(SerializerOptions.HEADER_IN_BLOCK, false);
 
          int size = 0;
-         size += writer.WriteWithSerializer(typeInstance.Header!, protocolVersion, this._blockHeaderSerializer, options);
-         size += writer.WriteArray(typeInstance.Transactions!, protocolVersion, this._transactionSerializer, options);
+         size += writer.WriteWithSerializer(typeInstance.Header!, protocolVersion, _blockHeaderSerializer, options);
+         size += writer.WriteArray(typeInstance.Transactions!, protocolVersion, _transactionSerializer, options);
 
          return size;
       }

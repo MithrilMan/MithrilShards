@@ -42,18 +42,18 @@ To recover from this state fix your time and restart the node.
       /// </summary>
       public DateTimeProvider(ILogger<DateTimeProvider> logger, IOptions<BitcoinSettings> options)
       {
-         this._logger = logger;
-         this._settings = options.Value;
+         _logger = logger;
+         _settings = options.Value;
 
-         this.adjustedTimeOffset = TimeSpan.Zero;
+         adjustedTimeOffset = TimeSpan.Zero;
 
-         this._medianFilter = new MedianFilter<long>(
+         _medianFilter = new MedianFilter<long>(
             size: MAX_SAMPLES,
             initialValue: 0,
             medianComputationOnEvenElements: args => (args.lowerItem + args.higherItem) / 2
             );
 
-         this._knownPeers = new HashSet<IPAddress>(MAX_SAMPLES);
+         _knownPeers = new HashSet<IPAddress>(MAX_SAMPLES);
       }
 
       /// <inheritdoc />
@@ -86,13 +86,13 @@ To recover from this state fix your time and restart the node.
       /// <inheritdoc />
       public DateTime GetAdjustedTime()
       {
-         return this.GetUtcNow().Add(this.adjustedTimeOffset);
+         return GetUtcNow().Add(adjustedTimeOffset);
       }
 
       /// <inheritdoc />
       public long GetAdjustedTimeAsUnixTimestamp()
       {
-         return new DateTimeOffset(this.GetAdjustedTime()).ToUnixTimeSeconds();
+         return new DateTimeOffset(GetAdjustedTime()).ToUnixTimeSeconds();
       }
 
       /// <inheritdoc />
@@ -105,10 +105,10 @@ To recover from this state fix your time and restart the node.
       {
          if (!_autoAdjustingTimeEnabled)
          {
-            this._logger.LogDebug("Automatic time adjustment is disabled.");
+            _logger.LogDebug("Automatic time adjustment is disabled.");
             if (_showWarning)
             {
-               this._logger.LogCritical(WARNING_MESSAGE);
+               _logger.LogCritical(WARNING_MESSAGE);
             }
             return;
          }
@@ -116,20 +116,20 @@ To recover from this state fix your time and restart the node.
          /// note: this behavior mimic bitcoin core but it's broken as it is on bitcoin core.
          /// something better should be implemented.
 
-         if (this._knownPeers.Count == MAX_SAMPLES)
+         if (_knownPeers.Count == MAX_SAMPLES)
          {
-            this._logger.LogDebug("Ignored AddTimeData: max peer tracked.");
+            _logger.LogDebug("Ignored AddTimeData: max peer tracked.");
             return;
          }
 
-         if (this._knownPeers.Contains(remoteEndPoint.Address))
+         if (_knownPeers.Contains(remoteEndPoint.Address))
          {
-            this._logger.LogDebug("Ignored AddTimeData: peer already contributed.");
+            _logger.LogDebug("Ignored AddTimeData: peer already contributed.");
             return;
          }
 
-         this._knownPeers.Add(remoteEndPoint.Address);
-         this._medianFilter.AddSample((long)timeoffset.TotalSeconds);
+         _knownPeers.Add(remoteEndPoint.Address);
+         _medianFilter.AddSample((long)timeoffset.TotalSeconds);
 
          // There is a known issue here (see issue #4521):
          //
@@ -148,20 +148,20 @@ To recover from this state fix your time and restart the node.
          // So we should hold off on fixing this and clean it up as part of
          // a timing cleanup that strengthens it in a number of other ways.
          //
-         if (this._medianFilter.Count >= 5 && this._medianFilter.Count % 2 == 1)
+         if (_medianFilter.Count >= 5 && _medianFilter.Count % 2 == 1)
          {
-            long median = this._medianFilter.GetMedian();
+            long median = _medianFilter.GetMedian();
 
             // Only let other nodes change our time by so much
-            if (Math.Abs(median) <= Math.Max(0, this._settings.MaxTimeAdjustment))
+            if (Math.Abs(median) <= Math.Max(0, _settings.MaxTimeAdjustment))
             {
-               this.SetAdjustedTimeOffset(TimeSpan.FromSeconds(median));
+               SetAdjustedTimeOffset(TimeSpan.FromSeconds(median));
             }
             else
             {
-               this._autoAdjustingTimeEnabled = false;
-               this._showWarning = true;
-               this.SetAdjustedTimeOffset(TimeSpan.Zero);
+               _autoAdjustingTimeEnabled = false;
+               _showWarning = true;
+               SetAdjustedTimeOffset(TimeSpan.Zero);
             }
          }
       }

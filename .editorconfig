@@ -40,8 +40,6 @@ dotnet_naming_style.prefix_underscore.required_prefix             = _
 ########## End Naming Styles
 
 
-
-
 dotnet_sort_system_directives_first                               = true
 dotnet_style_coalesce_expression                                  = true : error
 dotnet_style_collection_initializer                               = true : suggestion
@@ -58,10 +56,10 @@ dotnet_style_prefer_conditional_expression_over_return            = true
 dotnet_style_prefer_inferred_anonymous_type_member_names          = false : warning
 dotnet_style_prefer_inferred_tuple_names                          = false : warning
 dotnet_style_prefer_is_null_check_over_reference_equality_method  = true : warning
-dotnet_style_qualification_for_event                              = true : error
-dotnet_style_qualification_for_field                              = true : error
-dotnet_style_qualification_for_method                             = true : error
-dotnet_style_qualification_for_property                           = true : error
+dotnet_style_qualification_for_event                              = false : error
+dotnet_style_qualification_for_field                              = false : error
+dotnet_style_qualification_for_method                             = false : error
+dotnet_style_qualification_for_property                           = false : error
 dotnet_style_readonly_field                                       = true : error
 dotnet_style_require_accessibility_modifiers                      = never : silent
 
@@ -130,7 +128,7 @@ dotnet_diagnostic.CA1051.severity                                 = silent
 dotnet_diagnostic.CA1707.severity                                 = none
 
 # CA1031: Do not catch general exception types
-dotnet_diagnostic.CA1031.severity                                 = suggestion
+dotnet_diagnostic.CA1031.severity                                 = silent
 
 # CA1001: Types that own disposable fields should be disposable
 dotnet_diagnostic.CA1001.severity                                 = suggestion
@@ -139,7 +137,7 @@ dotnet_diagnostic.CA1001.severity                                 = suggestion
 dotnet_diagnostic.CA1028.severity                                 = suggestion
 
 # CA1062: Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity                                 = suggestion
+dotnet_diagnostic.CA1062.severity                                 = silent
 
 # CA1308: Normalize strings to uppercase
 dotnet_diagnostic.CA1308.severity                                 = silent

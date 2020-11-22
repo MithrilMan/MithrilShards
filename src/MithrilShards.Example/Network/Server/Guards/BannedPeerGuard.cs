@@ -11,12 +11,12 @@ namespace MithrilShards.Example.Network.Server.Guards
 
       public BannedPeerGuard(ILogger<BannedPeerGuard> logger, IOptions<ForgeConnectivitySettings> settings, IPeerAddressBook peerAddressBook) : base(logger, settings)
       {
-         this._peerAddressBook = peerAddressBook;
+         _peerAddressBook = peerAddressBook;
       }
 
       internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
-         if (this._peerAddressBook.IsBanned(peerContext))
+         if (_peerAddressBook.IsBanned(peerContext))
          {
             return "Inbound connection refused: peer is banned.";
          }

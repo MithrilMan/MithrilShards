@@ -16,9 +16,9 @@ namespace MithrilShards.Core.Forge
 
       public DefaultConfigurationWriter(ILogger<DefaultConfigurationWriter> logger, IEnumerable<IMithrilShardSettings> mithrilShardSettings, string configurationFilePath)
       {
-         this._logger = logger;
-         this._mithrilShardSettings = mithrilShardSettings;
-         this._configurationFilePath = configurationFilePath;
+         _logger = logger;
+         _mithrilShardSettings = mithrilShardSettings;
+         _configurationFilePath = configurationFilePath;
       }
 
 
@@ -29,20 +29,20 @@ namespace MithrilShards.Core.Forge
       /// </summary>
       public void GenerateDefaultFile()
       {
-         if (this._mithrilShardSettings == null)
+         if (_mithrilShardSettings == null)
          {
-            this._logger.LogInformation("No Mithril Shard settings found in current Forge.");
+            _logger.LogInformation("No Mithril Shard settings found in current Forge.");
             return;
          }
 
          var appConfig = new Dictionary<string, object>();
 
-         foreach (IMithrilShardSettings shardSettings in this._mithrilShardSettings)
+         foreach (IMithrilShardSettings shardSettings in _mithrilShardSettings)
          {
             appConfig[shardSettings.ConfigurationSection] = shardSettings;
          }
 
-         System.IO.File.WriteAllText(this._configurationFilePath, JsonSerializer.Serialize(appConfig, new JsonSerializerOptions
+         System.IO.File.WriteAllText(_configurationFilePath, JsonSerializer.Serialize(appConfig, new JsonSerializerOptions
          {
             WriteIndented = true,
          }));

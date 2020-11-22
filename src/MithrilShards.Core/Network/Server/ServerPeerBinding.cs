@@ -29,36 +29,36 @@ namespace MithrilShards.Core.Network.Server
       /// <returns></returns>
       public bool Matches(IPEndPoint otherEndpoint)
       {
-         var endpoint = IPEndPoint.Parse(this.EndPoint);
+         var endpoint = IPEndPoint.Parse(EndPoint);
          if (endpoint.IsAnyIP())
          {
             return endpoint.Port == otherEndpoint.Port;
          }
          else
          {
-            return otherEndpoint.Equals(this.EndPoint);
+            return otherEndpoint.Equals(EndPoint);
          }
       }
 
       public bool IsValidEndpoint([NotNullWhen(true)] out IPEndPoint? parsedEndpoint)
       {
          parsedEndpoint = null;
-         return this.EndPoint != null && IPEndPoint.TryParse(this.EndPoint, out parsedEndpoint);
+         return EndPoint != null && IPEndPoint.TryParse(EndPoint, out parsedEndpoint);
       }
 
       public bool IsValidPublicEndPoint()
       {
-         return this.PublicEndPoint != null && IPEndPoint.TryParse(this.PublicEndPoint, out _);
+         return PublicEndPoint != null && IPEndPoint.TryParse(PublicEndPoint, out _);
       }
 
       public bool TryGetIPEndPoint(out IPEndPoint endPoint)
       {
-         return IPEndPoint.TryParse(this.EndPoint, out endPoint);
+         return IPEndPoint.TryParse(EndPoint, out endPoint);
       }
 
       public bool TryGetPublicIPEndPoint(out IPEndPoint publicEndPoint)
       {
-         return IPEndPoint.TryParse(this.PublicEndPoint, out publicEndPoint);
+         return IPEndPoint.TryParse(PublicEndPoint, out publicEndPoint);
       }
    }
 }

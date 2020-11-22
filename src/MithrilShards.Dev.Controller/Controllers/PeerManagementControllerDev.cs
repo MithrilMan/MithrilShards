@@ -21,9 +21,9 @@ namespace MithrilShards.Dev.Controller.Controllers
 
       public PeerManagementControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
       {
-         this._logger = logger;
-         this._eventBus = eventBus;
-         this._requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
+         _logger = logger;
+         _eventBus = eventBus;
+         _requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
       }
 
       [HttpPost]
@@ -33,17 +33,17 @@ namespace MithrilShards.Dev.Controller.Controllers
       [Route("Connect")]
       public ActionResult<bool> Connect(PeerManagementConnectRequest request)
       {
-         if (this._requiredConnection == null)
+         if (_requiredConnection == null)
          {
-            return this.NotFound($"Cannot produce output because {nameof(RequiredConnection)} is not available");
+            return NotFound($"Cannot produce output because {nameof(RequiredConnection)} is not available");
          }
 
          if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint ipEndPoint))
          {
-            return this.BadRequest("Incorrect endpoint");
+            return BadRequest("Incorrect endpoint");
          }
 
-         return this.Ok(this._requiredConnection.TryAddEndPoint(ipEndPoint));
+         return Ok(_requiredConnection.TryAddEndPoint(ipEndPoint));
       }
 
       [HttpPost]
@@ -54,10 +54,10 @@ namespace MithrilShards.Dev.Controller.Controllers
       {
          if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint ipEndPoint))
          {
-            return this.BadRequest("Incorrect endpoint");
+            return BadRequest("Incorrect endpoint");
          }
 
-         this._eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));
+         _eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));
          return true;
       }
    }

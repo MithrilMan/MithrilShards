@@ -199,7 +199,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
       private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new NBitcoin.DataEncoders.HexEncoder();
       public override string ToString()
       {
-         ulong[] arr = new ulong[] { this._value1, this._value2, this._value3, this._value4 };
+         ulong[] arr = new ulong[] { _value1, _value2, _value3, _value4 };
          Span<byte> toBeReversed = MemoryMarshal.Cast<ulong, byte>(arr).ToArray();
          toBeReversed.Reverse();
          return _encoder.EncodeData(toBeReversed.ToArray());

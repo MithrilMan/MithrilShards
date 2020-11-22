@@ -12,17 +12,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public HeadersMessageSerializer(IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer)
       {
-         this._blockHeaderSerializer = blockHeaderSerializer;
+         _blockHeaderSerializer = blockHeaderSerializer;
       }
 
       public override void Serialize(HeadersMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
       {
-         output.WriteArray(message.Headers!, protocolVersion, this._blockHeaderSerializer);
+         output.WriteArray(message.Headers!, protocolVersion, _blockHeaderSerializer);
       }
 
       public override HeadersMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
-         return new HeadersMessage { Headers = reader.ReadArray(protocolVersion, this._blockHeaderSerializer) };
+         return new HeadersMessage { Headers = reader.ReadArray(protocolVersion, _blockHeaderSerializer) };
       }
    }
 }

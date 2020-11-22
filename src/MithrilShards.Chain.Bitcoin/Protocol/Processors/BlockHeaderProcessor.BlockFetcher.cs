@@ -26,8 +26,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private bool CanFetch(HeaderNode node)
       {
-         bool isAvailable = this._status.BestKnownHeader?.IsInSameChain(node) == true;
-         bool canServe = (!this.IsWitnessEnabled(node.Previous) || this.PeerContext.CanServeWitness);
+         bool isAvailable = _status.BestKnownHeader?.IsInSameChain(node) == true;
+         bool canServe = (!IsWitnessEnabled(node.Previous) || PeerContext.CanServeWitness);
          return isAvailable && canServe;
       }
 
@@ -36,7 +36,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          uint blockScore = GetFetchBlockScore(blockToDownload);
          if (blockScore < minimumScore || blockScore == 0)
          {
-            this.logger.LogDebug("Cannot download the block, score {BlockScore} doesn't satisfy requirement {MinimumScore}", blockScore, minimumScore);
+            logger.LogDebug("Cannot download the block, score {BlockScore} doesn't satisfy requirement {MinimumScore}", blockScore, minimumScore);
             return false;
          }
 
@@ -143,13 +143,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          // we don't have data for this block and we can fetch it
          if (!blockToDownload.HasAvailability(HeaderDataAvailability.HasBlockData) && CanFetch(blockToDownload))
          {
-            this._fetcherStatus.BlocksInDownload.Add(blockToDownload.Hash);
+            _fetcherStatus.BlocksInDownload.Add(blockToDownload.Hash);
 
             var vGetData = new List<InventoryVector>();
-            uint fetchFlags = this.GetFetchFlags();
+            uint fetchFlags = GetFetchFlags();
             vGetData.Add(new InventoryVector { Type = InventoryType.MSG_BLOCK | fetchFlags, Hash = blockToDownload.Hash });
 
-            await this.SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
+            await SendMessageAsync(new GetDataMessage { Inventory = vGetData.ToArray() }).ConfigureAwait(false);
          }
       }
 
@@ -171,8 +171,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          ProcessBlockAvailability();
 
          if (_status.BestKnownHeader == null
-            || _status.BestKnownHeader.ChainWork < this._chainState.GetTip().ChainWork
-            || _status.BestKnownHeader.ChainWork < this._minimumChainWork)
+            || _status.BestKnownHeader.ChainWork < _chainState.GetTip().ChainWork
+            || _status.BestKnownHeader.ChainWork < _minimumChainWork)
          {
             // This peer has nothing interesting.
             return null;
@@ -182,7 +182,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          {
             // Bootstrap quickly by guessing a parent of our best tip is the forking point.
             // Guessing wrong in either direction is not a problem.
-            this._chainState.TryGetAtHeight(Math.Min(_status.BestKnownHeader.Height, this._chainState.GetTip().Height), out HeaderNode? headerNode);
+            _chainState.TryGetAtHeight(Math.Min(_status.BestKnownHeader.Height, _chainState.GetTip().Height), out HeaderNode? headerNode);
             _fetcherStatus.LastCommonBlock = headerNode;
          }
 
@@ -195,7 +195,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
 
          var vToFetch = new List<HeaderNode>(128);
-         HeaderNode pindexWalk = this._fetcherStatus.LastCommonBlock;
+         HeaderNode pindexWalk = _fetcherStatus.LastCommonBlock;
          // Never fetch further than the best block we know the peer has, or more than BLOCK_DOWNLOAD_WINDOW + 1 beyond the last
          // linked block we have in common with this peer. The +1 is so we can detect stalling, namely if we would be able to
          // download that next block if the window were 1 larger.
@@ -234,14 +234,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                   return blocksToDownload;
                }
 
-               if (pindex.HasAvailability(HeaderDataAvailability.HasBlockData) || this._chainState.IsInBestChain(pindex))
+               if (pindex.HasAvailability(HeaderDataAvailability.HasBlockData) || _chainState.IsInBestChain(pindex))
                {
                   if (pindex.HaveTxsDownloaded())
                   {
                      _fetcherStatus.LastCommonBlock = pindex;
                   }
                }
-               else if (!this._blockFetcherManager.TryGetFetcher(pindex.Hash, out IBlockFetcher? fetcherDownloadingBlock)) //nobody is fetching yet this block
+               else if (!_blockFetcherManager.TryGetFetcher(pindex.Hash, out IBlockFetcher? fetcherDownloadingBlock)) //nobody is fetching yet this block
                {
                   // The block is not already downloaded, and not yet in flight.
                   if (pindex.Height > nWindowEnd)

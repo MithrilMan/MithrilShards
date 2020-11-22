@@ -14,19 +14,19 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         this._data = "0123456789ABCDEF"[(char)new Random().Next(0, 15)];
+         _data = "0123456789ABCDEF"[(char)new Random().Next(0, 15)];
       }
 
 
 
       [Benchmark]
-      public int ParseNibble_A() => ParseNibble1(this._data);
+      public int ParseNibble_A() => ParseNibble1(_data);
 
       [Benchmark]
-      public int ParseNibble_B() => ParseNibble2(this._data);
+      public int ParseNibble_B() => ParseNibble2(_data);
 
       [Benchmark]
-      public int ParseNibble_C() => ParseNibble3(this._data);
+      public int ParseNibble_C() => ParseNibble3(_data);
 
       private static int ParseNibble1(char c)
       {

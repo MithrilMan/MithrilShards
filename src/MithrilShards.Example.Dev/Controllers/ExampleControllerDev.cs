@@ -24,8 +24,8 @@ namespace MithrilShards.Example.Dev
 
       public ExampleControllerDev(ILogger<ExampleControllerDev> logger, IQuoteService quoteService)
       {
-         this._logger = logger;
-         this._quoteService = quoteService;
+         _logger = logger;
+         _quoteService = quoteService;
       }
 
       [HttpGet]
@@ -33,7 +33,7 @@ namespace MithrilShards.Example.Dev
       [Route("GetQuotes")]
       public ActionResult GetQuotes()
       {
-         return this.Ok(this._quoteService.Quotes);
+         return Ok(_quoteService.Quotes);
       }
 
       [HttpPost]
@@ -41,11 +41,11 @@ namespace MithrilShards.Example.Dev
       [Route("AddQuote")]
       public ActionResult AddQuote(string quote)
       {
-         this._quoteService.Quotes.Add(quote);
+         _quoteService.Quotes.Add(quote);
 
          _logger.LogDebug("A new quote has been added to {DevController}: `{Quote}`", nameof(PingPongProcessor), quote);
 
-         return this.Ok($"Quote `{quote}` added.");
+         return Ok($"Quote `{quote}` added.");
       }
 
       [HttpPost]
@@ -53,21 +53,21 @@ namespace MithrilShards.Example.Dev
       [Route("RemoveQuote")]
       public ActionResult RemoveQuote([Range(1, int.MaxValue)] int quoteIndex)
       {
-         if (this._quoteService.Quotes.Count > quoteIndex)
+         if (_quoteService.Quotes.Count > quoteIndex)
          {
-            string removedQuote = this._quoteService.Quotes[quoteIndex];
-            if (this._quoteService.Quotes.Remove(removedQuote))
+            string removedQuote = _quoteService.Quotes[quoteIndex];
+            if (_quoteService.Quotes.Remove(removedQuote))
             {
-               return this.Ok($"Quote `{removedQuote}` removed.");
+               return Ok($"Quote `{removedQuote}` removed.");
             }
             else
             {
-               return this.Problem($"Error while removing quote at index {quoteIndex}.");
+               return Problem($"Error while removing quote at index {quoteIndex}.");
             }
          }
          else
          {
-            return this.BadRequest($"Quote index out of range, available quotes: {this._quoteService.Quotes.Count}.");
+            return BadRequest($"Quote index out of range, available quotes: {_quoteService.Quotes.Count}.");
          }
       }
 
@@ -76,8 +76,8 @@ namespace MithrilShards.Example.Dev
       [Route("ClearQuotes")]
       public ActionResult ClearQuotes()
       {
-         this._quoteService.Quotes.Clear();
-         return this.Ok();
+         _quoteService.Quotes.Clear();
+         return Ok();
       }
 
    }

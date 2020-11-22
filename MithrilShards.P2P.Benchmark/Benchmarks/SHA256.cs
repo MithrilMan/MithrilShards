@@ -18,21 +18,21 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         this._data = new byte[this.Payload];
-         new Random().NextBytes(this._data);
+         _data = new byte[Payload];
+         new Random().NextBytes(_data);
       }
 
 
       [Benchmark]
       public NBitcoin.uint256 NBitcoin_Hash256()
       {
-         return NBitcoin.Crypto.Hashes.Hash256(this._data);
+         return NBitcoin.Crypto.Hashes.Hash256(_data);
       }
 
       [Benchmark]
       public Core.DataTypes.UInt256 MithrilShards_DoubleSha256()
       {
-         return new Core.DataTypes.UInt256(HashGenerator.DoubleSha256(this._data));
+         return new Core.DataTypes.UInt256(HashGenerator.DoubleSha256(_data));
       }
    }
 }

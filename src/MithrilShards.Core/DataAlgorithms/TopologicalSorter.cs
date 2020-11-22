@@ -73,7 +73,7 @@ namespace MithrilShards.Core.DataAlgorithms
       /// <returns></returns>
       public (IEnumerable<(TItem item, int level)> sorted, IEnumerable<TItem> cycled) Sort()
       {
-         var map = this._map.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+         var map = _map.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
          // first add all nodes
          var sorted = map.Where(item => item.Value.Dependencies == 0).Select(kvp => (item: kvp.Key, level: 0)).ToList();

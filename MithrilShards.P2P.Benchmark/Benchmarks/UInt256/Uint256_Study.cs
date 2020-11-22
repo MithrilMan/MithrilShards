@@ -18,26 +18,26 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       [GlobalSetup]
       public void Setup()
       {
-         new Random(47).NextBytes(this._data);
+         new Random(47).NextBytes(_data);
 
-         _u1 = new AltUInt256.UInt256(this._data);
-         _aU1 = new AltUInt256.UInt256_Updated(this._data);
+         _u1 = new AltUInt256.UInt256(_data);
+         _aU1 = new AltUInt256.UInt256_Updated(_data);
 
-         new Random(53).NextBytes(this._data);
-         _u2 = new AltUInt256.UInt256(this._data);
-         _aU2 = new AltUInt256.UInt256_Updated(this._data);
+         new Random(53).NextBytes(_data);
+         _u2 = new AltUInt256.UInt256(_data);
+         _aU2 = new AltUInt256.UInt256_Updated(_data);
       }
 
       [Benchmark]
       public object Create_UInt256()
       {
-         return new AltUInt256.UInt256(this._data);
+         return new AltUInt256.UInt256(_data);
       }
 
       [Benchmark]
       public object Create_AltUInt256()
       {
-         return new AltUInt256.UInt256(this._data);
+         return new AltUInt256.UInt256(_data);
       }
 
       [Benchmark]
@@ -80,13 +80,13 @@ namespace AltUInt256
             ThrowHelper.ThrowFormatException("the byte array should be 32 bytes long");
          }
 
-         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+         Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
          input.CopyTo(dst);
       }
 
       public ReadOnlySpan<byte> GetBytes()
       {
-         return MemoryMarshal.AsBytes(MemoryMarshal.CreateReadOnlySpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+         return MemoryMarshal.AsBytes(MemoryMarshal.CreateReadOnlySpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
       }
    }
 
@@ -113,13 +113,13 @@ namespace AltUInt256
             ThrowHelper.ThrowFormatException("the byte array should be 32 bytes long");
          }
 
-         Span<byte> dst = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref this.part1), EXPECTED_SIZE);
+         Span<byte> dst = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref part1), EXPECTED_SIZE);
          input.CopyTo(dst);
       }
 
       public ReadOnlySpan<byte> GetBytes()
       {
-         return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, byte>(ref this.part1), EXPECTED_SIZE);
+         return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, byte>(ref part1), EXPECTED_SIZE);
       }
    }
 

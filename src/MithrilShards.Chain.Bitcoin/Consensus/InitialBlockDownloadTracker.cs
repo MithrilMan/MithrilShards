@@ -26,28 +26,28 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                                          IOptions<BitcoinSettings> options,
                                          IDateTimeProvider dateTimeProvider)
       {
-         this._logger = logger;
-         this._eventBus = eventBus;
-         this._chainState = chainState;
-         this._consensusParameters = consensusParameters;
-         this._dateTimeProvider = dateTimeProvider;
+         _logger = logger;
+         _eventBus = eventBus;
+         _chainState = chainState;
+         _consensusParameters = consensusParameters;
+         _dateTimeProvider = dateTimeProvider;
 
          //TODO register to tip advance
          //this.subscriptionManager.RegisterSubscriptions(this.eventBus.Subscribe())
 
-         _minimumChainWork = options.Value.MinimumChainWork ?? this._consensusParameters.MinimumChainWork;
-         if (_minimumChainWork < this._consensusParameters.MinimumChainWork)
+         _minimumChainWork = options.Value.MinimumChainWork ?? _consensusParameters.MinimumChainWork;
+         if (_minimumChainWork < _consensusParameters.MinimumChainWork)
          {
-            this._logger.LogWarning($"{nameof(_minimumChainWork)} set below default value of {this._consensusParameters.MinimumChainWork}");
+            _logger.LogWarning($"{nameof(_minimumChainWork)} set below default value of {_consensusParameters.MinimumChainWork}");
          }
 
-         this._maxTipAge = options.Value.MaxTipAge;
+         _maxTipAge = options.Value.MaxTipAge;
       }
 
       public bool IsDownloadingBlocks()
       {
-         return this._chainState.ChainTip.ChainWork < _minimumChainWork
-            || (this._chainState.GetTipHeader().TimeStamp < (this._dateTimeProvider.GetTime() - this._maxTipAge));
+         return _chainState.ChainTip.ChainWork < _minimumChainWork
+            || (_chainState.GetTipHeader().TimeStamp < (_dateTimeProvider.GetTime() - _maxTipAge));
       }
    }
 }

@@ -35,13 +35,13 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
             throw new ArgumentNullException(nameof(message));
          }
 
-         this.Serialize((TMessageType)message, protocolVersion, (TPeerContext)peerContext, output);
+         Serialize((TMessageType)message, protocolVersion, (TPeerContext)peerContext, output);
       }
 
       public INetworkMessage Deserialize(ref ReadOnlySequence<byte> data, int protocolVersion, IPeerContext peerContext)
       {
          var reader = new SequenceReader<byte>(data);
-         return this.Deserialize(ref reader, protocolVersion, (TPeerContext)peerContext);
+         return Deserialize(ref reader, protocolVersion, (TPeerContext)peerContext);
       }
    }
 }

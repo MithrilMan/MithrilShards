@@ -11,8 +11,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
 
       public CheckProofOfWork(ILogger<CheckProofOfWork> logger, IProofOfWorkCalculator proofOfWorkCalculator)
       {
-         this._logger = logger;
-         this._proofOfWorkCalculator = proofOfWorkCalculator;
+         _logger = logger;
+         _proofOfWorkCalculator = proofOfWorkCalculator;
       }
 
       public bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)
@@ -21,7 +21,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
 
          // Check proof of work matches claimed amount
          //if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits, consensusParams))
-         if (!this._proofOfWorkCalculator.CheckProofOfWork(header))
+         if (!_proofOfWorkCalculator.CheckProofOfWork(header))
          {
             validationState.Invalid(BlockValidationStateResults.InvalidHeader, "high-hash", "proof of work failed");
             return false;

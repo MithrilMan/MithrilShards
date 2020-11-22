@@ -13,13 +13,13 @@ namespace MithrilShards.Dev.Controller
 
       public DevAssemblyScaffolder LoadAssemblyFromType<T>()
       {
-         this._assembliesToScaffold.Add(typeof(T).Assembly);
+         _assembliesToScaffold.Add(typeof(T).Assembly);
          return this;
       }
 
       internal IEnumerable<Assembly> GetAssemblies()
       {
-         return this._assembliesToScaffold.Distinct();
+         return _assembliesToScaffold.Distinct();
       }
    }
 }

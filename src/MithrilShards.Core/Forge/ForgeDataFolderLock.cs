@@ -15,14 +15,14 @@ namespace MithrilShards.Core.Forge
 
       public ForgeDataFolderLock(IDataFolders dataFolders)
       {
-         this._lockFileName = Path.Combine(dataFolders.RootPath, LOCK_FILE_NAME);
+         _lockFileName = Path.Combine(dataFolders.RootPath, LOCK_FILE_NAME);
       }
 
       public bool TryLockDataFolder()
       {
          try
          {
-            this._fileStream = new FileStream(this._lockFileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+            _fileStream = new FileStream(_lockFileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
             return true;
          }
          catch (IOException)
@@ -33,10 +33,10 @@ namespace MithrilShards.Core.Forge
 
       public void UnlockDataFolder()
       {
-         this._fileStream?.Close();
+         _fileStream?.Close();
          try
          {
-            File.Delete(this._lockFileName);
+            File.Delete(_lockFileName);
          }
          catch { }
       }

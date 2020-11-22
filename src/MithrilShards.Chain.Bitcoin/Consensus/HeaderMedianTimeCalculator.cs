@@ -14,8 +14,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public HeaderMedianTimeCalculator(ILogger<HeaderMedianTimeCalculator> logger, IBlockHeaderRepository blockHeaderRepository)
       {
-         this._logger = logger;
-         this._blockHeaderRepository = blockHeaderRepository;
+         _logger = logger;
+         _blockHeaderRepository = blockHeaderRepository;
       }
 
       /// <summary>
@@ -36,7 +36,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          int samplesLenght = startingBlockHeight > MEDIAN_TIMESPAN ? MEDIAN_TIMESPAN : startingBlockHeight + 1;
          uint[]? median = new uint[samplesLenght];
 
-         if (!this._blockHeaderRepository.TryGet(startingBlockHash, out BlockHeader? currentHeader))
+         if (!_blockHeaderRepository.TryGet(startingBlockHash, out BlockHeader? currentHeader))
          {
             ThrowHelper.ThrowNotSupportedException("Fatal exception, shouldn't happen, repository may be corrupted.");
          }
@@ -45,7 +45,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          {
             median[i] = currentHeader.TimeStamp;
 
-            if (!this._blockHeaderRepository.TryGet(currentHeader.PreviousBlockHash!, out currentHeader))
+            if (!_blockHeaderRepository.TryGet(currentHeader.PreviousBlockHash!, out currentHeader))
             {
                ThrowHelper.ThrowNotSupportedException("Fatal exception, shouldn't happen, repository may be corrupted.");
             }

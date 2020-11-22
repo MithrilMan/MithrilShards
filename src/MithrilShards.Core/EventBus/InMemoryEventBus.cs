@@ -32,9 +32,9 @@ namespace MithrilShards.Core.EventBus
       /// <param name="subscriptionErrorHandler">The subscription error handler. If null the default one will be used</param>
       public InMemoryEventBus(ILogger<InMemoryEventBus> logger, ISubscriptionErrorHandler subscriptionErrorHandler)
       {
-         this._logger = logger;
-         this._subscriptionErrorHandler = subscriptionErrorHandler;
-         this._subscriptions = new Dictionary<Type, List<ISubscription>>();
+         _logger = logger;
+         _subscriptionErrorHandler = subscriptionErrorHandler;
+         _subscriptions = new Dictionary<Type, List<ISubscription>>();
       }
 
       /// <inheritdoc />
@@ -45,18 +45,18 @@ namespace MithrilShards.Core.EventBus
             throw new ArgumentNullException(nameof(handler));
          }
 
-         lock (this._subscriptionsLock)
+         lock (_subscriptionsLock)
          {
-            if (!this._subscriptions.ContainsKey(typeof(TEvent)))
+            if (!_subscriptions.ContainsKey(typeof(TEvent)))
             {
-               this._subscriptions.Add(typeof(TEvent), new List<ISubscription>());
+               _subscriptions.Add(typeof(TEvent), new List<ISubscription>());
             }
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
             var subscriptionToken = new SubscriptionToken(this, typeof(TEvent));
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
-            this._subscriptions[typeof(TEvent)].Add(new Subscription<TEvent>(handler, subscriptionToken));
+            _subscriptions[typeof(TEvent)].Add(new Subscription<TEvent>(handler, subscriptionToken));
 
             return subscriptionToken;
          }
@@ -68,20 +68,20 @@ namespace MithrilShards.Core.EventBus
          // Ignore null token
          if (subscriptionToken == null)
          {
-            this._logger.LogDebug("Unsubscribe called with a null token, ignored.");
+            _logger.LogDebug("Unsubscribe called with a null token, ignored.");
             return;
          }
 
-         lock (this._subscriptionsLock)
+         lock (_subscriptionsLock)
          {
-            if (this._subscriptions.ContainsKey(subscriptionToken.EventType))
+            if (_subscriptions.ContainsKey(subscriptionToken.EventType))
             {
-               List<ISubscription> allSubscriptions = this._subscriptions[subscriptionToken.EventType];
+               List<ISubscription> allSubscriptions = _subscriptions[subscriptionToken.EventType];
 
                ISubscription subscriptionToRemove = allSubscriptions.FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
                if (subscriptionToRemove != null)
                {
-                  this._subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
+                  _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
                }
             }
          }
@@ -96,12 +96,12 @@ namespace MithrilShards.Core.EventBus
          }
 
          var allSubscriptions = new List<ISubscription>();
-         lock (this._subscriptionsLock)
+         lock (_subscriptionsLock)
          {
             Type eventType = typeof(TEvent);
-            if (this._subscriptions.ContainsKey(eventType))
+            if (_subscriptions.ContainsKey(eventType))
             {
-               allSubscriptions = this._subscriptions[eventType].ToList();
+               allSubscriptions = _subscriptions[eventType].ToList();
             }
          }
 
@@ -114,7 +114,7 @@ namespace MithrilShards.Core.EventBus
             }
             catch (Exception ex)
             {
-               this._subscriptionErrorHandler?.Handle(@event, ex, subscription);
+               _subscriptionErrorHandler?.Handle(@event, ex, subscription);
             }
          }
       }

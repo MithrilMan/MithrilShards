@@ -12,12 +12,12 @@ namespace MithrilShards.Example.Network.Server.Guards
                                          IOptions<ForgeConnectivitySettings> settings,
                                          IConnectivityPeerStats serverPeerStats) : base(logger, settings)
       {
-         this._peerStats = serverPeerStats;
+         _peerStats = serverPeerStats;
       }
 
       internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
-         if (this._peerStats.ConnectedInboundPeersCount >= this.settings.MaxInboundConnections)
+         if (_peerStats.ConnectedInboundPeersCount >= settings.MaxInboundConnections)
          {
             return "Inbound connection refused: max connection threshold reached.";
          }

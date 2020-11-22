@@ -14,9 +14,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
                                    IProtocolTypeSerializer<TransactionOutput> transactionOutputSerializer,
                                    IProtocolTypeSerializer<TransactionWitness> transactionWitnessSerializer)
       {
-         this._transactionInputSerializer = transactionInputSerializer;
-         this._transactionOutputSerializer = transactionOutputSerializer;
-         this._transactionWitnessSerializer = transactionWitnessSerializer;
+         _transactionInputSerializer = transactionInputSerializer;
+         _transactionOutputSerializer = transactionOutputSerializer;
+         _transactionWitnessSerializer = transactionWitnessSerializer;
       }
 
       public Transaction Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          var tx = new Transaction { Version = reader.ReadInt() };
 
          /// Try to read the inputs. In case the dummy byte is, this will be read as an empty list of transaction inputs.
-         TransactionInput[] inputs = reader.ReadArray(protocolVersion, this._transactionInputSerializer);
+         TransactionInput[] inputs = reader.ReadArray(protocolVersion, _transactionInputSerializer);
 
          if (inputs.Length == 0)
          {
@@ -35,14 +35,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
             flags = reader.ReadByte();
             if (flags != 0 && allowWitness)
             {
-               tx.Inputs = reader.ReadArray(protocolVersion, this._transactionInputSerializer);
-               tx.Outputs = reader.ReadArray(protocolVersion, this._transactionOutputSerializer);
+               tx.Inputs = reader.ReadArray(protocolVersion, _transactionInputSerializer);
+               tx.Outputs = reader.ReadArray(protocolVersion, _transactionOutputSerializer);
             }
          }
          else
          {
             // otherwise we read valid inputs, now we have to read outputs
-            tx.Outputs = reader.ReadArray(protocolVersion, this._transactionOutputSerializer);
+            tx.Outputs = reader.ReadArray(protocolVersion, _transactionOutputSerializer);
          }
 
          if ((flags & 1) != 0 && allowWitness)
@@ -98,8 +98,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
             size += writer.WriteByte(flags);
          }
 
-         size += writer.WriteArray(tx.Inputs, protocolVersion, this._transactionInputSerializer);
-         size += writer.WriteArray(tx.Outputs, protocolVersion, this._transactionOutputSerializer);
+         size += writer.WriteArray(tx.Inputs, protocolVersion, _transactionInputSerializer);
+         size += writer.WriteArray(tx.Outputs, protocolVersion, _transactionOutputSerializer);
 
          if ((flags & 1) != 0)
          {
@@ -107,7 +107,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
             {
                for (int i = 0; i < tx.Inputs.Length; i++)
                {
-                  size += writer.WriteWithSerializer(tx.Inputs[i].ScriptWitness!, protocolVersion, this._transactionWitnessSerializer);
+                  size += writer.WriteWithSerializer(tx.Inputs[i].ScriptWitness!, protocolVersion, _transactionWitnessSerializer);
                }
             }
          }

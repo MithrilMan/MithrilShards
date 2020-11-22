@@ -40,14 +40,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                IPeriodicWork periodicPing)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
-         this._randomNumberGenerator = randomNumberGenerator;
-         this._dateTimeProvider = dateTimeProvider;
-         this._periodicPing = periodicPing;
+         _randomNumberGenerator = randomNumberGenerator;
+         _dateTimeProvider = dateTimeProvider;
+         _periodicPing = periodicPing;
       }
 
       protected override ValueTask OnPeerHandshakedAsync()
       {
-         _ = this._periodicPing.StartAsync(
+         _ = _periodicPing.StartAsync(
                label: $"{nameof(_periodicPing)}-{PeerContext.PeerId}",
                work: PingAsync,
                interval: TimeSpan.FromSeconds(PING_INTERVAL),
@@ -62,45 +62,45 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          var ping = new PingMessage();
          if (PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V60001)
          {
-            ping.Nonce = this._randomNumberGenerator.GetUint64();
+            ping.Nonce = _randomNumberGenerator.GetUint64();
          }
 
-         await this.SendMessageAsync(ping).ConfigureAwait(false);
+         await SendMessageAsync(ping).ConfigureAwait(false);
 
-         this._status.PingSent(this._dateTimeProvider.GetTimeMicros(), ping);
-         this.logger.LogDebug("Sent ping request with nonce {PingNonce}", this._status.PingRequestNonce);
+         _status.PingSent(_dateTimeProvider.GetTimeMicros(), ping);
+         logger.LogDebug("Sent ping request with nonce {PingNonce}", _status.PingRequestNonce);
 
          //in case of memory leak, investigate this.
-         this._pingCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+         _pingCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
          // ensures the handshake is performed timely (supported only starting from version 60001)
          if (PeerContext.NegotiatedProtocolVersion.Version >= KnownVersion.V60001)
          {
-            await this.DisconnectIfAsync(() =>
+            await DisconnectIfAsync(() =>
             {
-               return new ValueTask<bool>(this._status.PingResponseTime == 0);
-            }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", this._pingCancellationTokenSource.Token).ConfigureAwait(false);
+               return new ValueTask<bool>(_status.PingResponseTime == 0);
+            }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", _pingCancellationTokenSource.Token).ConfigureAwait(false);
          }
       }
 
       public async ValueTask<bool> ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
       {
-         await this.SendMessageAsync(new PongMessage { Nonce = message.Nonce }).ConfigureAwait(false);
+         await SendMessageAsync(new PongMessage { Nonce = message.Nonce }).ConfigureAwait(false);
 
          return true;
       }
 
       public ValueTask<bool> ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
       {
-         if (this._status.PingRequestNonce != 0 && message.Nonce == this._status.PingRequestNonce)
+         if (_status.PingRequestNonce != 0 && message.Nonce == _status.PingRequestNonce)
          {
-            (ulong Nonce, long RoundTrip) = this._status.PongReceived(this._dateTimeProvider.GetTimeMicros());
-            this.logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec.", Nonce, RoundTrip);
-            this._pingCancellationTokenSource.Cancel();
+            (ulong Nonce, long RoundTrip) = _status.PongReceived(_dateTimeProvider.GetTimeMicros());
+            logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec.", Nonce, RoundTrip);
+            _pingCancellationTokenSource.Cancel();
          }
          else
          {
-            this.logger.LogDebug("Received pong with wrong nonce: {PingNonce}", this._status.PingRequestNonce);
+            logger.LogDebug("Received pong with wrong nonce: {PingNonce}", _status.PingRequestNonce);
          }
 
          return new ValueTask<bool>(true);

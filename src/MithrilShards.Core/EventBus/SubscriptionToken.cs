@@ -15,14 +15,14 @@ namespace MithrilShards.Core.EventBus
 
       internal SubscriptionToken(IEventBus bus, Type eventType)
       {
-         this.Bus = bus;
-         this.Token = Guid.NewGuid();
-         this.EventType = eventType;
+         Bus = bus;
+         Token = Guid.NewGuid();
+         EventType = eventType;
       }
 
       public void Dispose()
       {
-         this.Bus.Unsubscribe(this);
+         Bus.Unsubscribe(this);
       }
    }
 }

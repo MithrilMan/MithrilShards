@@ -26,7 +26,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
       public override ConsensusParameters ConfigureConsensus()
       {
          return new ConsensusParameters(
-            genesisHeader: this.BuildGenesisBlock(),
+            genesisHeader: BuildGenesisBlock(),
 
             subsidyHalvingInterval: 210000,
             maxMoney: 21_000_000 * COIN,

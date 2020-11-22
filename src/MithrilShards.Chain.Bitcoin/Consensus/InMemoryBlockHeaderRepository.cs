@@ -24,8 +24,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public InMemoryBlockHeaderRepository(ILogger<InMemoryBlockHeaderRepository> logger, IEventBus eventBus)
       {
-         this._logger = logger;
-         this._eventBus = eventBus;
+         _logger = logger;
+         _eventBus = eventBus;
       }
 
       /// <summary>
@@ -45,22 +45,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          if (hash == null) throw new NullReferenceException("Block Header hash cannot be null");
 
          bool success;
-         using (new WriteLock(this._theLock))
+         using (new WriteLock(_theLock))
          {
-            if (this._headers.ContainsKey(hash))
+            if (_headers.ContainsKey(hash))
             {
                success = false;
             }
             else
             {
-               this._headers[hash] = header;
+               _headers[hash] = header;
                success = true;
             }
          }
 
          if (success)
          {
-            this._eventBus.Publish(new BlockHeaderAddedToRepository(header));
+            _eventBus.Publish(new BlockHeaderAddedToRepository(header));
          }
 
          return success;
@@ -78,9 +78,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          if (hash is null) throw new ArgumentNullException(nameof(hash));
 
-         using (new ReadLock(this._theLock))
+         using (new ReadLock(_theLock))
          {
-            return this._headers.TryGetValue(hash, out header!);
+            return _headers.TryGetValue(hash, out header!);
          }
       }
    }

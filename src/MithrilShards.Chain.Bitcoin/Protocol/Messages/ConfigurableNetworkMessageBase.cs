@@ -10,32 +10,32 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 
       protected abstract string Command { get; }
 
-      string INetworkMessage.Command => this.Command;
+      string INetworkMessage.Command => Command;
 
       protected void SetSerializationOptions(params (string Key, object Value)[] options)
       {
-         if (this._serializationOptions != null)
+         if (_serializationOptions != null)
          {
-            this._serializationOptions.Clear();
+            _serializationOptions.Clear();
          }
 
          if ((options?.Length ?? 0) == 0) return;
 
-         this._serializationOptions ??= new Dictionary<string, object>();
+         _serializationOptions ??= new Dictionary<string, object>();
 
          foreach ((string Key, object Value) option in options!)
          {
-            this._serializationOptions.Add(option.Key, option.Value);
+            _serializationOptions.Add(option.Key, option.Value);
          }
       }
 
       public void PopulateSerializerOption(ref ProtocolTypeSerializerOptions? options)
       {
-         if (this._serializationOptions == null) return;
+         if (_serializationOptions == null) return;
 
          options ??= new ProtocolTypeSerializerOptions();
 
-         foreach (KeyValuePair<string, object> option in this._serializationOptions)
+         foreach (KeyValuePair<string, object> option in _serializationOptions)
          {
             options.Set(option.Key, option.Value);
          }

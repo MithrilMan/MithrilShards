@@ -39,15 +39,15 @@ namespace MithrilShards.Example.Network.Bedrock
       /// </value>
       public uint PayloadLength
       {
-         get => this._payloadLength;
+         get => _payloadLength;
          set
          {
-            if (value > this._maximumProtocolMessageLength)
+            if (value > _maximumProtocolMessageLength)
             {
-               throw new ProtocolViolationException($"Message size exceeds the maximum value {this._maximumProtocolMessageLength}.");
+               throw new ProtocolViolationException($"Message size exceeds the maximum value {_maximumProtocolMessageLength}.");
             }
-            this._payloadLength = value;
-            this.PayloadLengthRead = true;
+            _payloadLength = value;
+            PayloadLengthRead = true;
          }
       }
 
@@ -60,30 +60,30 @@ namespace MithrilShards.Example.Network.Bedrock
       /// </value>
       public uint Checksum
       {
-         get => this._checksum;
+         get => _checksum;
          set
          {
-            this._checksum = value;
-            this.ChecksumRead = true;
+            _checksum = value;
+            ChecksumRead = true;
          }
       }
 
       public DeserializationContext(byte[] magicNumberBytesmagicBytes, uint maximumProtocolMessageLength = ProtocolDefinition.DEFAULT_MAX_PROTOCOL_MESSAGE_LENGTH)
       {
-         this.MagicNumberBytes = magicNumberBytesmagicBytes;
-         this._maximumProtocolMessageLength = maximumProtocolMessageLength;
-         this.MagicNumber = BitConverter.ToInt32(magicNumberBytesmagicBytes);
-         this.FirstMagicNumberByte = magicNumberBytesmagicBytes[0];
+         MagicNumberBytes = magicNumberBytesmagicBytes;
+         _maximumProtocolMessageLength = maximumProtocolMessageLength;
+         MagicNumber = BitConverter.ToInt32(magicNumberBytesmagicBytes);
+         FirstMagicNumberByte = magicNumberBytesmagicBytes[0];
 
-         this.ResetFlags();
+         ResetFlags();
       }
 
       public void ResetFlags()
       {
-         this.MagicNumberRead = false;
-         this.PayloadLengthRead = false;
-         this.CommandRead = false;
-         this.ChecksumRead = false;
+         MagicNumberRead = false;
+         PayloadLengthRead = false;
+         CommandRead = false;
+         ChecksumRead = false;
       }
 
       /// <summary>
@@ -95,13 +95,13 @@ namespace MithrilShards.Example.Network.Bedrock
       /// </value>
       public void SetCommand(ref ReadOnlySequence<byte> command)
       {
-         this.CommandName = Encoding.ASCII.GetString((command.IsSingleSegment ? command.FirstSpan : command.ToArray()).Trim((byte)'\0'));
-         this.CommandRead = true;
+         CommandName = Encoding.ASCII.GetString((command.IsSingleSegment ? command.FirstSpan : command.ToArray()).Trim((byte)'\0'));
+         CommandRead = true;
       }
 
       public int GetTotalMessageLength()
       {
-         return ProtocolDefinition.HEADER_LENGTH + (int)this._payloadLength;
+         return ProtocolDefinition.HEADER_LENGTH + (int)_payloadLength;
       }
    }
 }

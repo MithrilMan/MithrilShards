@@ -20,10 +20,10 @@ namespace MithrilShards.Core.Network
                                 ILoggerFactory loggerFactory,
                                 IOptions<ForgeConnectivitySettings> serverSettings)
       {
-         this._logger = logger;
-         this._eventBus = eventBus;
-         this._loggerFactory = loggerFactory;
-         this._serverSettings = serverSettings.Value;
+         _logger = logger;
+         _eventBus = eventBus;
+         _loggerFactory = loggerFactory;
+         _serverSettings = serverSettings.Value;
       }
 
       public virtual IPeerContext CreateIncomingPeerContext(string peerId, EndPoint localEndPoint, EndPoint remoteEndPoint, INetworkMessageWriter messageWriter)
@@ -47,12 +47,12 @@ namespace MithrilShards.Core.Network
       {
 
          var peerContext = (TPeerContext)System.Activator.CreateInstance(typeof(TPeerContext),
-            this._loggerFactory.CreateLogger<IPeerContext>(),
-            this._eventBus,
+            _loggerFactory.CreateLogger<IPeerContext>(),
+            _eventBus,
             direction,
             peerId,
             localEndPoint,
-            this.GetPublicEndPoint(localEndPoint),
+            GetPublicEndPoint(localEndPoint),
             remoteEndPoint,
             messageWriter
             )!;
@@ -62,7 +62,7 @@ namespace MithrilShards.Core.Network
 
       protected EndPoint GetPublicEndPoint(EndPoint localEndPoint)
       {
-         return this._serverSettings.Listeners
+         return _serverSettings.Listeners
             .Where(binding =>
             {
                if (!IPEndPoint.TryParse(binding.EndPoint, out IPEndPoint parsedEndPoint))

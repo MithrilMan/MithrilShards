@@ -48,24 +48,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public HeadersTree(ILogger<HeadersTree> logger, IConsensusParameters consensusParameters)
       {
-         this._logger = logger;
-         this._consensusParameters = consensusParameters ?? throw new ArgumentNullException(nameof(consensusParameters));
+         _logger = logger;
+         _consensusParameters = consensusParameters ?? throw new ArgumentNullException(nameof(consensusParameters));
 
-         this.Genesis = HeaderNode.GenerateGenesis(this._consensusParameters.GenesisHeader);
+         Genesis = HeaderNode.GenerateGenesis(_consensusParameters.GenesisHeader);
 
-         this.ResetToGenesis();
+         ResetToGenesis();
       }
 
       private void ResetToGenesis()
       {
-         using (new WriteLock(this._theLock))
+         using (new WriteLock(_theLock))
          {
-            this._bestChain.Clear();
-            this._knownHeaders.Clear();
+            _bestChain.Clear();
+            _knownHeaders.Clear();
 
-            this._height = 0;
-            this._bestChain.Add(this.Genesis.Hash);
-            this._knownHeaders.Add(this.Genesis.Hash, this.Genesis);
+            _height = 0;
+            _bestChain.Add(Genesis.Hash);
+            _knownHeaders.Add(Genesis.Hash, Genesis);
          }
       }
 
@@ -86,9 +86,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             return false;
          }
 
-         using (new ReadLock(this._theLock))
+         using (new ReadLock(_theLock))
          {
-            return onlyBestChain ? this.TryGetNodeOnBestChainNoLock(blockHash, out node!) : this._knownHeaders.TryGetValue(blockHash, out node!);
+            return onlyBestChain ? TryGetNodeOnBestChainNoLock(blockHash, out node!) : _knownHeaders.TryGetValue(blockHash, out node!);
          }
       }
 
@@ -102,24 +102,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </returns>
       public bool TryGetNodeOnBestChain(int height, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         using (new ReadLock(this._theLock))
+         using (new ReadLock(_theLock))
          {
-            if (height > this._height)
+            if (height > _height)
             {
                node = null!;
                return false;
             }
 
-            node = this.GetHeaderNodeNoLock(height);
+            node = GetHeaderNodeNoLock(height);
             return true;
          }
       }
 
       public void Add(in HeaderNode newHeader)
       {
-         using (new WriteLock(this._theLock))
+         using (new WriteLock(_theLock))
          {
-            this._knownHeaders.Add(newHeader.Hash, newHeader);
+            _knownHeaders.Add(newHeader.Hash, newHeader);
          }
       }
       public void SetTip(HeaderNode newTip)
@@ -182,11 +182,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockLocator? GetLocator(HeaderNode? headerNode)
       {
-         using var readLock = new ReadLock(this._theLock);
+         using var readLock = new ReadLock(_theLock);
 
          if (headerNode == null)
          {
-            headerNode = this.GetTip();
+            headerNode = GetTip();
          }
 
          var hashes = new List<UInt256>(32); //sets initial capacity to a number that can fit usual case
@@ -201,10 +201,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
             // Exponentially larger steps back, plus the genesis block.
             int height = Math.Max(headerNode.Height - step, 0);
-            if (this.IsInBestChain(headerNode))
+            if (IsInBestChain(headerNode))
             {
                // Use O(1) CChain index if possible.
-               this.TryGetNodeOnBestChain(height, out headerNode);
+               TryGetNodeOnBestChain(height, out headerNode);
             }
             else
             {
@@ -224,9 +224,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns></returns>
       public HeaderNode GetTip()
       {
-         using (new ReadLock(this._theLock))
+         using (new ReadLock(_theLock))
          {
-            return this.GetHeaderNodeNoLock(this._height);
+            return GetHeaderNodeNoLock(_height);
          }
       }
 
@@ -238,17 +238,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          if (headerNode == null) return false;
 
-         using (new ReadLock(this._theLock))
+         using (new ReadLock(_theLock))
          {
             int headerHeight = headerNode.Height;
-            return this._bestChain.Count > headerHeight && this._bestChain[headerHeight] == headerNode.Hash;
+            return _bestChain.Count > headerHeight && _bestChain[headerHeight] == headerNode.Hash;
          }
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       private HeaderNode GetHeaderNodeNoLock(int height)
       {
-         return this._knownHeaders[this._bestChain[height]];
+         return _knownHeaders[_bestChain[height]];
       }
 
       /// <summary>
@@ -260,7 +260,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       private bool TryGetNodeOnBestChainNoLock(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         if (this._knownHeaders.TryGetValue(blockHash, out node!) && this._height > node.Height && this._bestChain[node.Height] == blockHash)
+         if (_knownHeaders.TryGetValue(blockHash, out node!) && _height > node.Height && _bestChain[node.Height] == blockHash)
          {
             return true;
          }

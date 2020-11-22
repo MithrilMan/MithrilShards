@@ -24,48 +24,48 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          public HandshakeProcessorStatus(HandshakeProcessor processor)
          {
-            this._processor = processor;
+            _processor = processor;
          }
 
          internal void VersionSent()
          {
-            this.IsVersionSent = true;
+            IsVersionSent = true;
          }
 
          internal async ValueTask VersionReceivedAsync(VersionMessage version)
          {
-            this.PeerVersion = version;
-            this._processor.PeerContext.NegotiatedProtocolVersion.Version
-               = Math.Min(this.PeerVersion.Version, this._processor._nodeImplementation.ImplementationVersion);
+            PeerVersion = version;
+            _processor.PeerContext.NegotiatedProtocolVersion.Version
+               = Math.Min(PeerVersion.Version, _processor._nodeImplementation.ImplementationVersion);
 
-            await this.OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
+            await OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
          }
 
          internal async ValueTask VerAckReceivedAsync()
          {
-            this.VersionAckReceived = true;
-            await this.OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
+            VersionAckReceived = true;
+            await OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
          }
 
          private ValueTask OnHandshakeStatusUpdatedAsync()
          {
-            if (!this.VersionAckReceived)
+            if (!VersionAckReceived)
             {
-               this._processor.logger.LogDebug("Waiting verack...");
+               _processor.logger.LogDebug("Waiting verack...");
                return default;
             }
 
-            if (this.PeerVersion == null)
+            if (PeerVersion == null)
             {
-               this._processor.logger.LogDebug("Waiting version message...");
+               _processor.logger.LogDebug("Waiting version message...");
                return default;
             }
 
             // if we reach this point, peer completed the handshake, yay!
-            this.IsHandShaked = true;
-            this._processor.logger.LogDebug("Handshake successful");
+            IsHandShaked = true;
+            _processor.logger.LogDebug("Handshake successful");
 
-            this._processor.PeerContext.OnHandshakeCompleted(this.PeerVersion);
+            _processor.PeerContext.OnHandshakeCompleted(PeerVersion);
 
             return default;
          }

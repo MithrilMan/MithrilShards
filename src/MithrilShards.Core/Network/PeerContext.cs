@@ -75,39 +75,39 @@ namespace MithrilShards.Core.Network
       {
          this.logger = logger;
          this.eventBus = eventBus;
-         this.Direction = direction;
-         this.PeerId = peerId;
+         Direction = direction;
+         PeerId = peerId;
          this.messageWriter = messageWriter;
-         this.LocalEndPoint = localEndPoint.AsIPEndPoint();
-         this.PublicEndPoint = publicEndPoint.AsIPEndPoint();
-         this.RemoteEndPoint = remoteEndPoint.AsIPEndPoint();
+         LocalEndPoint = localEndPoint.AsIPEndPoint();
+         PublicEndPoint = publicEndPoint.AsIPEndPoint();
+         RemoteEndPoint = remoteEndPoint.AsIPEndPoint();
       }
 
       public INetworkMessageWriter GetMessageWriter()
       {
-         return this.messageWriter;
+         return messageWriter;
       }
 
       public virtual void AttachNetworkMessageProcessor(INetworkMessageProcessor messageProcessor)
       {
-         if (this._messageProcessors.Exists(p => p.GetType() == messageProcessor.GetType()))
+         if (_messageProcessors.Exists(p => p.GetType() == messageProcessor.GetType()))
          {
             throw new ArgumentException($"Cannot add multiple processors of the same type. Trying to attack {messageProcessor.GetType().Name} multiple times");
          }
 
-         this._messageProcessors.Add(messageProcessor);
+         _messageProcessors.Add(messageProcessor);
       }
 
       public void Disconnect(string reason)
       {
-         this.IsConnected = false;
-         this.eventBus.Publish(new PeerDisconnectionRequired(this.RemoteEndPoint, reason));
+         IsConnected = false;
+         eventBus.Publish(new PeerDisconnectionRequired(RemoteEndPoint, reason));
       }
 
       public void Dispose()
       {
-         this.logger.LogDebug("Disposing PeerContext of {PeerId}.", this.PeerId);
-         foreach (INetworkMessageProcessor messageProcessor in this._messageProcessors)
+         logger.LogDebug("Disposing PeerContext of {PeerId}.", PeerId);
+         foreach (INetworkMessageProcessor messageProcessor in _messageProcessors)
          {
             try
             {
@@ -116,13 +116,13 @@ namespace MithrilShards.Core.Network
             }
             catch (Exception ex)
             {
-               this.logger.LogError(ex, "Fail to dispose message processor {MessageProcessor}", messageProcessor.GetType().Name);
+               logger.LogError(ex, "Fail to dispose message processor {MessageProcessor}", messageProcessor.GetType().Name);
             }
          }
 
-         this.IsConnected = false;
-         this.ConnectionCancellationTokenSource.Cancel();
-         this.eventBus.Publish(new PeerDisconnected(this, "Client disconnected", null));
+         IsConnected = false;
+         ConnectionCancellationTokenSource.Cancel();
+         eventBus.Publish(new PeerDisconnected(this, "Client disconnected", null));
       }
    }
 }

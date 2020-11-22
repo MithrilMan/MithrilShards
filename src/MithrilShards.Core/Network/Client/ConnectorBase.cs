@@ -27,11 +27,11 @@ namespace MithrilShards.Core.Network.Client
       {
          this.logger = logger;
          this.eventBus = eventBus;
-         this.peerStats = serverPeerStats;
+         peerStats = serverPeerStats;
          this.forgeConnectivity = forgeConnectivity;
          this.connectionLoop = connectionLoop;
 
-         this.DefaultDelayBetweenAttempts = TimeSpan.FromSeconds(15);
+         DefaultDelayBetweenAttempts = TimeSpan.FromSeconds(15);
 
          this.connectionLoop.Configure(stopOnException: true, exceptionHandler: this);
       }
@@ -49,7 +49,7 @@ namespace MithrilShards.Core.Network.Client
       /// <returns></returns>
       public virtual TimeSpan ComputeDelayAdjustment()
       {
-         return this.DefaultDelayBetweenAttempts;
+         return DefaultDelayBetweenAttempts;
       }
 
       /// <summary>
@@ -58,22 +58,22 @@ namespace MithrilShards.Core.Network.Client
       /// <param name="cancellation"></param>
       public virtual async Task StartConnectionLoopAsync(CancellationToken cancellation)
       {
-         await this.connectionLoop.StartAsync(
+         await connectionLoop.StartAsync(
               label: "connectionLoop",
               work: ConnectionLoopAsync,
-              this.ComputeDelayAdjustment,
+              ComputeDelayAdjustment,
               cancellation
            ).ConfigureAwait(false);
       }
 
       private async Task ConnectionLoopAsync(CancellationToken cancellation)
       {
-         if (this.connectionManager == null)
+         if (connectionManager == null)
          {
-            ThrowHelper.ThrowNullReferenceException($"{nameof(this.connectionManager)} cannot be null.");
+            ThrowHelper.ThrowNullReferenceException($"{nameof(connectionManager)} cannot be null.");
          }
 
-         await this.AttemptConnectionsAsync(this.connectionManager, cancellation).ConfigureAwait(false);
+         await AttemptConnectionsAsync(connectionManager, cancellation).ConfigureAwait(false);
       }
 
       /// <summary>
@@ -86,9 +86,9 @@ namespace MithrilShards.Core.Network.Client
 
       public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
-         if (failedWork == this.connectionLoop)
+         if (failedWork == connectionLoop)
          {
-            this.logger.LogCritical(ex, "Connector {Connector} failure, it has been stopped, node may have connection problems.", this.GetType().Name);
+            logger.LogCritical(ex, "Connector {Connector} failure, it has been stopped, node may have connection problems.", GetType().Name);
             feedback.ContinueExecution = false;
             feedback.IsCritical = true;
             feedback.Message = "Without Connector loop no new connection can be established, restart the node to fix the problem.";

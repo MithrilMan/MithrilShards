@@ -20,8 +20,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
 
       public BlockToValidate(Protocol.Types.Block block, IPeerContext? peer)
       {
-         this.Block = block;
-         this.Peer = peer;
+         Block = block;
+         Peer = peer;
       }
    }
 }

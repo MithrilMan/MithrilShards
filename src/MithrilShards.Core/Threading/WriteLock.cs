@@ -13,13 +13,13 @@ namespace MithrilShards.Core.Threading
 
       public WriteLock(ReaderWriterLockSlim theLock)
       {
-         this._theLock = theLock;
-         this._theLock.EnterWriteLock();
+         _theLock = theLock;
+         _theLock.EnterWriteLock();
       }
 
       public void Dispose()
       {
-         this._theLock.ExitWriteLock();
+         _theLock.ExitWriteLock();
       }
    }
 }

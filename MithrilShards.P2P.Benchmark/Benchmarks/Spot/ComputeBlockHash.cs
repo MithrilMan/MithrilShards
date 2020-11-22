@@ -25,7 +25,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         this._headers = Enumerable.Range(0, N)
+         _headers = Enumerable.Range(0, N)
             .Select(n => new BlockHeader
             {
                PreviousBlockHash = Core.DataTypes.UInt256.Zero,
@@ -33,7 +33,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
             })
             .ToArray();
 
-         this._headersNBitcoin = Enumerable.Range(0, N)
+         _headersNBitcoin = Enumerable.Range(0, N)
 #pragma warning disable CS0618 // Type or member is obsolete
            .Select(n => new NBitcoin.BlockHeader()
            {
@@ -49,7 +49,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       {
          foreach (var header in _headers)
          {
-            header.Hash = this._hashCalculator.ComputeHash(header, KnownVersion.CurrentVersion);
+            header.Hash = _hashCalculator.ComputeHash(header, KnownVersion.CurrentVersion);
          }
          return null;
       }
@@ -57,7 +57,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public object Parallelized()
       {
-         return Parallel.ForEach(_headers, header => header.Hash = this._hashCalculator.ComputeHash(header, KnownVersion.CurrentVersion));
+         return Parallel.ForEach(_headers, header => header.Hash = _hashCalculator.ComputeHash(header, KnownVersion.CurrentVersion));
       }
 
       [Benchmark]

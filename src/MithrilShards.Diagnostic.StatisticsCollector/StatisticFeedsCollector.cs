@@ -23,21 +23,21 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
       public StatisticFeedsCollector(ILogger<StatisticFeedsCollector> logger, IOptions<StatisticsCollectorSettings> options)
       {
-         this._logger = logger;
-         this._logStringBuilder = new StringBuilder();
-         this._settings = options.Value;
+         _logger = logger;
+         _logStringBuilder = new StringBuilder();
+         _settings = options.Value;
       }
 
       public void RegisterStatisticFeeds(IStatisticFeedsProvider statisticSource, params StatisticFeedDefinition[] statisticfeeds)
       {
-         lock (this._statisticsFeedsLock)
+         lock (_statisticsFeedsLock)
          {
             if (statisticfeeds != null)
             {
                foreach (StatisticFeedDefinition feed in statisticfeeds)
                {
-                  this._registeredfeedDefinitions.Add(feed);
-                  this._scheduledFeeds.Add(new ScheduledStatisticFeed(statisticSource, feed));
+                  _registeredfeedDefinitions.Add(feed);
+                  _scheduledFeeds.Add(new ScheduledStatisticFeed(statisticSource, feed));
                }
             }
          }
@@ -45,7 +45,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
       public IEnumerable<StatisticFeedDefinition> GetRegisteredFeedsDefinitions()
       {
-         return this._registeredfeedDefinitions.AsEnumerable();
+         return _registeredfeedDefinitions.AsEnumerable();
       }
 
       /// <summary>
@@ -58,14 +58,14 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public Task StartAsync(CancellationToken cancellationToken)
       {
-         if (this._settings.ContinuousConsoleDisplay)
+         if (_settings.ContinuousConsoleDisplay)
          {
-            this._logger.LogDebug("Starting automatic feed collection every {ContinuousConsoleDisplayRate} seconds.", this._settings.ContinuousConsoleDisplayRate);
-            _ = this.StartFetchingLoopAsync(cancellationToken);
+            _logger.LogDebug("Starting automatic feed collection every {ContinuousConsoleDisplayRate} seconds.", _settings.ContinuousConsoleDisplayRate);
+            _ = StartFetchingLoopAsync(cancellationToken);
          }
          else
          {
-            this._logger.LogDebug("Automatic feed collection is disabled, no console output will happens.");
+            _logger.LogDebug("Automatic feed collection is disabled, no console output will happens.");
          }
 
          return Task.CompletedTask;
@@ -82,15 +82,15 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          {
             while (!cancellationToken.IsCancellationRequested)
             {
-               this.FetchAllStatistics(false, true);
+               FetchAllStatistics(false, true);
 
-               if (this._logStringBuilder.Length > 0)
+               if (_logStringBuilder.Length > 0)
                {
-                  Console.WriteLine(this._logStringBuilder.ToString());
-                  this._logStringBuilder.Clear();
+                  Console.WriteLine(_logStringBuilder.ToString());
+                  _logStringBuilder.Clear();
                }
 
-               await Task.Delay(TimeSpan.FromSeconds(this._settings.ContinuousConsoleDisplayRate)).WithCancellationAsync(cancellationToken).ConfigureAwait(false);
+               await Task.Delay(TimeSpan.FromSeconds(_settings.ContinuousConsoleDisplayRate)).WithCancellationAsync(cancellationToken).ConfigureAwait(false);
             }
          }
          catch (OperationCanceledException)
@@ -99,7 +99,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          }
          catch (Exception)
          {
-            this._logger.LogDebug("Unexpected Exception during statistic generation, Statistic Collector stopped.");
+            _logger.LogDebug("Unexpected Exception during statistic generation, Statistic Collector stopped.");
          }
       }
 
@@ -112,16 +112,16 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <param name="useTableBuilder">If set to <c>true</c> use the feed tableBuilder to build an human readable output.</param>
       private void FetchAllStatistics(bool forceFetch, bool useTableBuilder)
       {
-         lock (this._statisticsFeedsLock)
+         lock (_statisticsFeedsLock)
          {
             DateTimeOffset currentTime = DateTimeOffset.Now;
-            foreach (ScheduledStatisticFeed feed in this._scheduledFeeds)
+            foreach (ScheduledStatisticFeed feed in _scheduledFeeds)
             {
                if (forceFetch || feed.NextPlannedExecution <= currentTime)
                {
                   feed.NextPlannedExecution += feed.StatisticFeedDefinition.FrequencyTarget;
 
-                  this.FetchFeedStatisticNoLock(feed, useTableBuilder);
+                  FetchFeedStatisticNoLock(feed, useTableBuilder);
                }
             }
          }
@@ -155,14 +155,14 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
             if (useTableBuilder)
             {
-               this._logStringBuilder.AppendLine(feed.GetTabularFeed());
+               _logStringBuilder.AppendLine(feed.GetTabularFeed());
             }
 
             feed.SetLastResults(newValues);
          }
          catch (Exception ex)
          {
-            this._logger.LogDebug(ex, "Error generating statistics for {IStatisticFeedsProvider}", feed.Source.GetType().Name);
+            _logger.LogDebug(ex, "Error generating statistics for {IStatisticFeedsProvider}", feed.Source.GetType().Name);
             throw;
          }
       }
@@ -178,11 +178,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public object GetFeedsDump()
       {
-         this.FetchAllStatistics(true, false);
+         FetchAllStatistics(true, false);
 
-         lock (this._statisticsFeedsLock)
+         lock (_statisticsFeedsLock)
          {
-            return this._scheduledFeeds.Select(feed => feed.GetLastResultsDump());
+            return _scheduledFeeds.Select(feed => feed.GetLastResultsDump());
          }
       }
 
@@ -194,15 +194,15 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public IStatisticFeedResult GetFeedDump(string feedId, bool humanReadable)
       {
-         ScheduledStatisticFeed feed = this._scheduledFeeds.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
+         ScheduledStatisticFeed feed = _scheduledFeeds.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
          if (feed == null)
          {
             throw new ArgumentException("feedId not found");
          }
 
-         lock (this._statisticsFeedsLock)
+         lock (_statisticsFeedsLock)
          {
-            this.FetchFeedStatisticNoLock(feed, humanReadable);
+            FetchFeedStatisticNoLock(feed, humanReadable);
             if (humanReadable)
             {
                return new TabularStatisticFeedResult(feed);

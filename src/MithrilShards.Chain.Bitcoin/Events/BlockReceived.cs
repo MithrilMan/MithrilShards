@@ -28,9 +28,9 @@ namespace MithrilShards.Chain.Events
 
       public BlockReceived(Block receivedBlock, IPeerContext? peer, IBlockFetcher? fetcher)
       {
-         this.ReceivedBlock = receivedBlock;
-         this.Peer = peer;
-         this.Fetcher = fetcher;
+         ReceivedBlock = receivedBlock;
+         Peer = peer;
+         Fetcher = fetcher;
       }
    }
 }

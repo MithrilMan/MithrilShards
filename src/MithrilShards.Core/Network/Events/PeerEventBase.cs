@@ -12,7 +12,7 @@ namespace MithrilShards.Core.Network.Events
 
       public PeerEventBase(IPeerContext peerContext)
       {
-         this.PeerContext = peerContext;
+         PeerContext = peerContext;
       }
    }
 }

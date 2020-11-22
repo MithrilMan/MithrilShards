@@ -45,8 +45,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       /// <param name="mustBeExecutedAfter">An optional list of other rules that have to be executed after the target rule.</param>
       public RulePrecedenceAttribute(uint preferredExecutionOrder = DEFAULT_EXECUTION_ORDER, params Type[] mustBeExecutedAfter)
       {
-         this.PreferredExecutionOrder = preferredExecutionOrder;
-         this.MustBeExecutedAfter = mustBeExecutedAfter;
+         PreferredExecutionOrder = preferredExecutionOrder;
+         MustBeExecutedAfter = mustBeExecutedAfter;
       }
    }
 }

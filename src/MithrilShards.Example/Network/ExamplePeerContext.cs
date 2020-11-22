@@ -45,9 +45,9 @@ namespace MithrilShards.Example.Network
 
       public void OnHandshakeCompleted(Protocol.Messages.VersionMessage peerVersion)
       {
-         this.UserAgent = peerVersion.UserAgent;
-         this.IsConnected = true;
-         this.eventBus.Publish(new PeerHandshaked(this));
+         UserAgent = peerVersion.UserAgent;
+         IsConnected = true;
+         eventBus.Publish(new PeerHandshaked(this));
       }
    }
 }

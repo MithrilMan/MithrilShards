@@ -19,15 +19,15 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
                                             IInitialBlockDownloadTracker initialBlockDownloadState
                                             ) : base(logger, settings)
       {
-         this._initialBlockDownloadState = initialBlockDownloadState;
+         _initialBlockDownloadState = initialBlockDownloadState;
       }
 
       internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
-         if (this._initialBlockDownloadState.IsDownloadingBlocks())
+         if (_initialBlockDownloadState.IsDownloadingBlocks())
          {
 
-            bool clientIsWhiteListed = this.settings.Listeners
+            bool clientIsWhiteListed = settings.Listeners
                .Any(binding => binding.IsWhitelistingEndpoint && binding.Matches(peerContext.LocalEndPoint));
 
             if (!clientIsWhiteListed)

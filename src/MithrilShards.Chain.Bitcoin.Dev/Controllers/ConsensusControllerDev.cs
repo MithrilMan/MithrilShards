@@ -20,9 +20,9 @@ namespace MithrilShards.Chain.Bitcoin.Dev
 
       public ConsensusControllerDev(ILogger<ConsensusControllerDev> logger, IEventBus eventBus, IChainState chainState)
       {
-         this._logger = logger;
-         this._eventBus = eventBus;
-         this._chainState = chainState;
+         _logger = logger;
+         _eventBus = eventBus;
+         _chainState = chainState;
       }
 
       [HttpGet]
@@ -30,7 +30,7 @@ namespace MithrilShards.Chain.Bitcoin.Dev
       [Route("ShowBestHeaderTree")]
       public ActionResult<string> ShowBestHeaderTree()
       {
-         return this.Ok(DumpKnownTree(this._chainState.BestHeader));
+         return Ok(DumpKnownTree(_chainState.BestHeader));
       }
 
 

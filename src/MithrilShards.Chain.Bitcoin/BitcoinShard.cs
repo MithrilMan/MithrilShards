@@ -14,8 +14,8 @@ namespace MithrilShards.Chain.Bitcoin
 
       public BitcoinShard(ILogger<BitcoinShard> logger, IOptions<BitcoinSettings> settings)
       {
-         this._logger = logger;
-         this._settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
+         _logger = logger;
+         _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
       }
 
       public ValueTask InitializeAsync(CancellationToken cancellationToken)

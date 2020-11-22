@@ -21,8 +21,8 @@ namespace MithrilShards.Dev.Controller.Controllers
 
       public StatisticsController(ILogger<StatisticsController> logger, IStatisticFeedsCollector statisticFeedsCollector)
       {
-         this._logger = logger;
-         this._statisticFeedsCollector = statisticFeedsCollector!;
+         _logger = logger;
+         _statisticFeedsCollector = statisticFeedsCollector!;
       }
 
       [HttpGet]
@@ -30,7 +30,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       [ProducesResponseType(StatusCodes.Status404NotFound)]
       public IActionResult GetStats()
       {
-         return this.Ok(this._statisticFeedsCollector.GetFeedsDump());
+         return Ok(_statisticFeedsCollector.GetFeedsDump());
       }
 
       [HttpGet]
@@ -41,17 +41,17 @@ namespace MithrilShards.Dev.Controller.Controllers
       {
          try
          {
-            return this._statisticFeedsCollector.GetFeedDump(feedId, humanReadable) switch
+            return _statisticFeedsCollector.GetFeedDump(feedId, humanReadable) switch
             {
-               RawStatisticFeedResult result => this.Ok(result),
-               TabularStatisticFeedResult result => this.Content(result.Content, "text/plain"),
-               IStatisticFeedResult result => this.Ok(result),
-               _ => this.NotFound()
+               RawStatisticFeedResult result => Ok(result),
+               TabularStatisticFeedResult result => Content(result.Content, "text/plain"),
+               IStatisticFeedResult result => Ok(result),
+               _ => NotFound()
             };
          }
          catch (System.ArgumentException)
          {
-            return this.NotFound($"Feed {feedId} not found!");
+            return NotFound($"Feed {feedId} not found!");
          }
       }
 
@@ -61,7 +61,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       [Route("AvailableFeeds")]
       public IEnumerable<StatisticsGetAvailableFeeds> GetAvailableFeeds()
       {
-         return this._statisticFeedsCollector.GetRegisteredFeedsDefinitions()
+         return _statisticFeedsCollector.GetRegisteredFeedsDefinitions()
             .Select(feed => new StatisticsGetAvailableFeeds
             {
                FeedId = feed.FeedId,

@@ -17,37 +17,37 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       {
          var value = new Span<byte>(new byte[32]);
          new Random().NextBytes(value);
-         this._data = value.ToArray().ToHexString();
+         _data = value.ToArray().ToHexString();
       }
 
       [Benchmark]
       public void UInt256_Neo_Parse()
       {
-         _ = NEO_UInt256.Parse(this._data);
+         _ = NEO_UInt256.Parse(_data);
       }
 
       [Benchmark]
       public void uint256_NBitcoin_Parse()
       {
-         _ = uint256.Parse(this._data);
+         _ = uint256.Parse(_data);
       }
 
       [Benchmark]
       public void uint256_NBitcoin_StringConstructor()
       {
-         _ = new uint256(this._data);
+         _ = new uint256(_data);
       }
 
       [Benchmark]
       public void uint256_MithrilShards_Parse()
       {
-         _ = MithrilShards.Core.DataTypes.UInt256.Parse(this._data);
+         _ = MithrilShards.Core.DataTypes.UInt256.Parse(_data);
       }
 
       [Benchmark]
       public void uint256_MithrilShards_StringConstructor()
       {
-         _ = new MithrilShards.Core.DataTypes.UInt256(this._data);
+         _ = new MithrilShards.Core.DataTypes.UInt256(_data);
       }
    }
 }

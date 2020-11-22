@@ -18,7 +18,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
       public RequiresRuleAttribute(Type requiredRuleType)
       {
-         this.RequiredRuleType = requiredRuleType;
+         RequiredRuleType = requiredRuleType;
       }
    }
 }

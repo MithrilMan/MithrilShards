@@ -43,22 +43,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
                              IPeriodicWork validationLoop,
                              IEventBus eventBus)
       {
-         this._logger = logger;
-         this._validationLoop = validationLoop;
-         this._chainState = chainState;
-         this._headerValidationRules = headerValidationRules;
-         this._headerValidationContextFactory = headerValidationContextFactory;
-         this._eventBus = eventBus;
+         _logger = logger;
+         _validationLoop = validationLoop;
+         _chainState = chainState;
+         _headerValidationRules = headerValidationRules;
+         _headerValidationContextFactory = headerValidationContextFactory;
+         _eventBus = eventBus;
 
-         this._headersToValidate = Channel.CreateUnbounded<HeadersToValidate>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
-         this._genesisHash = consensusParameters.GenesisHeader.Hash!;
+         _headersToValidate = Channel.CreateUnbounded<HeadersToValidate>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
+         _genesisHash = consensusParameters.GenesisHeader.Hash!;
 
-         this._validationLoop.Configure(false, this);
+         _validationLoop.Configure(false, this);
       }
 
       public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
-         this._logger.LogCritical("An unhandled exception has been raised in the header validation loop.");
+         _logger.LogCritical("An unhandled exception has been raised in the header validation loop.");
          feedback.IsCritical = true;
          feedback.ContinueExecution = false;
          feedback.Message = "Without validation loop, it's impossible to advance in consensus. A node restart is required to fix the problem.";
@@ -66,10 +66,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 
       public Task StartAsync(CancellationToken cancellationToken)
       {
-         this._headerValidationRules.SetupRules();
+         _headerValidationRules.SetupRules();
 
          // starts the consumer loop of header validation
-         this._validationLoop.StartAsync(
+         _validationLoop.StartAsync(
             label: nameof(HeaderValidator),
             work: ValidationWorkAsync,
             interval: TimeSpan.Zero,
@@ -86,7 +86,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 
       public async ValueTask RequestValidationAsync(HeadersToValidate header)
       {
-         await this._headersToValidate.Writer.WriteAsync(header).ConfigureAwait(false);
+         await _headersToValidate.Writer.WriteAsync(header).ConfigureAwait(false);
       }
 
       /// <summary>
@@ -99,7 +99,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
          {
             if (request.Headers.Count == 0) continue; //if there aren't headers to validate, ignore the request
 
-            this._logger.LogDebug("Validating {HeadersCount} headers", request.Headers.Count);
+            _logger.LogDebug("Validating {HeadersCount} headers", request.Headers.Count);
 
             var newValidatedHeaderNodes = new List<HeaderNode>();
 
@@ -121,7 +121,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
                {
                   using (_logger.BeginScope("Validating header {ValidationRuleType}", header!.Hash))
                   {
-                     if (!this.AcceptBlockHeaderLocked(header, out state, out HeaderNode? validatedHeaderNode, out bool newHeaderFound))
+                     if (!AcceptBlockHeaderLocked(header, out state, out HeaderNode? validatedHeaderNode, out bool newHeaderFound))
                      {
                         invalidBlockHeader = header;
                         break;
@@ -143,12 +143,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
             if (state!.IsInvalid())
             {
                // signal header validation failed
-               this._eventBus.Publish(new BlockHeaderValidationFailed(invalidBlockHeader!, state, request.Peer));
+               _eventBus.Publish(new BlockHeaderValidationFailed(invalidBlockHeader!, state, request.Peer));
             }
             else
             {
                // signal header validation succeeded
-               this._eventBus.Publish(new BlockHeaderValidationSucceeded(validatedHeaders,
+               _eventBus.Publish(new BlockHeaderValidationSucceeded(validatedHeaders,
                                                                         lastValidatedBlockHeader!,
                                                                         lastValidatedHeaderNode!,
                                                                         newValidatedHeaderNodes.Count,
@@ -174,15 +174,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
          validationState = new BlockValidationState();
 
          //don't validate genesis header
-         if (headerHash != this._genesisHash)
+         if (headerHash != _genesisHash)
          {
-            IHeaderValidationContext context = this._headerValidationContextFactory.Create(header);
+            IHeaderValidationContext context = _headerValidationContextFactory.Create(header);
 
-            foreach (IHeaderValidationRule rule in this._headerValidationRules.Rules)
+            foreach (IHeaderValidationRule rule in _headerValidationRules.Rules)
             {
                if (!rule.Check(context, ref validationState))
                {
-                  this._logger.LogDebug("Header validation failed: {HeaderValidationState}", validationState.ToString());
+                  _logger.LogDebug("Header validation failed: {HeaderValidationState}", validationState.ToString());
                   isNew = false;
                   processedHeader = null;
                   return false;
@@ -203,7 +203,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
             }
          }
 
-         processedHeader = this._chainState.AddToBlockIndex(header);
+         processedHeader = _chainState.AddToBlockIndex(header);
          isNew = true;
 
          return true;

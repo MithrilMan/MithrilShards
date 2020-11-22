@@ -78,9 +78,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// </returns>
       public bool IsCoinBase()
       {
-         return this.Inputs!.Length == 1
-             && this.Inputs[0].PreviousOutput!.IsNull()
-             && this.Outputs!.Length >= 1;
+         return Inputs!.Length == 1
+             && Inputs[0].PreviousOutput!.IsNull()
+             && Outputs!.Length >= 1;
       }
    }
 }

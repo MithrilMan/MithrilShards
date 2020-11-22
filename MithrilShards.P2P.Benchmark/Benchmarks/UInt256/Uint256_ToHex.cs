@@ -18,20 +18,20 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
          var value = new Span<byte>(new byte[32]);
          new Random().NextBytes(value);
 
-         this._nBitcoinData = new uint256(value.ToArray());
-         this._mithrilShardsData = new Core.DataTypes.UInt256(value);
+         _nBitcoinData = new uint256(value.ToArray());
+         _mithrilShardsData = new Core.DataTypes.UInt256(value);
       }
 
       [Benchmark(Baseline = true)]
       public void UInt256_ToString_NBitcoin()
       {
-         _ = this._nBitcoinData.ToString();
+         _ = _nBitcoinData.ToString();
       }
 
       [Benchmark]
       public void UInt256_ToString_MithrilShards()
       {
-         _ = this._mithrilShardsData.ToString();
+         _ = _mithrilShardsData.ToString();
       }
    }
 }

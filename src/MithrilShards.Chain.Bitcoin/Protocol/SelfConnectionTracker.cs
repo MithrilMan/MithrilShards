@@ -12,8 +12,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public SelfConnectionTracker(ILogger<SelfConnectionTracker> logger, IRandomNumberGenerator randomNumberGenerator)
       {
-         this._logger = logger;
-         this._randomNumberGenerator = randomNumberGenerator;
+         _logger = logger;
+         _randomNumberGenerator = randomNumberGenerator;
       }
 
 
@@ -26,7 +26,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
       /// </returns>
       public bool IsSelfConnection(ulong nonce)
       {
-         return this._localNonces.Contains(nonce);
+         return _localNonces.Contains(nonce);
       }
 
       /// <summary>
@@ -37,9 +37,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
          /// thread safety concerns: currently the process of allocating new nonces is not thread safe but server are generated synchronously,
          /// this mean that we shouldn't have thread problems on this.
 
-         ulong localNonce = this._randomNumberGenerator.GetUint64();
-         this._logger.LogDebug("Generated new local nonce {LocalNonce}", localNonce);
-         this._localNonces.Add(localNonce);
+         ulong localNonce = _randomNumberGenerator.GetUint64();
+         _logger.LogDebug("Generated new local nonce {LocalNonce}", localNonce);
+         _localNonces.Add(localNonce);
       }
    }
 }

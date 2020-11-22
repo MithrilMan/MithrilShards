@@ -14,8 +14,8 @@ namespace MithrilShards.Example
 
       public ExampleShard(ILogger<ExampleShard> logger, IOptions<ExampleSettings> settings)
       {
-         this._logger = logger;
-         this._settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
+         _logger = logger;
+         _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
       }
 
       public ValueTask InitializeAsync(CancellationToken cancellationToken)

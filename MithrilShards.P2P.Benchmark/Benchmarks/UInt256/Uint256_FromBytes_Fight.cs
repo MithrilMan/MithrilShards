@@ -15,61 +15,61 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
       [GlobalSetup]
       public void Setup()
       {
-         new Random().NextBytes(this._data);
+         new Random().NextBytes(_data);
       }
 
       [Benchmark]
       public void UInt256_BigInteger_FromBytes()
       {
-         _ = new BigInteger(this._data);
+         _ = new BigInteger(_data);
       }
 
       [Benchmark]
       public void UInt256_Neo_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(this._data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256(_data);
       }
 
       [Benchmark]
       public void uint256_NBitcoin_FromBytes()
       {
-         _ = new uint256(new ReadOnlySpan<byte>(this._data));
+         _ = new uint256(new ReadOnlySpan<byte>(_data));
       }
 
       [Benchmark]
       public void uint256_Stratis_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.Stratis.STRATIS_uint256(this._data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.Stratis.STRATIS_uint256(_data);
       }
 
       [Benchmark]
       public void uint256_MithrilShards_FromBytes()
       {
-         _ = new Core.DataTypes.UInt256(this._data);
+         _ = new Core.DataTypes.UInt256(_data);
       }
 
       [Benchmark]
       public void uint256_MithrilShards4Longs_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Long(this._data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Long(_data);
       }
 
       [Benchmark]
       public void uint256_Unsafe_MithrilShards_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256(this._data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256(_data);
       }
 
       [Benchmark]
       public void uint256_Unsafe_MithrilShards4Longs_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256As4Long(this._data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UnsafeUInt256As4Long(_data);
       }
 
       [Benchmark]
       public void uint256_Unsafe_MithrilShardsUInt256As4Jhon_FromBytes()
       {
-         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Jhon(this._data);
+         _ = new P2P.Benchmark.Benchmarks.DataTypes.MithrilShards.UInt256As4Jhon(_data);
       }
    }
 }

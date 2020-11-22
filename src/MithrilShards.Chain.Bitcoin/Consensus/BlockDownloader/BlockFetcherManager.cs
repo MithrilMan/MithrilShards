@@ -94,24 +94,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                                  IPeriodicWork checkStaleBlockDownload,
                                  IPeriodicWork checkFetcherScore)
       {
-         this._logger = logger;
-         this._eventBus = eventBus;
-         this._dateTimeProvider = dateTimeProvider;
-         this._chainState = chainState;
-         this._blockFetchAssignmentLoop = downloadAssignmentLoop;
-         this._checkStaleBlockFetchersLoop = checkStaleBlockDownload;
-         this._checkFetchersScoreLoop = checkFetcherScore;
-         this._requiredBlocks = Channel.CreateUnbounded<HeaderNode>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
+         _logger = logger;
+         _eventBus = eventBus;
+         _dateTimeProvider = dateTimeProvider;
+         _chainState = chainState;
+         _blockFetchAssignmentLoop = downloadAssignmentLoop;
+         _checkStaleBlockFetchersLoop = checkStaleBlockDownload;
+         _checkFetchersScoreLoop = checkFetcherScore;
+         _requiredBlocks = Channel.CreateUnbounded<HeaderNode>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
 
-         this._blockFetchAssignmentLoop.Configure(stopOnException: false, exceptionHandler: this);
-         this._checkStaleBlockFetchersLoop.Configure(stopOnException: false, exceptionHandler: this);
-         this._checkFetchersScoreLoop.Configure(stopOnException: false, exceptionHandler: this);
+         _blockFetchAssignmentLoop.Configure(stopOnException: false, exceptionHandler: this);
+         _checkStaleBlockFetchersLoop.Configure(stopOnException: false, exceptionHandler: this);
+         _checkFetchersScoreLoop.Configure(stopOnException: false, exceptionHandler: this);
       }
 
       public Task StartAsync(CancellationToken cancellationToken)
       {
          // starts the loop that distribute block downloads requests.
-         this._blockFetchAssignmentLoop.StartAsync(
+         _blockFetchAssignmentLoop.StartAsync(
             label: nameof(_blockFetchAssignmentLoop),
             work: BlockFetchAssignmentWorkAsync,
             interval: TimeSpan.Zero,
@@ -119,7 +119,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
             );
 
          // starts the loop that check for stale block fetchers.
-         this._checkStaleBlockFetchersLoop.StartAsync(
+         _checkStaleBlockFetchersLoop.StartAsync(
             label: nameof(_checkStaleBlockFetchersLoop),
             work: CheckStaleBlockFetchersWorkAsync,
             interval: TimeSpan.FromSeconds(CHECK_STALE_BLOCK_FETCHERS_LOOP_INTERVAL),
@@ -127,7 +127,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
             );
 
          // starts the consumer loop that distribute block downloads requests.
-         this._checkFetchersScoreLoop.StartAsync(
+         _checkFetchersScoreLoop.StartAsync(
             label: nameof(_checkFetchersScoreLoop),
             work: CheckFetchersScoreWorkAsync,
             interval: TimeSpan.FromSeconds(CHECK_FETCHERS_SCORE_LOOP_INTERVAL),
@@ -136,8 +136,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
          // subscribe to events we are interested into
          _eventSubscriptionManager
-            .RegisterSubscriptions(this._eventBus.Subscribe<BlockHeaderValidationSucceeded>(async (args) => await this.OnBlockHeaderValidationSucceededAsync(args).ConfigureAwait(false)))
-            .RegisterSubscriptions(this._eventBus.Subscribe<BlockReceived>(this.OnBlockReceived));
+            .RegisterSubscriptions(_eventBus.Subscribe<BlockHeaderValidationSucceeded>(async (args) => await OnBlockHeaderValidationSucceededAsync(args).ConfigureAwait(false)))
+            .RegisterSubscriptions(_eventBus.Subscribe<BlockReceived>(OnBlockReceived));
 
          return Task.CompletedTask;
       }
@@ -149,7 +149,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
       public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
-         this._logger.LogCritical("An unhandled exception has been raised in the {0} work.", failedWork.Label);
+         _logger.LogCritical("An unhandled exception has been raised in the {0} work.", failedWork.Label);
          feedback.ContinueExecution = false;
          feedback.IsCritical = true;
          feedback.Message = "Node may be unstable, restart the node to fix the problem";
@@ -157,7 +157,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
       public bool TryGetFetcher(UInt256 hash, [MaybeNullWhen(false)] out IBlockFetcher? fetcher)
       {
-         bool result = this._mapBlocksInFlight.TryGetValue(hash, out (IBlockFetcher fetcher, List<QueuedBlock> queuedBlocks) items);
+         bool result = _mapBlocksInFlight.TryGetValue(hash, out (IBlockFetcher fetcher, List<QueuedBlock> queuedBlocks) items);
          fetcher = items.fetcher;
 
          return result;
@@ -171,9 +171,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
          if (arg.Fetcher != null)
          {
             //check if the block was requested and remove it from the queued blocks
-            if (!this._blocksInDownload.TryGetValue(arg.Fetcher, out List<PendingDownload>? pendingDownloads))
+            if (!_blocksInDownload.TryGetValue(arg.Fetcher, out List<PendingDownload>? pendingDownloads))
             {
-               this._logger.LogDebug("Received block {UnrequestedBlock} from an unexpected source, do nothing.", blockHash);
+               _logger.LogDebug("Received block {UnrequestedBlock} from an unexpected source, do nothing.", blockHash);
                return;
             }
 
@@ -208,7 +208,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
          {
             //check if the header is relative to current "best header"
             //this.chainState.
-            HeaderNode? bestNodeHeader = this._chainState.BestHeader;
+            HeaderNode? bestNodeHeader = _chainState.BestHeader;
             if (args.LastValidatedHeaderNode.LastCommonAncestor(bestNodeHeader) != bestNodeHeader)
             {
                /// these validated headers refers to a chain that's not currently the best chain so I don't require blocks yet.
@@ -217,7 +217,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                ///TODO: ensure we are not stuck in case our best known header refers to something not validated fully
                ///(e.g. headers validate but blocks are never sent to us)
                ///Technically this branch may be left without blocks and so should be removed and rolled back to be moved then to a better fork
-               this._logger.LogDebug("Ignoring validated headers because they are on a lower fork at this time");
+               _logger.LogDebug("Ignoring validated headers because they are on a lower fork at this time");
                return;
             }
 
@@ -236,7 +236,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
             foreach (HeaderNode? header in newNodesToFetch)
             {
-               this._blocksToDownload.Enqueue(header);
+               _blocksToDownload.Enqueue(header);
             }
          }
 
@@ -249,7 +249,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       {
          using (new WriteLock(_fetcherSlimLock))
          {
-            this._fetchers.Add(blockFetcher);
+            _fetchers.Add(blockFetcher);
          }
       }
 
@@ -261,25 +261,25 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       {
          lock (_channelLock)
          {
-            if (this._blocksToDownload.Count == 0)
+            if (_blocksToDownload.Count == 0)
             {
-               this._logger.LogDebug("No blocks to download");
+               _logger.LogDebug("No blocks to download");
                // no more blocks to download
                return;
             }
 
-            int availableSlots = MAX_PARALLEL_DOWNLOADED_BLOCKS - this._blocksInDownload.Count;
+            int availableSlots = MAX_PARALLEL_DOWNLOADED_BLOCKS - _blocksInDownload.Count;
 
             for (int i = 0; i < availableSlots; i++)
             {
-               if (!this._blocksToDownload.TryDequeue(out HeaderNode? blockToDownload))
+               if (!_blocksToDownload.TryDequeue(out HeaderNode? blockToDownload))
                {
-                  this._logger.LogTrace("No blocks to download");
+                  _logger.LogTrace("No blocks to download");
                   // no more blocks to download
                   return;
                }
 
-               this._requiredBlocks.Writer.TryWrite(blockToDownload);
+               _requiredBlocks.Writer.TryWrite(blockToDownload);
             }
          }
       }
@@ -290,7 +290,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       /// <param name="cancellation">The cancellation.</param>
       private async Task BlockFetchAssignmentWorkAsync(CancellationToken cancellation)
       {
-         await foreach (HeaderNode blockToDownload in this._requiredBlocks.Reader.ReadAllAsync(cancellation))
+         await foreach (HeaderNode blockToDownload in _requiredBlocks.Reader.ReadAllAsync(cancellation))
          {
             // get first 3 fetchers with score
             //this.fetchers
@@ -300,7 +300,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
             //try to see if performance wise has too much impact
             IBlockFetcher? selectedFetcher = (
-               from fetcher in this._fetchers
+               from fetcher in _fetchers
                let score = fetcher.GetFetchBlockScore(blockToDownload)
                orderby score descending
                where score > 0 // only peers that can fetch the block
@@ -310,18 +310,18 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
 
             if (selectedFetcher == null)
             {
-               this._logger.LogDebug("None of the block fetcher is able to get block {BlockHash}, mark this block as failed", blockToDownload.Hash);
-               this._failedBlockFetch.TryAdd(blockToDownload.Hash, blockToDownload);
+               _logger.LogDebug("None of the block fetcher is able to get block {BlockHash}, mark this block as failed", blockToDownload.Hash);
+               _failedBlockFetch.TryAdd(blockToDownload.Hash, blockToDownload);
                return;
             }
 
-            if (!this._blocksInDownload.TryGetValue(selectedFetcher, out List<PendingDownload>? selectedFetcherPendingDownloads))
+            if (!_blocksInDownload.TryGetValue(selectedFetcher, out List<PendingDownload>? selectedFetcherPendingDownloads))
             {
                selectedFetcherPendingDownloads = new List<PendingDownload>();
-               this._blocksInDownload.TryAdd(selectedFetcher, selectedFetcherPendingDownloads);
+               _blocksInDownload.TryAdd(selectedFetcher, selectedFetcherPendingDownloads);
             }
 
-            selectedFetcherPendingDownloads.Add(new PendingDownload(blockToDownload, selectedFetcher, this._dateTimeProvider.GetTimeMicros()));
+            selectedFetcherPendingDownloads.Add(new PendingDownload(blockToDownload, selectedFetcher, _dateTimeProvider.GetTimeMicros()));
          }
       }
 
@@ -364,10 +364,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       /// <returns></returns>
       private Task CheckFetchersScoreWorkAsync(CancellationToken cancellation)
       {
-         using var writeFetcherLock = new WriteLock(this._fetcherSlimLock);
+         using var writeFetcherLock = new WriteLock(_fetcherSlimLock);
 
          uint min = 0, max = 0, sum = 0;
-         foreach (IBlockFetcher? fetcher in this._fetchers)
+         foreach (IBlockFetcher? fetcher in _fetchers)
          {
             uint score = fetcher.GetScore();
 
@@ -376,7 +376,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
             sum += score;
          }
 
-         this._fetchersScore = (min, max, _fetchers.Count == 0 ? 0 : (uint)(sum / _fetchers.Count));
+         _fetchersScore = (min, max, _fetchers.Count == 0 ? 0 : (uint)(sum / _fetchers.Count));
 
          return Task.CompletedTask;
       }

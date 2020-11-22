@@ -15,31 +15,31 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public LocalServiceProvider(ILogger<LocalServiceProvider> logger)
       {
-         this._logger = logger;
+         _logger = logger;
 
-         this.AddServices(NodeServices.Network | NodeServices.NetworkLimited | NodeServices.Witness);
+         AddServices(NodeServices.Network | NodeServices.NetworkLimited | NodeServices.Witness);
       }
 
       public void AddServices(NodeServices services)
       {
-         this._logger.LogDebug("Adding services {NodeServices}", services);
-         this._availableServices |= services;
+         _logger.LogDebug("Adding services {NodeServices}", services);
+         _availableServices |= services;
       }
 
       public void RemoveServices(NodeServices services)
       {
-         this._logger.LogDebug("Removing services {NodeServices}", services);
-         this._availableServices &= ~services;
+         _logger.LogDebug("Removing services {NodeServices}", services);
+         _availableServices &= ~services;
       }
 
       public NodeServices GetServices()
       {
-         return this._availableServices;
+         return _availableServices;
       }
 
       public bool HasServices(NodeServices service)
       {
-         return this._availableServices.HasFlag(service);
+         return _availableServices.HasFlag(service);
       }
    }
 }

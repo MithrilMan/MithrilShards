@@ -35,22 +35,22 @@
 
       public void Add(int permission)
       {
-         this._permissions |= permission;
+         _permissions |= permission;
       }
 
       public void Remove(int permission)
       {
-         this._permissions &= ~permission;
+         _permissions &= ~permission;
       }
 
       public bool Has(int permission)
       {
-         return (this._permissions & permission) == permission;
+         return (_permissions & permission) == permission;
       }
 
       public void Reset()
       {
-         this._permissions = NONE;
+         _permissions = NONE;
       }
    }
 }

@@ -12,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public BlockMessageSerializer(IProtocolTypeSerializer<Block> blockSerializer)
       {
-         this._blockSerializer = blockSerializer;
+         _blockSerializer = blockSerializer;
       }
 
       public override void Serialize(BlockMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
@@ -20,14 +20,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
          ProtocolTypeSerializerOptions? options = null;
          message.PopulateSerializerOption(ref options);
 
-         output.WriteWithSerializer(message.Block!, protocolVersion, this._blockSerializer, options);
+         output.WriteWithSerializer(message.Block!, protocolVersion, _blockSerializer, options);
       }
 
       public override BlockMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
          var options = new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, peerContext.CanServeWitness));
 
-         return new BlockMessage { Block = reader.ReadWithSerializer(protocolVersion, this._blockSerializer, options) };
+         return new BlockMessage { Block = reader.ReadWithSerializer(protocolVersion, _blockSerializer, options) };
       }
    }
 }

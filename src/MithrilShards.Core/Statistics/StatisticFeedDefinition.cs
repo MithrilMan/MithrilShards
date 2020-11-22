@@ -27,10 +27,10 @@ namespace MithrilShards.Core.Statistics
 
       public StatisticFeedDefinition(string feedId, string title, List<FieldDefinition> counterDefinitions, TimeSpan frequencyTarget)
       {
-         this.FeedId = feedId;
-         this.Title = title ?? throw new ArgumentNullException(nameof(title));
-         this.FieldsDefinition = counterDefinitions ?? throw new ArgumentNullException(nameof(title));
-         this.FrequencyTarget = frequencyTarget;
+         FeedId = feedId;
+         Title = title ?? throw new ArgumentNullException(nameof(title));
+         FieldsDefinition = counterDefinitions ?? throw new ArgumentNullException(nameof(title));
+         FrequencyTarget = frequencyTarget;
       }
    }
 }

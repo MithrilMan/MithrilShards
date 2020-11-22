@@ -17,11 +17,11 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         this._value = new Core.DataTypes.UInt256("0123456789abcdef0123456789ABCDEF0123456789abcdef0123456789ABCDEF").GetBytes().ToArray();
+         _value = new Core.DataTypes.UInt256("0123456789abcdef0123456789ABCDEF0123456789abcdef0123456789ABCDEF").GetBytes().ToArray();
       }
 
       [Benchmark]
-      public object ConvertAsMithril() => this.ConvertAsMithril(this._value);
+      public object ConvertAsMithril() => ConvertAsMithril(_value);
 
       private object ConvertAsMithril(byte[] value)
       {
@@ -29,7 +29,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public string ConvertReverseAsMithril() => this.ConvertReverseAsMithril(this._value);
+      public string ConvertReverseAsMithril() => ConvertReverseAsMithril(_value);
 
       private string ConvertReverseAsMithril(byte[] value)
       {
@@ -37,10 +37,10 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public object ConvertAsNEO() => ConvertAsNEO(this._value);
+      public object ConvertAsNEO() => ConvertAsNEO(_value);
 
       [Benchmark]
-      public object ConvertAsNBitcoin() => ConvertAsNBitcoin(this._value, false);
+      public object ConvertAsNBitcoin() => ConvertAsNBitcoin(_value, false);
 
       private static string ConvertAsNEO(byte[] value)
       {

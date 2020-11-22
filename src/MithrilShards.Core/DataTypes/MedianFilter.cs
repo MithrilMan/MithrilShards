@@ -13,12 +13,12 @@ namespace MithrilShards.Core.DataTypes
       private readonly Func<(T lowerItem, T higherItem), T> _medianComputationOnEvenElements;
       private readonly uint _size;
 
-      public int Count => this._items.Count;
+      public int Count => _items.Count;
 
       public MedianFilter(uint size, T initialValue, Func<(T lowerItem, T higherItem), T> medianComputationOnEvenElements)
       {
-         this._size = size;
-         this._medianComputationOnEvenElements = medianComputationOnEvenElements;
+         _size = size;
+         _medianComputationOnEvenElements = medianComputationOnEvenElements;
          _items = new Queue<T>((int)size);
          _items.Enqueue(initialValue);
       }
@@ -39,7 +39,7 @@ namespace MithrilShards.Core.DataTypes
          }
          else
          {
-            return this._medianComputationOnEvenElements((sortedItems[_size / 2 - 1], sortedItems[_size / 2]));
+            return _medianComputationOnEvenElements((sortedItems[_size / 2 - 1], sortedItems[_size / 2]));
          }
       }
 

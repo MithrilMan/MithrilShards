@@ -24,35 +24,35 @@ namespace MithrilShards.Core.Forge
                    IEnumerable<IMithrilShard> mithrilShards,
                    DefaultConfigurationWriter? defaultConfigurationManager = null)
       {
-         this._forgeDataFolderLock = forgeDataFolderLock;
-         this._forgeServer = forgeServer;
-         this._mithrilShards = mithrilShards;
-         this._defaultConfigurationManager = defaultConfigurationManager;
-         this._logger = logger;
+         _forgeDataFolderLock = forgeDataFolderLock;
+         _forgeServer = forgeServer;
+         _mithrilShards = mithrilShards;
+         _defaultConfigurationManager = defaultConfigurationManager;
+         _logger = logger;
       }
 
       private async Task InitializeShardsAsync(CancellationToken stoppingToken)
       {
          //if no default configuration file is present, create one
-         this._defaultConfigurationManager?.GenerateDefaultFile();
+         _defaultConfigurationManager?.GenerateDefaultFile();
 
-         using (this._logger.BeginScope("Initializing Shards"))
+         using (_logger.BeginScope("Initializing Shards"))
          {
-            foreach (IMithrilShard shard in this._mithrilShards)
+            foreach (IMithrilShard shard in _mithrilShards)
             {
                if (!(shard is IForgeConnectivity))
                {
-                  this._logger.LogDebug("Initializing Shard {ShardType}", shard.GetType().Name);
+                  _logger.LogDebug("Initializing Shard {ShardType}", shard.GetType().Name);
                   await shard.InitializeAsync(stoppingToken).ConfigureAwait(false);
                }
             }
          }
 
-         foreach (IMithrilShard shard in this._mithrilShards)
+         foreach (IMithrilShard shard in _mithrilShards)
          {
             if (!(shard is IForgeConnectivity))
             {
-               this._logger.LogDebug("Starting Shard {ShardType}", shard.GetType().Name);
+               _logger.LogDebug("Starting Shard {ShardType}", shard.GetType().Name);
                _ = shard.StartAsync(stoppingToken);
             }
          }
@@ -60,47 +60,47 @@ namespace MithrilShards.Core.Forge
 
       protected override async Task ExecuteAsync(CancellationToken stoppingToken)
       {
-         if (!this._forgeDataFolderLock.TryLockDataFolder())
+         if (!_forgeDataFolderLock.TryLockDataFolder())
          {
-            this._logger.LogCritical("Node folder is being used by another instance of the application!");
+            _logger.LogCritical("Node folder is being used by another instance of the application!");
             throw new Exception("Node folder is being used!");
          }
 
-         await this.InitializeShardsAsync(stoppingToken).ConfigureAwait(false);
+         await InitializeShardsAsync(stoppingToken).ConfigureAwait(false);
 
-         await this._forgeServer.InitializeAsync(stoppingToken).ConfigureAwait(false);
+         await _forgeServer.InitializeAsync(stoppingToken).ConfigureAwait(false);
 
-         await this._forgeServer.StartAsync(stoppingToken).ConfigureAwait(false);
+         await _forgeServer.StartAsync(stoppingToken).ConfigureAwait(false);
 
-         this._forgeDataFolderLock.UnlockDataFolder();
+         _forgeDataFolderLock.UnlockDataFolder();
       }
 
       public override async Task StopAsync(CancellationToken cancellationToken)
       {
-         using IDisposable logScope = this._logger.BeginScope("Shutting down the Forge.");
+         using IDisposable logScope = _logger.BeginScope("Shutting down the Forge.");
 
-         this._logger.LogDebug("Stopping forge server.");
-         await this._forgeServer.StopAsync(cancellationToken).ConfigureAwait(false);
+         _logger.LogDebug("Stopping forge server.");
+         await _forgeServer.StopAsync(cancellationToken).ConfigureAwait(false);
 
-         this._logger.LogDebug("Stopping Shards");
-         foreach (IMithrilShard shard in this._mithrilShards)
+         _logger.LogDebug("Stopping Shards");
+         foreach (IMithrilShard shard in _mithrilShards)
          {
             if (!(shard is IForgeConnectivity))
             {
-               this._logger.LogDebug("Stopping Shard {ShardType}", shard.GetType().Name);
+               _logger.LogDebug("Stopping Shard {ShardType}", shard.GetType().Name);
                _ = shard.StopAsync(cancellationToken);
             }
          }
 
-         this._logger.LogDebug("Stopping Forge instance.");
+         _logger.LogDebug("Stopping Forge instance.");
          await base.StopAsync(cancellationToken).ConfigureAwait(false);
       }
 
       public List<(string name, string version)> GetMeltedShardsNames()
       {
-         if (this._mithrilShards?.Count() == 0) return new List<(string name, string version)>();
+         if (_mithrilShards?.Count() == 0) return new List<(string name, string version)>();
 
-         return this._mithrilShards.Select(shard => (
+         return _mithrilShards.Select(shard => (
             name: shard.GetType().Name,
             version: shard.GetType().Assembly.GetName().Version?.ToString(3) ?? "-"
             )).ToList();

@@ -57,12 +57,12 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.NBitcoinTypes
       public NBitcoin_Target(BigInteger target)
       {
          _target = target;
-         _target = new NBitcoin_Target(this.ToCompact())._target;
+         _target = new NBitcoin_Target(ToCompact())._target;
       }
       public NBitcoin_Target(uint256 target)
       {
          _target = new BigInteger(target.ToBytes(false));
-         _target = new NBitcoin_Target(this.ToCompact())._target;
+         _target = new NBitcoin_Target(ToCompact())._target;
       }
 
       public static implicit operator NBitcoin_Target(uint a)

@@ -45,18 +45,18 @@ namespace MithrilShards.Core.Threading
 
       public PeriodicWork(ILogger<PeriodicWork> logger, IPeriodicWorkTracker periodicWorkTracker, IEventBus eventBus)
       {
-         this._logger = logger;
-         this._periodicWorkTracker = periodicWorkTracker;
-         this._eventBus = eventBus;
+         _logger = logger;
+         _periodicWorkTracker = periodicWorkTracker;
+         _eventBus = eventBus;
 
-         this.Id = Guid.NewGuid();
-         logger.LogDebug("Created periodic work {IPeriodicWorkId}", this.Id);
+         Id = Guid.NewGuid();
+         logger.LogDebug("Created periodic work {IPeriodicWorkId}", Id);
       }
 
       public void Configure(bool stopOnException = false, IPeriodicWorkExceptionHandler? exceptionHandler = null)
       {
-         this._stopOnException = stopOnException;
-         this._exceptionHandler = exceptionHandler;
+         _stopOnException = stopOnException;
+         _exceptionHandler = exceptionHandler;
       }
 
       public Task StartAsync(string label, IPeriodicWork.WorkAsync work, TimeSpan interval, CancellationToken cancellation)
@@ -71,24 +71,24 @@ namespace MithrilShards.Core.Threading
 
       private async Task StartInternalAsync(string label, IPeriodicWork.WorkAsync work, Func<TimeSpan> interval, CancellationToken cancellation)
       {
-         if (this._isRunning)
+         if (_isRunning)
          {
-            _logger.LogError("PeriodicWork {PeriodicWorkId} is already running.", this.Id);
+            _logger.LogError("PeriodicWork {PeriodicWorkId} is already running.", Id);
             ThrowHelper.ThrowInvalidOperationException("Cannot start a periodic work that's already running.");
             return;
          }
 
-         this._label = label;
+         _label = label;
          Interlocked.Exchange(ref _exceptionsCount, 0);
 
-         this._periodicWorkTracker.StartTracking(this);
+         _periodicWorkTracker.StartTracking(this);
 
-         using (this._cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellation))
+         using (_cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellation))
          {
             CancellationToken token = _cancellationTokenSource.Token;
 
-            _logger.LogDebug("PeriodicWork {PeriodicWorkId} is starting.", this.Id);
-            this._isRunning = true;
+            _logger.LogDebug("PeriodicWork {PeriodicWorkId} is starting.", Id);
+            _isRunning = true;
             while (!token.IsCancellationRequested)
             {
                try
@@ -98,7 +98,7 @@ namespace MithrilShards.Core.Threading
                }
                catch (OperationCanceledException)
                {
-                  _logger.LogDebug("PeriodicWork {PeriodicWorkId} aborted.", this.Id);
+                  _logger.LogDebug("PeriodicWork {PeriodicWorkId} aborted.", Id);
                   break;
                }
                catch (Exception ex)
@@ -107,16 +107,16 @@ namespace MithrilShards.Core.Threading
                   Interlocked.Increment(ref _exceptionsCount);
 
                   var feedback = new IPeriodicWorkExceptionHandler.Feedback(!_stopOnException, false, null);
-                  this._exceptionHandler?.OnPeriodicWorkException(this, ex, ref feedback);
+                  _exceptionHandler?.OnPeriodicWorkException(this, ex, ref feedback);
 
                   if (!feedback.ContinueExecution)
                   {
-                     _logger.LogDebug("PeriodicWork {PeriodicWorkId} terminated because of {PeriodicWorkException}.", this.Id, ex);
-                     this._isRunning = false;
+                     _logger.LogDebug("PeriodicWork {PeriodicWorkId} terminated because of {PeriodicWorkException}.", Id, ex);
+                     _isRunning = false;
 
                      if (feedback.IsCritical)
                      {
-                        this._eventBus.Publish(new PeriodicWorkCriticallyStopped(this._label, this.Id, this._lastException, feedback.Message));
+                        _eventBus.Publish(new PeriodicWorkCriticallyStopped(_label, Id, _lastException, feedback.Message));
                      }
 
                      return;
@@ -124,35 +124,35 @@ namespace MithrilShards.Core.Threading
                }
             }
 
-            this._isRunning = false;
+            _isRunning = false;
 
-            if (this.ExceptionsCount == 0)
+            if (ExceptionsCount == 0)
             {
-               _logger.LogDebug("PeriodicWork {PeriodicWorkId} terminated without errors.", this.Id);
+               _logger.LogDebug("PeriodicWork {PeriodicWorkId} terminated without errors.", Id);
             }
             else
             {
-               _logger.LogDebug("PeriodicWork {PeriodicWorkId} terminated with {PeriodicWorkErrors} errors.", this.Id, this.ExceptionsCount);
+               _logger.LogDebug("PeriodicWork {PeriodicWorkId} terminated with {PeriodicWorkErrors} errors.", Id, ExceptionsCount);
             }
          }
 
-         this._periodicWorkTracker.StopTracking(this);
+         _periodicWorkTracker.StopTracking(this);
       }
 
       public Task StopAsync()
       {
-         if (!this._isRunning)
+         if (!_isRunning)
          {
-            _logger.LogDebug("PeriodicWork {PeriodicWorkId} is not running.", this.Id);
+            _logger.LogDebug("PeriodicWork {PeriodicWorkId} is not running.", Id);
             return Task.CompletedTask;
          }
 
-         if (!this._cancellationTokenSource?.IsCancellationRequested ?? true)
+         if (!_cancellationTokenSource?.IsCancellationRequested ?? true)
          {
-            _logger.LogDebug("PeriodicWork {PeriodicWorkId} is stopping.", this.Id);
-            this._cancellationTokenSource?.Cancel();
-            this._cancellationTokenSource?.Dispose();
-            this._cancellationTokenSource = null;
+            _logger.LogDebug("PeriodicWork {PeriodicWorkId} is stopping.", Id);
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
          }
 
          return Task.CompletedTask;
@@ -161,9 +161,9 @@ namespace MithrilShards.Core.Threading
 
       public void Dispose()
       {
-         if (this._isRunning)
+         if (_isRunning)
          {
-            this.StopAsync();
+            StopAsync();
          }
 
          GC.SuppressFinalize(this);

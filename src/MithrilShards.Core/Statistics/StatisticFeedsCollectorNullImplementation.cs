@@ -22,9 +22,9 @@ namespace MithrilShards.Core.Statistics
 
       public StatisticFeedsCollectorNullImplementation(ILogger<StatisticFeedsCollectorNullImplementation> logger)
       {
-         this._logger = logger;
+         _logger = logger;
 
-         this._logger.LogWarning($"No statistic feed collector available, using {nameof(StatisticFeedsCollectorNullImplementation)}");
+         _logger.LogWarning($"No statistic feed collector available, using {nameof(StatisticFeedsCollectorNullImplementation)}");
       }
 
       public IStatisticFeedResult GetFeedDump(string feedId, bool humanReadable)

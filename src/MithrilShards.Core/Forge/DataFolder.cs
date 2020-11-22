@@ -19,7 +19,7 @@ namespace MithrilShards.Core.Forge
                throw new ArgumentNullException(nameof(featureKey));
             }
 
-            if (this._paths.TryGetValue(featureKey.ToLowerInvariant(), out string? path))
+            if (_paths.TryGetValue(featureKey.ToLowerInvariant(), out string? path))
             {
                return path;
             }
@@ -40,14 +40,14 @@ namespace MithrilShards.Core.Forge
                throw new ArgumentNullException(nameof(value));
             }
 
-            this._paths[featureKey.ToLowerInvariant()] = value;
+            _paths[featureKey.ToLowerInvariant()] = value;
          }
       }
 
       public DataFolders(string rootPath)
       {
-         this.RootPath = rootPath;
-         this._paths = new Dictionary<string, string>();
+         RootPath = rootPath;
+         _paths = new Dictionary<string, string>();
          this[ROOT_FEATURE] = rootPath;
       }
    }

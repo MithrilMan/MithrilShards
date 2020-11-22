@@ -14,8 +14,8 @@ namespace MithrilShards.Core.Network.Events
 
       public PeerDisconnected(IPeerContext peerContext, string reason, Exception? exception) : base(peerContext)
       {
-         this.Reason = reason;
-         this.Exception = exception;
+         Reason = reason;
+         Exception = exception;
       }
    }
 }

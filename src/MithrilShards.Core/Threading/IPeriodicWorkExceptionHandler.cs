@@ -25,9 +25,9 @@ namespace MithrilShards.Core.Threading
 
          internal Feedback(bool continueExecution, bool isCritical, string? message)
          {
-            this.ContinueExecution = continueExecution;
-            this.IsCritical = isCritical;
-            this.Message = message;
+            ContinueExecution = continueExecution;
+            IsCritical = isCritical;
+            Message = message;
          }
       }
    }

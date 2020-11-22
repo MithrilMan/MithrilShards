@@ -30,22 +30,22 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
                              IPeriodicWork validationLoop,
                              IEventBus eventBus)
       {
-         this._logger = logger;
-         this._validationLoop = validationLoop;
-         this._chainState = chainState;
-         this._blockValidationRules = blockValidationRules;
-         this._blockValidationContextFactory = blockValidationContextFactory;
-         this._eventBus = eventBus;
+         _logger = logger;
+         _validationLoop = validationLoop;
+         _chainState = chainState;
+         _blockValidationRules = blockValidationRules;
+         _blockValidationContextFactory = blockValidationContextFactory;
+         _eventBus = eventBus;
 
-         this._blocksToValidate = Channel.CreateUnbounded<BlockToValidate>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
-         this._genesisHash = consensusParameters.GenesisHeader.Hash!;
+         _blocksToValidate = Channel.CreateUnbounded<BlockToValidate>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
+         _genesisHash = consensusParameters.GenesisHeader.Hash!;
 
-         this._validationLoop.Configure(false, this);
+         _validationLoop.Configure(false, this);
       }
 
       public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
       {
-         this._logger.LogCritical("An unhandled exception has been raised in the block validation loop.");
+         _logger.LogCritical("An unhandled exception has been raised in the block validation loop.");
          feedback.IsCritical = true;
          feedback.ContinueExecution = false;
          feedback.Message = "Without block validation loop, it's impossible to advance in consensus. A node restart is required to fix the problem.";
@@ -53,10 +53,10 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
 
       public Task StartAsync(CancellationToken cancellationToken)
       {
-         this._blockValidationRules.SetupRules();
+         _blockValidationRules.SetupRules();
 
          // starts the consumer loop of header validation
-         this._validationLoop.StartAsync(
+         _validationLoop.StartAsync(
             label: nameof(BlockValidator),
             work: ValidationWorkAsync,
             interval: TimeSpan.Zero,
@@ -73,7 +73,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
 
       public async ValueTask RequestValidationAsync(BlockToValidate block)
       {
-         await this._blocksToValidate.Writer.WriteAsync(block).ConfigureAwait(false);
+         await _blocksToValidate.Writer.WriteAsync(block).ConfigureAwait(false);
       }
 
       /// <summary>
@@ -92,19 +92,19 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
                bool isNew = false;
                using (await GlobalLocks.WriteOnMainAsync())
                {
-                  this.AcceptBlockLocked(request.Block, out state, out isNew);
+                  AcceptBlockLocked(request.Block, out state, out isNew);
                }
 
                // publish events out of lock
                if (state!.IsInvalid())
                {
                   // signal header validation failed
-                  this._eventBus.Publish(new BlockValidationFailed(request.Block, state, request.Peer));
+                  _eventBus.Publish(new BlockValidationFailed(request.Block, state, request.Peer));
                }
                else
                {
                   // signal header validation succeeded
-                  this._eventBus.Publish(new BlockValidationSucceeded(request.Block, isNew, request.Peer));
+                  _eventBus.Publish(new BlockValidationSucceeded(request.Block, isNew, request.Peer));
                }
             }
          }
@@ -115,13 +115,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
       {
          validationState = new BlockValidationState();
 
-         IBlockValidationContext context = this._blockValidationContextFactory.Create(block);
+         IBlockValidationContext context = _blockValidationContextFactory.Create(block);
 
-         foreach (IBlockValidationRule rule in this._blockValidationRules.Rules)
+         foreach (IBlockValidationRule rule in _blockValidationRules.Rules)
          {
             if (!rule.Check(context, ref validationState))
             {
-               this._logger.LogDebug("Block validation failed: {BlockValidationState}", validationState.ToString());
+               _logger.LogDebug("Block validation failed: {BlockValidationState}", validationState.ToString());
                isNew = false;
                return false;
             }

@@ -33,11 +33,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
          internal (ulong Nonce, long RoundTrip) PongReceived(long responseTime)
          {
-            (ulong Nonce, long RoundTrip) result = (this.PingRequestNonce, responseTime - this.PingRequestTime);
+            (ulong Nonce, long RoundTrip) result = (PingRequestNonce, responseTime - PingRequestTime);
 
-            this.PingResponseTime = responseTime;
-            this.PingRequestTime = 0;
-            this.PingRequestNonce = 0;
+            PingResponseTime = responseTime;
+            PingRequestTime = 0;
+            PingRequestNonce = 0;
 
             return result;
          }

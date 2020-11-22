@@ -21,11 +21,11 @@ namespace MithrilShards.Core.EventBus
       /// <param name="subscriptions">The subscription action.</param>
       public EventSubscriptionManager RegisterSubscriptions(params SubscriptionToken[] subscriptions)
       {
-         if (this._disposedValue) throw new ObjectDisposedException(nameof(EventSubscriptionManager));
+         if (_disposedValue) throw new ObjectDisposedException(nameof(EventSubscriptionManager));
 
-         lock (this._subscriptionsLock)
+         lock (_subscriptionsLock)
          {
-            this._subscriptionTokens.AddRange(subscriptions);
+            _subscriptionTokens.AddRange(subscriptions);
          }
 
          return this;
@@ -36,28 +36,28 @@ namespace MithrilShards.Core.EventBus
 
       protected virtual void Dispose(bool disposing)
       {
-         if (!this._disposedValue)
+         if (!_disposedValue)
          {
             if (disposing)
             {
-               lock (this._subscriptionsLock)
+               lock (_subscriptionsLock)
                {
-                  foreach (SubscriptionToken token in this._subscriptionTokens)
+                  foreach (SubscriptionToken token in _subscriptionTokens)
                   {
                      token?.Dispose();
                   }
-                  this._subscriptionTokens.Clear();
+                  _subscriptionTokens.Clear();
                }
             }
 
-            this._disposedValue = true;
+            _disposedValue = true;
          }
       }
 
       // This code added to correctly implement the disposable pattern.
       public void Dispose()
       {
-         this.Dispose(true);
+         Dispose(true);
       }
       #endregion
 

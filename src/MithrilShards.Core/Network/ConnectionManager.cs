@@ -40,7 +40,7 @@ namespace MithrilShards.Core.Network
       /// <value>
       /// The connected inbound peers count.
       /// </value>
-      public int ConnectedInboundPeersCount => this.inboundPeers.Count;
+      public int ConnectedInboundPeersCount => inboundPeers.Count;
 
       /// <summary>
       /// Gets the connected outbound peers count.
@@ -48,7 +48,7 @@ namespace MithrilShards.Core.Network
       /// <value>
       /// The connected outbound peers count.
       /// </value>
-      public int ConnectedOutboundPeersCount => this.outboundPeers.Count;
+      public int ConnectedOutboundPeersCount => outboundPeers.Count;
 
 
       public ConnectionManager(ILogger<ConnectionManager> logger,
@@ -57,12 +57,12 @@ namespace MithrilShards.Core.Network
                                IEnumerable<IConnector> connectors
                                )
       {
-         this._logger = logger;
-         this._eventBus = eventBus;
-         this._statisticFeedsCollector = statisticFeedsCollector;
-         this._connectors = connectors;
+         _logger = logger;
+         _eventBus = eventBus;
+         _statisticFeedsCollector = statisticFeedsCollector;
+         _connectors = connectors;
 
-         foreach (IConnector? connector in this._connectors)
+         foreach (IConnector? connector in _connectors)
          {
             connector?.SetConnectionManager(this);
          }
@@ -74,9 +74,9 @@ namespace MithrilShards.Core.Network
       /// <param name="peerContext">The peer context.</param>
       private void AddConnectedPeer(PeerConnected @event)
       {
-         ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? this.inboundPeers : this.outboundPeers;
+         ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? inboundPeers : outboundPeers;
          container[@event.PeerContext.PeerId] = @event.PeerContext;
-         this._logger.LogDebug("Added peer {PeerId} to the list of connected peers", @event.PeerContext.PeerId);
+         _logger.LogDebug("Added peer {PeerId} to the list of connected peers", @event.PeerContext.PeerId);
       }
 
       /// <summary>
@@ -85,35 +85,35 @@ namespace MithrilShards.Core.Network
       /// <param name="peerContext">The peer context.</param>
       private void RemoveConnectedPeer(PeerDisconnected @event)
       {
-         ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? this.inboundPeers : this.outboundPeers;
+         ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? inboundPeers : outboundPeers;
          if (!container.TryRemove(@event.PeerContext.PeerId, out _))
          {
-            this._logger.LogWarning("Cannot remove peer {PeerId}, peer not found", @event.PeerContext.PeerId);
+            _logger.LogWarning("Cannot remove peer {PeerId}, peer not found", @event.PeerContext.PeerId);
          }
          else
          {
-            this._logger.LogInformation("Peer {PeerId} disconnected.", @event.PeerContext.PeerId);
+            _logger.LogInformation("Peer {PeerId} disconnected.", @event.PeerContext.PeerId);
          }
       }
 
       public virtual Task StartAsync(CancellationToken cancellationToken)
       {
-         this.RegisterStatisticFeeds();
-         this._eventSubscriptionManager.RegisterSubscriptions(
-               this._eventBus.Subscribe<PeerConnected>(this.AddConnectedPeer),
-               this._eventBus.Subscribe<PeerDisconnected>(this.RemoveConnectedPeer),
-               this._eventBus.Subscribe<PeerDisconnectionRequired>(this.OnPeerDisconnectionRequested)
+         RegisterStatisticFeeds();
+         _eventSubscriptionManager.RegisterSubscriptions(
+               _eventBus.Subscribe<PeerConnected>(AddConnectedPeer),
+               _eventBus.Subscribe<PeerDisconnected>(RemoveConnectedPeer),
+               _eventBus.Subscribe<PeerDisconnectionRequired>(OnPeerDisconnectionRequested)
          );
 
          // start the task that tries to connect to other peers
-         _ = this.StartOutgoingConnectionAttemptsAsync(cancellationToken);
+         _ = StartOutgoingConnectionAttemptsAsync(cancellationToken);
 
          return Task.CompletedTask;
       }
 
       public virtual Task StopAsync(CancellationToken cancellationToken)
       {
-         this._eventSubscriptionManager.Dispose();
+         _eventSubscriptionManager.Dispose();
 
          return Task.CompletedTask;
       }
@@ -122,7 +122,7 @@ namespace MithrilShards.Core.Network
       {
          string byteFormatter((object? value, int widthHint) item) => ByteSizeFormatter.HumanReadable((long)item.value!);
 
-         this._statisticFeedsCollector.RegisterStatisticFeeds(this,
+         _statisticFeedsCollector.RegisterStatisticFeeds(this,
             new StatisticFeedDefinition(FEED_CONNECTED_PEERS_SUMMARY, "Connected Peers summary",
                new List<FieldDefinition>{
                   new FieldDefinition("Inbound","Number of inbound peers currently connected to one of the Forge listener",15),
@@ -151,8 +151,8 @@ namespace MithrilShards.Core.Network
          {
             FEED_CONNECTED_PEERS_SUMMARY => new List<object?[]> {
                   new object?[] {
-                     this.inboundPeers.Count,
-                     this.outboundPeers.Count
+                     inboundPeers.Count,
+                     outboundPeers.Count
                   }
                },
             FEED_CONNECTED_PEERS => inboundPeers.Values.Concat(outboundPeers.Values)
@@ -173,13 +173,13 @@ namespace MithrilShards.Core.Network
 
       protected virtual Task StartOutgoingConnectionAttemptsAsync(CancellationToken cancellation)
       {
-         this._logger.LogDebug("Starting Connectors");
-         if (this._connectors == null)
+         _logger.LogDebug("Starting Connectors");
+         if (_connectors == null)
          {
-            this._logger.LogWarning("No Connectors found, the Forge will not try to connect to any peer.");
+            _logger.LogWarning("No Connectors found, the Forge will not try to connect to any peer.");
             return Task.CompletedTask;
          }
-         foreach (IConnector connector in this._connectors)
+         foreach (IConnector connector in _connectors)
          {
             try
             {
@@ -187,11 +187,11 @@ namespace MithrilShards.Core.Network
             }
             catch (OperationCanceledException)
             {
-               this._logger.LogDebug("Connector {Connector} canceled.", connector.GetType().Name);
+               _logger.LogDebug("Connector {Connector} canceled.", connector.GetType().Name);
             }
             catch (Exception ex)
             {
-               this._logger.LogError(ex, "Connector {Connector} failure, it has been stopped, node may have connection problems.", connector.GetType().Name);
+               _logger.LogError(ex, "Connector {Connector} failure, it has been stopped, node may have connection problems.", connector.GetType().Name);
             }
          }
 
@@ -202,9 +202,9 @@ namespace MithrilShards.Core.Network
       {
 
          // ensures I'm not already connected to the same endpoint
-         if (this.outboundPeers.Values.ToList().Any(peer => peer.RemoteEndPoint.Equals(endPoint.EnsureIPv6())))
+         if (outboundPeers.Values.ToList().Any(peer => peer.RemoteEndPoint.Equals(endPoint.EnsureIPv6())))
          {
-            this._logger.LogTrace("Already connected to peer {RemoteEndPoint}", endPoint);
+            _logger.LogTrace("Already connected to peer {RemoteEndPoint}", endPoint);
             return false;
          }
 
@@ -215,18 +215,18 @@ namespace MithrilShards.Core.Network
       protected void OnPeerDisconnectionRequested(PeerDisconnectionRequired @event)
       {
          IPEndPoint endPoint = @event.EndPoint.AsIPEndPoint().EnsureIPv6();
-         IPeerContext peerContext = this.inboundPeers.Values
-            .Concat(this.outboundPeers.Values.ToList())
+         IPeerContext peerContext = inboundPeers.Values
+            .Concat(outboundPeers.Values.ToList())
             .FirstOrDefault(peer => peer.RemoteEndPoint.Equals(endPoint));
 
          if (peerContext != null)
          {
-            this._logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection because: {DisconnectionReason}", endPoint, @event.Reason);
+            _logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection because: {DisconnectionReason}", endPoint, @event.Reason);
             peerContext.ConnectionCancellationTokenSource.Cancel();
          }
          else
          {
-            this._logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection failed, endpoint not matching with any connected peer.", endPoint);
+            _logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection failed, endpoint not matching with any connected peer.", endPoint);
          }
       }
    }

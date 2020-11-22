@@ -17,9 +17,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
 
       public CheckTransactions(ILogger<CheckTransactions> logger, IProtocolTypeSerializer<Transaction> transactionSerializer, IConsensusParameters consensusParameters)
       {
-         this._logger = logger;
-         this._transactionSerializer = transactionSerializer;
-         this._consensusParameters = consensusParameters;
+         _logger = logger;
+         _transactionSerializer = transactionSerializer;
+         _consensusParameters = consensusParameters;
       }
 
 
@@ -56,7 +56,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
          }
 
          // Size limits (this doesn't take the witness into account, as that hasn't been checked for malleability)
-         int size = this._transactionSerializer.Serialize(transaction, KnownVersion.CurrentVersion, new ArrayBufferWriter<byte>(), new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
+         int size = _transactionSerializer.Serialize(transaction, KnownVersion.CurrentVersion, new ArrayBufferWriter<byte>(), new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
          if (size * _consensusParameters.WitnessScaleFactor > _consensusParameters.MaxBlockWeight)
          {
             return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-oversize");

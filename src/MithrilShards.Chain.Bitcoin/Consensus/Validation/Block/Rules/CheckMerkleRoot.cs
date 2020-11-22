@@ -14,14 +14,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
 
       public CheckMerkleRoot(ILogger<CheckMerkleRoot> logger, IMerkleRootCalculator merkleRootCalculator)
       {
-         this._logger = logger;
-         this._merkleRootCalculator = merkleRootCalculator;
+         _logger = logger;
+         _merkleRootCalculator = merkleRootCalculator;
       }
 
 
       public bool Check(IBlockValidationContext context, ref BlockValidationState validationState)
       {
-         if (this.IsBlockMalleated(context.Block.Transactions!))
+         if (IsBlockMalleated(context.Block.Transactions!))
          {
             return validationState.Invalid(BlockValidationStateResults.Mutated, "bad-txns-duplicate", "duplicate transaction");
          }

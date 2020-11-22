@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Events
 
       public BlockHeaderAddedToRepository(BlockHeader blockHeader)
       {
-         this.BlockHeader = blockHeader;
+         BlockHeader = blockHeader;
       }
    }
 }

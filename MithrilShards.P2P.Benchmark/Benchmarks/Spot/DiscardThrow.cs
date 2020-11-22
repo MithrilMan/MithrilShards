@@ -13,12 +13,12 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         this._data = new object();
+         _data = new object();
       }
 
 
       [Benchmark]
-      public void WithDiscard() => WithDiscard(this._data);
+      public void WithDiscard() => WithDiscard(_data);
 
       public static void WithDiscard(object data)
       {
@@ -26,7 +26,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public void WithIf() => WithIf(this._data);
+      public void WithIf() => WithIf(_data);
 
       public static void WithIf(object data)
       {

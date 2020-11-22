@@ -9,14 +9,14 @@
 
          public PeerScore(IPeerContext peerContext, int initialScore)
          {
-            this.PeerContext = peerContext;
-            this.Score = initialScore;
+            PeerContext = peerContext;
+            Score = initialScore;
          }
 
          public int UpdateScore(int amount)
          {
-            this.Score += amount;
-            return this.Score;
+            Score += amount;
+            return Score;
          }
       }
    }

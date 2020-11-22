@@ -34,10 +34,10 @@ namespace MithrilShards.Core.Network.Client
                                 IForgeConnectivity forgeConnectivity,
                                 IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
       {
-         this._settings = options.Value!;
+         _settings = options.Value!;
 
-         this.connectionsToAttempt.AddRange(
-            from connection in this._settings.Connections
+         connectionsToAttempt.AddRange(
+            from connection in _settings.Connections
             let endPoint = connection.TryGetIPEndPoint(out IPEndPoint? endPoint) ? endPoint : null
             where endPoint != null
             select new OutgoingConnectionEndPoint(endPoint)
@@ -48,17 +48,17 @@ namespace MithrilShards.Core.Network.Client
       {
          float fillRatioPercentage;
          //compute outbound slot fill ratio (0 - 1 range)
-         if (this.peerStats.ConnectedOutboundPeersCount == 0)
+         if (peerStats.ConnectedOutboundPeersCount == 0)
          {
             fillRatioPercentage = 0;
          }
-         else if (this._settings.MaxOutboundConnections == 0)
+         else if (_settings.MaxOutboundConnections == 0)
          {
             fillRatioPercentage = 0.5f;
          }
          else
          {
-            fillRatioPercentage = this._settings.MaxOutboundConnections / this.peerStats.ConnectedOutboundPeersCount;
+            fillRatioPercentage = _settings.MaxOutboundConnections / peerStats.ConnectedOutboundPeersCount;
          }
 
          if (fillRatioPercentage < 0.25)
@@ -78,14 +78,14 @@ namespace MithrilShards.Core.Network.Client
 
       protected override async ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation)
       {
-         foreach (OutgoingConnectionEndPoint remoteEndPoint in this.connectionsToAttempt)
+         foreach (OutgoingConnectionEndPoint remoteEndPoint in connectionsToAttempt)
          {
             if (cancellation.IsCancellationRequested) break;
 
             if (connectionManager.CanConnectTo(remoteEndPoint.EndPoint))
             {
                // note that AttemptConnection is not blocking because it returns when the peer fails to connect or when one of the parties disconnect
-               _ = this.forgeConnectivity.AttemptConnectionAsync(remoteEndPoint, cancellation).ConfigureAwait(false);
+               _ = forgeConnectivity.AttemptConnectionAsync(remoteEndPoint, cancellation).ConfigureAwait(false);
 
                // apply a delay between attempts to prevent too many connection attempt in a row
                await Task.Delay(INNER_DELAY).ConfigureAwait(false);
@@ -102,15 +102,15 @@ namespace MithrilShards.Core.Network.Client
       public bool TryAddEndPoint(IPEndPoint endPoint)
       {
          endPoint = endPoint.EnsureIPv6();
-         if (this.connectionsToAttempt.Exists(ip => ip.Equals(endPoint)))
+         if (connectionsToAttempt.Exists(ip => ip.Equals(endPoint)))
          {
-            this.logger.LogDebug("EndPoint {RemoteEndPoint} already in the list of connections attempt.", endPoint);
+            logger.LogDebug("EndPoint {RemoteEndPoint} already in the list of connections attempt.", endPoint);
             return false;
          }
          else
          {
-            this.connectionsToAttempt.Add(new OutgoingConnectionEndPoint(endPoint));
-            this.logger.LogDebug("EndPoint {RemoteEndPoint} added to the list of connections attempt.", endPoint);
+            connectionsToAttempt.Add(new OutgoingConnectionEndPoint(endPoint));
+            logger.LogDebug("EndPoint {RemoteEndPoint} added to the list of connections attempt.", endPoint);
             return true;
          }
       }
@@ -123,7 +123,7 @@ namespace MithrilShards.Core.Network.Client
       /// <returns><see langword="true"/> if the endpoint has been removed, <see langword="false"/> if the endpoint has not been found.</returns>
       public bool TryRemoveEndPoint(IPEndPoint endPoint)
       {
-         return this.connectionsToAttempt.RemoveAll(remoteEndPoint => remoteEndPoint.EndPoint == endPoint) > 0;
+         return connectionsToAttempt.RemoveAll(remoteEndPoint => remoteEndPoint.EndPoint == endPoint) > 0;
       }
    }
 }

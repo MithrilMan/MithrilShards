@@ -12,17 +12,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 
       public AddrMessageSerializer(IProtocolTypeSerializer<NetworkAddress> networkAddressSerializer)
       {
-         this._networkAddressSerializer = networkAddressSerializer;
+         _networkAddressSerializer = networkAddressSerializer;
       }
 
       public override void Serialize(AddrMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
       {
-         output.WriteArray(message.Addresses!, protocolVersion, this._networkAddressSerializer);
+         output.WriteArray(message.Addresses!, protocolVersion, _networkAddressSerializer);
       }
 
       public override AddrMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
-         return new AddrMessage { Addresses = reader.ReadArray(protocolVersion, this._networkAddressSerializer) };
+         return new AddrMessage { Addresses = reader.ReadArray(protocolVersion, _networkAddressSerializer) };
       }
    }
 }

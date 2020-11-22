@@ -16,7 +16,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
          return feedId switch
          {
             FEED_PEERS_SCORE => (
-               from peerScore in this._connectedPeers.Values.ToList()
+               from peerScore in _connectedPeers.Values.ToList()
                orderby peerScore.Score descending
                select new object[] {
                   peerScore.PeerContext.PeerId,
@@ -29,7 +29,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
 
       public void RegisterStatisticFeeds()
       {
-         this._statisticFeedsCollector.RegisterStatisticFeeds(this,
+         _statisticFeedsCollector.RegisterStatisticFeeds(this,
             new StatisticFeedDefinition(
                FEED_PEERS_SCORE,
                "Peers Score",
