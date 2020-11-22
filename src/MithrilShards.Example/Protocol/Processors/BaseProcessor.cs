@@ -23,31 +23,36 @@ namespace MithrilShards.Example.Protocol.Processors
       protected readonly IEventBus eventBus;
       private readonly IPeerBehaviorManager peerBehaviorManager;
       private readonly bool isHandshakeAware;
-      private INetworkMessageWriter messageWriter;
+      private readonly bool receiveMessagesOnlyIfHandshaked;
+      private INetworkMessageWriter messageWriter = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
+      private bool isHandshaked = false;
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// </summary>
       private readonly EventSubscriptionManager eventSubscriptionManager = new EventSubscriptionManager();
 
-      public ExamplePeerContext PeerContext { get; private set; }
+      public ExamplePeerContext PeerContext { get; private set; } = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
 
+      /// <inheritdoc/>
       public virtual bool Enabled { get; private set; } = true;
+
+      /// <inheritdoc/>
+      public virtual bool CanReceiveMessages => isHandshaked || this.receiveMessagesOnlyIfHandshaked == false;
 
       /// <summary>Initializes a new instance of the <see cref="BaseProcessor"/> class.</summary>
       /// <param name="logger">The logger.</param>
       /// <param name="eventBus">The event bus.</param>
       /// <param name="peerBehaviorManager">The peer behavior manager.</param>
       /// <param name="isHandshakeAware">If set to <c>true</c> register the instance to be handshake aware: when the peer is handshaked, OnPeerHandshaked method will be invoked.</param>
-      public BaseProcessor(ILogger<BaseProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager, bool isHandshakeAware)
+      /// <param name="receiveMessagesOnlyIfHandshaked">if set to <c>true</c> receives messages only if handshaked.</param>
+      public BaseProcessor(ILogger<BaseProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager, bool isHandshakeAware, bool receiveMessagesOnlyIfHandshaked)
       {
          this.logger = logger;
          this.eventBus = eventBus;
          this.peerBehaviorManager = peerBehaviorManager;
          this.isHandshakeAware = isHandshakeAware;
-
-         this.PeerContext = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
-         this.messageWriter = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
+         this.receiveMessagesOnlyIfHandshaked = receiveMessagesOnlyIfHandshaked;
       }
 
       public async ValueTask AttachAsync(IPeerContext peerContext)
@@ -64,10 +69,16 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <returns></returns>
       protected virtual ValueTask OnPeerAttachedAsync()
       {
-         if (this.isHandshakeAware)
+         this.RegisterLifeTimeEventHandler<PeerHandshaked>(async (receivedEvent) =>
          {
-            this.RegisterLifeTimeEventHandler<PeerHandshaked>(async (receivedEvent) => await this.OnPeerHandshakedAsync().ConfigureAwait(false), IsCurrentPeer);
-         }
+            this.isHandshaked = true;
+
+            if (this.isHandshakeAware)
+            {
+               await this.OnPeerHandshakedAsync().ConfigureAwait(false);
+            }
+         }, IsCurrentPeer);
+
 
          return default;
       }

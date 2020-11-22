@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -27,7 +26,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
    /// <summary>
    /// Manage the exchange of block and headers between peers.
    /// </summary>
-   /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.Processors.BaseProcessor" />
+   /// <seealso cref="BaseProcessor" />
    public partial class BlockHeaderProcessor : BaseProcessor, IPeriodicWorkExceptionHandler,
       INetworkMessageHandler<GetHeadersMessage>,
       INetworkMessageHandler<SendHeadersMessage>,
@@ -66,7 +65,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IPeriodicWork headerSyncLoop,
                                   IPeriodicWork blockRequestLoop,
                                   IOptions<BitcoinSettings> options)
-         : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
+         : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
          this.dateTimeProvider = dateTimeProvider;
          this.consensusParameters = consensusParameters;
