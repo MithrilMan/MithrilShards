@@ -84,8 +84,12 @@ namespace MithrilShards.Core.Network.Protocol.Processors
 
          for (int i = 0; i < handlers.Count; i++)
          {
-            // when an handler return false, mean it doesn't want other handlers to continue parsing the message
-            if (!await handlers[i].InvokeAsync(message, cancellation).ConfigureAwait(false)) break;
+            ProcessorHandler handler = handlers[i];
+            if (handler.processor.Enabled)
+            {
+               // when an handler return false, mean it doesn't want other handlers to continue parsing the message
+               if (!await handler.InvokeAsync(message, cancellation).ConfigureAwait(false)) break;
+            }
          }
 
          return true;
