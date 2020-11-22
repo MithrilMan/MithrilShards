@@ -41,7 +41,7 @@ namespace MithrilShards.Example.Protocol.Processors
                                IDateTimeProvider dateTimeProvider,
                                IPeriodicWork periodicPing,
                                IQuoteService quoteService)
-         : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
+         : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
          this.randomNumberGenerator = randomNumberGenerator;
          this.dateTimeProvider = dateTimeProvider;

@@ -19,7 +19,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IPeerBehaviorManager peerBehaviorManager,
                                   IDateTimeProvider dateTimeProvider
                                  )
-         : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
+         : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
          this.dateTimeProvider = dateTimeProvider;
       }

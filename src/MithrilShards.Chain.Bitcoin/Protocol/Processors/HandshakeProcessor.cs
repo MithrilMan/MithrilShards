@@ -39,7 +39,12 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                 IUserAgentBuilder userAgentBuilder,
                                 ILocalServiceProvider localServiceProvider,
                                 IHeadersTree headersTree,
-                                SelfConnectionTracker selfConnectionTracker) : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
+                                SelfConnectionTracker selfConnectionTracker) : base(logger,
+                                                                                    eventBus,
+                                                                                    peerBehaviorManager,
+                                                                                    isHandshakeAware: true,
+                                                                                    // we are performing handshake so we want to receive messages before handshake status
+                                                                                    receiveMessagesOnlyIfHandshaked: false)
       {
          this.dateTimeProvider = dateTimeProvider;
          this.randomNumberGenerator = randomNumberGenerator;

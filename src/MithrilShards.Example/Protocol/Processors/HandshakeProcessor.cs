@@ -31,7 +31,12 @@ namespace MithrilShards.Example.Protocol.Processors
                                 NodeImplementation nodeImplementation,
                                 IPeerBehaviorManager peerBehaviorManager,
                                 IUserAgentBuilder userAgentBuilder
-                                ) : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
+                                ) : base(logger,
+                                         eventBus,
+                                         peerBehaviorManager,
+                                         isHandshakeAware: true,
+                                         // we are performing handshake so we want to receive messages before handshake status
+                                         receiveMessagesOnlyIfHandshaked: false)
       {
          this.dateTimeProvider = dateTimeProvider;
          this.randomNumberGenerator = randomNumberGenerator;

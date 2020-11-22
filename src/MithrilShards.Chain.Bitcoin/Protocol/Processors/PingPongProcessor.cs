@@ -38,7 +38,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                IRandomNumberGenerator randomNumberGenerator,
                                IDateTimeProvider dateTimeProvider,
                                IPeriodicWork periodicPing)
-         : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true)
+         : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
          this.randomNumberGenerator = randomNumberGenerator;
          this.dateTimeProvider = dateTimeProvider;

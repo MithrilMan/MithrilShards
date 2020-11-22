@@ -23,15 +23,17 @@ namespace MithrilShards.Dev.Controller
       readonly ILogger<DevControllerShard> logger;
       readonly IServiceCollection registeredServices;
       readonly IServiceProvider serviceProvider;
+      readonly IHostApplicationLifetime hostApplicationLifetime;
       readonly DevAssemblyScaffolder devAssemblyScaffolder;
       readonly DevControllerSettings settings;
       private IWebHost? webHost;
 
-      public DevControllerShard(ILogger<DevControllerShard> logger, IOptions<DevControllerSettings> options, IServiceCollection registeredServices, IServiceProvider serviceProvider, DevAssemblyScaffolder devAssemblyScaffolder)
+      public DevControllerShard(ILogger<DevControllerShard> logger, IOptions<DevControllerSettings> options, IServiceCollection registeredServices, IServiceProvider serviceProvider, IHostApplicationLifetime hostApplicationLifetime, DevAssemblyScaffolder devAssemblyScaffolder)
       {
          this.logger = logger;
          this.registeredServices = registeredServices;
          this.serviceProvider = serviceProvider;
+         this.hostApplicationLifetime = hostApplicationLifetime;
          this.devAssemblyScaffolder = devAssemblyScaffolder;
          this.settings = options.Value;
       }
@@ -116,8 +118,24 @@ namespace MithrilShards.Dev.Controller
       {
          if (webHost != null)
          {
-            webHost.StartAsync(cancellationToken);
-            this.logger.LogInformation("DevController API started, listening to endpoint {ListenerLocalEndpoint}/swagger.", settings.EndPoint);
+            _ = Task.Run(async () =>
+              {
+                 try
+                 {
+                    this.logger.LogInformation("DevController API started, listening to endpoint {ListenerLocalEndpoint}/swagger.", settings.EndPoint);
+                    await webHost.StartAsync(cancellationToken).ConfigureAwait(false);
+                 }
+                 catch (OperationCanceledException)
+                 {
+                    // Task canceled, legit, ignoring exception.
+                 }
+                 catch (Exception ex)
+                 {
+                    this.logger.LogCritical(ex, "DevController API exception, {DevControllerException}. App will still run, without DevController funtionality", ex.Message);
+                    // if we want to stop the application in case of exception, uncomment line below
+                    // hostApplicationLifetime.StopApplication();
+                 }
+              });
          }
 
 
