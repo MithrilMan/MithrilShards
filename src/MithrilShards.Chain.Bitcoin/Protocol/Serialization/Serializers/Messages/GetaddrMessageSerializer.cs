@@ -6,9 +6,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class GetAddrMessageSerializer : BitcoinNetworkMessageSerializerBase<GetAddrMessage>
    {
-      private static readonly GetAddrMessage instance = new GetAddrMessage();
+      private static readonly GetAddrMessage _instance = new GetAddrMessage();
 
-      public override GetAddrMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext) => instance;
+      public override GetAddrMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext) => _instance;
 
       public override void Serialize(GetAddrMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output) { }
    }

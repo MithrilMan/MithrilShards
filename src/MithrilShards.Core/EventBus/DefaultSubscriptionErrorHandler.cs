@@ -12,17 +12,17 @@ namespace MithrilShards.Core.EventBus
       /// <summary>
       /// The logger
       /// </summary>
-      private readonly ILogger logger;
+      private readonly ILogger _logger;
 
       public DefaultSubscriptionErrorHandler(ILogger<DefaultSubscriptionErrorHandler> logger)
       {
-         this.logger = logger;
+         _logger = logger;
       }
 
       /// <inheritdoc />
       public void Handle(EventBase theEvent, Exception exception, ISubscription subscription)
       {
-         this.logger.LogError(exception, "Error handling the event {0}", theEvent.GetType().Name);
+         _logger.LogError(exception, "Error handling the event {0}", theEvent.GetType().Name);
          throw exception;
       }
    }

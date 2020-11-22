@@ -17,8 +17,8 @@ namespace MithrilShards.Core.Threading.Events
       public PeriodicWorkCriticallyStopped(string WorkLabel, Guid workId, Exception lastException, string? Message)
       {
          this.WorkLabel = WorkLabel;
-         this.WorkId = workId;
-         this.LastException = lastException;
+         WorkId = workId;
+         LastException = lastException;
          this.Message = Message;
       }
    }

@@ -9,24 +9,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
 {
    public class CheckMerkleRoot : IBlockValidationRule
    {
-      readonly ILogger<CheckMerkleRoot> logger;
-      readonly IMerkleRootCalculator merkleRootCalculator;
+      readonly ILogger<CheckMerkleRoot> _logger;
+      readonly IMerkleRootCalculator _merkleRootCalculator;
 
       public CheckMerkleRoot(ILogger<CheckMerkleRoot> logger, IMerkleRootCalculator merkleRootCalculator)
       {
-         this.logger = logger;
-         this.merkleRootCalculator = merkleRootCalculator;
+         _logger = logger;
+         _merkleRootCalculator = merkleRootCalculator;
       }
 
 
       public bool Check(IBlockValidationContext context, ref BlockValidationState validationState)
       {
-         if (this.IsBlockMalleated(context.Block.Transactions!))
+         if (IsBlockMalleated(context.Block.Transactions!))
          {
             return validationState.Invalid(BlockValidationStateResults.Mutated, "bad-txns-duplicate", "duplicate transaction");
          }
 
-         UInt256 computedMerkleRoot = merkleRootCalculator.GetBlockMerkleRoot(context.Block);
+         UInt256 computedMerkleRoot = _merkleRootCalculator.GetBlockMerkleRoot(context.Block);
          if (context.Block.Header!.MerkleRoot != computedMerkleRoot)
          {
             return validationState.Invalid(BlockValidationStateResults.Mutated, "bad-txnmrklroot", "hashMerkleRoot mismatch");

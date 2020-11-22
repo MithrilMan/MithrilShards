@@ -6,36 +6,36 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 {
    public abstract class ConfigurableNetworkMessageBase : INetworkMessage
    {
-      private Dictionary<string, object>? serializationOptions;
+      private Dictionary<string, object>? _serializationOptions;
 
       protected abstract string Command { get; }
 
-      string INetworkMessage.Command => this.Command;
+      string INetworkMessage.Command => Command;
 
       protected void SetSerializationOptions(params (string Key, object Value)[] options)
       {
-         if (this.serializationOptions != null)
+         if (_serializationOptions != null)
          {
-            this.serializationOptions.Clear();
+            _serializationOptions.Clear();
          }
 
          if ((options?.Length ?? 0) == 0) return;
 
-         this.serializationOptions ??= new Dictionary<string, object>();
+         _serializationOptions ??= new Dictionary<string, object>();
 
-         foreach (var option in options!)
+         foreach ((string Key, object Value) option in options!)
          {
-            this.serializationOptions.Add(option.Key, option.Value);
+            _serializationOptions.Add(option.Key, option.Value);
          }
       }
 
       public void PopulateSerializerOption(ref ProtocolTypeSerializerOptions? options)
       {
-         if (this.serializationOptions == null) return;
+         if (_serializationOptions == null) return;
 
          options ??= new ProtocolTypeSerializerOptions();
 
-         foreach (var option in this.serializationOptions)
+         foreach (KeyValuePair<string, object> option in _serializationOptions)
          {
             options.Set(option.Key, option.Value);
          }

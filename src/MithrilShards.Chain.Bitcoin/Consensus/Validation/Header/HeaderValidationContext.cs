@@ -8,9 +8,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 
       public BlockHeader Header { get; }
 
-      private readonly HeaderNode? knownHeader = null;
+      private readonly HeaderNode? _knownHeader = null;
 
-      public HeaderNode? KnownHeader => knownHeader;
+      public HeaderNode? KnownHeader => _knownHeader;
 
       /// <summary>
       /// Initializes a new instance of the <see cref="HeaderValidationContext"/> class.
@@ -22,8 +22,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
                                      bool isInInitialBlockDownloadState,
                                      IChainState chainState) : base(logger, isInInitialBlockDownloadState, chainState)
       {
-         this.Header = header;
-         this.ChainState.TryGetKnownHeaderNode(header.Hash, out knownHeader);
+         Header = header;
+         ChainState.TryGetKnownHeaderNode(header.Hash, out _knownHeader);
       }
    }
 }

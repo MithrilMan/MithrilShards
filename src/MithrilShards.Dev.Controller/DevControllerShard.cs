@@ -20,40 +20,40 @@ namespace MithrilShards.Dev.Controller
 {
    internal class DevControllerShard : IMithrilShard
    {
-      readonly ILogger<DevControllerShard> logger;
-      readonly IServiceCollection registeredServices;
-      readonly IServiceProvider serviceProvider;
-      readonly IHostApplicationLifetime hostApplicationLifetime;
-      readonly DevAssemblyScaffolder devAssemblyScaffolder;
-      readonly DevControllerSettings settings;
-      private IWebHost? webHost;
+      readonly ILogger<DevControllerShard> _logger;
+      readonly IServiceCollection _registeredServices;
+      readonly IServiceProvider _serviceProvider;
+      readonly IHostApplicationLifetime _hostApplicationLifetime;
+      readonly DevAssemblyScaffolder _devAssemblyScaffolder;
+      readonly DevControllerSettings _settings;
+      private IWebHost? _webHost;
 
       public DevControllerShard(ILogger<DevControllerShard> logger, IOptions<DevControllerSettings> options, IServiceCollection registeredServices, IServiceProvider serviceProvider, IHostApplicationLifetime hostApplicationLifetime, DevAssemblyScaffolder devAssemblyScaffolder)
       {
-         this.logger = logger;
-         this.registeredServices = registeredServices;
-         this.serviceProvider = serviceProvider;
-         this.hostApplicationLifetime = hostApplicationLifetime;
-         this.devAssemblyScaffolder = devAssemblyScaffolder;
-         this.settings = options.Value;
+         _logger = logger;
+         _registeredServices = registeredServices;
+         _serviceProvider = serviceProvider;
+         _hostApplicationLifetime = hostApplicationLifetime;
+         _devAssemblyScaffolder = devAssemblyScaffolder;
+         _settings = options.Value;
       }
 
       public ValueTask InitializeAsync(CancellationToken cancellationToken)
       {
-         if (!settings.Enabled)
+         if (!_settings.Enabled)
          {
-            this.logger.LogWarning($"{nameof(DevControllerSettings)} disabled, Dev API will not be available");
+            _logger.LogWarning($"{nameof(DevControllerSettings)} disabled, Dev API will not be available");
 
             return default;
          }
 
-         if (!IPEndPoint.TryParse(settings.EndPoint, out IPEndPoint iPEndPoint))
+         if (!IPEndPoint.TryParse(_settings.EndPoint, out IPEndPoint iPEndPoint))
          {
-            ThrowHelper.ThrowArgumentException($"Wrong configuration parameter for {nameof(settings.EndPoint)}");
+            ThrowHelper.ThrowArgumentException($"Wrong configuration parameter for {nameof(_settings.EndPoint)}");
          }
 
 
-         this.webHost = new WebHostBuilder()
+         _webHost = new WebHostBuilder()
             .UseContentRoot(Directory.GetCurrentDirectory())
             .UseKestrel(serverOptions => { serverOptions.Listen(iPEndPoint); })
             .Configure(app => app
@@ -66,7 +66,7 @@ namespace MithrilShards.Dev.Controller
             {
                // copies all the services registered in the forge, maintaining eventual singleton instances
                // also copies over singleton instances already defined
-               foreach (ServiceDescriptor service in registeredServices)
+               foreach (ServiceDescriptor service in _registeredServices)
                {
                   if (service.ServiceType == typeof(IHostedService))
                   {
@@ -80,7 +80,7 @@ namespace MithrilShards.Dev.Controller
                   }
                   else if (service.Lifetime == ServiceLifetime.Singleton)
                   {
-                     services.AddSingleton(service.ServiceType, sp => serviceProvider.GetService(service.ServiceType)); //resolve singletons from the main provider
+                     services.AddSingleton(service.ServiceType, sp => _serviceProvider.GetService(service.ServiceType)); //resolve singletons from the main provider
                   }
                   else
                   {
@@ -100,9 +100,9 @@ namespace MithrilShards.Dev.Controller
                   })
                   .AddMvcOptions(options => options.Conventions.Add(new DevControllerConvetion()));
 
-               IEnumerable<Assembly> assembliesToScaffold = this.serviceProvider.GetService<IEnumerable<IMithrilShard>>()
+               IEnumerable<Assembly> assembliesToScaffold = _serviceProvider.GetService<IEnumerable<IMithrilShard>>()
                   .Select(shard => shard.GetType().Assembly)
-                  .Concat(this.devAssemblyScaffolder?.GetAssemblies());
+                  .Concat(_devAssemblyScaffolder?.GetAssemblies());
 
                foreach (Assembly shardAssembly in assembliesToScaffold)
                {
@@ -116,14 +116,14 @@ namespace MithrilShards.Dev.Controller
 
       public ValueTask StartAsync(CancellationToken cancellationToken)
       {
-         if (webHost != null)
+         if (_webHost != null)
          {
             _ = Task.Run(async () =>
               {
                  try
                  {
-                    this.logger.LogInformation("DevController API started, listening to endpoint {ListenerLocalEndpoint}/swagger.", settings.EndPoint);
-                    await webHost.StartAsync(cancellationToken).ConfigureAwait(false);
+                    _logger.LogInformation("DevController API started, listening to endpoint {ListenerLocalEndpoint}/swagger.", _settings.EndPoint);
+                    await _webHost.StartAsync(cancellationToken).ConfigureAwait(false);
                  }
                  catch (OperationCanceledException)
                  {
@@ -131,7 +131,7 @@ namespace MithrilShards.Dev.Controller
                  }
                  catch (Exception ex)
                  {
-                    this.logger.LogCritical(ex, "DevController API exception, {DevControllerException}. App will still run, without DevController funtionality", ex.Message);
+                    _logger.LogCritical(ex, "DevController API exception, {DevControllerException}. App will still run, without DevController funtionality", ex.Message);
                     // if we want to stop the application in case of exception, uncomment line below
                     // hostApplicationLifetime.StopApplication();
                  }
@@ -144,9 +144,9 @@ namespace MithrilShards.Dev.Controller
 
       public ValueTask StopAsync(CancellationToken cancellationToken)
       {
-         if (webHost != null)
+         if (_webHost != null)
          {
-            webHost.StopAsync(cancellationToken);
+            _webHost.StopAsync(cancellationToken);
          }
 
          return default;

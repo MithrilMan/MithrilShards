@@ -5,11 +5,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
 {
    public class CheckCoinbase : IBlockValidationRule
    {
-      readonly ILogger<CheckCoinbase> logger;
+      readonly ILogger<CheckCoinbase> _logger;
 
       public CheckCoinbase(ILogger<CheckCoinbase> logger)
       {
-         this.logger = logger;
+         _logger = logger;
       }
 
 

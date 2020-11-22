@@ -36,9 +36,9 @@ namespace MithrilShards.Chain.Events
       /// <param name="peerContext">The peer context.</param>
       public BlockValidationSucceeded(Block validatedBlock, bool isNewBlock, IPeerContext? peerContext)
       {
-         this.ValidatedBlock = validatedBlock;
-         this.IsNewBlock = isNewBlock;
-         this.PeerContext = peerContext;
+         ValidatedBlock = validatedBlock;
+         IsNewBlock = isNewBlock;
+         PeerContext = peerContext;
       }
    }
 }

@@ -26,14 +26,14 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Stratis
          if (!lendian)
             vch = vch.Reverse().ToArray();
 
-         this.pn0 = Utils.ToUInt32(vch, 4 * 0, true);
-         this.pn1 = Utils.ToUInt32(vch, 4 * 1, true);
-         this.pn2 = Utils.ToUInt32(vch, 4 * 2, true);
-         this.pn3 = Utils.ToUInt32(vch, 4 * 3, true);
-         this.pn4 = Utils.ToUInt32(vch, 4 * 4, true);
-         this.pn5 = Utils.ToUInt32(vch, 4 * 5, true);
-         this.pn6 = Utils.ToUInt32(vch, 4 * 6, true);
-         this.pn7 = Utils.ToUInt32(vch, 4 * 7, true);
+         pn0 = Utils.ToUInt32(vch, 4 * 0, true);
+         pn1 = Utils.ToUInt32(vch, 4 * 1, true);
+         pn2 = Utils.ToUInt32(vch, 4 * 2, true);
+         pn3 = Utils.ToUInt32(vch, 4 * 3, true);
+         pn4 = Utils.ToUInt32(vch, 4 * 4, true);
+         pn5 = Utils.ToUInt32(vch, 4 * 5, true);
+         pn6 = Utils.ToUInt32(vch, 4 * 6, true);
+         pn7 = Utils.ToUInt32(vch, 4 * 7, true);
 
       }
 

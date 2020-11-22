@@ -9,13 +9,13 @@ namespace MithrilShards.Dev.Controller
 {
    public class DevControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
    {
-      private const string DevControllerTypeNameSuffix = "ControllerDev";
+      private const string DEV_CONTROLLER_TYPE_NAME_SUFFIX = "ControllerDev";
 
       public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
       {
-         foreach (var part in parts.OfType<IApplicationPartTypeProvider>())
+         foreach (IApplicationPartTypeProvider? part in parts.OfType<IApplicationPartTypeProvider>())
          {
-            foreach (var type in part.Types)
+            foreach (TypeInfo? type in part.Types)
             {
                if (IsDevController(type) && !feature.Controllers.Contains(type))
                {
@@ -55,7 +55,7 @@ namespace MithrilShards.Dev.Controller
             return false;
          }
 
-         if (!typeInfo.Name.EndsWith(DevControllerTypeNameSuffix, StringComparison.OrdinalIgnoreCase) &&
+         if (!typeInfo.Name.EndsWith(DEV_CONTROLLER_TYPE_NAME_SUFFIX, StringComparison.OrdinalIgnoreCase) &&
              !typeInfo.IsDefined(typeof(DevControllerAttribute)))
          {
             return false;

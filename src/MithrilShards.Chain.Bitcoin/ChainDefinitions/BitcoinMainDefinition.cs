@@ -4,7 +4,6 @@ using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Core.Crypto;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
@@ -27,7 +26,7 @@ namespace MithrilShards.Chain.Bitcoin.ChainDefinitions
       public override ConsensusParameters ConfigureConsensus()
       {
          return new ConsensusParameters(
-            genesisHeader: this.BuildGenesisBlock(),
+            genesisHeader: BuildGenesisBlock(),
 
             subsidyHalvingInterval: 210000,
             maxMoney: 21_000_000 * COIN,

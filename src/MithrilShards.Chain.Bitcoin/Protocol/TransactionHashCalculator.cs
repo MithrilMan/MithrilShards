@@ -10,17 +10,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 {
    public class TransactionHashCalculator : ITransactionHashCalculator
    {
-      readonly IProtocolTypeSerializer<Transaction> transactionSerializer;
+      private readonly IProtocolTypeSerializer<Transaction> _transactionSerializer;
 
       public TransactionHashCalculator(IProtocolTypeSerializer<Transaction> transactionSerializer)
       {
-         this.transactionSerializer = transactionSerializer;
+         _transactionSerializer = transactionSerializer;
       }
 
       public UInt256 ComputeHash(Transaction transaction, int protocolVersion)
       {
-         ArrayBufferWriter<byte> buffer = new ArrayBufferWriter<byte>();
-         this.transactionSerializer.Serialize(transaction,
+         var buffer = new ArrayBufferWriter<byte>();
+         _transactionSerializer.Serialize(transaction,
                                               protocolVersion,
                                               buffer,
                                               new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
@@ -30,8 +30,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
       public UInt256 ComputeWitnessHash(Transaction transaction, int protocolVersion)
       {
-         ArrayBufferWriter<byte> buffer = new ArrayBufferWriter<byte>();
-         this.transactionSerializer.Serialize(transaction,
+         var buffer = new ArrayBufferWriter<byte>();
+         _transactionSerializer.Serialize(transaction,
                                               protocolVersion,
                                               buffer,
                                               new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, transaction.HasWitness())));

@@ -18,7 +18,7 @@ namespace MithrilShards.Example.Network
 
       public ExampleEndPoint(IPAddress address, int port, string myExtraInformation) : base(address, port)
       {
-         this.MyExtraInformation = myExtraInformation;
+         MyExtraInformation = myExtraInformation;
       }
    }
 }

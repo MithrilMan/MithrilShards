@@ -13,7 +13,7 @@ namespace MithrilShards.Core.Network.Server
 
       public bool TryGetIPEndPoint([MaybeNullWhen(false)]out IPEndPoint endPoint)
       {
-         return IPEndPoint.TryParse(this.EndPoint, out endPoint);
+         return IPEndPoint.TryParse(EndPoint, out endPoint);
       }
    }
 }

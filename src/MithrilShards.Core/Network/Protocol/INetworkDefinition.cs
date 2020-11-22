@@ -1,6 +1,4 @@
-﻿using MithrilShards.Core.DataTypes;
-
-namespace MithrilShards.Core.Network.Protocol
+﻿namespace MithrilShards.Core.Network.Protocol
 {
    public interface INetworkDefinition
    {

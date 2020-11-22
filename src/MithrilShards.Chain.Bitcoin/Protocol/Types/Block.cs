@@ -1,7 +1,4 @@
-﻿using System;
-using MithrilShards.Core.DataTypes;
-
-namespace MithrilShards.Chain.Bitcoin.Protocol.Types
+﻿namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 {
    /// <summary>
    /// Represents a block.

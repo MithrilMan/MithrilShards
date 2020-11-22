@@ -6,11 +6,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class VerackMessageSerializer : BitcoinNetworkMessageSerializerBase<VerackMessage>
    {
-      private static readonly VerackMessage instance = new VerackMessage();
+      private static readonly VerackMessage _instance = new VerackMessage();
       public override VerackMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
          // having a singleton verack is fine because it contains no data
-         return instance;
+         return _instance;
       }
 
       public override void Serialize(VerackMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)

@@ -18,9 +18,9 @@ namespace MithrilShards.Core.Forge
       /// <summary>
       /// A temporary console logger that can be used to report to user errors that may happens for example with missing configuration files and we don't have yet proper logger registration.
       /// </summary>
-      private readonly ILogger<ForgeBuilder> logger;
-      private bool isForgeSet = false;
-      private bool createDefaultConfigurationFileNeeded = false;
+      private readonly ILogger<ForgeBuilder> _logger;
+      private bool _isForgeSet = false;
+      private bool _createDefaultConfigurationFileNeeded = false;
 
       public readonly HostBuilder hostBuilder;
       public string ConfigurationFileName { get; private set; } = null!; //set to something meaningful during initialization
@@ -29,12 +29,12 @@ namespace MithrilShards.Core.Forge
       {
          // create a temporary logger that logs on console to communicate pre-initialization errors that may happens for example with missing configuration files
          ILoggerFactory loggerFactory = LoggerFactory.Create(logging => logging.SetMinimumLevel(LogLevel.Warning).AddConsole());
-         logger = loggerFactory.CreateLogger<ForgeBuilder>();
+         _logger = loggerFactory.CreateLogger<ForgeBuilder>();
 
-         this.hostBuilder = new HostBuilder();
+         hostBuilder = new HostBuilder();
 
          // Add a new service provider configuration
-         this.hostBuilder
+         hostBuilder
             .UseContentRoot(Directory.GetCurrentDirectory())
             .UseDefaultServiceProvider((context, options) =>
             {
@@ -49,9 +49,9 @@ namespace MithrilShards.Core.Forge
       /// <returns></returns>
       private void CreateDefaultConfigurationFile(FileLoadExceptionContext fileContext)
       {
-         this.createDefaultConfigurationFileNeeded = true;
+         _createDefaultConfigurationFileNeeded = true;
 
-         logger.LogWarning($"Missing configuration file {this.ConfigurationFileName}, creating one with default values.");
+         _logger.LogWarning($"Missing configuration file {ConfigurationFileName}, creating one with default values.");
 
          //default file created, no need to throw error
          fileContext.Ignore = true;
@@ -59,21 +59,21 @@ namespace MithrilShards.Core.Forge
 
       public IForgeBuilder UseForge<TForgeImplementation>(string[] commandLineArgs, string configurationFile = "forge-settings.json") where TForgeImplementation : class, IForge
       {
-         if (this.isForgeSet)
+         if (_isForgeSet)
          {
             throw new Exception($"Forge already set. Only one call to {nameof(UseForge)} is allowed");
          }
 
-         _ = this.hostBuilder.ConfigureServices((context, services) =>
+         _ = hostBuilder.ConfigureServices((context, services) =>
          {
-            if (this.createDefaultConfigurationFileNeeded)
+            if (_createDefaultConfigurationFileNeeded)
             {
                services.AddSingleton<DefaultConfigurationWriter>(services =>
                {
                   return new DefaultConfigurationWriter(
                      services.GetService<ILoggerFactory>().CreateLogger<DefaultConfigurationWriter>(),
                      services.GetServices<IMithrilShardSettings>(),
-                     this.ConfigurationFileName
+                     ConfigurationFileName
                      );
                });
             }
@@ -86,9 +86,9 @@ namespace MithrilShards.Core.Forge
                .ConfigureForge(context);
          });
 
-         this.isForgeSet = true;
+         _isForgeSet = true;
 
-         this.Configure(commandLineArgs, configurationFile);
+         Configure(commandLineArgs, configurationFile);
 
          return this;
       }
@@ -110,7 +110,7 @@ namespace MithrilShards.Core.Forge
       //     The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.
       public IForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging)
       {
-         this.hostBuilder.ConfigureLogging(configureLogging);
+         hostBuilder.ConfigureLogging(configureLogging);
          return this;
       }
 
@@ -119,10 +119,10 @@ namespace MithrilShards.Core.Forge
          where TMithrilShardSettings : class, IMithrilShardSettings, new()
       {
 
-         this.AddShard<TMithrilShard>(configureDelegate);
+         AddShard<TMithrilShard>(configureDelegate);
 
          //register shard configuration settings
-         this.hostBuilder.ConfigureServices((context, services) =>
+         hostBuilder.ConfigureServices((context, services) =>
          {
             services.Configure<TMithrilShardSettings>(MithrilShardSettingsManager.GetSection<TMithrilShardSettings>(context.Configuration));
 
@@ -142,7 +142,7 @@ namespace MithrilShards.Core.Forge
             throw new ArgumentNullException(nameof(configureDelegate));
          }
 
-         this.hostBuilder.ConfigureServices((context, services) =>
+         hostBuilder.ConfigureServices((context, services) =>
          {
             services.AddSingleton<IMithrilShard, TMithrilShard>();
             configureDelegate(context, services);
@@ -153,7 +153,7 @@ namespace MithrilShards.Core.Forge
 
       public IForgeBuilder ExtendInnerHostBuilder(Action<IHostBuilder> extendHostBuilderAction)
       {
-         extendHostBuilderAction(this.hostBuilder);
+         extendHostBuilderAction(hostBuilder);
          return this;
       }
 
@@ -163,7 +163,7 @@ namespace MithrilShards.Core.Forge
       /// <returns></returns>
       public IForgeBuilder AddConsoleLog()
       {
-         this.ConfigureLogging((context, logging) =>
+         ConfigureLogging((context, logging) =>
          {
             logging.AddConfiguration(context.Configuration.GetSection("Logging"));
             logging.AddConsole();
@@ -189,14 +189,14 @@ namespace MithrilShards.Core.Forge
       //     shutdown is triggered.
       public Task RunConsoleAsync(CancellationToken cancellationToken = default)
       {
-         this.EnsureForgeIsSet();
+         EnsureForgeIsSet();
 
-         return this.hostBuilder.RunConsoleAsync(cancellationToken);
+         return hostBuilder.RunConsoleAsync(cancellationToken);
       }
 
       private void EnsureForgeIsSet()
       {
-         if (!this.isForgeSet)
+         if (!_isForgeSet)
          {
             throw new ForgeBuilderException("Forge must be set. A call to UseForge is required");
          }
@@ -204,19 +204,19 @@ namespace MithrilShards.Core.Forge
 
       private IForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE)
       {
-         this.ConfigurationFileName = Path.GetFullPath(configurationFile ?? CONFIGURATION_FILE);
-         string absoluteDirectoryPath = Path.GetDirectoryName(this.ConfigurationFileName)!;
+         ConfigurationFileName = Path.GetFullPath(configurationFile ?? CONFIGURATION_FILE);
+         string absoluteDirectoryPath = Path.GetDirectoryName(ConfigurationFileName)!;
          if (!Directory.Exists(absoluteDirectoryPath))
          {
-            logger.LogWarning($"Creating directory structure to store configuration file {this.ConfigurationFileName}.");
+            _logger.LogWarning($"Creating directory structure to store configuration file {ConfigurationFileName}.");
             Directory.CreateDirectory(absoluteDirectoryPath);
          }
          var configurationFileProvider = new PhysicalFileProvider(absoluteDirectoryPath);
 
-         _ = this.hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
+         _ = hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
          {
             // do not change optional to true, because there is SetFileLoadExceptionHandler that will create a default file if missing.
-            config.AddJsonFile(configurationFileProvider, Path.GetFileName(this.ConfigurationFileName), optional: false, reloadOnChange: true);
+            config.AddJsonFile(configurationFileProvider, Path.GetFileName(ConfigurationFileName), optional: false, reloadOnChange: true);
 
             config.AddEnvironmentVariables("FORGE_");
 

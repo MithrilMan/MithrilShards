@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 
       public IPEndPoint EndPoint
       {
-         get { return new IPEndPoint(new IPAddress(this.IP), this.Port); }
+         get { return new IPEndPoint(new IPAddress(IP), Port); }
          set
          {
             if (value == null)
@@ -35,8 +35,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
                throw new InvalidOperationException("Can't set 'AddressReceiver' to null.");
             }
 
-            this.IP = value.Address.MapToIPv6().GetAddressBytes();
-            this.Port = (ushort)value.Port;
+            IP = value.Address.MapToIPv6().GetAddressBytes();
+            Port = (ushort)value.Port;
          }
       }
    }

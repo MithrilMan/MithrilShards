@@ -10,8 +10,8 @@ namespace MithrilShards.Diagnostic.StatisticsCollector.Models
 
       public RawStatisticFeedResult(ScheduledStatisticFeed feed) : base(feed.StatisticFeedDefinition.FeedId, feed.LastResultsDate)
       {
-         this.Fields = feed.StatisticFeedDefinition.FieldsDefinition;
-         this.Values = feed.lastResults;
+         Fields = feed.StatisticFeedDefinition.FieldsDefinition;
+         Values = feed.lastResults;
       }
    }
 }

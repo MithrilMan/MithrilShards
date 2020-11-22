@@ -48,18 +48,18 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                                  long maxMoney
          )
       {
-         this.GenesisHeader = genesisHeader;
-         this.SubsidyHalvingInterval = subsidyHalvingInterval;
-         this.PowLimit = powLimit;
-         this.PowTargetTimespan = powTargetTimespan;
-         this.PowTargetSpacing = powTargetSpacing;
-         this.PowAllowMinDifficultyBlocks = powAllowMinDifficultyBlocks;
-         this.PowNoRetargeting = powNoRetargeting;
-         this.MinimumChainWork = minimumChainWork;
-         this.MaxBlockWeight = maxBlockSerializedSize;
-         this.WitnessScaleFactor = witnessScaleFactor;
-         this.SegwitHeight = segwitHeight;
-         this.MaxMoney = maxMoney;
+         GenesisHeader = genesisHeader;
+         SubsidyHalvingInterval = subsidyHalvingInterval;
+         PowLimit = powLimit;
+         PowTargetTimespan = powTargetTimespan;
+         PowTargetSpacing = powTargetSpacing;
+         PowAllowMinDifficultyBlocks = powAllowMinDifficultyBlocks;
+         PowNoRetargeting = powNoRetargeting;
+         MinimumChainWork = minimumChainWork;
+         MaxBlockWeight = maxBlockSerializedSize;
+         WitnessScaleFactor = witnessScaleFactor;
+         SegwitHeight = segwitHeight;
+         MaxMoney = maxMoney;
       }
    }
 }

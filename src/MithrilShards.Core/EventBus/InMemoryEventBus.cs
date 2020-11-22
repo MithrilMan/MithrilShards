@@ -8,22 +8,22 @@ namespace MithrilShards.Core.EventBus
    public class InMemoryEventBus : IEventBus
    {
       /// <summary>Instance logger.</summary>
-      private readonly ILogger logger;
+      private readonly ILogger _logger;
 
       /// <summary>
       /// The subscriber error handler
       /// </summary>
-      private readonly ISubscriptionErrorHandler subscriptionErrorHandler;
+      private readonly ISubscriptionErrorHandler _subscriptionErrorHandler;
 
       /// <summary>
       /// The subscriptions stored by EventType
       /// </summary>
-      private readonly Dictionary<Type, List<ISubscription>> subscriptions;
+      private readonly Dictionary<Type, List<ISubscription>> _subscriptions;
 
       /// <summary>
       /// The subscriptions lock to prevent race condition during publishing
       /// </summary>
-      private readonly object subscriptionsLock = new object();
+      private readonly object _subscriptionsLock = new object();
 
       /// <summary>
       /// Initializes a new instance of the <see cref="InMemoryEventBus"/> class.
@@ -32,9 +32,9 @@ namespace MithrilShards.Core.EventBus
       /// <param name="subscriptionErrorHandler">The subscription error handler. If null the default one will be used</param>
       public InMemoryEventBus(ILogger<InMemoryEventBus> logger, ISubscriptionErrorHandler subscriptionErrorHandler)
       {
-         this.logger = logger;
-         this.subscriptionErrorHandler = subscriptionErrorHandler;
-         this.subscriptions = new Dictionary<Type, List<ISubscription>>();
+         _logger = logger;
+         _subscriptionErrorHandler = subscriptionErrorHandler;
+         _subscriptions = new Dictionary<Type, List<ISubscription>>();
       }
 
       /// <inheritdoc />
@@ -45,18 +45,18 @@ namespace MithrilShards.Core.EventBus
             throw new ArgumentNullException(nameof(handler));
          }
 
-         lock (this.subscriptionsLock)
+         lock (_subscriptionsLock)
          {
-            if (!this.subscriptions.ContainsKey(typeof(TEvent)))
+            if (!_subscriptions.ContainsKey(typeof(TEvent)))
             {
-               this.subscriptions.Add(typeof(TEvent), new List<ISubscription>());
+               _subscriptions.Add(typeof(TEvent), new List<ISubscription>());
             }
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
             var subscriptionToken = new SubscriptionToken(this, typeof(TEvent));
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
-            this.subscriptions[typeof(TEvent)].Add(new Subscription<TEvent>(handler, subscriptionToken));
+            _subscriptions[typeof(TEvent)].Add(new Subscription<TEvent>(handler, subscriptionToken));
 
             return subscriptionToken;
          }
@@ -68,20 +68,20 @@ namespace MithrilShards.Core.EventBus
          // Ignore null token
          if (subscriptionToken == null)
          {
-            this.logger.LogDebug("Unsubscribe called with a null token, ignored.");
+            _logger.LogDebug("Unsubscribe called with a null token, ignored.");
             return;
          }
 
-         lock (this.subscriptionsLock)
+         lock (_subscriptionsLock)
          {
-            if (this.subscriptions.ContainsKey(subscriptionToken.EventType))
+            if (_subscriptions.ContainsKey(subscriptionToken.EventType))
             {
-               List<ISubscription> allSubscriptions = this.subscriptions[subscriptionToken.EventType];
+               List<ISubscription> allSubscriptions = _subscriptions[subscriptionToken.EventType];
 
                ISubscription subscriptionToRemove = allSubscriptions.FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
                if (subscriptionToRemove != null)
                {
-                  this.subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
+                  _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
                }
             }
          }
@@ -95,13 +95,13 @@ namespace MithrilShards.Core.EventBus
             throw new ArgumentNullException(nameof(@event));
          }
 
-         List<ISubscription> allSubscriptions = new List<ISubscription>();
-         lock (this.subscriptionsLock)
+         var allSubscriptions = new List<ISubscription>();
+         lock (_subscriptionsLock)
          {
             Type eventType = typeof(TEvent);
-            if (this.subscriptions.ContainsKey(eventType))
+            if (_subscriptions.ContainsKey(eventType))
             {
-               allSubscriptions = this.subscriptions[eventType].ToList();
+               allSubscriptions = _subscriptions[eventType].ToList();
             }
          }
 
@@ -114,7 +114,7 @@ namespace MithrilShards.Core.EventBus
             }
             catch (Exception ex)
             {
-               this.subscriptionErrorHandler?.Handle(@event, ex, subscription);
+               _subscriptionErrorHandler?.Handle(@event, ex, subscription);
             }
          }
       }

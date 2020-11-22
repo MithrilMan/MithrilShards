@@ -25,7 +25,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
             throw new ArgumentException($"Protocol violation: command name is limited to {MAX_COMMAND_LENGTH} characters.");
          }
 
-         this.Command = commandName;
+         Command = commandName;
       }
    }
 }

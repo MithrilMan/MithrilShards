@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
 namespace MithrilShards.Core.DataTypes
 {
    public partial class UInt256 : IEquatable<UInt256>
    {
-      public override bool Equals(object? obj) => ReferenceEquals(this, obj) || this.Equals(obj as UInt256);
+      public override bool Equals(object? obj) => ReferenceEquals(this, obj) || Equals(obj as UInt256);
 
       public static bool operator !=(UInt256? a, UInt256? b) => !(a == b);
 
@@ -15,10 +14,10 @@ namespace MithrilShards.Core.DataTypes
       {
          if (other is null) return false;
 
-         return this.part1 == other.part1
-             && this.part2 == other.part2
-             && this.part3 == other.part3
-             && this.part4 == other.part4;
+         return part1 == other.part1
+             && part2 == other.part2
+             && part3 == other.part3
+             && part4 == other.part4;
       }
 
       public static bool operator <(UInt256? a, UInt256? b)

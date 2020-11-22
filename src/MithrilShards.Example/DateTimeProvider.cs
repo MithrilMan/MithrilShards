@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MithrilShards.Core;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Extensions;
 
@@ -22,18 +21,18 @@ To recover from this state fix your time and restart the node.
       /// <summary>
       /// Represents the number of ticks that are in 1 microsecond.
       /// </summary>
-      const long TicksPerMicrosecond = TimeSpan.TicksPerMillisecond / 1000;
-      const long UnixEpochTicks = 719_162 * TimeSpan.TicksPerDay;
-      const long UnixEpochMicroseconds = UnixEpochTicks / TimeSpan.TicksPerMillisecond;
+      const long TICKS_PER_MICROSECOND = TimeSpan.TicksPerMillisecond / 1000;
+      const long UNIX_EPOCH_TICKS = 719_162 * TimeSpan.TicksPerDay;
+      const long UNIX_EPOCH_MICROSECONDS = UNIX_EPOCH_TICKS / TimeSpan.TicksPerMillisecond;
 
-      readonly ILogger<DateTimeProvider> logger;
-      private readonly ExampleSettings settings;
+      readonly ILogger<DateTimeProvider> _logger;
+      private readonly ExampleSettings _settings;
 
 
-      private readonly MedianFilter<long> medianFilter;
-      private readonly HashSet<IPAddress> knownPeers;
-      private bool autoAdjustingTimeEnabled = true;
-      private bool showWarning = false;
+      private readonly MedianFilter<long> _medianFilter;
+      private readonly HashSet<IPAddress> _knownPeers;
+      private bool _autoAdjustingTimeEnabled = true;
+      private bool _showWarning = false;
 
       /// <summary>UTC adjusted timestamp, or null if no adjusted time is set.</summary>
       protected TimeSpan adjustedTimeOffset { get; set; }
@@ -43,18 +42,18 @@ To recover from this state fix your time and restart the node.
       /// </summary>
       public DateTimeProvider(ILogger<DateTimeProvider> logger, IOptions<ExampleSettings> options)
       {
-         this.logger = logger;
-         this.settings = options.Value;
+         _logger = logger;
+         _settings = options.Value;
 
-         this.adjustedTimeOffset = TimeSpan.Zero;
+         adjustedTimeOffset = TimeSpan.Zero;
 
-         this.medianFilter = new MedianFilter<long>(
+         _medianFilter = new MedianFilter<long>(
             size: MAX_SAMPLES,
             initialValue: 0,
             medianComputationOnEvenElements: args => (args.lowerItem + args.higherItem) / 2
             );
 
-         this.knownPeers = new HashSet<IPAddress>(MAX_SAMPLES);
+         _knownPeers = new HashSet<IPAddress>(MAX_SAMPLES);
       }
 
       /// <inheritdoc />
@@ -67,8 +66,8 @@ To recover from this state fix your time and restart the node.
       {
          // Truncate sub-millisecond precision before offsetting by the Unix Epoch to avoid
          // the last digit being off by one for dates that result in negative Unix times
-         long microseconds = DateTimeOffset.UtcNow.Ticks / TicksPerMicrosecond;
-         return microseconds - UnixEpochMicroseconds;
+         long microseconds = DateTimeOffset.UtcNow.Ticks / TICKS_PER_MICROSECOND;
+         return microseconds - UNIX_EPOCH_MICROSECONDS;
       }
 
 
@@ -87,13 +86,13 @@ To recover from this state fix your time and restart the node.
       /// <inheritdoc />
       public DateTime GetAdjustedTime()
       {
-         return this.GetUtcNow().Add(this.adjustedTimeOffset);
+         return GetUtcNow().Add(adjustedTimeOffset);
       }
 
       /// <inheritdoc />
       public long GetAdjustedTimeAsUnixTimestamp()
       {
-         return new DateTimeOffset(this.GetAdjustedTime()).ToUnixTimeSeconds();
+         return new DateTimeOffset(GetAdjustedTime()).ToUnixTimeSeconds();
       }
 
       /// <inheritdoc />
@@ -104,12 +103,12 @@ To recover from this state fix your time and restart the node.
 
       public void AddTimeData(TimeSpan timeoffset, IPEndPoint remoteEndPoint)
       {
-         if (!autoAdjustingTimeEnabled)
+         if (!_autoAdjustingTimeEnabled)
          {
-            this.logger.LogDebug("Automatic time adjustment is disabled.");
-            if (showWarning)
+            _logger.LogDebug("Automatic time adjustment is disabled.");
+            if (_showWarning)
             {
-               this.logger.LogCritical(WARNING_MESSAGE);
+               _logger.LogCritical(WARNING_MESSAGE);
             }
             return;
          }
@@ -117,20 +116,20 @@ To recover from this state fix your time and restart the node.
          /// note: this behavior mimic bitcoin core but it's broken as it is on bitcoin core.
          /// something better should be implemented.
 
-         if (this.knownPeers.Count == MAX_SAMPLES)
+         if (_knownPeers.Count == MAX_SAMPLES)
          {
-            this.logger.LogDebug("Ignored AddTimeData: max peer tracked.");
+            _logger.LogDebug("Ignored AddTimeData: max peer tracked.");
             return;
          }
 
-         if (this.knownPeers.Contains(remoteEndPoint.Address))
+         if (_knownPeers.Contains(remoteEndPoint.Address))
          {
-            this.logger.LogDebug("Ignored AddTimeData: peer already contributed.");
+            _logger.LogDebug("Ignored AddTimeData: peer already contributed.");
             return;
          }
 
-         this.knownPeers.Add(remoteEndPoint.Address);
-         this.medianFilter.AddSample((long)timeoffset.TotalSeconds);
+         _knownPeers.Add(remoteEndPoint.Address);
+         _medianFilter.AddSample((long)timeoffset.TotalSeconds);
 
          // There is a known issue here (see issue #4521):
          //
@@ -149,20 +148,20 @@ To recover from this state fix your time and restart the node.
          // So we should hold off on fixing this and clean it up as part of
          // a timing cleanup that strengthens it in a number of other ways.
          //
-         if (this.medianFilter.Count >= 5 && this.medianFilter.Count % 2 == 1)
+         if (_medianFilter.Count >= 5 && _medianFilter.Count % 2 == 1)
          {
-            long median = this.medianFilter.GetMedian();
+            long median = _medianFilter.GetMedian();
 
             // Only let other nodes change our time by so much
-            if (Math.Abs(median) <= Math.Max(0, this.settings.MaxTimeAdjustment))
+            if (Math.Abs(median) <= Math.Max(0, _settings.MaxTimeAdjustment))
             {
-               this.SetAdjustedTimeOffset(TimeSpan.FromSeconds(median));
+               SetAdjustedTimeOffset(TimeSpan.FromSeconds(median));
             }
             else
             {
-               this.autoAdjustingTimeEnabled = false;
-               this.showWarning = true;
-               this.SetAdjustedTimeOffset(TimeSpan.Zero);
+               _autoAdjustingTimeEnabled = false;
+               _showWarning = true;
+               SetAdjustedTimeOffset(TimeSpan.Zero);
             }
          }
       }

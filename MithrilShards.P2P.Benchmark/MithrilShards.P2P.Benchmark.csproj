@@ -8,12 +8,10 @@
 
   <ItemGroup>
     <Compile Remove="coreKey.cs" />
-    <Compile Remove="Key2.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="coreKey.cs" />
-    <None Include="Key2.cs" />
   </ItemGroup>
 
   <ItemGroup>

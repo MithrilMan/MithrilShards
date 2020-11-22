@@ -10,8 +10,8 @@ namespace MithrilShards.Core.Statistics
 
       public StatisticFeedResult(string feedId, DateTimeOffset time)
       {
-         this.FeedId = feedId;
-         this.Time = time;
+         FeedId = feedId;
+         Time = time;
       }
    }
 }

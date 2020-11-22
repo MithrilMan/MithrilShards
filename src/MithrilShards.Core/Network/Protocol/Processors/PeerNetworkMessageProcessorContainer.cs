@@ -24,18 +24,18 @@ namespace MithrilShards.Core.Network.Protocol.Processors
          }
          internal ValueTask<bool> InvokeAsync(INetworkMessage message, CancellationToken cancellation)
          {
-            return (ValueTask<bool>)this.handler.Invoke(this.processor, new object[] { message, cancellation });
+            return (ValueTask<bool>)handler.Invoke(processor, new object[] { message, cancellation });
          }
       }
 
       /// <summary>
       /// The mapping between MessageType and which processor instance is able to handle the request.
       /// </summary>
-      private readonly Dictionary<Type, List<ProcessorHandler>> mapping = new Dictionary<Type, List<ProcessorHandler>>();
+      private readonly Dictionary<Type, List<ProcessorHandler>> _mapping = new Dictionary<Type, List<ProcessorHandler>>();
 
       public PeerNetworkMessageProcessorContainer(IEnumerable<INetworkMessageProcessor> processors)
       {
-         this.ConfigureMapping(processors);
+         ConfigureMapping(processors);
       }
 
       private void ConfigureMapping(IEnumerable<INetworkMessageProcessor> processors)
@@ -61,10 +61,10 @@ namespace MithrilShards.Core.Network.Protocol.Processors
                   .Where(method => method.Name == nameof(INetworkMessageHandler<INetworkMessage>.ProcessMessageAsync))
                   .First();
 
-               if (!this.mapping.TryGetValue(handledMessageType, out List<ProcessorHandler>? handlers))
+               if (!_mapping.TryGetValue(handledMessageType, out List<ProcessorHandler>? handlers))
                {
                   handlers = new List<ProcessorHandler>();
-                  this.mapping[handledMessageType] = handlers;
+                  _mapping[handledMessageType] = handlers;
                }
 
                handlers.Add(new ProcessorHandler(processor, CreateLambdaWrapper(method)));
@@ -80,7 +80,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       /// <returns><see langword="true"/> if message has been processed, <see langword="false"/> otherwise.</returns>
       public async ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation)
       {
-         if (!this.mapping.TryGetValue(message.GetType(), out List<ProcessorHandler>? handlers)) return false;
+         if (!_mapping.TryGetValue(message.GetType(), out List<ProcessorHandler>? handlers)) return false;
 
          for (int i = 0; i < handlers.Count; i++)
          {

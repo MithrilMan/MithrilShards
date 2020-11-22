@@ -5,9 +5,6 @@
 using System;
 using System.Buffers;
 using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MithrilShards.Core.Memory
 {
@@ -26,7 +23,7 @@ namespace MithrilShards.Core.Memory
       private byte[]? _rentedBuffer;
       private int _index;
 
-      private const int MinimumBufferSize = 256;
+      private const int MINIMUM_BUFFER_SIZE = 256;
 
       public PooledByteBufferWriter(int initialCapacity)
       {
@@ -140,7 +137,7 @@ namespace MithrilShards.Core.Memory
 
          if (sizeHint == 0)
          {
-            sizeHint = MinimumBufferSize;
+            sizeHint = MINIMUM_BUFFER_SIZE;
          }
 
          int availableSpace = _rentedBuffer.Length - _index;

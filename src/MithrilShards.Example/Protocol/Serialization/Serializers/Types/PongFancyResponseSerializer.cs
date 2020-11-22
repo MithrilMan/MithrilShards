@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
-using MithrilShards.Example.Protocol.Types;
 using MithrilShards.Core.Network.Protocol.Serialization;
+using MithrilShards.Example.Protocol.Types;
 
 namespace MithrilShards.Example.Protocol.Serialization.Serializers.Types
 {

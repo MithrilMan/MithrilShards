@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.DataTypes
@@ -70,7 +68,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          const int ELEMENTS = EXPECTED_SIZE / sizeof(ulong);
          const int SIZE = sizeof(ulong) * 8;
 
-         Span<ulong> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, ulong>(ref this.part1), ELEMENTS);
+         Span<ulong> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, ulong>(ref part1), ELEMENTS);
 
          Span<ulong> result = stackalloc ulong[ELEMENTS];
          result.Clear();
@@ -96,7 +94,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          const int ELEMENTS = EXPECTED_SIZE / sizeof(uint);
          const int SIZE = sizeof(uint) * 8;
 
-         ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref this.part1), ELEMENTS);
+         ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref part1), ELEMENTS);
 
          int k = shiftAmount / SIZE;
          shiftAmount %= SIZE;
@@ -148,7 +146,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          const int ELEMENTS = EXPECTED_SIZE / sizeof(uint);
          const int SIZE = sizeof(uint) * 8;
 
-         Span<uint> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, uint>(ref this.part1), ELEMENTS);
+         Span<uint> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, uint>(ref part1), ELEMENTS);
 
          ulong carry = 0;
          for (int i = 0; i < ELEMENTS; i++)
@@ -172,9 +170,9 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
             ThrowHelper.ThrowArgumentException("Division by zero");
          }
 
-         BigInteger dividend = new BigInteger(this.GetBytes());
+         var dividend = new BigInteger(GetBytes());
 
-         Span<byte> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref this.part1), EXPECTED_SIZE);
+         Span<byte> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref part1), EXPECTED_SIZE);
          data.Clear();
          (dividend / divisor).TryWriteBytes(data, out _);
       }

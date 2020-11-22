@@ -12,7 +12,7 @@ namespace MithrilShards.Core.Network.Events
       public IPEndPoint RemoteEndPoint { get; }
       public PeerConnectionAttempt(IPEndPoint remoteEndPoint)
       {
-         this.RemoteEndPoint = remoteEndPoint;
+         RemoteEndPoint = remoteEndPoint;
       }
    }
 }

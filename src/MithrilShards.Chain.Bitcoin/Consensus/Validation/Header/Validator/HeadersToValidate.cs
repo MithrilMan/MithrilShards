@@ -24,8 +24,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
 
       public HeadersToValidate(IReadOnlyCollection<BlockHeader> headers, IPeerContext? peer)
       {
-         this.Headers = headers;
-         this.Peer = peer;
+         Headers = headers;
+         Peer = peer;
       }
    }
 }

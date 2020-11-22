@@ -11,17 +11,17 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class HexEncoder
    {
-      private byte[] value;
+      private byte[] _value;
 
 
       [GlobalSetup]
       public void Setup()
       {
-         this.value = new Core.DataTypes.UInt256("0123456789abcdef0123456789ABCDEF0123456789abcdef0123456789ABCDEF").GetBytes().ToArray();
+         _value = new Core.DataTypes.UInt256("0123456789abcdef0123456789ABCDEF0123456789abcdef0123456789ABCDEF").GetBytes().ToArray();
       }
 
       [Benchmark]
-      public object ConvertAsMithril() => this.ConvertAsMithril(this.value);
+      public object ConvertAsMithril() => ConvertAsMithril(_value);
 
       private object ConvertAsMithril(byte[] value)
       {
@@ -29,7 +29,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public string ConvertReverseAsMithril() => this.ConvertReverseAsMithril(this.value);
+      public string ConvertReverseAsMithril() => ConvertReverseAsMithril(_value);
 
       private string ConvertReverseAsMithril(byte[] value)
       {
@@ -37,20 +37,20 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public object ConvertAsNEO() => ConvertAsNEO(this.value);
+      public object ConvertAsNEO() => ConvertAsNEO(_value);
 
       [Benchmark]
-      public object ConvertAsNBitcoin() => ConvertAsNBitcoin(this.value, false);
+      public object ConvertAsNBitcoin() => ConvertAsNBitcoin(_value, false);
 
       private static string ConvertAsNEO(byte[] value)
       {
-         StringBuilder sb = new StringBuilder();
+         var sb = new StringBuilder();
          foreach (byte b in value)
             sb.AppendFormat("{0:x2}", b);
          return sb.ToString();
       }
 
-      private static readonly string[] HexTbl = Enumerable.Range(0, 256).Select(v => v.ToString("x2")).ToArray();
+      private static readonly string[] _hexTbl = Enumerable.Range(0, 256).Select(v => v.ToString("x2")).ToArray();
       private static string ConvertAsNBitcoin(byte[] data, bool Space)
       {
          int spaces = (Space ? Math.Max((data.Length - 1), 0) : 0);
@@ -62,7 +62,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
             {
                if (Space && i != 0)
                   s[pos++] = ' ';
-               string c = HexTbl[state.data[i]];
+               string c = _hexTbl[state.data[i]];
                s[pos++] = c[0];
                s[pos++] = c[1];
             }

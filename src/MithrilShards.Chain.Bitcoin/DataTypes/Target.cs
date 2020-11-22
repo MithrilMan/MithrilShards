@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
    [TypeConverter(typeof(TargetConverter))]
    public partial class Target : UInt256
    {
-      private static BigInteger Pow256 = BigInteger.Pow(new BigInteger(2), 256);
+      private static readonly BigInteger _pow256 = BigInteger.Pow(new BigInteger(2), 256);
 
       public static new Target Zero { get; } = new Target("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
@@ -43,7 +43,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       /// <param name="compactValue">The compact value.</param>
       public Target(uint compactValue)
       {
-         Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+         Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
 
          byte exponent = (byte)(compactValue >> 24); // number of bytes of N
          uint mantissa = compactValue & 0x007fffff;
@@ -56,8 +56,8 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          }
          else
          {
-            this.part1 = mantissa;
-            this.ShiftLeft(8 * (exponent - 3));
+            part1 = mantissa;
+            ShiftLeft(8 * (exponent - 3));
          }
       }
 
@@ -67,7 +67,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       /// <param name="compactValue">The compact value.</param>
       public Target(uint compactValue, out bool isNegative, out bool isOverflow)
       {
-         Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.part1, EXPECTED_SIZE / sizeof(ulong)));
+         Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
 
          byte exponent = (byte)(compactValue >> 24); // number of bytes of N
          uint mantissa = compactValue & 0x007fffff;
@@ -79,8 +79,8 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
          }
          else
          {
-            this.part1 = mantissa;
-            this.ShiftLeft(8 * (exponent - 3));
+            part1 = mantissa;
+            ShiftLeft(8 * (exponent - 3));
          }
 
          // 0x00800000 is the mask to use to obtain the sign.
@@ -95,27 +95,27 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       {
          const int bitsPerPart = sizeof(ulong) * 8;
 
-         if (this.part4 != 0)
+         if (part4 != 0)
          {
-            int zeroes = BitOperations.LeadingZeroCount(this.part4);
+            int zeroes = BitOperations.LeadingZeroCount(part4);
             if (zeroes > 0) return (bitsPerPart * 4) - zeroes;
          }
 
-         if (this.part3 != 0)
+         if (part3 != 0)
          {
-            int zeroes = BitOperations.LeadingZeroCount(this.part3);
+            int zeroes = BitOperations.LeadingZeroCount(part3);
             if (zeroes > 0) return (bitsPerPart * 3) - zeroes;
          }
 
-         if (this.part2 != 0)
+         if (part2 != 0)
          {
-            int zeroes = BitOperations.LeadingZeroCount(this.part2);
+            int zeroes = BitOperations.LeadingZeroCount(part2);
             if (zeroes > 0) return (bitsPerPart * 2) - zeroes;
          }
 
-         if (this.part1 != 0)
+         if (part1 != 0)
          {
-            int zeroes = BitOperations.LeadingZeroCount(this.part1);
+            int zeroes = BitOperations.LeadingZeroCount(part1);
             if (zeroes > 0) return bitsPerPart - zeroes;
          }
 
@@ -126,14 +126,14 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       {
          uint compact;
 
-         int size = (this.Bits() + 7) / 8;
+         int size = (Bits() + 7) / 8;
          if (size <= 3)
          {
-            compact = (uint)(this.part1 << 8 * (3 - size));
+            compact = (uint)(part1 << 8 * (3 - size));
          }
          else
          {
-            compact = this.GetCompactMantissa(8 * (size - 3));
+            compact = GetCompactMantissa(8 * (size - 3));
          }
 
          // The 0x00800000 bit denotes the sign.
@@ -154,8 +154,8 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       public BigInteger ToBigInteger()
       {
          uint compact = ToCompact();
-         var exp = compact >> 24;
-         var value = compact & 0x00FFFFFF;
+         uint exp = compact >> 24;
+         uint value = compact & 0x00FFFFFF;
          return new BigInteger(value) << (8 * ((int)exp - 3));
       }
 
@@ -174,15 +174,15 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
 
          //but we can using BigInteger (less performant, could be improved)
 
-         var asBigInt = new BigInteger(this.GetBytes());
-         if (this <= Zero || asBigInt >= Pow256)
+         var asBigInt = new BigInteger(GetBytes());
+         if (this <= Zero || asBigInt >= _pow256)
             return Zero;
 
 
          var proof = new Target();
          Span<byte> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref proof.part1), EXPECTED_SIZE);
          data.Clear();
-         (Pow256 / (asBigInt + 1)).TryWriteBytes(data, out _);
+         (_pow256 / (asBigInt + 1)).TryWriteBytes(data, out _);
 
          return proof;
       }

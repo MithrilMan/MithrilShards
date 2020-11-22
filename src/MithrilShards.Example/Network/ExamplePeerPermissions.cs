@@ -28,22 +28,22 @@
 
       public void Add(int permission)
       {
-         this.Permissions |= permission;
+         Permissions |= permission;
       }
 
       public void Remove(int permission)
       {
-         this.Permissions &= ~permission;
+         Permissions &= ~permission;
       }
 
       public bool Has(int permission)
       {
-         return (this.Permissions & permission) == permission;
+         return (Permissions & permission) == permission;
       }
 
       public void Reset()
       {
-         this.Permissions = NONE;
+         Permissions = NONE;
       }
    }
 }

@@ -10,7 +10,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
    public class IsRoutable
    {
 
-      private IPAddress data;
+      private IPAddress _data;
 
       [GlobalSetup]
       public void Setup()
@@ -18,19 +18,19 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
          var random = new Random();
          byte[] randomIP = new byte[4];
          random.NextBytes(randomIP);
-         this.data = new IPAddress(randomIP);
+         _data = new IPAddress(randomIP);
       }
 
       [Benchmark]
       public void NBitcoin_IsRoutable()
       {
-         NBitcoin.IpExtensions.IsRoutable(this.data, true);
+         NBitcoin.IpExtensions.IsRoutable(_data, true);
       }
 
       [Benchmark]
       public void MithrilShards_IsRoutable()
       {
-         MithrilShards.Core.Extensions.IPAddressExtensions.IsRoutable(this.data, true);
+         MithrilShards.Core.Extensions.IPAddressExtensions.IsRoutable(_data, true);
       }
    }
 }

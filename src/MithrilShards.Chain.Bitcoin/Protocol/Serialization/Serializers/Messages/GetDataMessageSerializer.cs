@@ -8,22 +8,22 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class GetDataMessageSerializer : BitcoinNetworkMessageSerializerBase<GetDataMessage>
    {
-      private static readonly GetDataMessage instance = new GetDataMessage();
-      readonly IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer;
+      private static readonly GetDataMessage _instance = new GetDataMessage();
+      readonly IProtocolTypeSerializer<InventoryVector> _inventoryVectorSerializer;
 
       public GetDataMessageSerializer(IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer)
       {
-         this.inventoryVectorSerializer = inventoryVectorSerializer;
+         _inventoryVectorSerializer = inventoryVectorSerializer;
       }
 
       public override GetDataMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
-         return new GetDataMessage { Inventory = reader.ReadArray(protocolVersion, this.inventoryVectorSerializer) };
+         return new GetDataMessage { Inventory = reader.ReadArray(protocolVersion, _inventoryVectorSerializer) };
       }
 
       public override void Serialize(GetDataMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
       {
-         output.WriteArray(message.Inventory!, protocolVersion, this.inventoryVectorSerializer);
+         output.WriteArray(message.Inventory!, protocolVersion, _inventoryVectorSerializer);
       }
    }
 }

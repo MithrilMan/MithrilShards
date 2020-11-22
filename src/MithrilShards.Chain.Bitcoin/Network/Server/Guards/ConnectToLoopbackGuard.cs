@@ -18,9 +18,9 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
 
       internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
-         if (!this.settings.AllowLoopbackConnection && IPAddress.IsLoopback(peerContext.RemoteEndPoint.Address))
+         if (!settings.AllowLoopbackConnection && IPAddress.IsLoopback(peerContext.RemoteEndPoint.Address))
          {
-            return $"Loopback peer connection not allowed (set {nameof(this.settings.AllowLoopbackConnection)} to true to allow such kind of connections).";
+            return $"Loopback peer connection not allowed (set {nameof(settings.AllowLoopbackConnection)} to true to allow such kind of connections).";
          }
 
          return null;

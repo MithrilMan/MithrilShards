@@ -22,7 +22,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 
       public BlockMessage SetSerializerOption(bool useWitness)
       {
-         this.SetSerializationOptions((SerializerOptions.SERIALIZE_WITNESS, useWitness));
+         SetSerializationOptions((SerializerOptions.SERIALIZE_WITNESS, useWitness));
 
          return this;
       }

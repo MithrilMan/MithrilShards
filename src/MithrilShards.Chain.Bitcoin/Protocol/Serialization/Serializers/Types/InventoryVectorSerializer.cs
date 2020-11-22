@@ -7,11 +7,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 {
    public class InventoryVectorSerializer : IProtocolTypeSerializer<InventoryVector>
    {
-      private readonly IProtocolTypeSerializer<UInt256> uInt256Serializator;
+      private readonly IProtocolTypeSerializer<UInt256> _uInt256Serializator;
 
       public InventoryVectorSerializer(IProtocolTypeSerializer<UInt256> uInt256Serializator)
       {
-         this.uInt256Serializator = uInt256Serializator;
+         _uInt256Serializator = uInt256Serializator;
       }
 
       public InventoryVector Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
@@ -19,7 +19,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          return new InventoryVector
          {
             Type = reader.ReadUInt(),
-            Hash = reader.ReadWithSerializer(protocolVersion, this.uInt256Serializator),
+            Hash = reader.ReadWithSerializer(protocolVersion, _uInt256Serializator),
          };
       }
 
@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
       {
          int size = 0;
          size += writer.WriteUInt(typeInstance.Type);
-         size += writer.WriteWithSerializer(typeInstance.Hash, protocolVersion, this.uInt256Serializator);
+         size += writer.WriteWithSerializer(typeInstance.Hash, protocolVersion, _uInt256Serializator);
 
          return size;
       }

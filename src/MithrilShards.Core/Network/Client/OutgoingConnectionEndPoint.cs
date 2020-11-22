@@ -24,7 +24,7 @@ namespace MithrilShards.Core.Network.Client
 
       public OutgoingConnectionEndPoint(IPEndPoint endPoint)
       {
-         this.EndPoint = endPoint.EnsureIPv6();
+         EndPoint = endPoint.EnsureIPv6();
       }
    }
 }

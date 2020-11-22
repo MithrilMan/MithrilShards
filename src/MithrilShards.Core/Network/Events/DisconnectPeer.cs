@@ -16,8 +16,8 @@ namespace MithrilShards.Core.Network.Events
 
       public PeerDisconnectionRequired(EndPoint endPoint, string reason)
       {
-         this.EndPoint = endPoint;
-         this.Reason = reason;
+         EndPoint = endPoint;
+         Reason = reason;
       }
    }
 }

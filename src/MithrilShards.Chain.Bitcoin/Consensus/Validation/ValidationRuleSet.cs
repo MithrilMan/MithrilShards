@@ -15,26 +15,26 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
          public uint PreferredExecutionOrder { get; }
 
-         private HashSet<TValidationRule> executeAfter = new HashSet<TValidationRule>();
+         private readonly HashSet<TValidationRule> _executeAfter = new HashSet<TValidationRule>();
 
-         public IEnumerable<TValidationRule> GetDependencies() => executeAfter;
+         public IEnumerable<TValidationRule> GetDependencies() => _executeAfter;
 
          public RuleDefinition(TValidationRule rule, uint preferredExecutionOrder)
          {
-            this.Rule = rule;
-            this.PreferredExecutionOrder = preferredExecutionOrder;
+            Rule = rule;
+            PreferredExecutionOrder = preferredExecutionOrder;
          }
 
          public void ExecuteAfter(TValidationRule rule)
          {
-            this.executeAfter.Add(rule);
+            _executeAfter.Add(rule);
          }
       }
 
       protected readonly ILogger<ValidationRuleSet<TValidationRule>> logger;
       protected List<TValidationRule> rules;
 
-      public IEnumerable<TValidationRule> Rules => this.rules;
+      public IEnumerable<TValidationRule> Rules => rules;
 
       public ValidationRuleSet(ILogger<ValidationRuleSet<TValidationRule>> logger, IEnumerable<TValidationRule> rules)
       {
@@ -46,12 +46,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       {
          using IDisposable logScope = logger.BeginScope("Setting up validation rules for {ValidationRuleType}", typeof(TValidationRule));
 
-         List<RuleDefinition> definitions = this.VerifyValidationRules();
+         List<RuleDefinition> definitions = VerifyValidationRules();
 
          // definitions now contains a list of rule definitions with all data needed to sort them
          // use topological sorting to solve dependency graph
 
-         TopologicalSorter<RuleDefinition> resolver = new TopologicalSorter<RuleDefinition>();
+         var resolver = new TopologicalSorter<RuleDefinition>();
          foreach (RuleDefinition definition in definitions)
          {
             resolver.Add(
@@ -62,19 +62,19 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
                );
          }
 
-         var (sorted, cycled) = resolver.Sort();
+         (IEnumerable<(ValidationRuleSet<TValidationRule>.RuleDefinition item, int level)> sorted, IEnumerable<ValidationRuleSet<TValidationRule>.RuleDefinition> cycled) = resolver.Sort();
          if (cycled.Count() > 0)
          {
-            string circularDependency = String.Join(", ", cycled.Select(definition => definition.Rule.GetType().Name));
+            string circularDependency = string.Join(", ", cycled.Select(definition => definition.Rule.GetType().Name));
             ThrowHelper.ThrowNotSupportedException($"Error configuring {typeof(TValidationRule).Name} rules, circular dependency detected: {circularDependency}");
          }
 
-         this.rules = sorted
+         rules = sorted
             .OrderBy(definition => definition.level)
             .ThenBy(definition => definition.item.PreferredExecutionOrder)
             .Select(definition => definition.item.Rule).ToList();
 
-         logger.LogDebug("Final sorted rules: {SortedRules}", string.Join(", ", this.rules.Select(rule => rule.GetType().Name)));
+         logger.LogDebug("Final sorted rules: {SortedRules}", string.Join(", ", rules.Select(rule => rule.GetType().Name)));
       }
 
       /// <summary>
@@ -97,17 +97,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
          Type validationRulesType = typeof(TValidationRule);
 
          using IDisposable logScope = logger.BeginScope("Verifying validation rules for {ValidationRuleType}", validationRulesType.Name);
-         foreach (TValidationRule rule in this.rules)
+         foreach (TValidationRule rule in rules)
          {
             RulePrecedenceAttribute? precedenceAttribute = rule.GetType().GetCustomAttribute<RulePrecedenceAttribute>();
-            var definition = new RuleDefinition(rule, precedenceAttribute?.PreferredExecutionOrder ?? RulePrecedenceAttribute.DefaultExecutionOrder);
+            var definition = new RuleDefinition(rule, precedenceAttribute?.PreferredExecutionOrder ?? RulePrecedenceAttribute.DEFAULT_EXECUTION_ORDER);
             definitions.Add(definition);
 
             if (precedenceAttribute != null)
             {
-               foreach (var ruleToExecuteBefore in precedenceAttribute.MustBeExecutedAfter)
+               foreach (Type? ruleToExecuteBefore in precedenceAttribute.MustBeExecutedAfter)
                {
-                  var ruleInstance = rules.FirstOrDefault(rule => ruleToExecuteBefore.IsAssignableFrom(rule.GetType()));
+                  TValidationRule? ruleInstance = rules.FirstOrDefault(rule => ruleToExecuteBefore.IsAssignableFrom(rule.GetType()));
                }
             }
 
@@ -119,7 +119,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
                   ThrowHelper.ThrowArgumentException($"{nameof(ruleType)} must implement {validationRulesType.Name}.");
                }
 
-               var requiredRuleInstance = rules.FirstOrDefault(rule => requiredRule.IsAssignableFrom(rule.GetType()));
+               TValidationRule? requiredRuleInstance = rules.FirstOrDefault(rule => requiredRule.IsAssignableFrom(rule.GetType()));
                if (requiredRuleInstance == null)
                {
                   ThrowHelper.ThrowArgumentException($"{nameof(ruleType)} requires '{requiredRule.Name}' but the rule (or a subclass of that rule) is not registered.");

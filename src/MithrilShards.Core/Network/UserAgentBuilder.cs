@@ -23,7 +23,7 @@ namespace MithrilShards.Core.Network
          this.forgeVersion = $"MithrilShards:{coreVersion}({forgeVersion})";
 
          List<(string name, string version)> shardsInfo = forge.GetMeltedShardsNames();
-         this.shards = shardsInfo?.Count == 0 ? string.Empty : $"({string.Join("; ", forge.GetMeltedShardsNames().Select(shard => $"{shard.name}:{shard.version}"))})";
+         shards = shardsInfo?.Count == 0 ? string.Empty : $"({string.Join("; ", forge.GetMeltedShardsNames().Select(shard => $"{shard.name}:{shard.version}"))})";
       }
 
       /// <summary>
@@ -33,7 +33,7 @@ namespace MithrilShards.Core.Network
       /// <returns></returns>
       public virtual string GetUserAgent()
       {
-         return $"/{this.forgeVersion}{this.shards}/";
+         return $"/{forgeVersion}{shards}/";
       }
    }
 }

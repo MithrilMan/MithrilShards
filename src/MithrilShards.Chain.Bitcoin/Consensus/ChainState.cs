@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    {
       protected readonly ILogger<ChainState> logger;
 
-      readonly IBlockHeaderRepository blockHeaderRepository;
+      readonly IBlockHeaderRepository _blockHeaderRepository;
 
       /// <summary>
       /// The current chain of block headers we consult and build on.
@@ -30,7 +30,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </value>
       protected private readonly ICoinsView coinsView;
 
-      readonly IConsensusParameters consensusParameters;
+      readonly IConsensusParameters _consensusParameters;
 
       /// <summary>
       /// Gets or sets the block sequence identifier.
@@ -80,14 +80,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                         IConsensusParameters consensusParameters)
       {
          this.logger = logger;
-         this.HeadersTree = headersTree;
+         HeadersTree = headersTree;
          this.coinsView = coinsView;
-         this.blockHeaderRepository = blockHeaderRepository;
-         this.consensusParameters = consensusParameters;
-         this.ChainTip = headersTree.Genesis;
-         this.BestHeader = headersTree.Genesis;
+         _blockHeaderRepository = blockHeaderRepository;
+         _consensusParameters = consensusParameters;
+         ChainTip = headersTree.Genesis;
+         BestHeader = headersTree.Genesis;
 
-         this.blockHeaderRepository.TryAdd(consensusParameters.GenesisHeader);
+         _blockHeaderRepository.TryAdd(consensusParameters.GenesisHeader);
       }
 
       /// <summary>
@@ -100,46 +100,46 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public BlockLocator GetTipLocator()
       {
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
-         return this.HeadersTree.GetLocator(this.ChainTip)!;
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         return HeadersTree.GetLocator(ChainTip)!;
       }
 
       public bool TryGetBestChainHeaderNode(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
-         return this.HeadersTree.TryGetNode(blockHash, true, out node);
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         return HeadersTree.TryGetNode(blockHash, true, out node);
       }
 
       public bool TryGetKnownHeaderNode(UInt256? blockHash, [MaybeNullWhen(false)] out HeaderNode node)
       {
          //using var readLock = new ReadLock(this.theLock);
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
-         return this.HeadersTree.TryGetNode(blockHash, false, out node);
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         return HeadersTree.TryGetNode(blockHash, false, out node);
       }
 
 
       public BlockLocator? GetLocator(HeaderNode headerNode)
       {
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
-         return this.HeadersTree.GetLocator(headerNode);
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         return HeadersTree.GetLocator(headerNode);
       }
 
       public bool IsInBestChain(HeaderNode headerNode)
       {
-         return this.HeadersTree.IsInBestChain(headerNode);
+         return HeadersTree.IsInBestChain(headerNode);
       }
 
       public HeaderNode GetTip()
       {
-         return this.ChainTip;
+         return ChainTip;
       }
 
       public BlockHeader GetTipHeader()
       {
-         using var readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
-         if (!this.blockHeaderRepository.TryGet(this.ChainTip.Hash, out BlockHeader? header))
+         using Microsoft.VisualStudio.Threading.AsyncReaderWriterLock.Releaser readMainLock = GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult();
+         if (!_blockHeaderRepository.TryGet(ChainTip.Hash, out BlockHeader? header))
          {
-            ThrowHelper.ThrowBlockHeaderRepositoryException($"Unexpected error, cannot fetch the tip at height {this.ChainTip.Height}.");
+            ThrowHelper.ThrowBlockHeaderRepositoryException($"Unexpected error, cannot fetch the tip at height {ChainTip.Height}.");
          }
 
          return header!;
@@ -161,14 +161,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
                      return pindex;
                   }
 
-                  if (pindex.GetAncestor(this.ChainTip.Height) == this.ChainTip)
+                  if (pindex.GetAncestor(ChainTip.Height) == ChainTip)
                   {
-                     return this.ChainTip;
+                     return ChainTip;
                   }
                }
             }
          }
-         return this.HeadersTree.Genesis;
+         return HeadersTree.Genesis;
       }
 
 
@@ -176,7 +176,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       {
          using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
-            if (this.IsInBestChain(headerNode) && this.HeadersTree.TryGetNodeOnBestChain(headerNode.Height + 1, out nextHeaderNode))
+            if (IsInBestChain(headerNode) && HeadersTree.TryGetNodeOnBestChain(headerNode.Height + 1, out nextHeaderNode))
             {
                return true;
             }
@@ -188,14 +188,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public bool TryGetBlockHeader(HeaderNode headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader)
       {
-         return this.blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader);
+         return _blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader);
       }
 
       public bool TryGetAtHeight(int height, [MaybeNullWhen(false)] out HeaderNode? headerNode)
       {
          using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
-            return this.HeadersTree.TryGetNodeOnBestChain(height, out headerNode);
+            return HeadersTree.TryGetNodeOnBestChain(height, out headerNode);
          }
       }
 
@@ -205,25 +205,25 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          {
 
             // Check for duplicate
-            if (this.TryGetKnownHeaderNode(header.Hash, out HeaderNode? headerNode))
+            if (TryGetKnownHeaderNode(header.Hash, out HeaderNode? headerNode))
             {
                return headerNode;
             }
 
-            if (!this.TryGetKnownHeaderNode(header.PreviousBlockHash, out HeaderNode? previousHeader))
+            if (!TryGetKnownHeaderNode(header.PreviousBlockHash, out HeaderNode? previousHeader))
             {
                ThrowHelper.ThrowNotSupportedException("Previous hash not found (shouldn't happen).");
             }
 
             headerNode = new HeaderNode(header, previousHeader);
 
-            if (this.BestHeader == null || this.BestHeader.ChainWork < headerNode.ChainWork)
+            if (BestHeader == null || BestHeader.ChainWork < headerNode.ChainWork)
             {
-               this.BestHeader = headerNode;
+               BestHeader = headerNode;
             }
 
-            this.HeadersTree.Add(headerNode);
-            this.blockHeaderRepository.TryAdd(header);
+            HeadersTree.Add(headerNode);
+            _blockHeaderRepository.TryAdd(header);
 
             return headerNode;
          }

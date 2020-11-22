@@ -20,8 +20,8 @@ namespace MithrilShards.Core.Network.Events
 
       public PeerMessageSent(IPeerContext peerContext, INetworkMessage message, int size) : base(peerContext)
       {
-         this.Message = message;
-         this.Size = size;
+         Message = message;
+         Size = size;
       }
    }
 }

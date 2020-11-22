@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MithrilShards.Core.Threading
+﻿namespace MithrilShards.Core.Threading
 {
    /// <summary>
    /// Tracks instantiated IPeriodicWork to check their health status and collect statistics

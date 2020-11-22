@@ -1,24 +1,24 @@
-﻿using System.Buffers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MithrilShards.Core.Network.Protocol.Serialization
 {
    public class ProtocolTypeSerializerOptions
    {
-      private Dictionary<string, object> options = new Dictionary<string, object>();
+      private readonly Dictionary<string, object> _options = new Dictionary<string, object>();
 
       public bool HasOption(string key)
       {
-         return this.options.ContainsKey(key);
+         return _options.ContainsKey(key);
       }
 
       public ProtocolTypeSerializerOptions(params (string Key, object Value)[] values)
       {
          if (values != null)
          {
-            foreach (var item in values)
+            foreach ((string Key, object Value) item in values)
             {
-               this.options.Add(item.Key, item.Value);
+               _options.Add(item.Key, item.Value);
             }
          }
       }
@@ -31,9 +31,10 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
       /// <param name="key">The key.</param>
       /// <param name="defaultValue">The default value.</param>
       /// <returns></returns>
+      [return: MaybeNull]
       public T Get<T>(string key, T defaultValue = default)
       {
-         if (!this.options.TryGetValue(key, out object? value)) return defaultValue;
+         if (!_options.TryGetValue(key, out object? value)) return defaultValue;
 
          return (T)value;
       }
@@ -45,7 +46,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
       /// <param name="value">The value.</param>
       public ProtocolTypeSerializerOptions Set(string key, object value)
       {
-         this.options.Add(key, value);
+         _options.Add(key, value);
          return this;
       }
    }

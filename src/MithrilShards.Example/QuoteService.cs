@@ -9,13 +9,13 @@ namespace MithrilShards.Example
    /// </summary>
    public class QuoteService : IQuoteService
    {
-      readonly ILogger<QuoteService> logger;
-      readonly IRandomNumberGenerator randomNumberGenerator;
+      readonly ILogger<QuoteService> _logger;
+      readonly IRandomNumberGenerator _randomNumberGenerator;
 
       public QuoteService(ILogger<QuoteService> logger, IRandomNumberGenerator randomNumberGenerator)
       {
-         this.logger = logger;
-         this.randomNumberGenerator = randomNumberGenerator;
+         _logger = logger;
+         _randomNumberGenerator = randomNumberGenerator;
       }
 
       public List<string> Quotes { get; } = new List<string>
@@ -44,7 +44,7 @@ namespace MithrilShards.Example
 
       public string GetRandomQuote()
       {
-         return Quotes.Count > 0 ? Quotes[(int)(randomNumberGenerator.GetUint32() % Quotes.Count)] : string.Empty;
+         return Quotes.Count > 0 ? Quotes[(int)(_randomNumberGenerator.GetUint32() % Quotes.Count)] : string.Empty;
       }
    }
 }

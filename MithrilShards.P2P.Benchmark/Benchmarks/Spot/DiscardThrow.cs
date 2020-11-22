@@ -8,17 +8,17 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class DiscardThrow
    {
-      object data;
+      object _data;
 
       [GlobalSetup]
       public void Setup()
       {
-         this.data = new object();
+         _data = new object();
       }
 
 
       [Benchmark]
-      public void WithDiscard() => WithDiscard(this.data);
+      public void WithDiscard() => WithDiscard(_data);
 
       public static void WithDiscard(object data)
       {
@@ -26,7 +26,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public void WithIf() => WithIf(this.data);
+      public void WithIf() => WithIf(_data);
 
       public static void WithIf(object data)
       {

@@ -22,9 +22,9 @@
 
       public PendingDownload(HeaderNode blockInDownload, IBlockFetcher blockFetcher, long startingTime)
       {
-         this.BlockInDownload = blockInDownload;
-         this.BlockFetcher = blockFetcher;
-         this.StartingTime = startingTime;
+         BlockInDownload = blockInDownload;
+         BlockFetcher = blockFetcher;
+         StartingTime = startingTime;
       }
    }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using MithrilShards.Chain.Bitcoin.Consensus.Validation;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
@@ -16,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <summary>
       /// Represents validity and availability statuses, used for example by <see cref="IsValid"/> and IsAvailable.
       /// </summary>
-      private int status;
+      private int _status;
 
       /// <summary>
       /// Gets the height this node takes in the tree representation of the whole hierarchy of headers.
@@ -68,12 +67,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          if (header == null) ThrowHelper.ThrowArgumentNullException(nameof(header));
          if (header.Hash == null) ThrowHelper.ThrowArgumentException($"{nameof(header)} hash cannot be null.");
 
-         this.Hash = header.Hash;
-         this.Height = 0;
-         this.Previous = null;
-         this.ChainWork = Target.Zero;
-         this.Skip = null;
-         this.status = (int)HeaderValidityStatuses.ValidMask;
+         Hash = header.Hash;
+         Height = 0;
+         Previous = null;
+         ChainWork = Target.Zero;
+         Skip = null;
+         _status = (int)HeaderValidityStatuses.ValidMask;
       }
 
       internal HeaderNode(BlockHeader header, HeaderNode previous)
@@ -81,12 +80,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          if (header == null) ThrowHelper.ThrowArgumentNullException(nameof(header));
          if (header.Hash == null) ThrowHelper.ThrowArgumentException($"{nameof(header)} hash cannot be null.");
 
-         this.Hash = header.Hash;
-         this.Height = previous.Height + 1;
-         this.Previous = previous;
-         this.ChainWork = previous.ChainWork + new Target(header.Bits).GetBlockProof();
-         this.Skip = previous.GetAncestor(GetSkipHeight(this.Height));
-         this.status = (int)HeaderValidityStatuses.ValidTree;
+         Hash = header.Hash;
+         Height = previous.Height + 1;
+         Previous = previous;
+         ChainWork = previous.ChainWork + new Target(header.Bits).GetBlockProof();
+         Skip = previous.GetAncestor(GetSkipHeight(Height));
+         _status = (int)HeaderValidityStatuses.ValidTree;
 
          //pindexNew.TimeMax = (pindexNew->pprev ? std::max(pindexNew->pprev.TimeMax, pindexNew.Time) : pindexNew.Time);
       }
@@ -131,24 +130,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          // if some failed flag is on, it's not valid.
          if (IsInvalid()) return false;
 
-         return (this.status & (int)HeaderValidityStatuses.ValidMask) >= (int)upTo;
+         return (_status & (int)HeaderValidityStatuses.ValidMask) >= (int)upTo;
       }
 
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public bool IsInvalid()
       {
-         return (this.status & (int)HeaderValidityStatuses.FailedMask) != 0;
+         return (_status & (int)HeaderValidityStatuses.FailedMask) != 0;
       }
 
       //! Raise the validity level of this block index entry.
       //! Returns true if the validity was changed.
       bool RaiseValidity(HeaderValidityStatuses upTo)
       {
-         if ((status & (int)HeaderValidityStatuses.FailedMask) != 0) return false;
+         if ((_status & (int)HeaderValidityStatuses.FailedMask) != 0) return false;
 
-         if ((status & (int)HeaderValidityStatuses.ValidMask) < (int)upTo)
+         if ((_status & (int)HeaderValidityStatuses.ValidMask) < (int)upTo)
          {
-            status = (status & ~(int)HeaderValidityStatuses.ValidMask) | (int)upTo;
+            _status = (_status & ~(int)HeaderValidityStatuses.ValidMask) | (int)upTo;
             return true;
          }
          return false;
@@ -159,7 +158,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       public bool HasAvailability(HeaderDataAvailability availability)
       {
-         return (this.status & (int)availability) == (int)availability;
+         return (_status & (int)availability) == (int)availability;
       }
 
       /// <summary>
@@ -167,7 +166,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       public void AddAvailability(HeaderDataAvailability availability)
       {
-         this.status |= (int)availability;
+         _status |= (int)availability;
       }
 
       /// <summary>
@@ -175,14 +174,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       public void RemoveAvailability(HeaderDataAvailability availability)
       {
-         this.status &= ~(int)availability;
+         _status &= ~(int)availability;
       }
 
       internal HeaderNode LastCommonAncestor(HeaderNode otherHeaderNode)
       {
          //move both chains at the height of the lower one
-         HeaderNode? left = this.Height > otherHeaderNode.Height ? this.GetAncestor(otherHeaderNode.Height) : this;
-         HeaderNode? right = otherHeaderNode.Height > this.Height ? otherHeaderNode.GetAncestor(this.Height) : otherHeaderNode;
+         HeaderNode? left = Height > otherHeaderNode.Height ? GetAncestor(otherHeaderNode.Height) : this;
+         HeaderNode? right = otherHeaderNode.Height > Height ? otherHeaderNode.GetAncestor(Height) : otherHeaderNode;
 
          // walk back walking previous header, until we find that both are the header
          while (left != right && left != null && right != null)
@@ -197,7 +196,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public override string ToString()
       {
-         return $"{this.Hash} ({this.Height})";
+         return $"{Hash} ({Height})";
       }
 
       /// <summary>
@@ -209,7 +208,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </returns>
       public bool IsInSameChain(HeaderNode expectedAncestor)
       {
-         return this == expectedAncestor || this.GetAncestor(expectedAncestor.Height)?.Hash == expectedAncestor.Hash;
+         return this == expectedAncestor || GetAncestor(expectedAncestor.Height)?.Hash == expectedAncestor.Hash;
       }
 
       /// <summary>
@@ -219,11 +218,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <returns>The ancestor of this chain at the specified height.</returns>
       public HeaderNode? GetAncestor(int height)
       {
-         if (height > this.Height || height < 0)
+         if (height > Height || height < 0)
             return null;
 
          HeaderNode current = this;
-         int heightWalk = this.Height;
+         int heightWalk = Height;
          while (heightWalk > height)
          {
             int heightSkip = GetSkipHeight(heightWalk);
@@ -249,7 +248,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public bool HaveTxsDownloaded()
       {
-         return this.ChainTxCount > 0;
+         return ChainTxCount > 0;
       }
 
       public override bool Equals(object? obj)
@@ -258,7 +257,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          if (item is null)
             return false;
 
-         return this.Hash.Equals(item.Hash);
+         return Hash.Equals(item.Hash);
       }
 
       public static bool operator ==(HeaderNode? a, HeaderNode? b)
@@ -281,7 +280,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <inheritdoc />
       public override int GetHashCode()
       {
-         return this.Hash.GetHashCode();
+         return Hash.GetHashCode();
       }
    }
 }

@@ -10,44 +10,44 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class Uint256_ParseFromString_Fight
    {
-      private string data;
+      private string _data;
 
       [GlobalSetup]
       public void Setup()
       {
-         Span<byte> value = new Span<byte>(new byte[32]);
+         var value = new Span<byte>(new byte[32]);
          new Random().NextBytes(value);
-         this.data = value.ToArray().ToHexString();
+         _data = value.ToArray().ToHexString();
       }
 
       [Benchmark]
       public void UInt256_Neo_Parse()
       {
-         _ = P2P.Benchmark.Benchmarks.DataTypes.Neo.NEO_UInt256.Parse(this.data);
+         _ = NEO_UInt256.Parse(_data);
       }
 
       [Benchmark]
       public void uint256_NBitcoin_Parse()
       {
-         _ = uint256.Parse(this.data);
+         _ = uint256.Parse(_data);
       }
 
       [Benchmark]
       public void uint256_NBitcoin_StringConstructor()
       {
-         _ = new uint256(this.data);
+         _ = new uint256(_data);
       }
 
       [Benchmark]
       public void uint256_MithrilShards_Parse()
       {
-         _ = MithrilShards.Core.DataTypes.UInt256.Parse(this.data);
+         _ = MithrilShards.Core.DataTypes.UInt256.Parse(_data);
       }
 
       [Benchmark]
       public void uint256_MithrilShards_StringConstructor()
       {
-         _ = new MithrilShards.Core.DataTypes.UInt256(this.data);
+         _ = new MithrilShards.Core.DataTypes.UInt256(_data);
       }
    }
 }

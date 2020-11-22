@@ -17,13 +17,13 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public NBitcoin.BlockHeader[] HeadersNoInstances() => new NBitcoin.BlockHeader[this.size];
+      public NBitcoin.BlockHeader[] HeadersNoInstances() => new NBitcoin.BlockHeader[size];
 
       [Benchmark]
-      public NBitcoin.Target[] TargetsNoInstances() => new NBitcoin.Target[this.size];
+      public NBitcoin.Target[] TargetsNoInstances() => new NBitcoin.Target[size];
 
       [Benchmark]
-      public NBitcoin.BlockHeader[] HeadersWithInstances() => this.CreateHeaders(this.size);
+      public NBitcoin.BlockHeader[] HeadersWithInstances() => CreateHeaders(size);
 
       private BlockHeader[] CreateHeaders(int size)
       {
@@ -39,7 +39,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       }
 
       [Benchmark]
-      public NBitcoin.Target[] TargetsWithInstances() => this.CreateTargets(this.size);
+      public NBitcoin.Target[] TargetsWithInstances() => CreateTargets(size);
 
       private NBitcoin.Target[] CreateTargets(int size)
       {

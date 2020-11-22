@@ -113,7 +113,7 @@ namespace MithrilShards.Example
          /// the IServiceCollection.
 
          // in this scenario, we are looking for the ServiceDescriptor that registers our RequiredConnection implementation of IConnector
-         var requiredConnectionDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IConnector) && descriptor.ImplementationType == typeof(RequiredConnection));
+         ServiceDescriptor? requiredConnectionDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IConnector) && descriptor.ImplementationType == typeof(RequiredConnection));
          // remove it
          services.Remove(requiredConnectionDescriptor);
          // and add back our implementation

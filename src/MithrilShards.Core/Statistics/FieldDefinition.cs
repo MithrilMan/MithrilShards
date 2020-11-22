@@ -43,11 +43,11 @@ namespace MithrilShards.Core.Statistics
       /// <param name="valueFormatter">The value formatter (null if value doesn't need to be formatted).</param>
       public FieldDefinition(string label, string description, int widthHint, string? unitOfMeasure = null, Func<(object? value, int widthHint), string>? valueFormatter = null)
       {
-         this.Label = label ?? throw new ArgumentNullException(nameof(label));
-         this.Description = description ?? throw new ArgumentNullException(nameof(description));
-         this.WidthHint = widthHint;
-         this.UnitOfMeasure = unitOfMeasure;
-         this.ValueFormatter = valueFormatter;
+         Label = label ?? throw new ArgumentNullException(nameof(label));
+         Description = description ?? throw new ArgumentNullException(nameof(description));
+         WidthHint = widthHint;
+         UnitOfMeasure = unitOfMeasure;
+         ValueFormatter = valueFormatter;
       }
    }
 }

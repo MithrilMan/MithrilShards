@@ -30,27 +30,27 @@
       /// </summary>
       public const int MEMPOOL = 1 << 5;
 
-      private int permissions = NONE;
-      public int Permissions => permissions;
+      private int _permissions = NONE;
+      public int Permissions => _permissions;
 
       public void Add(int permission)
       {
-         this.permissions |= permission;
+         _permissions |= permission;
       }
 
       public void Remove(int permission)
       {
-         this.permissions &= ~permission;
+         _permissions &= ~permission;
       }
 
       public bool Has(int permission)
       {
-         return (this.permissions & permission) == permission;
+         return (_permissions & permission) == permission;
       }
 
       public void Reset()
       {
-         this.permissions = NONE;
+         _permissions = NONE;
       }
    }
 }

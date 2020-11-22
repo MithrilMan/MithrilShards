@@ -1,5 +1,4 @@
-﻿using MithrilShards.Chain.Bitcoin.Protocol.Types;
-using MithrilShards.Core.DataTypes;
+﻿using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus
 {

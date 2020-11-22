@@ -21,16 +21,16 @@ namespace MithrilShards.Example.Protocol.Processors
    {
       protected readonly ILogger<BaseProcessor> logger;
       protected readonly IEventBus eventBus;
-      private readonly IPeerBehaviorManager peerBehaviorManager;
-      private readonly bool isHandshakeAware;
-      private readonly bool receiveMessagesOnlyIfHandshaked;
-      private INetworkMessageWriter messageWriter = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
-      private bool isHandshaked = false;
+      private readonly IPeerBehaviorManager _peerBehaviorManager;
+      private readonly bool _isHandshakeAware;
+      private readonly bool _receiveMessagesOnlyIfHandshaked;
+      private INetworkMessageWriter _messageWriter = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
+      private bool _isHandshaked = false;
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// </summary>
-      private readonly EventSubscriptionManager eventSubscriptionManager = new EventSubscriptionManager();
+      private readonly EventSubscriptionManager _eventSubscriptionManager = new EventSubscriptionManager();
 
       public ExamplePeerContext PeerContext { get; private set; } = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
 
@@ -38,7 +38,7 @@ namespace MithrilShards.Example.Protocol.Processors
       public virtual bool Enabled { get; private set; } = true;
 
       /// <inheritdoc/>
-      public virtual bool CanReceiveMessages => isHandshaked || this.receiveMessagesOnlyIfHandshaked == false;
+      public virtual bool CanReceiveMessages => _isHandshaked || _receiveMessagesOnlyIfHandshaked == false;
 
       /// <summary>Initializes a new instance of the <see cref="BaseProcessor"/> class.</summary>
       /// <param name="logger">The logger.</param>
@@ -50,17 +50,17 @@ namespace MithrilShards.Example.Protocol.Processors
       {
          this.logger = logger;
          this.eventBus = eventBus;
-         this.peerBehaviorManager = peerBehaviorManager;
-         this.isHandshakeAware = isHandshakeAware;
-         this.receiveMessagesOnlyIfHandshaked = receiveMessagesOnlyIfHandshaked;
+         _peerBehaviorManager = peerBehaviorManager;
+         _isHandshakeAware = isHandshakeAware;
+         _receiveMessagesOnlyIfHandshaked = receiveMessagesOnlyIfHandshaked;
       }
 
       public async ValueTask AttachAsync(IPeerContext peerContext)
       {
-         this.PeerContext = peerContext as ExamplePeerContext ?? throw new ArgumentException("Expected ExamplePeerContext", nameof(peerContext));
-         this.messageWriter = this.PeerContext.GetMessageWriter();
+         PeerContext = peerContext as ExamplePeerContext ?? throw new ArgumentException("Expected ExamplePeerContext", nameof(peerContext));
+         _messageWriter = PeerContext.GetMessageWriter();
 
-         await this.OnPeerAttachedAsync().ConfigureAwait(false);
+         await OnPeerAttachedAsync().ConfigureAwait(false);
       }
 
       /// <summary>
@@ -69,13 +69,13 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <returns></returns>
       protected virtual ValueTask OnPeerAttachedAsync()
       {
-         this.RegisterLifeTimeEventHandler<PeerHandshaked>(async (receivedEvent) =>
+         RegisterLifeTimeEventHandler<PeerHandshaked>(async (receivedEvent) =>
          {
-            this.isHandshaked = true;
+            _isHandshaked = true;
 
-            if (this.isHandshakeAware)
+            if (_isHandshakeAware)
             {
-               await this.OnPeerHandshakedAsync().ConfigureAwait(false);
+               await OnPeerHandshakedAsync().ConfigureAwait(false);
             }
          }, IsCurrentPeer);
 
@@ -83,7 +83,7 @@ namespace MithrilShards.Example.Protocol.Processors
          return default;
       }
 
-      /// <summary>Method invoked when the peer handshakes and <see cref="isHandshakeAware"/> is set to <see langword="true"/>.</summary>
+      /// <summary>Method invoked when the peer handshakes and <see cref="_isHandshakeAware"/> is set to <see langword="true"/>.</summary>
       /// <param name="event">The event.</param>
       /// <returns></returns>
       protected virtual ValueTask OnPeerHandshakedAsync()
@@ -98,7 +98,7 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <param name="subscription">The subscription.</param>
       protected void RegisterLifeTimeEventHandler<TEventBase>(Func<TEventBase, ValueTask> handler, Func<TEventBase, bool>? clause = null) where TEventBase : EventBase
       {
-         this.eventSubscriptionManager.RegisterSubscriptions(this.eventBus.Subscribe<TEventBase>(async (message) =>
+         _eventSubscriptionManager.RegisterSubscriptions(eventBus.Subscribe<TEventBase>(async (message) =>
          {
             // ensure we listen only to events we are interested into
             if (clause != null && !clause(message)) return;
@@ -115,7 +115,7 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <returns></returns>
       protected async ValueTask SendMessageAsync(INetworkMessage message, CancellationToken cancellationToken = default)
       {
-         await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
+         await _messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
       }
 
       /// <summary>
@@ -130,13 +130,13 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <returns></returns>
       protected async ValueTask<bool> SendMessageAsync(int minVersion, INetworkMessage message, CancellationToken cancellationToken = default)
       {
-         if (this.PeerContext.NegotiatedProtocolVersion.Version < minVersion)
+         if (PeerContext.NegotiatedProtocolVersion.Version < minVersion)
          {
-            this.logger.LogDebug("Can't send message, negotiated protocol version is below required protocol.");
+            logger.LogDebug("Can't send message, negotiated protocol version is below required protocol.");
             return false;
          }
 
-         await this.messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
+         await _messageWriter.WriteAsync(message, cancellationToken).ConfigureAwait(false);
          return true;
       }
 
@@ -152,7 +152,7 @@ namespace MithrilShards.Example.Protocol.Processors
       {
          if (cancellation == default)
          {
-            cancellation = this.PeerContext.ConnectionCancellationTokenSource.Token;
+            cancellation = PeerContext.ConnectionCancellationTokenSource.Token;
          }
 
          return Task.Run(async () =>
@@ -167,9 +167,9 @@ namespace MithrilShards.Example.Protocol.Processors
             }
 
             // if cancellation was requested, return without doing anything
-            if (!cancellation.IsCancellationRequested && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
+            if (!cancellation.IsCancellationRequested && !PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
             {
-               this.PeerContext.Disconnect(reason);
+               PeerContext.Disconnect(reason);
             }
          });
       }
@@ -185,7 +185,7 @@ namespace MithrilShards.Example.Protocol.Processors
       {
          if (cancellation == default)
          {
-            cancellation = this.PeerContext.ConnectionCancellationTokenSource.Token;
+            cancellation = PeerContext.ConnectionCancellationTokenSource.Token;
          }
 
          return Task.Run(async () =>
@@ -200,9 +200,9 @@ namespace MithrilShards.Example.Protocol.Processors
             }
 
             // if cancellation was requested, return without doing anything
-            if (!cancellation.IsCancellationRequested && !this.PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
+            if (!cancellation.IsCancellationRequested && !PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
             {
-               this.logger.LogDebug("Condition met, trigger action.");
+               logger.LogDebug("Condition met, trigger action.");
                await action().ConfigureAwait(false);
             }
          });
@@ -216,10 +216,10 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <param name="disconnect">if set to <c>true</c> [disconnect].</param>
       protected void Misbehave(uint penalty, string reason, bool disconnect = false)
       {
-         this.peerBehaviorManager.Misbehave(this.PeerContext, penalty, reason);
+         _peerBehaviorManager.Misbehave(PeerContext, penalty, reason);
          if (disconnect)
          {
-            this.PeerContext.Disconnect(reason);
+            PeerContext.Disconnect(reason);
          }
       }
 
@@ -235,7 +235,7 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <returns></returns>
       protected bool IsSupported(int minVersion)
       {
-         return this.PeerContext.NegotiatedProtocolVersion.Version >= minVersion;
+         return PeerContext.NegotiatedProtocolVersion.Version >= minVersion;
       }
 
       /// <summary>
@@ -245,12 +245,12 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <param name="theEvent">The event.</param>
       protected bool IsCurrentPeer(PeerEventBase theEvent)
       {
-         return theEvent.PeerContext == this.PeerContext;
+         return theEvent.PeerContext == PeerContext;
       }
 
       public virtual void Dispose()
       {
-         this.eventSubscriptionManager.Dispose();
+         _eventSubscriptionManager.Dispose();
       }
    }
 }

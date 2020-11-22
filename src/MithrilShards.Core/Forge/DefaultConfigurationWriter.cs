@@ -10,15 +10,15 @@ namespace MithrilShards.Core.Forge
    /// </summary>
    public class DefaultConfigurationWriter
    {
-      readonly ILogger<DefaultConfigurationWriter> logger;
-      readonly IEnumerable<IMithrilShardSettings> mithrilShardSettings;
-      readonly string configurationFilePath;
+      readonly ILogger<DefaultConfigurationWriter> _logger;
+      readonly IEnumerable<IMithrilShardSettings> _mithrilShardSettings;
+      readonly string _configurationFilePath;
 
       public DefaultConfigurationWriter(ILogger<DefaultConfigurationWriter> logger, IEnumerable<IMithrilShardSettings> mithrilShardSettings, string configurationFilePath)
       {
-         this.logger = logger;
-         this.mithrilShardSettings = mithrilShardSettings;
-         this.configurationFilePath = configurationFilePath;
+         _logger = logger;
+         _mithrilShardSettings = mithrilShardSettings;
+         _configurationFilePath = configurationFilePath;
       }
 
 
@@ -29,20 +29,20 @@ namespace MithrilShards.Core.Forge
       /// </summary>
       public void GenerateDefaultFile()
       {
-         if (this.mithrilShardSettings == null)
+         if (_mithrilShardSettings == null)
          {
-            this.logger.LogInformation("No Mithril Shard settings found in current Forge.");
+            _logger.LogInformation("No Mithril Shard settings found in current Forge.");
             return;
          }
 
-         Dictionary<string, object> appConfig = new Dictionary<string, object>();
+         var appConfig = new Dictionary<string, object>();
 
-         foreach (IMithrilShardSettings shardSettings in this.mithrilShardSettings)
+         foreach (IMithrilShardSettings shardSettings in _mithrilShardSettings)
          {
             appConfig[shardSettings.ConfigurationSection] = shardSettings;
          }
 
-         System.IO.File.WriteAllText(this.configurationFilePath, JsonSerializer.Serialize(appConfig, new JsonSerializerOptions
+         System.IO.File.WriteAllText(_configurationFilePath, JsonSerializer.Serialize(appConfig, new JsonSerializerOptions
          {
             WriteIndented = true,
          }));

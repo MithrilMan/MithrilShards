@@ -9,14 +9,14 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
    {
       private const string FEED_PEERS_SCORE = "PeersScore";
       private const int STATISTIC_REFRESH_RATE = 15;
-      private readonly IStatisticFeedsCollector statisticFeedsCollector;
+      private readonly IStatisticFeedsCollector _statisticFeedsCollector;
 
       public List<object?[]>? GetStatisticFeedValues(string feedId)
       {
          return feedId switch
          {
             FEED_PEERS_SCORE => (
-               from peerScore in this.connectedPeers.Values.ToList()
+               from peerScore in _connectedPeers.Values.ToList()
                orderby peerScore.Score descending
                select new object[] {
                   peerScore.PeerContext.PeerId,
@@ -29,7 +29,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
 
       public void RegisterStatisticFeeds()
       {
-         this.statisticFeedsCollector.RegisterStatisticFeeds(this,
+         _statisticFeedsCollector.RegisterStatisticFeeds(this,
             new StatisticFeedDefinition(
                FEED_PEERS_SCORE,
                "Peers Score",

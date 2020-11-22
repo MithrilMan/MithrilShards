@@ -8,8 +8,8 @@ namespace MithrilShards.Logging.TableFormatter
 {
    public class TableBuilder
    {
-      private readonly StringBuilder stringBuilder;
-      private bool prepared;
+      private readonly StringBuilder _stringBuilder;
+      private bool _prepared;
 
       public List<ColumnDefinition> ColumnDefinitions { get; }
       public TableStyle TableStyle { get; private set; } = null!;
@@ -17,41 +17,41 @@ namespace MithrilShards.Logging.TableFormatter
 
       public TableBuilder(StringBuilder builder)
       {
-         this.stringBuilder = builder ?? new StringBuilder();
+         _stringBuilder = builder ?? new StringBuilder();
 
-         this.ColumnDefinitions = new List<ColumnDefinition>();
+         ColumnDefinitions = new List<ColumnDefinition>();
       }
 
       public TableBuilder AddColumns(params ColumnDefinition[] columns)
       {
-         if (this.prepared)
+         if (_prepared)
          {
             throw new TableAlreadyDefinedException();
          }
 
-         this.ColumnDefinitions.AddRange(columns);
+         ColumnDefinitions.AddRange(columns);
          return this;
       }
 
       public TableBuilder AddColumn(ColumnDefinition column)
       {
-         if (this.prepared)
+         if (_prepared)
          {
             throw new TableAlreadyDefinedException();
          }
 
-         this.ColumnDefinitions.Add(column);
+         ColumnDefinitions.Add(column);
          return this;
       }
 
       public TableBuilder SetStyle(TableStyle style)
       {
-         if (this.prepared)
+         if (_prepared)
          {
             throw new TableAlreadyDefinedException();
          }
 
-         this.TableStyle = style;
+         TableStyle = style;
          return this;
       }
 
@@ -62,43 +62,43 @@ namespace MithrilShards.Logging.TableFormatter
       /// <returns></returns>
       public TableBuilder Prepare()
       {
-         if (this.prepared)
+         if (_prepared)
          {
             throw new TableAlreadyDefinedException();
          }
 
-         this.prepared = true;
-         if (this.TableStyle == null)
+         _prepared = true;
+         if (TableStyle == null)
          {
-            this.TableStyle = new TableStyle();
+            TableStyle = new TableStyle();
          }
 
-         this.ComputeTableWidth();
+         ComputeTableWidth();
          return this;
       }
 
       public TableBuilder Start(string? title = null)
       {
-         if (!this.prepared)
+         if (!_prepared)
          {
-            this.Prepare();
+            Prepare();
          }
 
          if (title != null)
          {
-            this.DrawTitle(title);
+            DrawTitle(title);
          }
 
-         this.DrawTopBorder();
+         DrawTopBorder();
 
-         this.DrawLeftBorder();
-         for (int i = 0; i < this.ColumnDefinitions.Count; i++)
+         DrawLeftBorder();
+         for (int i = 0; i < ColumnDefinitions.Count; i++)
          {
-            this.DrawColumn(i, this.ColumnDefinitions[i].Label.Center(this.ColumnDefinitions[i].Width));
+            DrawColumn(i, ColumnDefinitions[i].Label.Center(ColumnDefinitions[i].Width));
          }
-         this.DrawRightBorder();
+         DrawRightBorder();
 
-         this.DrawTopBorder();
+         DrawTopBorder();
 
          return this;
       }
@@ -113,17 +113,17 @@ namespace MithrilShards.Logging.TableFormatter
             _ => string.Empty
          };
 
-         if (this.TableStyle.TitleBorder)
+         if (TableStyle.TitleBorder)
          {
-            this.DrawTopBorder();
-            this.DrawLeftBorder();
-            int availableSpace = this.Width - (this.TableStyle.Left == char.MinValue ? 0 : 1) - (this.TableStyle.Right == char.MinValue ? 0 : 1);
-            this.stringBuilder.AppendLine(alignTitle(this.TableStyle.TitleAlignment, availableSpace));
-            this.DrawRightBorder();
+            DrawTopBorder();
+            DrawLeftBorder();
+            int availableSpace = Width - (TableStyle.Left == char.MinValue ? 0 : 1) - (TableStyle.Right == char.MinValue ? 0 : 1);
+            _stringBuilder.AppendLine(alignTitle(TableStyle.TitleAlignment, availableSpace));
+            DrawRightBorder();
          }
          else
          {
-            this.stringBuilder.AppendLine(alignTitle(this.TableStyle.TitleAlignment, this.Width));
+            _stringBuilder.AppendLine(alignTitle(TableStyle.TitleAlignment, Width));
          }
       }
 
@@ -131,117 +131,117 @@ namespace MithrilShards.Logging.TableFormatter
       {
          if (values is null) throw new ArgumentNullException(nameof(values));
 
-         if (values.Length > this.ColumnDefinitions.Count)
+         if (values.Length > ColumnDefinitions.Count)
          {
             throw new ArgumentOutOfRangeException(nameof(values), "values length is greater than column lengths.");
          }
 
-         this.DrawLeftBorder();
-         for (int i = 0; i < this.ColumnDefinitions.Count; i++)
+         DrawLeftBorder();
+         for (int i = 0; i < ColumnDefinitions.Count; i++)
          {
             if (i < values.Length)
             {
-               this.DrawColumn(i, values[i] ?? string.Empty);
+               DrawColumn(i, values[i] ?? string.Empty);
             }
             else
             {
-               this.DrawColumn(i, string.Empty);
+               DrawColumn(i, string.Empty);
             }
          }
-         this.DrawRightBorder();
+         DrawRightBorder();
 
          return this;
       }
 
       public TableBuilder End()
       {
-         this.DrawBottomBorder();
+         DrawBottomBorder();
          return this;
       }
 
       private void ComputeTableWidth()
       {
-         this.Width =
-             (this.TableStyle.Left == char.MinValue ? 0 : 1) // length of the left border
-             + this.ColumnDefinitions.Sum(cd => cd.Width) //sum of the column widths
-             + ((this.ColumnDefinitions.Count - 1) * this.TableStyle.Separator.Length) // sum of the space occupied by column separators;
-             + (this.TableStyle.Right == char.MinValue ? 0 : 1)// length of the right border
+         Width =
+             (TableStyle.Left == char.MinValue ? 0 : 1) // length of the left border
+             + ColumnDefinitions.Sum(cd => cd.Width) //sum of the column widths
+             + ((ColumnDefinitions.Count - 1) * TableStyle.Separator.Length) // sum of the space occupied by column separators;
+             + (TableStyle.Right == char.MinValue ? 0 : 1)// length of the right border
              ;
       }
 
       private void DrawTopBorder()
       {
-         if (this.TableStyle.Top != char.MinValue)
+         if (TableStyle.Top != char.MinValue)
          {
-            this.DrawLine(this.TableStyle.Top, this.Width);
+            DrawLine(TableStyle.Top, Width);
          }
       }
 
       private void DrawLeftBorder()
       {
-         if (this.TableStyle.Left != char.MinValue)
+         if (TableStyle.Left != char.MinValue)
          {
-            this.stringBuilder.Append(this.TableStyle.Left.ToString(CultureInfo.InvariantCulture));
+            _stringBuilder.Append(TableStyle.Left.ToString(CultureInfo.InvariantCulture));
          }
       }
 
       private void DrawColumn(int columnIndex, string value)
       {
-         ColumnDefinition columnDefinition = this.ColumnDefinitions[columnIndex];
+         ColumnDefinition columnDefinition = ColumnDefinitions[columnIndex];
 
          switch (columnDefinition.Alignment)
          {
             case ColumnAlignment.Left:
-               this.stringBuilder.Append(value.AlignLeft(columnDefinition.Width));
+               _stringBuilder.Append(value.AlignLeft(columnDefinition.Width));
                break;
             case ColumnAlignment.Right:
-               this.stringBuilder.Append(value.AlignRight(columnDefinition.Width));
+               _stringBuilder.Append(value.AlignRight(columnDefinition.Width));
                break;
             case ColumnAlignment.Center:
-               this.stringBuilder.Append(value.Center(columnDefinition.Width));
+               _stringBuilder.Append(value.Center(columnDefinition.Width));
                break;
             default:
                throw new NotImplementedException(columnDefinition.Alignment.ToString());
          }
 
-         bool isLastColumn = columnIndex == this.ColumnDefinitions.Count - 1;
+         bool isLastColumn = columnIndex == ColumnDefinitions.Count - 1;
          if (!isLastColumn)
          {
-            this.DrawColumnSeparator();
+            DrawColumnSeparator();
          }
       }
 
       private void DrawColumnSeparator()
       {
-         if (this.TableStyle.Separator.Length > 0)
+         if (TableStyle.Separator.Length > 0)
          {
-            this.stringBuilder.Append(this.TableStyle.Separator);
+            _stringBuilder.Append(TableStyle.Separator);
          }
       }
 
       private void DrawRightBorder()
       {
-         if (this.TableStyle.Right != char.MinValue)
+         if (TableStyle.Right != char.MinValue)
          {
-            this.stringBuilder.AppendLine(this.TableStyle.Right.ToString(CultureInfo.InvariantCulture));
+            _stringBuilder.AppendLine(TableStyle.Right.ToString(CultureInfo.InvariantCulture));
          }
          else
          {
-            this.stringBuilder.AppendLine();
+            _stringBuilder.AppendLine();
          }
       }
 
       private void DrawBottomBorder()
       {
-         if (this.TableStyle.Bottom != char.MinValue)
+         if (TableStyle.Bottom != char.MinValue)
          {
-            this.DrawLine(this.TableStyle.Bottom, this.Width);
+            DrawLine(TableStyle.Bottom, Width);
          }
       }
 
       public void DrawLine(char character, int width)
       {
-         this.stringBuilder.AppendLine(string.Empty.PadRight(width, character));
+         _stringBuilder.AppendLine(string.Empty.PadRight(width, character));
       }
    }
 }

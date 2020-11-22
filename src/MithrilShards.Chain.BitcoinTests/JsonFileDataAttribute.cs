@@ -51,7 +51,7 @@ namespace Xunit
          if (testMethod == null) { throw new ArgumentNullException(nameof(testMethod)); }
 
          // Get the absolute path to the JSON file
-         var path = Path.IsPathRooted(_filePath)
+         string path = Path.IsPathRooted(_filePath)
              ? _filePath
              : Path.GetRelativePath(Directory.GetCurrentDirectory(), _filePath);
 
@@ -61,7 +61,7 @@ namespace Xunit
          }
 
          // Load the file
-         var fileData = File.ReadAllText(_filePath);
+         string fileData = File.ReadAllText(_filePath);
 
          if (string.IsNullOrEmpty(_propertyName))
          {
@@ -70,7 +70,7 @@ namespace Xunit
          }
 
          // Only use the specified property as the data
-         JObject allData = JObject.Parse(fileData);
+         var allData = JObject.Parse(fileData);
          JToken data = allData[_propertyName];
 
 

@@ -9,13 +9,13 @@ namespace MithrilShards.Chain.Bitcoin
 {
    public class BitcoinShard : IMithrilShard
    {
-      private readonly ILogger<BitcoinShard> logger;
-      private readonly BitcoinSettings settings;
+      private readonly ILogger<BitcoinShard> _logger;
+      private readonly BitcoinSettings _settings;
 
       public BitcoinShard(ILogger<BitcoinShard> logger, IOptions<BitcoinSettings> settings)
       {
-         this.logger = logger;
-         this.settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
+         _logger = logger;
+         _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
       }
 
       public ValueTask InitializeAsync(CancellationToken cancellationToken)

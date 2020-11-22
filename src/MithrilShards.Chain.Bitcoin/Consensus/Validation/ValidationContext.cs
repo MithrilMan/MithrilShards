@@ -25,38 +25,38 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       public ValidationContext(ILogger logger, bool isInInitialBlockDownloadState, IChainState chainState)
       {
          this.logger = logger;
-         this.IsInInitialBlockDownloadState = isInInitialBlockDownloadState;
-         this.ChainState = chainState;
+         IsInInitialBlockDownloadState = isInInitialBlockDownloadState;
+         ChainState = chainState;
       }
 
       public void SetData<T>(string key, T data) where T : notnull
       {
-         if (this.items.ContainsKey(key))
+         if (items.ContainsKey(key))
          {
-            this.logger.LogDebug("Overwriting context data {DataKey}", key);
+            logger.LogDebug("Overwriting context data {DataKey}", key);
          }
-         this.items[key] = data;
+         items[key] = data;
       }
 
       public bool TryGetData<T>(string key, [MaybeNullWhen(false)] out T data)
       {
-         if (!this.items.ContainsKey(key))
+         if (!items.ContainsKey(key))
          {
-            this.logger.LogDebug("context data not found: {DataKey}", key);
+            logger.LogDebug("context data not found: {DataKey}", key);
             data = default(T);
             return false;
          }
 
          //here may throw if the stored type is not the same as the passed T
-         data = (T)this.items[key];
+         data = (T)items[key];
 
          return true;
       }
 
       public void ForceAsValid(string reason)
       {
-         this.logger.LogDebug("Forced as valid because {ForceAsValidReason}", reason);
-         this.IsForcedAsValid = true;
+         logger.LogDebug("Forced as valid because {ForceAsValidReason}", reason);
+         IsForcedAsValid = true;
       }
    }
 }

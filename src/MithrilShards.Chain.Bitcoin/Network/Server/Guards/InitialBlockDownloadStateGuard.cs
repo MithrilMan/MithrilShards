@@ -12,22 +12,22 @@ namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards
    /// <seealso cref="ServerPeerConnectionGuardBase" />
    public class InitialBlockDownloadStateGuard : ServerPeerConnectionGuardBase
    {
-      readonly IInitialBlockDownloadTracker initialBlockDownloadState;
+      readonly IInitialBlockDownloadTracker _initialBlockDownloadState;
 
       public InitialBlockDownloadStateGuard(ILogger<InitialBlockDownloadStateGuard> logger,
                                             IOptions<ForgeConnectivitySettings> settings,
                                             IInitialBlockDownloadTracker initialBlockDownloadState
                                             ) : base(logger, settings)
       {
-         this.initialBlockDownloadState = initialBlockDownloadState;
+         _initialBlockDownloadState = initialBlockDownloadState;
       }
 
       internal override string? TryGetDenyReason(IPeerContext peerContext)
       {
-         if (this.initialBlockDownloadState.IsDownloadingBlocks())
+         if (_initialBlockDownloadState.IsDownloadingBlocks())
          {
 
-            bool clientIsWhiteListed = this.settings.Listeners
+            bool clientIsWhiteListed = settings.Listeners
                .Any(binding => binding.IsWhitelistingEndpoint && binding.Matches(peerContext.LocalEndPoint));
 
             if (!clientIsWhiteListed)

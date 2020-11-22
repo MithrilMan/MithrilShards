@@ -17,8 +17,8 @@ namespace MithrilShards.Core.Network.Events
 
       public PeerMessageSendFailure(IPeerContext peerContext, INetworkMessage message, System.Exception exception) : base(peerContext)
       {
-         this.Message = message;
-         this.Exception = exception;
+         Message = message;
+         Exception = exception;
       }
    }
 }

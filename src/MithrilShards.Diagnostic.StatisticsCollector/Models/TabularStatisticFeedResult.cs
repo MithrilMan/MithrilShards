@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using MithrilShards.Core.Statistics;
+﻿using MithrilShards.Core.Statistics;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector.Models
 {
@@ -10,7 +8,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector.Models
 
       internal TabularStatisticFeedResult(ScheduledStatisticFeed feed) : base(feed.StatisticFeedDefinition.FeedId, feed.LastResultsDate)
       {
-         this.Content = feed.GetTabularFeed();
+         Content = feed.GetTabularFeed();
       }
    }
 }

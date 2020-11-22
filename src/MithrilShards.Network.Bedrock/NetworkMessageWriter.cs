@@ -8,23 +8,23 @@ namespace MithrilShards.Network.Bedrock
 {
    public class NetworkMessageWriter : INetworkMessageWriter
    {
-      readonly ProtocolWriter writer;
-      readonly IMessageWriter<INetworkMessage> messageWriter;
+      readonly ProtocolWriter _writer;
+      readonly IMessageWriter<INetworkMessage> _messageWriter;
 
       public NetworkMessageWriter(IMessageWriter<INetworkMessage> messageWriter, ProtocolWriter writer)
       {
-         this.messageWriter = messageWriter;
-         this.writer = writer;
+         _messageWriter = messageWriter;
+         _writer = writer;
       }
 
       public ValueTask WriteAsync(INetworkMessage message, CancellationToken cancellationToken = default)
       {
-         return this.writer.WriteAsync(this.messageWriter, message, cancellationToken);
+         return _writer.WriteAsync(_messageWriter, message, cancellationToken);
       }
 
       public ValueTask WriteManyAsync(IEnumerable<INetworkMessage> messages, CancellationToken cancellationToken = default)
       {
-         return this.writer.WriteManyAsync(this.messageWriter, messages, cancellationToken);
+         return _writer.WriteManyAsync(_messageWriter, messages, cancellationToken);
       }
    }
 }

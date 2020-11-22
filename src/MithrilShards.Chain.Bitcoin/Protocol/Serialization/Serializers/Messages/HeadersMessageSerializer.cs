@@ -8,21 +8,21 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class HeadersMessageSerializer : BitcoinNetworkMessageSerializerBase<HeadersMessage>
    {
-      private readonly IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer;
+      private readonly IProtocolTypeSerializer<BlockHeader> _blockHeaderSerializer;
 
       public HeadersMessageSerializer(IProtocolTypeSerializer<BlockHeader> blockHeaderSerializer)
       {
-         this.blockHeaderSerializer = blockHeaderSerializer;
+         _blockHeaderSerializer = blockHeaderSerializer;
       }
 
       public override void Serialize(HeadersMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
       {
-         output.WriteArray(message.Headers!, protocolVersion, this.blockHeaderSerializer);
+         output.WriteArray(message.Headers!, protocolVersion, _blockHeaderSerializer);
       }
 
       public override HeadersMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
       {
-         return new HeadersMessage { Headers = reader.ReadArray(protocolVersion, this.blockHeaderSerializer) };
+         return new HeadersMessage { Headers = reader.ReadArray(protocolVersion, _blockHeaderSerializer) };
       }
    }
 }

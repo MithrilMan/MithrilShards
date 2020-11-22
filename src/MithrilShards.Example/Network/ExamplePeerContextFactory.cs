@@ -23,7 +23,7 @@ namespace MithrilShards.Example.Network
       public override IPeerContext CreateOutgoingPeerContext(string peerId, EndPoint localEndPoint, OutgoingConnectionEndPoint outgoingConnectionEndPoint, INetworkMessageWriter messageWriter)
       {
          //we know the returned type is correct because we specified it in our inheritance PeerContextFactory<ExamplePeerContext>
-         ExamplePeerContext peerContext = (ExamplePeerContext)base.CreateOutgoingPeerContext(peerId, localEndPoint, outgoingConnectionEndPoint, messageWriter);
+         var peerContext = (ExamplePeerContext)base.CreateOutgoingPeerContext(peerId, localEndPoint, outgoingConnectionEndPoint, messageWriter);
 
          /// outgoing PeerContext has a feature of type <see cref="OutgoingConnectionEndPoint"/> that we use to store additional information
          /// for peers we want to connect to (e.g. we could store a public key of the peer to start an encrypted communication.

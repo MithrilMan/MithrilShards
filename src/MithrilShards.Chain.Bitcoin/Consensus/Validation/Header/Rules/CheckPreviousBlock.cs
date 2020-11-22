@@ -9,11 +9,11 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header.Rules
    public class CheckPreviousBlock : IHeaderValidationRule
    {
       public const string PREV_BLOCK = "PREV_BLOCK";
-      readonly ILogger<CheckPreviousBlock> logger;
+      readonly ILogger<CheckPreviousBlock> _logger;
 
       public CheckPreviousBlock(ILogger<CheckPreviousBlock> logger)
       {
-         this.logger = logger;
+         _logger = logger;
       }
 
       public bool Check(IHeaderValidationContext context, ref BlockValidationState validationState)

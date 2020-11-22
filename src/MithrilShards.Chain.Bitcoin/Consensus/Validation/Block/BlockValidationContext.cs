@@ -18,9 +18,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block
                                     bool isInInitialBlockDownloadState,
                                     IChainState chainState) : base(logger, isInInitialBlockDownloadState, chainState)
       {
-         this.Block = block;
+         Block = block;
 
-         this.KnownBlock = null; //TODO or remove this property?
+         KnownBlock = null; //TODO or remove this property?
       }
    }
 }

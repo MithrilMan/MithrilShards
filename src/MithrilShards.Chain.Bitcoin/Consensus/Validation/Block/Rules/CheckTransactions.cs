@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MithrilShards.Chain.Bitcoin.Protocol;
 using MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
@@ -12,15 +11,15 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
 {
    public class CheckTransactions : IBlockValidationRule
    {
-      readonly ILogger<CheckTransactions> logger;
-      readonly IProtocolTypeSerializer<Transaction> transactionSerializer;
-      readonly IConsensusParameters consensusParameters;
+      readonly ILogger<CheckTransactions> _logger;
+      readonly IProtocolTypeSerializer<Transaction> _transactionSerializer;
+      readonly IConsensusParameters _consensusParameters;
 
       public CheckTransactions(ILogger<CheckTransactions> logger, IProtocolTypeSerializer<Transaction> transactionSerializer, IConsensusParameters consensusParameters)
       {
-         this.logger = logger;
-         this.transactionSerializer = transactionSerializer;
-         this.consensusParameters = consensusParameters;
+         _logger = logger;
+         _transactionSerializer = transactionSerializer;
+         _consensusParameters = consensusParameters;
       }
 
 
@@ -57,8 +56,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
          }
 
          // Size limits (this doesn't take the witness into account, as that hasn't been checked for malleability)
-         int size = this.transactionSerializer.Serialize(transaction, KnownVersion.CurrentVersion, new ArrayBufferWriter<byte>(), new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
-         if (size * consensusParameters.WitnessScaleFactor > consensusParameters.MaxBlockWeight)
+         int size = _transactionSerializer.Serialize(transaction, KnownVersion.CurrentVersion, new ArrayBufferWriter<byte>(), new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
+         if (size * _consensusParameters.WitnessScaleFactor > _consensusParameters.MaxBlockWeight)
          {
             return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-oversize");
          }
@@ -72,13 +71,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
                return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-vout-negative");
             }
 
-            if (output.Value > consensusParameters.MaxMoney)
+            if (output.Value > _consensusParameters.MaxMoney)
             {
                return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-vout-toolarge");
             }
 
             totalOutput += output.Value;
-            if (totalOutput < 0 || totalOutput > consensusParameters.MaxMoney)
+            if (totalOutput < 0 || totalOutput > _consensusParameters.MaxMoney)
             {
                return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-txouttotal-toolarge");
             }
@@ -90,7 +89,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
          // of a tx as spent, it does not check if the tx has duplicate inputs.
          // Failure to run this check will result in either a crash or an inflation bug, depending on the implementation of
          // the underlying coins database.
-         HashSet<OutPoint> usedOutPoints = new HashSet<OutPoint>();
+         var usedOutPoints = new HashSet<OutPoint>();
          foreach (TransactionInput input in transaction.Inputs)
          {
             if (!usedOutPoints.Add(input.PreviousOutput!))

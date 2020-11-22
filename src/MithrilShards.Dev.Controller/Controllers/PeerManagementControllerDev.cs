@@ -15,15 +15,15 @@ namespace MithrilShards.Dev.Controller.Controllers
    [Route("[controller]")]
    public class PeerManagementControllerDev : ControllerBase
    {
-      private readonly ILogger<PeerManagementControllerDev> logger;
-      readonly IEventBus eventBus;
-      readonly RequiredConnection? requiredConnection;
+      private readonly ILogger<PeerManagementControllerDev> _logger;
+      readonly IEventBus _eventBus;
+      readonly RequiredConnection? _requiredConnection;
 
       public PeerManagementControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
       {
-         this.logger = logger;
-         this.eventBus = eventBus;
-         this.requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
+         _logger = logger;
+         _eventBus = eventBus;
+         _requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
       }
 
       [HttpPost]
@@ -33,17 +33,17 @@ namespace MithrilShards.Dev.Controller.Controllers
       [Route("Connect")]
       public ActionResult<bool> Connect(PeerManagementConnectRequest request)
       {
-         if (this.requiredConnection == null)
+         if (_requiredConnection == null)
          {
-            return this.NotFound($"Cannot produce output because {nameof(RequiredConnection)} is not available");
+            return NotFound($"Cannot produce output because {nameof(RequiredConnection)} is not available");
          }
 
          if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint ipEndPoint))
          {
-            return this.BadRequest("Incorrect endpoint");
+            return BadRequest("Incorrect endpoint");
          }
 
-         return this.Ok(this.requiredConnection.TryAddEndPoint(ipEndPoint));
+         return Ok(_requiredConnection.TryAddEndPoint(ipEndPoint));
       }
 
       [HttpPost]
@@ -54,10 +54,10 @@ namespace MithrilShards.Dev.Controller.Controllers
       {
          if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint ipEndPoint))
          {
-            return this.BadRequest("Incorrect endpoint");
+            return BadRequest("Incorrect endpoint");
          }
 
-         this.eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));
+         _eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));
          return true;
       }
    }

@@ -9,14 +9,14 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
    /// </summary>
    public class UInt160 : UIntBase, IComparable<UInt160>, IEquatable<UInt160>
    {
-      public const int Length = 20;
+      public const int LENGTH = 20;
       public static readonly UInt160 Zero = new UInt160();
 
-      private ulong value1;
-      private ulong value2;
-      private uint value3;
+      private ulong _value1;
+      private ulong _value2;
+      private uint _value3;
 
-      public override int Size => Length;
+      public override int Size => LENGTH;
 
       public UInt160()
       {
@@ -24,10 +24,10 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
       public unsafe UInt160(byte[] value)
       {
-         fixed (ulong* p = &value1)
+         fixed (ulong* p = &_value1)
          {
-            Span<byte> dst = new Span<byte>(p, Length);
-            value[..Length].CopyTo(dst);
+            var dst = new Span<byte>(p, LENGTH);
+            value[..LENGTH].CopyTo(dst);
          }
       }
 
@@ -37,18 +37,18 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
       /// </summary>
       public int CompareTo(UInt160 other)
       {
-         int result = value3.CompareTo(other.value3);
+         int result = _value3.CompareTo(other._value3);
          if (result != 0) return result;
-         result = value2.CompareTo(other.value2);
+         result = _value2.CompareTo(other._value2);
          if (result != 0) return result;
-         return value1.CompareTo(other.value1);
+         return _value1.CompareTo(other._value1);
       }
 
       public override void Deserialize(BinaryReader reader)
       {
-         value1 = reader.ReadUInt64();
-         value2 = reader.ReadUInt64();
-         value3 = reader.ReadUInt32();
+         _value1 = reader.ReadUInt64();
+         _value2 = reader.ReadUInt64();
+         _value3 = reader.ReadUInt32();
       }
 
       /// <summary>
@@ -66,14 +66,14 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
       public bool Equals(UInt160 other)
       {
          if (other is null) return false;
-         return value1 == other.value1
-             && value2 == other.value2
-             && value3 == other.value3;
+         return _value1 == other._value1
+             && _value2 == other._value2
+             && _value3 == other._value3;
       }
 
       public override int GetHashCode()
       {
-         return (int)value1;
+         return (int)_value1;
       }
 
       /// <summary>
@@ -86,7 +86,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
             throw new ArgumentNullException(nameof(value));
          if (value.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
             value = value.Substring(2);
-         if (value.Length != Length * 2)
+         if (value.Length != LENGTH * 2)
             throw new FormatException();
          byte[] data = value.HexToBytes();
          Array.Reverse(data);
@@ -95,9 +95,9 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
       public override void Serialize(BinaryWriter writer)
       {
-         writer.Write(value1);
-         writer.Write(value2);
-         writer.Write(value3);
+         writer.Write(_value1);
+         writer.Write(_value2);
+         writer.Write(_value3);
       }
 
       /// <summary>
@@ -113,13 +113,13 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
          }
          if (s.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
             s = s.Substring(2);
-         if (s.Length != Length * 2)
+         if (s.Length != LENGTH * 2)
          {
             result = null;
             return false;
          }
-         byte[] data = new byte[Length];
-         for (int i = 0; i < Length; i++)
+         byte[] data = new byte[LENGTH];
+         for (int i = 0; i < LENGTH; i++)
             if (!byte.TryParse(s.Substring(i * 2, 2), NumberStyles.AllowHexSpecifier, null, out data[i]))
             {
                result = null;

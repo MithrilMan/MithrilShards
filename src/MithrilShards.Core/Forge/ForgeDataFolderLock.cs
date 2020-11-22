@@ -9,20 +9,20 @@ namespace MithrilShards.Core.Forge
    public class ForgeDataFolderLock : IForgeDataFolderLock
    {
       private const string LOCK_FILE_NAME = "lockfile";
-      private readonly string lockFileName;
+      private readonly string _lockFileName;
 
-      private FileStream? fileStream;
+      private FileStream? _fileStream;
 
       public ForgeDataFolderLock(IDataFolders dataFolders)
       {
-         this.lockFileName = Path.Combine(dataFolders.RootPath, LOCK_FILE_NAME);
+         _lockFileName = Path.Combine(dataFolders.RootPath, LOCK_FILE_NAME);
       }
 
       public bool TryLockDataFolder()
       {
          try
          {
-            this.fileStream = new FileStream(this.lockFileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+            _fileStream = new FileStream(_lockFileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
             return true;
          }
          catch (IOException)
@@ -33,10 +33,10 @@ namespace MithrilShards.Core.Forge
 
       public void UnlockDataFolder()
       {
-         this.fileStream?.Close();
+         _fileStream?.Close();
          try
          {
-            File.Delete(this.lockFileName);
+            File.Delete(_lockFileName);
          }
          catch { }
       }

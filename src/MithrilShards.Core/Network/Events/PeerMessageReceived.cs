@@ -12,7 +12,7 @@ namespace MithrilShards.Core.Network.Events
 
       public PeerMessageReceived(IPeerContext peerContext, INetworkMessage message) : base(peerContext)
       {
-         this.Message = message;
+         Message = message;
       }
    }
 }

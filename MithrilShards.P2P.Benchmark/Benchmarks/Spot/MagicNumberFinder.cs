@@ -9,10 +9,10 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
    public class MagicNumberFinder
    {
-      readonly byte[] magicNumberBytes = BitConverter.GetBytes(0x0709110B);
-      readonly int magicNumber = 0x0709110B;
+      readonly byte[] _magicNumberBytes = BitConverter.GetBytes(0x0709110B);
+      readonly int _magicNumber = 0x0709110B;
 
-      private ReadOnlySequence<byte> input;
+      private ReadOnlySequence<byte> _input;
 
       [Params(100, 10000)]
       //[Params(1_000_000)]
@@ -26,43 +26,43 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [GlobalSetup]
       public void Setup()
       {
-         byte[] data = new byte[this.PacketSize];
+         byte[] data = new byte[PacketSize];
          new Random().NextBytes(data);
 
          //ensure magic packet is at the right position, replace every occurrence of the first magic packet in the string with something else
          for (int i = 0; i < data.Length; i++)
          {
             byte b = data[i];
-            if (b == this.magicNumberBytes[0])
+            if (b == _magicNumberBytes[0])
             {
                data[i] = (byte)'\0';
             }
          }
 
          // insert magic packet at the right position
-         int position = (int)(data.Length * this.MagicPacketRelativePosition);
-         position = Math.Min(position, data.Length - (this.magicNumberBytes.Length + 1));
-         for (int i = 0; i < this.magicNumberBytes.Length; i++)
+         int position = (int)(data.Length * MagicPacketRelativePosition);
+         position = Math.Min(position, data.Length - (_magicNumberBytes.Length + 1));
+         for (int i = 0; i < _magicNumberBytes.Length; i++)
          {
-            data[position + i] = this.magicNumberBytes[i];
+            data[position + i] = _magicNumberBytes[i];
          }
 
-         this.input = new ReadOnlySequence<byte>(data);
+         _input = new ReadOnlySequence<byte>(data);
       }
 
 
       [Benchmark]
       public bool FindWithTryAdvanceTo()
       {
-         var reader = new SequenceReader<byte>(this.input);
-         return this.FindWithTryAdvanceTo(ref reader);
+         var reader = new SequenceReader<byte>(_input);
+         return FindWithTryAdvanceTo(ref reader);
       }
 
       [Benchmark]
       public bool FindWithForLoop()
       {
-         var reader = new SequenceReader<byte>(this.input);
-         return this.FindWithForLoop(ref reader);
+         var reader = new SequenceReader<byte>(_input);
+         return FindWithForLoop(ref reader);
       }
 
 
@@ -71,11 +71,11 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       private bool FindWithTryAdvanceTo(ref SequenceReader<byte> reader)
       {
          // advance to the first byte of the magic number.
-         while (reader.TryAdvanceTo(this.magicNumberBytes[0], advancePastDelimiter: false))
+         while (reader.TryAdvanceTo(_magicNumberBytes[0], advancePastDelimiter: false))
          {
             if (reader.TryReadLittleEndian(out int magicRead))
             {
-               if (magicRead == this.magicNumber)
+               if (magicRead == _magicNumber)
                {
                   return true;
                }
@@ -97,9 +97,9 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
       private bool FindWithForLoop(ref SequenceReader<byte> reader)
       {
-         for (int i = 0; i < this.magicNumberBytes.Length; i++)
+         for (int i = 0; i < _magicNumberBytes.Length; i++)
          {
-            byte expectedByte = this.magicNumberBytes[i];
+            byte expectedByte = _magicNumberBytes[i];
 
             if (reader.TryRead(out byte receivedByte))
             {
@@ -112,7 +112,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
                   // with the second byte. Otherwise, we set index to -1
                   // here, which means that after the loop incrementation,
                   // we will start from first byte of magic.
-                  i = receivedByte == this.magicNumberBytes[0] ? 0 : -1;
+                  i = receivedByte == _magicNumberBytes[0] ? 0 : -1;
                }
             }
             else

@@ -13,7 +13,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 
       public BlockLocator()
       {
-         this.BlockLocatorHashes = Array.Empty<UInt256>();
+         BlockLocatorHashes = Array.Empty<UInt256>();
       }
    }
 }

@@ -7,8 +7,8 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
 {
    public class DeserializationContext
    {
-      private uint payloadLength;
-      private uint checksum;
+      private uint _payloadLength;
+      private uint _checksum;
 
       public bool ChecksumRead { get; private set; }
       public byte[] MagicNumberBytes { get; }
@@ -28,7 +28,7 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
       /// <summary>
       /// The maximum allowed protocol message length.
       /// </summary>
-      private readonly uint maximumProtocolMessageLength;
+      private readonly uint _maximumProtocolMessageLength;
 
       /// <summary>
       /// Gets or sets the length of the last parsed INetworkMessage payload (message length - header length).
@@ -39,15 +39,15 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
       /// </value>
       public uint PayloadLength
       {
-         get => this.payloadLength;
+         get => _payloadLength;
          set
          {
-            if (value > this.maximumProtocolMessageLength)
+            if (value > _maximumProtocolMessageLength)
             {
-               throw new ProtocolViolationException($"Message size exceeds the maximum value {this.maximumProtocolMessageLength}.");
+               throw new ProtocolViolationException($"Message size exceeds the maximum value {_maximumProtocolMessageLength}.");
             }
-            this.payloadLength = value;
-            this.PayloadLengthRead = true;
+            _payloadLength = value;
+            PayloadLengthRead = true;
          }
       }
 
@@ -60,30 +60,30 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
       /// </value>
       public uint Checksum
       {
-         get => this.checksum;
+         get => _checksum;
          set
          {
-            this.checksum = value;
-            this.ChecksumRead = true;
+            _checksum = value;
+            ChecksumRead = true;
          }
       }
 
       public DeserializationContext(byte[] magicNumberBytesmagicBytes, uint maximumProtocolMessageLength = ProtocolDefinition.DEFAULT_MAX_PROTOCOL_MESSAGE_LENGTH)
       {
-         this.MagicNumberBytes = magicNumberBytesmagicBytes;
-         this.maximumProtocolMessageLength = maximumProtocolMessageLength;
-         this.MagicNumber = BitConverter.ToInt32(magicNumberBytesmagicBytes);
-         this.FirstMagicNumberByte = magicNumberBytesmagicBytes[0];
+         MagicNumberBytes = magicNumberBytesmagicBytes;
+         _maximumProtocolMessageLength = maximumProtocolMessageLength;
+         MagicNumber = BitConverter.ToInt32(magicNumberBytesmagicBytes);
+         FirstMagicNumberByte = magicNumberBytesmagicBytes[0];
 
-         this.ResetFlags();
+         ResetFlags();
       }
 
       public void ResetFlags()
       {
-         this.MagicNumberRead = false;
-         this.PayloadLengthRead = false;
-         this.CommandRead = false;
-         this.ChecksumRead = false;
+         MagicNumberRead = false;
+         PayloadLengthRead = false;
+         CommandRead = false;
+         ChecksumRead = false;
       }
 
       /// <summary>
@@ -95,13 +95,13 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock
       /// </value>
       public void SetCommand(ref ReadOnlySequence<byte> command)
       {
-         this.CommandName = Encoding.ASCII.GetString((command.IsSingleSegment ? command.FirstSpan : command.ToArray()).Trim((byte)'\0'));
-         this.CommandRead = true;
+         CommandName = Encoding.ASCII.GetString((command.IsSingleSegment ? command.FirstSpan : command.ToArray()).Trim((byte)'\0'));
+         CommandRead = true;
       }
 
       public int GetTotalMessageLength()
       {
-         return ProtocolDefinition.HEADER_LENGTH + (int)this.payloadLength;
+         return ProtocolDefinition.HEADER_LENGTH + (int)_payloadLength;
       }
    }
 }

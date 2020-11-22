@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.Target
 {
@@ -11,32 +11,32 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser, PlainExporter]
    public class TargetGetBits
    {
-      uint perfectCompactValue = 0x03123456;
+      uint _perfectCompactValue = 0x03123456;
 
-      MSTarget target;
+      MSTarget _target;
 
       [GlobalSetup]
       public void Setup()
       {
-         target = new MSTarget(perfectCompactValue);
+         _target = new MSTarget(_perfectCompactValue);
       }
 
       [Benchmark]
       public int WithBitOperations()
       {
-         return target.WithBitOperations();
+         return _target.WithBitOperations();
       }
 
       [Benchmark]
       public int AsBitcoin()
       {
-         return target.AsBitcoin();
+         return _target.AsBitcoin();
       }
 
       [Benchmark]
       public int AsNBitcoin()
       {
-         return target.AsNBitcoin();
+         return _target.AsNBitcoin();
       }
 
 
@@ -51,27 +51,27 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
          {
             const int bitsPerPart = sizeof(ulong) * 8;
 
-            if (this.part4 != 0)
+            if (part4 != 0)
             {
-               int zeroes = BitOperations.LeadingZeroCount(this.part4);
+               int zeroes = BitOperations.LeadingZeroCount(part4);
                if (zeroes > 0) return (bitsPerPart * 4) - zeroes;
             }
 
-            if (this.part3 != 0)
+            if (part3 != 0)
             {
-               int zeroes = BitOperations.LeadingZeroCount(this.part3);
+               int zeroes = BitOperations.LeadingZeroCount(part3);
                if (zeroes > 0) return (bitsPerPart * 3) - zeroes;
             }
 
-            if (this.part2 != 0)
+            if (part2 != 0)
             {
-               int zeroes = BitOperations.LeadingZeroCount(this.part2);
+               int zeroes = BitOperations.LeadingZeroCount(part2);
                if (zeroes > 0) return (bitsPerPart * 2) - zeroes;
             }
 
-            if (this.part1 != 0)
+            if (part1 != 0)
             {
-               int zeroes = BitOperations.LeadingZeroCount(this.part1);
+               int zeroes = BitOperations.LeadingZeroCount(part1);
                if (zeroes > 0) return bitsPerPart - zeroes;
             }
 
@@ -80,7 +80,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
 
          public int AsBitcoin()
          {
-            ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref this.part1), 8);
+            ReadOnlySpan<uint> leftBytes = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ulong, uint>(ref part1), 8);
 
             for (int pos = leftBytes.Length - 1; pos >= 0; pos--)
             {

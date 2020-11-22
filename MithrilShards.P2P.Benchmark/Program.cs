@@ -1,6 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
 namespace MithrilShards.Network.Benchmark
@@ -23,7 +21,7 @@ namespace MithrilShards.Network.Benchmark
       }
 
 #pragma warning disable CA1823
-      private const string JitTieredCompilation = "COMPLUS_TieredCompilation";
+      private const string JIT_TIERED_COMPILATION = "COMPLUS_TieredCompilation";
 #pragma warning restore CA1823
 
       static void Main(string[] args)

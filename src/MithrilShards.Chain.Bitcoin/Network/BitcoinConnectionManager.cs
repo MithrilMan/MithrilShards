@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
@@ -17,9 +14,9 @@ namespace MithrilShards.Chain.Bitcoin.Network
 {
    public class BitcoinConnectionManager : ConnectionManager
    {
-      private readonly TimeSpan inactivityThreshold = TimeSpan.FromSeconds(2 * 60);
-      readonly IRandomNumberGenerator randomNumberGenerator;
-      readonly IPeriodicWork periodicPeerHealthCheck;
+      private readonly TimeSpan _inactivityThreshold = TimeSpan.FromSeconds(2 * 60);
+      readonly IRandomNumberGenerator _randomNumberGenerator;
+      readonly IPeriodicWork _periodicPeerHealthCheck;
 
       public BitcoinConnectionManager(ILogger<ConnectionManager> logger, IEventBus eventBus,
                                       IStatisticFeedsCollector statisticFeedsCollector,
@@ -27,15 +24,15 @@ namespace MithrilShards.Chain.Bitcoin.Network
                                       IRandomNumberGenerator randomNumberGenerator,
                                       IPeriodicWork periodicPeerHealthCheck) : base(logger, eventBus, statisticFeedsCollector, connectors)
       {
-         this.randomNumberGenerator = randomNumberGenerator;
-         this.periodicPeerHealthCheck = periodicPeerHealthCheck;
+         _randomNumberGenerator = randomNumberGenerator;
+         _periodicPeerHealthCheck = periodicPeerHealthCheck;
       }
 
       public override Task StartAsync(CancellationToken cancellationToken)
       {
-         _ = this.periodicPeerHealthCheck.StartAsync(
-               label: nameof(periodicPeerHealthCheck),
-               work: this.StartCheckingPeerHealthAsync,
+         _ = _periodicPeerHealthCheck.StartAsync(
+               label: nameof(_periodicPeerHealthCheck),
+               work: StartCheckingPeerHealthAsync,
                interval: TimeSpan.FromSeconds(10),
                cancellation: cancellationToken
             );

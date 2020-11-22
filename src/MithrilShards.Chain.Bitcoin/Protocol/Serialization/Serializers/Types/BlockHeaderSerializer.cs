@@ -7,11 +7,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 {
    public class BlockHeaderSerializer : IProtocolTypeSerializer<BlockHeader>
    {
-      private readonly IProtocolTypeSerializer<UInt256> uInt256Serializator;
+      private readonly IProtocolTypeSerializer<UInt256> _uInt256Serializator;
 
       public BlockHeaderSerializer(IProtocolTypeSerializer<UInt256> uInt256Serializator)
       {
-         this.uInt256Serializator = uInt256Serializator;
+         _uInt256Serializator = uInt256Serializator;
       }
 
       public BlockHeader Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
@@ -21,8 +21,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
          var header = new BlockHeader
          {
             Version = reader.ReadInt(),
-            PreviousBlockHash = reader.ReadWithSerializer(protocolVersion, this.uInt256Serializator),
-            MerkleRoot = reader.ReadWithSerializer(protocolVersion, this.uInt256Serializator),
+            PreviousBlockHash = reader.ReadWithSerializer(protocolVersion, _uInt256Serializator),
+            MerkleRoot = reader.ReadWithSerializer(protocolVersion, _uInt256Serializator),
             TimeStamp = reader.ReadUInt(),
             Bits = reader.ReadUInt(),
             Nonce = reader.ReadUInt(),
@@ -43,8 +43,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
 
          int size = 0;
          size += writer.WriteInt(typeInstance.Version);
-         size += writer.WriteWithSerializer(typeInstance.PreviousBlockHash!, protocolVersion, this.uInt256Serializator);
-         size += writer.WriteWithSerializer(typeInstance.MerkleRoot!, protocolVersion, this.uInt256Serializator);
+         size += writer.WriteWithSerializer(typeInstance.PreviousBlockHash!, protocolVersion, _uInt256Serializator);
+         size += writer.WriteWithSerializer(typeInstance.MerkleRoot!, protocolVersion, _uInt256Serializator);
          size += writer.WriteUInt(typeInstance.TimeStamp);
          size += writer.WriteUInt(typeInstance.Bits);
          size += writer.WriteUInt(typeInstance.Nonce);

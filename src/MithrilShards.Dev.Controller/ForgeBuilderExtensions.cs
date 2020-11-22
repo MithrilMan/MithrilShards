@@ -1,12 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using MithrilShards.Core.Forge;
 
 namespace MithrilShards.Dev.Controller
@@ -21,7 +14,7 @@ namespace MithrilShards.Dev.Controller
       /// Useful to include these assemblies that didn't have an entry point and wouldn't be loaded.</param>
       /// <param name="configurationFile">The configuration file.</param>
       /// <returns></returns>
-      public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder, Action<DevAssemblyScaffolder> assemblyScaffoldEnabler = null, string? configurationFile = null)
+      public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder, Action<DevAssemblyScaffolder>? assemblyScaffoldEnabler = null)
       {
          var scaffolder = new DevAssemblyScaffolder();
          assemblyScaffoldEnabler?.Invoke(scaffolder);

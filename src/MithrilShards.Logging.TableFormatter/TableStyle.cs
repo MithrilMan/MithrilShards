@@ -18,13 +18,13 @@
                         bool titleBorder = false,
                         ColumnAlignment titleAlignment = ColumnAlignment.Left)
       {
-         this.Top = top;
-         this.Right = right;
-         this.Bottom = bottom;
-         this.Left = left;
-         this.Separator = separator;
-         this.TitleBorder = titleBorder;
-         this.TitleAlignment = titleAlignment;
+         Top = top;
+         Right = right;
+         Bottom = bottom;
+         Left = left;
+         Separator = separator;
+         TitleBorder = titleBorder;
+         TitleAlignment = titleAlignment;
       }
    }
 }
