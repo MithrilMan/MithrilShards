@@ -22,11 +22,14 @@ namespace MithrilShards.Core.Network
 
       protected readonly ConcurrentDictionary<string, IPeerContext> inboundPeers = new ConcurrentDictionary<string, IPeerContext>();
       protected readonly ConcurrentDictionary<string, IPeerContext> outboundPeers = new ConcurrentDictionary<string, IPeerContext>();
+      protected readonly HashSet<EndPoint> attemptingConnections = new HashSet<EndPoint>();
 
       private readonly ILogger<ConnectionManager> _logger;
       private readonly IEventBus _eventBus;
       readonly IStatisticFeedsCollector _statisticFeedsCollector;
       readonly IEnumerable<IConnector> _connectors;
+
+      private readonly object _connectionLock = new object();
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
@@ -76,7 +79,7 @@ namespace MithrilShards.Core.Network
       {
          ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? inboundPeers : outboundPeers;
          container[@event.PeerContext.PeerId] = @event.PeerContext;
-         _logger.LogDebug("Added peer {PeerId} to the list of connected peers", @event.PeerContext.PeerId);
+         _logger.LogDebug("Connected to {RemoteEndPoint}, peer {PeerId} added to the list of connected peers.", @event.PeerContext.RemoteEndPoint, @event.PeerContext.PeerId);
       }
 
       /// <summary>
@@ -102,7 +105,9 @@ namespace MithrilShards.Core.Network
          _eventSubscriptionManager.RegisterSubscriptions(
                _eventBus.Subscribe<PeerConnected>(AddConnectedPeer),
                _eventBus.Subscribe<PeerDisconnected>(RemoveConnectedPeer),
-               _eventBus.Subscribe<PeerDisconnectionRequired>(OnPeerDisconnectionRequested)
+               _eventBus.Subscribe<PeerDisconnectionRequired>(OnPeerDisconnectionRequested),
+               _eventBus.Subscribe<PeerConnectionAttempt>(OnPeerConnectionAttempt),
+               _eventBus.Subscribe<PeerConnectionAttemptFailed>(OnPeerConnectionAttemptFailed)
          );
 
          // start the task that tries to connect to other peers
@@ -198,13 +203,21 @@ namespace MithrilShards.Core.Network
          return Task.CompletedTask;
       }
 
-      public bool CanConnectTo(IPEndPoint endPoint)
+      public bool CanConnectTo(IPEndPoint remoteEndPoint)
       {
+         IPEndPoint ipEndPoint = remoteEndPoint.EnsureIPv6();
+         lock (_connectionLock)
+         {
+            if (attemptingConnections.Contains(ipEndPoint))
+            {
+               _logger.LogDebug("A pending attempt to connect to {RemoteEndPoint} already exists", ipEndPoint);
+            }
+         }
 
          // ensures I'm not already connected to the same endpoint
-         if (outboundPeers.Values.ToList().Any(peer => peer.RemoteEndPoint.Equals(endPoint.EnsureIPv6())))
+         if (outboundPeers.Values.ToList().Any(peer => peer.RemoteEndPoint.Equals(remoteEndPoint.EnsureIPv6())))
          {
-            _logger.LogTrace("Already connected to peer {RemoteEndPoint}", endPoint);
+            _logger.LogTrace("Already connected to peer {RemoteEndPoint}", remoteEndPoint);
             return false;
          }
 
@@ -227,6 +240,33 @@ namespace MithrilShards.Core.Network
          else
          {
             _logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection failed, endpoint not matching with any connected peer.", endPoint);
+         }
+      }
+
+      private void OnPeerConnectionAttempt(PeerConnectionAttempt @event)
+      {
+         IPEndPoint ipEndPoint = @event.RemoteEndPoint;
+         lock (_connectionLock)
+         {
+            attemptingConnections.Add(ipEndPoint);
+         }
+
+         _logger.LogDebug("Connection attempt to {RemoteEndPoint}. Added to attemptingConnections list.", ipEndPoint);
+      }
+
+      private void OnPeerConnectionAttemptFailed(PeerConnectionAttemptFailed @event)
+      {
+         IPEndPoint ipEndPoint = @event.RemoteEndPoint;
+         lock (_connectionLock)
+         {
+            if (attemptingConnections.Remove(@event.RemoteEndPoint.EnsureIPv6()))
+            {
+               _logger.LogDebug("EndPoint {RemoteEndPoint} removed from attemptingConnections list. {FailureReason}", ipEndPoint, @event.Reason);
+            }
+            else
+            {
+               _logger.LogWarning("EndPoint {RemoteEndPoint} not found in attemptingConnections list (shouldn't happen, need investigation). {FailureReason}", ipEndPoint, @event.Reason);
+            }
          }
       }
    }

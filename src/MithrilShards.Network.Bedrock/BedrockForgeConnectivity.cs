@@ -158,23 +158,28 @@ namespace MithrilShards.Network.Bedrock
       {
          using IDisposable logScope = _logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
          _eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()));
-         _logger.LogDebug("Connection attempt to {RemoteEndPoint}", remoteEndPoint.EndPoint);
+
+         bool connectionEstablished = false;
+
          try
          {
             await using ConnectionContext connection = await _client.ConnectAsync(remoteEndPoint.EndPoint).ConfigureAwait(false);
             // we store the RemoteEndPoint class as a feature of the connection so we can then copy it into the PeerContext in the ClientConnectionHandler.OnConnectedAsync
             connection.Features.Set(remoteEndPoint);
+            connectionEstablished = true;
 
-            _logger.LogDebug("Connected to {RemoteEndPoint}", connection.RemoteEndPoint);
             await _clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
          }
          catch (OperationCanceledException)
          {
-            _logger.LogDebug("Operation cancelled.");
+            _eventBus.Publish(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), "Operation canceled."));
          }
          catch (Exception ex)
          {
-            _logger.LogDebug(ex, "Unexpected connection terminated because of {DisconnectionReason}.", ex.Message);
+            if (!connectionEstablished)
+            {
+               _eventBus.Publish(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), ex.Message));
+            }
          }
       }
    }

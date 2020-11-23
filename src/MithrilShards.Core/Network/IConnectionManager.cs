@@ -8,7 +8,7 @@ namespace MithrilShards.Core.Network
       /// <summary>
       /// Determines whether this Forge can connect to the specified end point.
       /// </summary>
-      /// <param name="endPoint">The end point.</param>
-      bool CanConnectTo(IPEndPoint endPoint);
+      /// <param name="remoteEndPoint">The remote end point we'd like to connect to.</param>
+      bool CanConnectTo(IPEndPoint remoteEndPoint);
    }
 }

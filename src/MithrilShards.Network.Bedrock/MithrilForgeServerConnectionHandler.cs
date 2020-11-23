@@ -125,7 +125,7 @@ namespace MithrilShards.Network.Bedrock
          {
             _logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected because of {ClientDisconnectedReason} and will be closed.", connection.RemoteEndPoint, result.DenyReason);
             connection.Abort(new ConnectionAbortedException(result.DenyReason));
-            _eventBus.Publish(new PeerConnectionAttemptFailed(peerContext, result.DenyReason));
+            _eventBus.Publish(new PeerConnectionRejected(peerContext, result.DenyReason));
             return false;
          }
 

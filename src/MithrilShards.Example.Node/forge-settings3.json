@@ -6,7 +6,7 @@
       "Listeners": [
          {
             "IsWhitelistingEndpoint": true,
-            "Endpoint": "0.0.0.0:45061"
+            "Endpoint": "0.0.0.0:45071"
          }
       ]
    },
@@ -14,7 +14,7 @@
       "MaxTimeAdjustment": 4200,
       "Connections": [
          {
-            "Endpoint": "127.0.0.1:45071",
+            "Endpoint": "127.0.0.1:45051",
             "AdditionalInformation": "I'm cool too!"
          }
       ]
