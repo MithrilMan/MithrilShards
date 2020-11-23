@@ -21,4 +21,4 @@ Note that a sheer byte/sec indicator isn't enough because the problem may be our
 During header sync, peers check if they are in a position to ask for block downloads, judging by their position respect the node tip and their communicated best peer header.
 Following bitcoin core implementation logic, a peer may trigger a block download when:
 
-- it's best known header has more chainwork than our current chain tip
+- its best known header has more chainwork than our current chain tip

@@ -631,12 +631,16 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private ValueTask OnBlockValidationSucceededAsync(BlockValidationSucceeded arg)
       {
-         logger.LogDebug("Block Validation succeeded");
+         logger.LogDebug("Block {BlockId} Validation succeeded", arg.ValidatedBlock!.Header!.Hash);
 
          if (arg.IsNewBlock)
          {
             logger.LogTrace("Block Validation succeeded");
             _status.LastBlockTime = _dateTimeProvider.GetTime();
+         }
+         else
+         {
+            logger.LogDebug("Block {BlockId} already known.", arg.ValidatedBlock!.Header!.Hash);
          }
 
          return default;
