@@ -51,7 +51,7 @@ namespace MithrilShards.Example.Network.Bedrock
          }
       }
 
-      public bool TryParseMessage(in ReadOnlySequence<byte> input, out SequencePosition consumed, out SequencePosition examined, /*[MaybeNullWhen(false)]*/ out INetworkMessage message)
+      public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, /*[MaybeNullWhen(false)]*/ out INetworkMessage message)
       {
          var reader = new SequenceReader<byte>(input);
 

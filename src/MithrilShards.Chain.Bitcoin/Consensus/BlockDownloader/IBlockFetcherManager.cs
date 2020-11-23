@@ -24,6 +24,12 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       void RegisterFetcher(IBlockFetcher blockFetcher);
 
       /// <summary>
+      /// Unregisters the passed block fetcher.
+      /// </summary>
+      /// <param name="blockFetcher">The block fetcher.</param>
+      void UnregisterFetcher(IBlockFetcher blockFetcher);
+
+      /// <summary>
       /// Requires the assignment to download the specified block.
       /// A block may be required to be downloaded from a specific fetcher for different reasons,
       /// one of which may be the fact that the fetcher is a peer who need this block to continue to validate the chain.

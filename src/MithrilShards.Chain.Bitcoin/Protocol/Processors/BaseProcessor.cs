@@ -255,8 +255,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       public virtual void Dispose()
       {
          _eventSubscriptionManager.Dispose();
-
-         //not sure it's needed this.PeerContext?.ConnectionCancellationTokenSource.Cancel();
       }
    }
 }

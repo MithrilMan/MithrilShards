@@ -58,6 +58,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// </value>
       public DateTimeOffset LastResultsDate { get; internal set; }
 
+      /// <summary>
+      /// The feed has a result.
+      /// </summary>
+      private bool _hasResult = false;
+
       public ScheduledStatisticFeed(IStatisticFeedsProvider source, StatisticFeedDefinition statisticFeedDefinition)
       {
          Source = source ?? throw new ArgumentNullException(nameof(source));
@@ -106,6 +111,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          lastResults.Clear();
          lastResults.AddRange(results);
          LastResultsDate = DateTime.Now;
+         _hasResult = true;
       }
 
 
@@ -116,9 +122,20 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       public string GetTabularFeed()
       {
          _stringBuilder.Clear();
+
          _tableBuilder.Start($"{LastResultsDate.LocalDateTime} - {StatisticFeedDefinition.Title}");
-         lastResults.ForEach(row => _tableBuilder.DrawRow(row));
+         if (_hasResult)
+         {
+            lastResults.ForEach(row => _tableBuilder.DrawRow(row));
+         }
+         else
+         {
+            _stringBuilder.AppendLine("No statistics available yet.");
+         }
+
          _tableBuilder.End();
+
+
          return _stringBuilder.ToString();
       }
    }

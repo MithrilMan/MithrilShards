@@ -253,6 +253,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
          }
       }
 
+      public void UnregisterFetcher(IBlockFetcher blockFetcher)
+      {
+         using (new WriteLock(_fetcherSlimLock))
+         {
+            if (_fetchers.Remove(blockFetcher))
+            {
+               _logger.LogDebug("fetcher removed");
+            }
+         }
+      }
+
       /// <summary>
       /// try to enqueue blocks in case there are blocks to download and there are free download slots available.
       /// </summary>
@@ -299,14 +310,32 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
             //   .DefaultIfEmpty(this.fetchers.)
 
             //try to see if performance wise has too much impact
-            IBlockFetcher? selectedFetcher = (
-               from fetcher in _fetchers
+            IEnumerable<IBlockFetcher> fetchersByScore = (
+               from fetcher in _fetchers.ToList() //get a copy
                let score = fetcher.GetFetchBlockScore(blockToDownload)
                orderby score descending
                where score > 0 // only peers that can fetch the block
                select fetcher
-               )
-               .FirstOrDefault((fetcher) => fetcher.TryFetchAsync(blockToDownload, 0).ConfigureAwait(false).GetAwaiter().GetResult()); //TODO use async
+               );
+
+            IBlockFetcher? selectedFetcher = null;
+            foreach (IBlockFetcher? fetcher in fetchersByScore)
+            {
+               try
+               {
+                  if (await fetcher.TryFetchAsync(blockToDownload, 0).ConfigureAwait(false))
+                  {
+                     selectedFetcher = fetcher;
+                     break;
+                  }
+
+               }
+               catch (Exception ex)
+               {
+                  _logger.LogDebug("Failed to fetch block because of: {ErrorMessage}", ex.Message);
+                  continue;
+               }
+            }
 
             if (selectedFetcher == null)
             {

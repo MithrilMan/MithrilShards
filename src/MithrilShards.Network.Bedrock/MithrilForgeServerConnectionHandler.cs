@@ -77,7 +77,7 @@ namespace MithrilShards.Network.Bedrock
             {
                try
                {
-                  ReadResult<INetworkMessage> result = await reader.ReadAsync(protocol).ConfigureAwait(false);
+                  ProtocolReadResult<INetworkMessage> result = await reader.ReadAsync(protocol).ConfigureAwait(false);
 
                   if (result.IsCompleted)
                   {

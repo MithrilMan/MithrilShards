@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
    /// Manage the exchange of block and headers between peers.
    /// </summary>
    /// <seealso cref="BaseProcessor" />
-   public partial class BlockHeaderProcessor : BaseProcessor, IPeriodicWorkExceptionHandler,
+   public partial class BlockHeaderProcessor : BaseProcessor, IPeriodicWorkExceptionHandler, IDisposable,
       INetworkMessageHandler<GetHeadersMessage>,
       INetworkMessageHandler<SendHeadersMessage>,
       INetworkMessageHandler<HeadersMessage>,
@@ -797,6 +797,17 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private bool IsWitnessEnabled(HeaderNode? headerNode)
       {
          return (headerNode?.Height ?? 0) + 1 >= _consensusParameters.SegwitHeight;
+      }
+
+      public override void Dispose()
+      {
+         // if this peer is able to serve blocks, register it
+         if (!_status.IsClient)
+         {
+            _blockFetcherManager.UnregisterFetcher(this);
+         }
+
+         base.Dispose();
       }
    }
 }

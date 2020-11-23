@@ -77,16 +77,32 @@ namespace MithrilShards.Core.Network
       /// <param name="peerContext">The peer context.</param>
       private void AddConnectedPeer(PeerConnected @event)
       {
+         IPEndPoint ipEndPoint = @event.PeerContext.RemoteEndPoint.EnsureIPv6();
+         if (@event.PeerContext.Direction == PeerConnectionDirection.Outbound)
+         {
+            lock (_connectionLock)
+            {
+               if (attemptingConnections.Remove(ipEndPoint))
+               {
+                  _logger.LogDebug("EndPoint {RemoteEndPoint} Connected!. Removed from attemptingConnections list.", ipEndPoint);
+               }
+               else
+               {
+                  _logger.LogDebug("EndPoint {RemoteEndPoint} Connected!. Not found in attemptingConnections list (shouldn't happen, need investigation)", ipEndPoint);
+               }
+            }
+         }
+
          ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? inboundPeers : outboundPeers;
          container[@event.PeerContext.PeerId] = @event.PeerContext;
-         _logger.LogDebug("Connected to {RemoteEndPoint}, peer {PeerId} added to the list of connected peers.", @event.PeerContext.RemoteEndPoint, @event.PeerContext.PeerId);
+         _logger.LogDebug("Connected to {RemoteEndPoint}, peer {PeerId} added to the list of connected peers.", ipEndPoint, @event.PeerContext.PeerId);
       }
 
       /// <summary>
       /// Removes the specified peer from the list of connected peer.
       /// </summary>
       /// <param name="peerContext">The peer context.</param>
-      private void RemoveConnectedPeer(PeerDisconnected @event)
+      private void OnPeerDisconnected(PeerDisconnected @event)
       {
          ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? inboundPeers : outboundPeers;
          if (!container.TryRemove(@event.PeerContext.PeerId, out _))
@@ -104,7 +120,7 @@ namespace MithrilShards.Core.Network
          RegisterStatisticFeeds();
          _eventSubscriptionManager.RegisterSubscriptions(
                _eventBus.Subscribe<PeerConnected>(AddConnectedPeer),
-               _eventBus.Subscribe<PeerDisconnected>(RemoveConnectedPeer),
+               _eventBus.Subscribe<PeerDisconnected>(OnPeerDisconnected),
                _eventBus.Subscribe<PeerDisconnectionRequired>(OnPeerDisconnectionRequested),
                _eventBus.Subscribe<PeerConnectionAttempt>(OnPeerConnectionAttempt),
                _eventBus.Subscribe<PeerConnectionAttemptFailed>(OnPeerConnectionAttemptFailed)
@@ -211,6 +227,7 @@ namespace MithrilShards.Core.Network
             if (attemptingConnections.Contains(ipEndPoint))
             {
                _logger.LogDebug("A pending attempt to connect to {RemoteEndPoint} already exists", ipEndPoint);
+               return false;
             }
          }
 
@@ -256,10 +273,10 @@ namespace MithrilShards.Core.Network
 
       private void OnPeerConnectionAttemptFailed(PeerConnectionAttemptFailed @event)
       {
-         IPEndPoint ipEndPoint = @event.RemoteEndPoint;
+         IPEndPoint ipEndPoint = @event.RemoteEndPoint.EnsureIPv6();
          lock (_connectionLock)
          {
-            if (attemptingConnections.Remove(@event.RemoteEndPoint.EnsureIPv6()))
+            if (attemptingConnections.Remove(ipEndPoint))
             {
                _logger.LogDebug("EndPoint {RemoteEndPoint} removed from attemptingConnections list. {FailureReason}", ipEndPoint, @event.Reason);
             }
