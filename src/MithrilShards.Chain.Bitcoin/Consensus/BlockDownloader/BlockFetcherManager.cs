@@ -253,6 +253,17 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
          }
       }
 
+      public void UnregisterFetcher(IBlockFetcher blockFetcher)
+      {
+         using (new WriteLock(_fetcherSlimLock))
+         {
+            if (_fetchers.Remove(blockFetcher))
+            {
+               _logger.LogDebug("fetcher removed");
+            }
+         }
+      }
+
       /// <summary>
       /// try to enqueue blocks in case there are blocks to download and there are free download slots available.
       /// </summary>
