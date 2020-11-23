@@ -172,6 +172,7 @@ namespace MithrilShards.Network.Bedrock
          }
          catch (OperationCanceledException)
          {
+            _logger.LogDebug("Connection to {RemoteEndPoint} canceled", remoteEndPoint.EndPoint);
             _eventBus.Publish(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), "Operation canceled."));
          }
          catch (Exception ex)
@@ -179,6 +180,11 @@ namespace MithrilShards.Network.Bedrock
             if (!connectionEstablished)
             {
                _eventBus.Publish(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), ex.Message));
+            }
+            else
+            {
+               _logger.LogError(ex, "AttemptConnectionAsync failed");
+               //throw;
             }
          }
       }
