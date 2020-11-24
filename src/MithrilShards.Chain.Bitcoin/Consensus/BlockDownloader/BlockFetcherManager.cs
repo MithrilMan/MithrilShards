@@ -412,7 +412,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
          throw new NotImplementedException();
       }
 
-      public object GetInsight()
+      object IDebugInsight.GetInsight()
       {
          return new
          {
