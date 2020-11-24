@@ -45,7 +45,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       readonly IHeaderValidator _headerValidator;
       readonly IBlockValidator _blockValidator;
       readonly IPeriodicWork _headerSyncLoop;
-      readonly IPeriodicWork _blockRequestLoop;
       readonly BitcoinSettings _options;
       private readonly Target _minimumChainWork;
 
@@ -63,7 +62,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                                   IHeaderValidator headerValidator,
                                   IBlockValidator blockValidator,
                                   IPeriodicWork headerSyncLoop,
-                                  IPeriodicWork blockRequestLoop,
                                   IOptions<BitcoinSettings> options)
          : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
       {
@@ -78,7 +76,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          _headerValidator = headerValidator;
          _blockValidator = blockValidator;
          _headerSyncLoop = headerSyncLoop;
-         _blockRequestLoop = blockRequestLoop;
          _options = options.Value;
 
 
@@ -89,7 +86,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
 
          headerSyncLoop.Configure(stopOnException: false, this);
-         blockRequestLoop.Configure(stopOnException: false, this);
       }
 
       public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
@@ -97,7 +93,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          string? disconnectionReason = failedWork switch
          {
             IPeriodicWork work when work == _headerSyncLoop => "Peer header syncing loop had failures.",
-            IPeriodicWork work when work == _blockRequestLoop => "Peer block request loop had failures.",
             _ => null
          };
 
@@ -165,13 +160,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                work: SyncLoopAsync,
                interval: TimeSpan.FromMilliseconds(SYNC_LOOP_INTERVAL),
                cancellation: PeerContext.ConnectionCancellationTokenSource.Token
-            );
-
-         _ = _blockRequestLoop.StartAsync(
-            label: $"{nameof(_blockRequestLoop)}-{PeerContext.PeerId}",
-            work: BlockRequestLoopAsync,
-            interval: TimeSpan.FromMilliseconds(BLOCK_REQUEST_INTERVAL),
-            cancellation: PeerContext.ConnectionCancellationTokenSource.Token
             );
       }
 
