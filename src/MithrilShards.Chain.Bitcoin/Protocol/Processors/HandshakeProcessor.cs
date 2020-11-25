@@ -76,7 +76,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
       }
 
-      public async ValueTask<bool> ProcessMessageAsync(VersionMessage version, CancellationToken cancellation)
+      async ValueTask<bool> INetworkMessageHandler<VersionMessage>.ProcessMessageAsync(VersionMessage version, CancellationToken cancellation)
       {
          bool peerServiceSupports(NodeServices service)
          {
@@ -157,7 +157,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          return !peerServices.HasFlag(requiredServices);
       }
 
-      public async ValueTask<bool> ProcessMessageAsync(VerackMessage verack, CancellationToken cancellation)
+      async ValueTask<bool> INetworkMessageHandler<VerackMessage>.ProcessMessageAsync(VerackMessage verack, CancellationToken cancellation)
       {
          if (!_status.IsVersionSent)
          {

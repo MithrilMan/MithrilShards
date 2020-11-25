@@ -56,10 +56,13 @@ namespace MithrilShards.Core.Network.Protocol.Processors
             {
                Type concreteMessageHandlerType = refType.MakeGenericType(handledMessageType);
 
-               MethodInfo method = processorType.GetInterfaceMap(concreteMessageHandlerType).TargetMethods
-                  //we are just interested to cache the method ProcessMessageAsync
-                  .Where(method => method.Name == nameof(INetworkMessageHandler<INetworkMessage>.ProcessMessageAsync))
-                  .First();
+               InterfaceMapping interfaceMapping = processorType.GetInterfaceMap(concreteMessageHandlerType);
+               int methodIndex = Array.FindIndex(
+                  interfaceMapping.InterfaceMethods,
+                  method => method.Name == nameof(INetworkMessageHandler<INetworkMessage>.ProcessMessageAsync)
+                  );
+
+               MethodInfo method = interfaceMapping.TargetMethods[methodIndex];
 
                if (!_mapping.TryGetValue(handledMessageType, out List<ProcessorHandler>? handlers))
                {

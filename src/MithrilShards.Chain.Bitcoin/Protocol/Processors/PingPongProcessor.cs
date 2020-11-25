@@ -83,14 +83,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
       }
 
-      public async ValueTask<bool> ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
+      async ValueTask<bool> INetworkMessageHandler<PingMessage>.ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
       {
          await SendMessageAsync(new PongMessage { Nonce = message.Nonce }).ConfigureAwait(false);
 
          return true;
       }
 
-      public ValueTask<bool> ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
+      ValueTask<bool> INetworkMessageHandler<PongMessage>.ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
       {
          if (_status.PingRequestNonce != 0 && message.Nonce == _status.PingRequestNonce)
          {

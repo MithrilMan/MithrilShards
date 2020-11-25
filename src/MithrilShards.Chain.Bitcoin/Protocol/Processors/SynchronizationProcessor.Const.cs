@@ -1,6 +1,6 @@
 ﻿namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
-   public partial class BlockHeaderProcessor
+   public partial class SynchronizationProcessor
    {
       /// <summary>
       /// Number of headers sent in one getheaders result.
@@ -23,13 +23,6 @@
       /// The maximum number of blocks that can be requested from a single peer.
       /// </summary>
       private const int MAX_BLOCKS_IN_TRANSIT_PER_PEER = 26; //FIX default bitcoin value: 16
-
-      /// <summary>
-      /// Maximum number of block hashes allowed in the BlockLocator.</summary>
-      /// <seealso cref="https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2018-August/016285.html"/>
-      /// <seealso cref="https://github.com/bitcoin/bitcoin/pull/13907"
-      /// </summary>
-      private const int MAX_LOCATOR_SIZE = 101;
 
       /// <summary>
       /// Base Headers download timeout expressed in microseconds (usec)

@@ -80,7 +80,7 @@ namespace MithrilShards.Example.Protocol.Processors
          }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", _pingCancellationTokenSource.Token).ConfigureAwait(false);
       }
 
-      public async ValueTask<bool> ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
+      async ValueTask<bool> INetworkMessageHandler<PingMessage>.ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
       {
          await SendMessageAsync(new PongMessage
          {
@@ -94,7 +94,7 @@ namespace MithrilShards.Example.Protocol.Processors
          return true;
       }
 
-      public ValueTask<bool> ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
+      ValueTask<bool> INetworkMessageHandler<PongMessage>.ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
       {
          if (_status.PingRequestNonce != 0 && message.PongFancyResponse?.Nonce == _status.PingRequestNonce)
          {

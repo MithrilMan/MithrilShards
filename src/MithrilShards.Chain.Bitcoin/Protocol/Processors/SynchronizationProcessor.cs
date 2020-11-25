@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -24,14 +23,11 @@ using MithrilShards.Core.Threading;
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
    /// <summary>
-   /// Manage the exchange of block and headers between peers.
+   /// Its job is to synchronize current peer with connected peers, requiring needed data and parsing them.
    /// </summary>
    /// <seealso cref="BaseProcessor" />
-   public partial class BlockHeaderProcessor : BaseProcessor, IPeriodicWorkExceptionHandler, IDisposable,
-      INetworkMessageHandler<GetHeadersMessage>,
-      INetworkMessageHandler<SendHeadersMessage>,
+   public partial class SynchronizationProcessor : BaseProcessor, IPeriodicWorkExceptionHandler, IDisposable,
       INetworkMessageHandler<HeadersMessage>,
-      INetworkMessageHandler<SendCmpctMessage>,
       INetworkMessageHandler<BlockMessage>
    {
       readonly IDateTimeProvider _dateTimeProvider;
@@ -48,7 +44,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       readonly BitcoinSettings _options;
       private readonly Target _minimumChainWork;
 
-      public BlockHeaderProcessor(ILogger<BlockHeaderProcessor> logger,
+      public SynchronizationProcessor(ILogger<SynchronizationProcessor> logger,
                                   IEventBus eventBus,
                                   IDateTimeProvider dateTimeProvider,
                                   IPeerBehaviorManager peerBehaviorManager,
@@ -192,7 +188,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                got back an empty response.  */
             HeaderNode? pindexStart = bestHeaderNode.Previous ?? bestHeaderNode;
 
-            logger.LogDebug("Starting syncing headers from height {LocatorHeight} (peer startheight: {startheight})", pindexStart.Height, _status.PeerStartingHeight);
+            logger.LogDebug("Starting syncing headers from height {LocatorHeight} (peer starting height: {StartingHeight})", pindexStart.Height, _status.PeerStartingHeight);
 
             var newGetHeaderRequest = new GetHeadersMessage
             {
@@ -338,124 +334,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       }
 
       /// <summary>
-      /// The other peer prefer to be announced about new block using headers
-      /// </summary>
-      public ValueTask<bool> ProcessMessageAsync(SendHeadersMessage message, CancellationToken cancellation)
-      {
-         _status.AnnounceNewBlockUsingSendHeaders = true;
-         return new ValueTask<bool>(true);
-      }
-
-      /// <summary>
-      /// The other peer prefer to receive blocks using cmpct messages.
-      /// </summary>
-      public ValueTask<bool> ProcessMessageAsync(SendCmpctMessage message, CancellationToken cancellation)
-      {
-         if (message.Version == 1 || (_localServiceProvider.HasServices(NodeServices.Witness) && message.Version == 2))
-         {
-            if (!_status.ProvidesHeaderAndIDs)
-            {
-               _status.ProvidesHeaderAndIDs = true;
-               _status.WantsCompactWitness = message.Version == 2;
-            }
-
-            // ignore later version announces
-            if (_status.WantsCompactWitness = (message.Version == 2))
-            {
-               _status.AnnounceUsingCompactBlock = message.AnnounceUsingCompactBlock;
-            }
-
-            if (!_status.SupportsDesiredCompactVersion)
-            {
-               if (_localServiceProvider.HasServices(NodeServices.Witness))
-               {
-                  _status.SupportsDesiredCompactVersion = (message.Version == 2);
-               }
-               else
-               {
-                  _status.SupportsDesiredCompactVersion = (message.Version == 1);
-               }
-            }
-         }
-         else
-         {
-            logger.LogDebug("Ignoring sendcmpct message because its version is unknown.");
-         }
-
-         return new ValueTask<bool>(true);
-      }
-
-      /// <summary>
-      /// The peer wants some headers from us
-      /// </summary>
-      public async ValueTask<bool> ProcessMessageAsync(GetHeadersMessage message, CancellationToken cancellation)
-      {
-         if (message is null) ThrowHelper.ThrowArgumentException(nameof(message));
-
-         if (message.BlockLocator!.BlockLocatorHashes.Length > MAX_LOCATOR_SIZE)
-         {
-            logger.LogDebug("Exceeded maximum block locator size for getheaders message.");
-            Misbehave(10, "Exceeded maximum getheaders block locator size", true);
-            return true;
-         }
-
-         if (_ibdState.IsDownloadingBlocks())
-         {
-            logger.LogDebug("Ignoring getheaders from {PeerId} because node is in initial block download state.", PeerContext.PeerId);
-            return true;
-         }
-
-         HeaderNode? startingNode;
-         // If block locator is null, return the hashStop block
-         if ((message.BlockLocator.BlockLocatorHashes?.Length ?? 0) == 0)
-         {
-            if (!_chainState.TryGetBestChainHeaderNode(message.HashStop!, out startingNode!))
-            {
-               logger.LogDebug("Empty block locator and HashStop not found");
-               return true;
-            }
-
-            //TODO (ref net_processing.cpp 2479 tag 0.20)
-            //if (!BlockRequestAllowed(pindex, chainparams.GetConsensus()))
-            //{
-            //   LogPrint(BCLog::NET, "%s: ignoring request from peer=%i for old block header that isn't in the main chain\n", __func__, pfrom->GetId());
-            //   return true;
-            //}
-         }
-         else
-         {
-            // Find the last block the caller has in the main chain
-            startingNode = _chainState.FindForkInGlobalIndex(message.BlockLocator);
-            _chainState.TryGetNext(startingNode, out startingNode);
-         }
-
-         logger.LogDebug("Serving headers from {StartingNodeHeight}:{StartingNodeHash}", startingNode?.Height, startingNode?.Hash);
-
-         var headersToSend = new List<BlockHeader>();
-         HeaderNode? headerToSend = startingNode;
-         while (headerToSend != null)
-         {
-            if (!_chainState.TryGetBlockHeader(headerToSend, out BlockHeader? blockHeader))
-            {
-               //fatal error, should never happen
-               ThrowHelper.ThrowNotSupportedException("Block Header not found");
-               return true;
-            }
-            headersToSend.Add(blockHeader);
-         }
-
-         await SendMessageAsync(new HeadersMessage
-         {
-            Headers = headersToSend.ToArray()
-         }).ConfigureAwait(false);
-
-         return true;
-      }
-
-      /// <summary>
       /// The peer sent us headers.
       /// </summary>
-      public async ValueTask<bool> ProcessMessageAsync(HeadersMessage headersMessage, CancellationToken cancellation)
+      async ValueTask<bool> INetworkMessageHandler<HeadersMessage>.ProcessMessageAsync(HeadersMessage headersMessage, CancellationToken cancellation)
       {
          BlockHeader[]? headers = headersMessage.Headers;
          int headersCount = headers!.Length;
@@ -529,7 +410,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <summary>
       /// The node received a block.
       /// </summary>
-      public async ValueTask<bool> ProcessMessageAsync(BlockMessage message, CancellationToken cancellation)
+      async ValueTask<bool> INetworkMessageHandler<BlockMessage>.ProcessMessageAsync(BlockMessage message, CancellationToken cancellation)
       {
          int protocolVersion = PeerContext.NegotiatedProtocolVersion.Version;
 
@@ -571,14 +452,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <returns></returns>
       private async ValueTask OnBlockHeaderValidationSucceededAsync(BlockHeaderValidationSucceeded arg)
       {
-         logger.LogDebug("Header Validation succeeded");
+         logger.LogTrace("Header Validation succeeded");
          HeaderNode? lastValidatedHeaderNode = arg.LastValidatedHeaderNode;
 
          using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
          {
             if (_status.UnconnectingHeaderReceived > 0)
             {
-               logger.LogDebug("Resetting UnconnectingHeaderReceived, was {UnconnectingHeaderReceived}.", _status.UnconnectingHeaderReceived);
+               logger.LogTrace("Resetting UnconnectingHeaderReceived, was {UnconnectingHeaderReceived}.", _status.UnconnectingHeaderReceived);
                _status.UnconnectingHeaderReceived = 0;
             }
 
@@ -595,7 +476,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
                // We received the maximum number of headers per protocol definition, the peer may have more headers.
                // TODO: optimize: if pindexLast is an ancestor of ::ChainActive().Tip or pindexBestHeader, continue
                // from there instead.
-               logger.LogDebug("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastValidatedHeaderNode.Height, _status.PeerStartingHeight);
+               logger.LogTrace("Request another getheaders from height {BlockLocatorStart} (startingHeight: {StartingHeight}).", lastValidatedHeaderNode.Height, _status.PeerStartingHeight);
                var newGetHeaderRequest = new GetHeadersMessage
                {
                   Version = (uint)PeerContext.NegotiatedProtocolVersion.Version,
@@ -619,7 +500,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       private ValueTask OnBlockValidationSucceededAsync(BlockValidationSucceeded arg)
       {
-         logger.LogDebug("Block {BlockId} Validation succeeded", arg.ValidatedBlock!.Header!.Hash);
+         logger.LogTrace("Block {BlockId} Validation succeeded", arg.ValidatedBlock!.Header!.Hash);
 
          if (arg.IsNewBlock)
          {
@@ -628,17 +509,10 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
          else
          {
-            logger.LogDebug("Block {BlockId} already known.", arg.ValidatedBlock!.Header!.Hash);
+            logger.LogTrace("Block {BlockId} already known.", arg.ValidatedBlock!.Header!.Hash);
          }
 
          return default;
-      }
-
-      private bool ShouldRequestCompactBlock(HeaderNode lastHeader)
-      {
-         return _status.SupportsDesiredCompactVersion
-            //TODO fix     && this.blockFetcherManager.BlocksInDownload == 0
-            && lastHeader.Previous?.IsValid(HeaderValidityStatuses.ValidChain) == true;
       }
 
       /// <summary>
@@ -706,7 +580,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             };
             await SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
 
-            logger.LogDebug("received an unconnecting header, missing {PrevBlock}. Request again headers from {BlockLocator}",
+            logger.LogTrace("received an unconnecting header, missing {PrevBlock}. Request again headers from {BlockLocator}",
                                  headers[0].PreviousBlockHash,
                                  newGetHeaderRequest.BlockLocator.BlockLocatorHashes[0]);
 

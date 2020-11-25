@@ -64,7 +64,7 @@ namespace MithrilShards.Example.Protocol.Processors
          }
       }
 
-      public async ValueTask<bool> ProcessMessageAsync(VersionMessage version, CancellationToken cancellation)
+      async ValueTask<bool> INetworkMessageHandler<VersionMessage>.ProcessMessageAsync(VersionMessage version, CancellationToken cancellation)
       {
          // did peers already handshaked?
          if (_status.IsHandShaked)
@@ -100,7 +100,7 @@ namespace MithrilShards.Example.Protocol.Processors
          return false;
       }
 
-      public async ValueTask<bool> ProcessMessageAsync(VerackMessage verack, CancellationToken cancellation)
+      async ValueTask<bool> INetworkMessageHandler<VerackMessage>.ProcessMessageAsync(VerackMessage verack, CancellationToken cancellation)
       {
          if (!_status.IsVersionSent)
          {
