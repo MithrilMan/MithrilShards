@@ -11,13 +11,10 @@ namespace MithrilShards.Core.DataTypes
 
       public static UInt256 Zero { get; } = new UInt256("0".PadRight(EXPECTED_SIZE * 2, '0'));
 
-#pragma warning disable IDE0044 // Add readonly modifier
       protected ulong part1;
       protected ulong part2;
       protected ulong part3;
       protected ulong part4;
-
-#pragma warning restore IDE0044 // Add readonly modifier
 
       /// <summary>
       /// Initializes a new instance of the <see cref="UInt256"/> class.

@@ -62,12 +62,10 @@ namespace AltUInt256
    {
       protected const int EXPECTED_SIZE = 32;
 
-#pragma warning disable IDE0044 // Add readonly modifier
       protected ulong part1;
       protected ulong part2;
       protected ulong part3;
       protected ulong part4;
-#pragma warning restore IDE0044 // Add readonly modifier
 
       /// <summary>
       /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
@@ -95,12 +93,10 @@ namespace AltUInt256
    {
       protected const int EXPECTED_SIZE = 32;
 
-#pragma warning disable IDE0044 // Add readonly modifier
       protected ulong part1;
       protected ulong part2;
       protected ulong part3;
       protected ulong part4;
-#pragma warning restore IDE0044 // Add readonly modifier
 
       /// <summary>
       /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
