@@ -6,7 +6,7 @@ using MithrilShards.Core.Network.Protocol.Serialization;
 namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
 {
    /// <summary>
-   /// Return an inv packet containing the list of blocks starting right after the last known hash in the block locator object,
+   /// Requests an inv packet containing the list of blocks starting right after the last known hash in the block locator object,
    /// up to hash_stop or 500 blocks, whichever comes first.
    /// The locator hashes are processed by a node in the order as they appear in the message.
    /// If a block hash is found in the node's main chain, the list of its children is returned back via the inv message and the

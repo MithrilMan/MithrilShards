@@ -8,7 +8,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class GetDataMessageSerializer : BitcoinNetworkMessageSerializerBase<GetDataMessage>
    {
-      private static readonly GetDataMessage _instance = new GetDataMessage();
       readonly IProtocolTypeSerializer<InventoryVector> _inventoryVectorSerializer;
 
       public GetDataMessageSerializer(IProtocolTypeSerializer<InventoryVector> inventoryVectorSerializer)

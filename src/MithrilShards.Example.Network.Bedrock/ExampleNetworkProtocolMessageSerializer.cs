@@ -77,12 +77,14 @@ namespace MithrilShards.Example.Network.Bedrock
                if (_networkMessageSerializerManager
                   .TryDeserialize(commandName, ref payload, _peerContext.NegotiatedProtocolVersion.Version, _peerContext, out message!))
                {
+                  int payloadSize = _deserializationContext.GetTotalMessageLength();
+                  _logger.LogTrace("Received message '{Command}' with payload size {PayloadSize}.", commandName, payloadSize);
                   _peerContext.Metrics.Received(_deserializationContext.GetTotalMessageLength());
                   return true;
                }
                else
                {
-                  _logger.LogWarning("Serializer for message '{Command}' not found.", commandName);
+                  _logger.LogDebug("Serializer for message '{Command}' not found.", commandName);
                   message = new UnknownMessage(commandName, payload.ToArray());
                   _peerContext.Metrics.Wasted(_deserializationContext.GetTotalMessageLength());
                   return true;
@@ -277,11 +279,11 @@ namespace MithrilShards.Example.Network.Bedrock
                output.Write(payloadOutput.WrittenSpan);
 
                _peerContext.Metrics.Sent(ProtocolDefinition.HEADER_LENGTH + payloadSize);
-               _logger.LogDebug("Sent message '{Command}' with payload size {PayloadSize}.", command, payloadSize);
+               _logger.LogTrace("Sent message '{Command}' with payload size {PayloadSize}.", command, payloadSize);
             }
             else
             {
-               _logger.LogError("Serializer for message '{Command}' not found.", command);
+               _logger.LogDebug("Serializer for message '{Command}' not found.", command);
             }
          }
       }

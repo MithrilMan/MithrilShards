@@ -12,7 +12,7 @@ using MithrilShards.Core.DataTypes;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
-   public partial class BlockHeaderProcessor : IBlockFetcher
+   public partial class SynchronizationProcessor : IBlockFetcher
    {
       public uint GetScore()
       {
@@ -43,6 +43,14 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          await FetchBlockAsync(blockToDownload).ConfigureAwait(false);
          return true;
       }
+
+
+      //private bool ShouldRequestCompactBlock(HeaderNode lastHeader)
+      //{
+      //   return _status.SupportsDesiredCompactVersion
+      //      //TODO fix     && this.blockFetcherManager.BlocksInDownload == 0
+      //      && lastHeader.Previous?.IsValid(HeaderValidityStatuses.ValidChain) == true;
+      //}
 
 
       private async Task FetchBlockAsync(HeaderNode blockToDownload)
