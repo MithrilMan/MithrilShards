@@ -111,7 +111,7 @@ namespace MithrilShards.Core.Network
          }
          else
          {
-            _logger.LogInformation("Peer {PeerId} disconnected.", @event.PeerContext.PeerId);
+            _logger.LogDebug("Peer {PeerId} disconnected.", @event.PeerContext.PeerId);
          }
       }
 

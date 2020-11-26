@@ -172,10 +172,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
          return Task.CompletedTask;
       }
 
-      /// <summary>
-      /// Gets an anonymous object containing the feeds dump.
-      /// </summary>
-      /// <returns></returns>
+      /// <inheritdoc/>
       public object GetFeedsDump()
       {
          FetchAllStatistics(true, false);
