@@ -34,7 +34,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
          ).ToDictionary(reg => reg.Command, reg => reg.Serializer);
 
 
-         _logger.LogInformation(
+         _logger.LogDebug(
                   "Using {NetworkMessageSerializersCount} message network serializers: {NetworkMessageSerializers}.",
                   _serializers.Count,
                   _serializers.Keys.ToArray()

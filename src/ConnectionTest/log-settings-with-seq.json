@@ -7,16 +7,19 @@
             "Name": "Console",
             "Args": {
                "IncludeScopes": true,
-               "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console"
+               "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console",
+               "restrictedToMinimumLevel": "Information"
             }
          },
          {
             "Name": "Seq",
-            "Args": { "serverUrl": "http://localhost:5341" }
+            "Args": {
+               "serverUrl": "http://localhost:5341"
+            }
          }
       ],
       "MinimumLevel": {
-         "Default": "Debug",
+         "Default": "Verbose",
          "Override": {
             "Bedrock.Framework": "Warning",
             "Microsoft": "Warning",
