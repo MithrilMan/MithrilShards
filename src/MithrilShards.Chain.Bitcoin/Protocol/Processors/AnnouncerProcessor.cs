@@ -25,6 +25,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       readonly IChainState _chainState;
       readonly BitcoinSettings _settings;
 
+      public override bool Enabled => false; // Work in progress, actually disabled
+
       public AnnouncerProcessor(ILogger<DataFeederProcessor> logger,
                                   IEventBus eventBus,
                                   IDateTimeProvider dateTimeProvider,
