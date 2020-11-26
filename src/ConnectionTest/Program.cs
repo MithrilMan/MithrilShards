@@ -59,10 +59,11 @@ namespace ConnectionTest
 
             await new ForgeBuilder().UseForge<DefaultForge>(args, settings)
                                     .UseBitcoinChain(networkName: network, minimumSupportedVersion: Math.Min(KnownVersion.V70012, protocolVersion), currentVersion: protocolVersion)
+                                    .UseBitcoinDev()
                                     .UseSerilog(logSettings)
                                     .UseBedrockForgeServer<BitcoinNetworkProtocolMessageSerializer>()
                                     .UseStatisticsCollector(options => options.DumpOnConsoleOnKeyPress = true)
-                                    .UseDevController(assemblyScaffoldEnabler => assemblyScaffoldEnabler.LoadAssemblyFromType<BitcoinDev>())
+                                    .UseDevController()
                                     .RunConsoleAsync()
                                     .ConfigureAwait(false);
          });
