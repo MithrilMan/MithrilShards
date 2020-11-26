@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace MithrilShards.Core.Network.Protocol.Processors
 {
@@ -32,9 +33,12 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       /// The mapping between MessageType and which processor instance is able to handle the request.
       /// </summary>
       private readonly Dictionary<Type, List<ProcessorHandler>> _mapping = new Dictionary<Type, List<ProcessorHandler>>();
+      readonly ILogger<PeerNetworkMessageProcessorContainer> _logger;
 
-      public PeerNetworkMessageProcessorContainer(IEnumerable<INetworkMessageProcessor> processors)
+      public PeerNetworkMessageProcessorContainer(ILogger<PeerNetworkMessageProcessorContainer> logger, IEnumerable<INetworkMessageProcessor> processors)
       {
+         _logger = logger;
+
          ConfigureMapping(processors);
       }
 
@@ -43,34 +47,51 @@ namespace MithrilShards.Core.Network.Protocol.Processors
          Type refType = typeof(INetworkMessageHandler<>);
          foreach (INetworkMessageProcessor processor in processors)
          {
-            // skip processors that aren't enabled
-            if (!processor.Enabled) continue;
-
             Type processorType = processor.GetType();
 
-            IEnumerable<Type> handledMessageTypes = processorType.GetInterfaces()
-               .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == refType)
-               .Select(i => i.GetGenericArguments().First());
-
-            foreach (Type handledMessageType in handledMessageTypes)
+            using (_logger.BeginScope("Registering processor {ProcessorType}", processorType.Name))
             {
-               Type concreteMessageHandlerType = refType.MakeGenericType(handledMessageType);
-
-               InterfaceMapping interfaceMapping = processorType.GetInterfaceMap(concreteMessageHandlerType);
-               int methodIndex = Array.FindIndex(
-                  interfaceMapping.InterfaceMethods,
-                  method => method.Name == nameof(INetworkMessageHandler<INetworkMessage>.ProcessMessageAsync)
-                  );
-
-               MethodInfo method = interfaceMapping.TargetMethods[methodIndex];
-
-               if (!_mapping.TryGetValue(handledMessageType, out List<ProcessorHandler>? handlers))
+               // skip processors that aren't enabled
+               if (!processor.Enabled)
                {
-                  handlers = new List<ProcessorHandler>();
-                  _mapping[handledMessageType] = handlers;
+                  _logger.LogTrace("Processor {ProcessorType} is disabled, skipping its registration.", processorType.Name);
+                  continue;
                }
 
-               handlers.Add(new ProcessorHandler(processor, CreateLambdaWrapper(method)));
+               List<Type> handledMessageTypes = processorType.GetInterfaces()
+                  .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == refType)
+                  .Select(i => i.GetGenericArguments().First())
+                  .ToList();
+
+               if (handledMessageTypes.Count == 0)
+               {
+                  _logger.LogTrace("Processor {ProcessorType} do not handle any INetworkMessage.", processorType.Name);
+               }
+               else
+               {
+                  _logger.LogTrace("Registering {ProcessorType} handlers : {HandledMessageTypes}.", processorType.Name, handledMessageTypes.Select(h => h.Name).ToArray());
+               }
+
+               foreach (Type handledMessageType in handledMessageTypes)
+               {
+                  Type concreteMessageHandlerType = refType.MakeGenericType(handledMessageType);
+
+                  InterfaceMapping interfaceMapping = processorType.GetInterfaceMap(concreteMessageHandlerType);
+                  int methodIndex = Array.FindIndex(
+                     interfaceMapping.InterfaceMethods,
+                     method => method.Name == nameof(INetworkMessageHandler<INetworkMessage>.ProcessMessageAsync)
+                     );
+
+                  MethodInfo method = interfaceMapping.TargetMethods[methodIndex];
+
+                  if (!_mapping.TryGetValue(handledMessageType, out List<ProcessorHandler>? handlers))
+                  {
+                     handlers = new List<ProcessorHandler>();
+                     _mapping[handledMessageType] = handlers;
+                  }
+
+                  handlers.Add(new ProcessorHandler(processor, CreateLambdaWrapper(method)));
+               }
             }
          }
       }
