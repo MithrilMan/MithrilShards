@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -80,7 +81,7 @@ namespace MithrilShards.Dev.Controller
                   }
                   else if (service.Lifetime == ServiceLifetime.Singleton)
                   {
-                     services.AddSingleton(service.ServiceType, sp => _serviceProvider.GetService(service.ServiceType)); //resolve singletons from the main provider
+                     services.AddSingleton(service.ServiceType, sp => _serviceProvider.GetServices(service.ServiceType).First(s => service.ImplementationType == null || s.GetType() == service.ImplementationType)); //resolve singletons from the main provider
                   }
                   else
                   {
@@ -92,11 +93,17 @@ namespace MithrilShards.Dev.Controller
                   .AddSwaggerGen(setup => setup.SwaggerDoc("v1", new OpenApiInfo { Title = "Dev Controller", Version = "v1" }));
 
 
-               IMvcBuilder mvcBuilder = services.AddControllers()
+               IMvcBuilder mvcBuilder = services
+                  .AddControllers()
                   .ConfigureApplicationPartManager(mgr =>
                   {
                      mgr.FeatureProviders.Clear();
                      mgr.FeatureProviders.Add(new DevControllerFeatureProvider());
+                  })
+                  .AddJsonOptions(options =>
+                  {
+                     options.JsonSerializerOptions.WriteIndented = true;
+                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                   })
                   .AddMvcOptions(options => options.Conventions.Add(new DevControllerConvetion()));
 

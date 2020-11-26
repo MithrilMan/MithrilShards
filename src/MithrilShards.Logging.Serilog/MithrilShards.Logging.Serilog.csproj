@@ -16,8 +16,13 @@
     <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
   </ItemGroup>
 
+   <ItemGroup>
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
+    <ProjectReference Include="..\MithrilShards.Dev.Controller\MithrilShards.Dev.Controller.csproj" />
   </ItemGroup>
 
   <ItemGroup>
