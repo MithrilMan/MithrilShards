@@ -130,7 +130,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
          }
          else
          {
-            _logger.LogInformation("Peer {PeerId} disconnected from PeerBehaviorManager.", @event.PeerContext.PeerId);
+            _logger.LogDebug("Peer {PeerId} disconnected from PeerBehaviorManager.", @event.PeerContext.PeerId);
          }
       }
 

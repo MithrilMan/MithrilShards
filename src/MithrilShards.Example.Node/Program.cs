@@ -44,7 +44,7 @@ namespace MithrilShards.Example.Node
               .UseForge<DefaultForge>(args, settings)
               .UseSerilog(logSettings)
               .UseBedrockForgeServer<ExampleNetworkProtocolMessageSerializer>()
-              .UseStatisticsCollector()
+              .UseStatisticsCollector(options => options.DumpOnConsoleOnKeyPress = true)
               /// we are injecting ExampleDev type to allow devcontroller to find all the dev controllers defined there
               /// because only controller in added shard assemblies are discovered automatically.
               /// Passing ExampleDev will cause dotnet runtime to load the assembly where ExampleDev lies and will be

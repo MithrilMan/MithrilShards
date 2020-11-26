@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using MithrilShards.Core.Forge;
 using MithrilShards.Core.Statistics;
 
@@ -13,8 +15,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <param name="minimumSupportedVersion">The minimum version local nodes requires in order to connect to other peers.</param>
       /// <param name="currentVersion">The current version local peer aim to use with connected peers.</param>
       /// <returns></returns>
-      public static IForgeBuilder UseStatisticsCollector(this IForgeBuilder forgeBuilder)
+      public static IForgeBuilder UseStatisticsCollector(this IForgeBuilder forgeBuilder, Action<StatisticsCollectorOptions>? configuration = null)
       {
+         var options = new StatisticsCollectorOptions();
+         configuration?.Invoke(options);
+
          forgeBuilder.AddShard<StatisticsCollectorShard, StatisticsCollectorSettings>(
             (hostBuildContext, services) =>
             {
@@ -22,9 +27,24 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
                   .AddSingleton<IStatisticFeedsCollector, StatisticFeedsCollector>()
                   .AddHostedService(sp => sp.GetRequiredService<IStatisticFeedsCollector>())
                   ;
+
+               if (options.DumpOnConsoleOnKeyPress == true)
+               {
+                  services.AddSingleton<ConsoleKeyDumper>();
+               }
             });
 
          return forgeBuilder;
       }
    }
+
+   public class StatisticsCollectorOptions
+   {
+      /// <summary>
+      /// Gets or sets a value indicating whether to dump statistics on console on S key pressed.
+      /// </summary>
+      public bool DumpOnConsoleOnKeyPress { get; set; } = false;
+   }
+
+
 }
