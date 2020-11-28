@@ -138,7 +138,7 @@ namespace MithrilShards.Dev.Controller
                  }
                  catch (Exception ex)
                  {
-                    _logger.LogCritical(ex, "DevController API exception, {DevControllerException}. App will still run, without DevController funtionality", ex.Message);
+                    _logger.LogCritical(ex, "DevController API exception, {DevControllerException}. App will still run, without DevController functionality.", ex.Message);
                     // if we want to stop the application in case of exception, uncomment line below
                     // hostApplicationLifetime.StopApplication();
                  }

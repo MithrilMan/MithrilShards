@@ -48,7 +48,14 @@ namespace MithrilShards.Dev.Controller.Controllers
       {
          if (_mithrilShards.TryGetValue(shardType, out (IMithrilShard shard, IMithrilShardSettings shardSettings) shardData))
          {
-            return Ok(shardData.shardSettings);
+            if (shardData.shardSettings == null)
+            {
+               return Ok(new object());
+            }
+            else
+            {
+               return Ok(shardData.shardSettings);
+            }
          }
          else
          {
