@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -21,8 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
-    <ProjectReference Include="..\MithrilShards.Diagnostic.StatisticsCollector\MithrilShards.Diagnostic.StatisticsCollector.csproj" />
-    <ProjectReference Include="..\MithrilShards.WebApi\MithrilShards.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

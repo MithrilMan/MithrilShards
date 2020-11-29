@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.MithrilShards;
 using System.Linq;
+using System;
+using Microsoft.Extensions.Options;
 
 namespace MithrilShards.Dev.Controller.Controllers
 {
@@ -14,13 +16,18 @@ namespace MithrilShards.Dev.Controller.Controllers
    {
       readonly ILogger<PeerManagementControllerDev> _logger;
       readonly IEventBus _eventBus;
+      readonly IServiceProvider _serviceProvider;
       readonly Dictionary<string, (IMithrilShard shard, IMithrilShardSettings shardSettings)> _mithrilShards;
 
-      public ShardsControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IMithrilShard> mithrilShards, IEnumerable<IMithrilShardSettings> mithrilShardsSettings)
+      public ShardsControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IMithrilShard> mithrilShards, IServiceProvider serviceProvider, IEnumerable<IMithrilShardSettings> mithrilShardsSettings)
       {
          _logger = logger;
          _eventBus = eventBus;
-         _mithrilShards = mithrilShards.ToDictionary(shard => shard.GetType().Name, shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)));
+         _serviceProvider = serviceProvider;
+
+         _mithrilShards = mithrilShards.ToDictionary(
+            shard => shard.GetType().Name,
+            shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)));
       }
 
       [HttpGet]
@@ -54,7 +61,10 @@ namespace MithrilShards.Dev.Controller.Controllers
             }
             else
             {
-               return Ok(shardData.shardSettings);
+               var settings = _serviceProvider.GetService(typeof(IOptions<>).MakeGenericType(shardData.shardSettings.GetType()));
+               //var option = mithrilShardsSettings.Select(setting => serviceProvider.GetService(typeof(IOptions<>).MakeGenericType(setting.GetType())));
+
+               return Ok(settings);
             }
          }
          else

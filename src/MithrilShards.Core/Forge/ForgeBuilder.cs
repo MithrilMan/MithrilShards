@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,8 +22,9 @@ namespace MithrilShards.Core.Forge
       private readonly ILogger<ForgeBuilder> _logger;
       private bool _isForgeSet = false;
       private bool _createDefaultConfigurationFileNeeded = false;
+      private List<Action<IHostBuilder>> _preBuildActions = new List<Action<IHostBuilder>>();
+      private readonly HostBuilder _hostBuilder;
 
-      public readonly HostBuilder hostBuilder;
       public string ConfigurationFileName { get; private set; } = null!; //set to something meaningful during initialization
 
       public ForgeBuilder()
@@ -31,10 +33,10 @@ namespace MithrilShards.Core.Forge
          ILoggerFactory loggerFactory = LoggerFactory.Create(logging => logging.SetMinimumLevel(LogLevel.Warning).AddConsole());
          _logger = loggerFactory.CreateLogger<ForgeBuilder>();
 
-         hostBuilder = new HostBuilder();
+         _hostBuilder = new HostBuilder();
 
          // Add a new service provider configuration
-         hostBuilder
+         _hostBuilder
             .UseContentRoot(Directory.GetCurrentDirectory())
             .UseDefaultServiceProvider((context, options) =>
             {
@@ -64,7 +66,7 @@ namespace MithrilShards.Core.Forge
             throw new Exception($"Forge already set. Only one call to {nameof(UseForge)} is allowed");
          }
 
-         _ = hostBuilder.ConfigureServices((context, services) =>
+         _ = _hostBuilder.ConfigureServices((context, services) =>
          {
             if (_createDefaultConfigurationFileNeeded)
             {
@@ -94,35 +96,23 @@ namespace MithrilShards.Core.Forge
       }
 
 
-      //
-      // Summary:
-      //     Adds a delegate for configuring the provided Microsoft.Extensions.Logging.ILoggingBuilder.
-      //     This may be called multiple times.
-      //
-      // Parameters:
-      //   hostBuilder:
-      //     The Microsoft.Extensions.Hosting.IHostBuilder to configure.
-      //
-      //   configureLogging:
-      //     The delegate that configures the Microsoft.Extensions.Logging.ILoggingBuilder.
-      //
-      // Returns:
-      //     The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.
+      /// <inheritdoc/>
       public IForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging)
       {
-         hostBuilder.ConfigureLogging(configureLogging);
+         _hostBuilder.ConfigureLogging(configureLogging);
          return this;
       }
 
-      public IForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+      /// <inheritdoc/>
+      public IForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings>(Action<HostBuilderContext, IServiceCollection> configureDelegate, Action<IHostBuilder>? preBuildAction = null)
          where TMithrilShard : class, IMithrilShard
          where TMithrilShardSettings : class, IMithrilShardSettings, new()
       {
 
-         AddShard<TMithrilShard>(configureDelegate);
+         AddShard<TMithrilShard>(configureDelegate, preBuildAction);
 
          //register shard configuration settings
-         hostBuilder.ConfigureServices((context, services) =>
+         _hostBuilder.ConfigureServices((context, services) =>
          {
             services.Configure<TMithrilShardSettings>(MithrilShardSettingsManager.GetSection<TMithrilShardSettings>(context.Configuration));
 
@@ -133,16 +123,18 @@ namespace MithrilShards.Core.Forge
          return this;
       }
 
-      public IForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+      /// <inheritdoc/>
+      public IForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate, Action<IHostBuilder>? preBuildAction = null)
          where TMithrilShard : class, IMithrilShard
       {
+         _ = configureDelegate ?? throw new ArgumentNullException(nameof(configureDelegate));
 
-         if (configureDelegate is null)
+         if (preBuildAction != null)
          {
-            throw new ArgumentNullException(nameof(configureDelegate));
+            _preBuildActions.Add(preBuildAction);
          }
 
-         hostBuilder.ConfigureServices((context, services) =>
+         _hostBuilder.ConfigureServices((context, services) =>
          {
             services.AddSingleton<IMithrilShard, TMithrilShard>();
             configureDelegate(context, services);
@@ -151,47 +143,25 @@ namespace MithrilShards.Core.Forge
          return this;
       }
 
+      /// <inheritdoc/>
       public IForgeBuilder ExtendInnerHostBuilder(Action<IHostBuilder> extendHostBuilderAction)
       {
-         extendHostBuilderAction(hostBuilder);
+         extendHostBuilderAction(_hostBuilder);
          return this;
       }
 
-      /// <summary>
-      /// Adds the console log reading settings from Logging section if configuration file and displaying on standard console
-      /// </summary>
-      /// <returns></returns>
-      public IForgeBuilder AddConsoleLog()
-      {
-         ConfigureLogging((context, logging) =>
-         {
-            logging.AddConfiguration(context.Configuration.GetSection("Logging"));
-            logging.AddConsole();
-         });
 
-         return this;
-      }
-
-      //
-      // Summary:
-      //     Enables console support, builds and starts the host, and waits for Ctrl+C or
-      //     SIGTERM to shut down.
-      //
-      // Parameters:
-      //   hostBuilder:
-      //     The Microsoft.Extensions.Hosting.IHostBuilder to configure.
-      //
-      //   cancellationToken:
-      //     A System.Threading.CancellationToken that can be used to cancel the console.
-      //
-      // Returns:
-      //     A System.Threading.Tasks.Task that only completes when the token is triggered or
-      //     shutdown is triggered.
+      /// <inheritdoc/>
       public Task RunConsoleAsync(CancellationToken cancellationToken = default)
       {
          EnsureForgeIsSet();
 
-         return hostBuilder.RunConsoleAsync(cancellationToken);
+         foreach (var preBuildAction in _preBuildActions)
+         {
+            preBuildAction.Invoke(_hostBuilder);
+         }
+
+         return _hostBuilder.RunConsoleAsync(cancellationToken);
       }
 
       private void EnsureForgeIsSet()
@@ -213,7 +183,7 @@ namespace MithrilShards.Core.Forge
          }
          var configurationFileProvider = new PhysicalFileProvider(absoluteDirectoryPath);
 
-         _ = hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
+         _ = _hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
          {
             // do not change optional to true, because there is SetFileLoadExceptionHandler that will create a default file if missing.
             config.AddJsonFile(configurationFileProvider, Path.GetFileName(ConfigurationFileName), optional: false, reloadOnChange: true);
@@ -228,6 +198,13 @@ namespace MithrilShards.Core.Forge
             config.SetFileLoadExceptionHandler(CreateDefaultConfigurationFile);
          });
 
+         return this;
+      }
+
+      /// <inheritdoc/>
+      public IForgeBuilder ConfigureContext(Action<HostBuilderContext> configureContextDelegate)
+      {
+         _hostBuilder.ConfigureAppConfiguration((context, configurationBuilder) => configureContextDelegate(context));
          return this;
       }
    }

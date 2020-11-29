@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Net;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using MithrilShards.Core;
 using MithrilShards.Core.Forge;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Dev.Controller
 {
@@ -22,6 +26,22 @@ namespace MithrilShards.Dev.Controller
          forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>(
             (hostBuildContext, services) =>
             {
+               services.AddSingleton<ApiServiceDefinition>(sp =>
+               {
+                  var settings = sp.GetService<IOptions<DevControllerSettings>>().Value;
+
+                  if (!IPEndPoint.TryParse(settings.EndPoint, out IPEndPoint iPEndPoint))
+                  {
+                     ThrowHelper.ThrowArgumentException($"Wrong configuration parameter for {nameof(settings.EndPoint)}");
+                  }
+
+                  var definition = new ApiServiceDefinition { EndPoint = iPEndPoint, Name = "Dev Controller", SwaggerPath = "dev", Version = "v1" };
+
+                  forgeBuilder.AddApiService(definition);
+
+                  return definition;
+               });
+
                services.AddSingleton<DevAssemblyScaffolder>(scaffolder);
             });
 

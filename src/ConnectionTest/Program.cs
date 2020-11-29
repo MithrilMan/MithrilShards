@@ -63,6 +63,7 @@ namespace ConnectionTest
                                     .UseSerilog(logSettings)
                                     .UseBedrockForgeServer<BitcoinNetworkProtocolMessageSerializer>()
                                     .UseStatisticsCollector(options => options.DumpOnConsoleOnKeyPress = true)
+                                    .UseApi()
                                     .UseDevController()
                                     .RunConsoleAsync()
                                     .ConfigureAwait(false);
