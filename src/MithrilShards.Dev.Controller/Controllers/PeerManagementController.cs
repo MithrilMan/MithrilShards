@@ -8,30 +8,34 @@ using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Dev.Controller.Models.Requests;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Dev.Controller.Controllers
 {
-   [ApiController]
-   [Route("[controller]")]
-   public class PeerManagementControllerDev : ControllerBase
+   [Area(WebApiArea.AREA_DEV)]
+   public class PeerManagementController : MithrilControllerBase
    {
-      private readonly ILogger<PeerManagementControllerDev> _logger;
+      private readonly ILogger<PeerManagementController> _logger;
       readonly IEventBus _eventBus;
       readonly RequiredConnection? _requiredConnection;
 
-      public PeerManagementControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
+      public PeerManagementController(ILogger<PeerManagementController> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
       {
          _logger = logger;
          _eventBus = eventBus;
          _requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
       }
 
+      /// <summary>
+      /// Adds a connection request, trying to connect to the specified endpoint.
+      /// </summary>
+      /// <param name="request">The request.</param>
+      /// <returns></returns>
       [HttpPost]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status404NotFound)]
       [ProducesResponseType(StatusCodes.Status400BadRequest)]
-      [Route("Connect")]
-      public ActionResult<bool> Connect(PeerManagementConnectRequest request)
+      public IActionResult Connect(PeerManagementConnectRequest request)
       {
          if (_requiredConnection == null)
          {
@@ -43,14 +47,19 @@ namespace MithrilShards.Dev.Controller.Controllers
             return BadRequest("Incorrect endpoint");
          }
 
-         return Ok(_requiredConnection.TryAddEndPoint(ipEndPoint));
+         _requiredConnection.TryAddEndPoint(ipEndPoint);
+         return Ok();
       }
 
+      /// <summary>
+      /// Tries to disconnects from the specified endpoint.
+      /// </summary>
+      /// <param name="request">The request.</param>
+      /// <returns></returns>
       [HttpPost]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status400BadRequest)]
-      [Route("Disconnect")]
-      public ActionResult<bool> Disconnect(PeerManagementDisconnectRequest request)
+      public IActionResult Disconnect(PeerManagementDisconnectRequest request)
       {
          if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint ipEndPoint))
          {
@@ -58,7 +67,7 @@ namespace MithrilShards.Dev.Controller.Controllers
          }
 
          _eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));
-         return true;
+         return Ok();
       }
    }
 }

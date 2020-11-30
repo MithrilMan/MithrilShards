@@ -5,29 +5,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Dev.Controller;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Chain.Bitcoin.Dev
 {
-   [ApiController]
-   [DevController]
-   [Route("[controller]")]
-   public class ConsensusControllerDev : ControllerBase
+   [Area(WebApiArea.AREA_DEV)]
+   public class ConsensusController : MithrilControllerBase
    {
-      private readonly ILogger<ConsensusControllerDev> _logger;
+      private readonly ILogger<ConsensusController> _logger;
       readonly IEventBus _eventBus;
       readonly IChainState _chainState;
 
-      public ConsensusControllerDev(ILogger<ConsensusControllerDev> logger, IEventBus eventBus, IChainState chainState)
+      public ConsensusController(ILogger<ConsensusController> logger, IEventBus eventBus, IChainState chainState)
       {
          _logger = logger;
          _eventBus = eventBus;
          _chainState = chainState;
       }
 
+      /// <summary>
+      /// Shows a textual representation of best header tree.
+      /// </summary>
+      /// <returns></returns>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
-      [Route("ShowBestHeaderTree")]
       public ActionResult<string> ShowBestHeaderTree()
       {
          return Ok(DumpKnownTree(_chainState.BestHeader));

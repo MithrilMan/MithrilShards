@@ -25,12 +25,16 @@
       ]
    },
    "StatisticsCollector": {
-      "ContinuousConsoleDisplay": true,
+      "ContinuousConsoleDisplay": false,
       "ContinuousConsoleDisplayRate": 5
    },
    "DevController": {
+      "Enabled": true
+   },
+   "WebApi": {
+      "EndPoint": "127.0.0.1:45020",
       "Enabled": true,
-      "EndPoint": "127.0.0.1:45013"
+      "Https": false
    },
 
    "Serilog": {

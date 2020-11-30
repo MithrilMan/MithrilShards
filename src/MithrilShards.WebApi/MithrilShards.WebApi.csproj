@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+     <LangVersion>8.0</LangVersion>
+     <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\swagger_ui\custom.css" />
+    <None Remove="Resources\swagger_ui\index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\swagger_ui\custom.css" />
+    <EmbeddedResource Include="Resources\swagger_ui\index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.13" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
+  </ItemGroup>
+
+   <ItemGroup>
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
+  </ItemGroup>
+
+</Project>

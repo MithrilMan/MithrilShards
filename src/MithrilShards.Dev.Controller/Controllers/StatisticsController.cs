@@ -6,14 +6,13 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Statistics;
 using MithrilShards.Dev.Controller.Models.Responses;
 using MithrilShards.Diagnostic.StatisticsCollector.Models;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Dev.Controller.Controllers
 {
-   [ApiController]
-   [DevController]
+   [Area(WebApiArea.AREA_API)]
    [TypeFilter(typeof(StatisticOnlyActionFilterAttribute))]
-   [Route("[controller]")]
-   public class StatisticsController : ControllerBase
+   public class StatisticsController : MithrilControllerBase
    {
       private readonly ILogger<StatisticsController> _logger;
       // StatisticOnlyActionFilterAttribute will prevent to use actions in this controller if StatisticFeedsCollector isn't resolved
@@ -25,6 +24,10 @@ namespace MithrilShards.Dev.Controller.Controllers
          _statisticFeedsCollector = statisticFeedsCollector!;
       }
 
+      /// <summary>
+      /// Gets all the statistic feeds in a raw JSON format.
+      /// </summary>
+      /// <returns></returns>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -33,10 +36,14 @@ namespace MithrilShards.Dev.Controller.Controllers
          return Ok(_statisticFeedsCollector.GetFeedsDump());
       }
 
+      /// <summary>
+      /// Gets the specified statistic feed.
+      /// </summary>
+      /// <param name="feedId">The feed identifier.</param>
+      /// <param name="humanReadable">if set to <c>true</c> prints a human readable output, otherwise returns a JSON raw feed.</param>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status404NotFound)]
-      [Route("{feedId}")]
       public IActionResult GetFeedStats(string feedId, bool humanReadable)
       {
          try
@@ -55,10 +62,13 @@ namespace MithrilShards.Dev.Controller.Controllers
          }
       }
 
+      /// <summary>
+      /// Gets the available feeds.
+      /// </summary>
+      /// <returns></returns>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status404NotFound)]
-      [Route("AvailableFeeds")]
       public IEnumerable<StatisticsGetAvailableFeeds> GetAvailableFeeds()
       {
          return _statisticFeedsCollector.GetRegisteredFeedsDefinitions()

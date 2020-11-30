@@ -5,6 +5,10 @@
      <Nullable>enable</Nullable>
   </PropertyGroup>
 
+   <PropertyGroup>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
     <ProjectReference Include="..\MithrilShards.Dev.Controller\MithrilShards.Dev.Controller.csproj" />

@@ -1,0 +1,126 @@
+﻿<!-- HTML for static distribution bundle build -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>%(DocumentTitle)</title>
+   <link rel="stylesheet" type="text/css" href="./swagger-ui.css">
+   <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+   <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+   <style>
+
+      html {
+         box-sizing: border-box;
+         overflow: -moz-scrollbars-vertical;
+         overflow-y: scroll;
+      }
+
+      *,
+      *:before,
+      *:after {
+         box-sizing: inherit;
+      }
+
+      body {
+         margin: 0;
+         background: #FAFAFA;
+      }
+   </style>
+   %(HeadContent)
+</head>
+
+<body>
+   <div id="swagger-ui"></div>
+
+   <!-- Workaround for https://github.com/swagger-api/swagger-editor/issues/1371 -->
+   <script>
+      if (window.navigator.userAgent.indexOf("Edge") > -1) {
+         console.log("Removing native Edge fetch in favor of swagger-ui's polyfill")
+         window.fetch = undefined;
+      }
+   </script>
+
+   <script src="./swagger-ui-bundle.js"></script>
+   <script src="./swagger-ui-standalone-preset.js"></script>
+   <script>
+      const advancedFilterPlugin = function (system) {
+         return {
+            fn: {
+               opsFilter: function (taggedOps, phrase) {
+                  phrase = phrase.toLowerCase()
+                  var normalTaggedOps = JSON.parse(JSON.stringify(taggedOps));
+                  for (tagObj in normalTaggedOps) {
+                     var operations = normalTaggedOps[tagObj].operations;
+                     var i = operations.length;
+                     while (i--) {
+                        var operation = operations[i].operation;
+                        if ((operations[i].path.toLowerCase().indexOf(phrase) === -1)
+                           && (operation.summary === undefined || operation.summary.toLowerCase().indexOf(phrase) === -1)
+                           && (operation.description === undefined || operation.description.toLowerCase().indexOf(phrase) === -1)
+                        ) {
+                           operations.splice(i, 1);
+                        }
+                     }
+                     if (operations.length == 0) {
+                        delete normalTaggedOps[tagObj];
+                     }
+                     else {
+                        normalTaggedOps[tagObj].operations = operations;
+                     }
+                  }
+
+                  return system.Im.fromJS(normalTaggedOps);
+               }
+            }
+         };
+      };
+   </script>
+   <script>
+      window.onload = function () {
+         // Build a system
+         const caseInsensitiveFilterPlugin = function (system) {
+            return {
+               fn: {
+                  opsFilter: (taggedOps, phrase) => {
+                     return taggedOps.filter((tagObj, tag) => tag.toLowerCase().indexOf(phrase.toLowerCase()) !== -1);
+                  }
+               }
+            }
+         };
+
+         var configObject = JSON.parse('%(ConfigObject)');
+         var oauthConfigObject = JSON.parse('%(OAuthConfigObject)');
+
+         // Workaround for https://github.com/swagger-api/swagger-ui/issues/5945
+         configObject.urls.forEach(function (item) {
+            if (item.url.startsWith("http") || item.url.startsWith("/")) return;
+            item.url = window.location.href.replace("index.html", item.url).split('#')[0];
+         });
+
+         // If validatorUrl is not explicitly provided, disable the feature by setting to null
+         if (!configObject.hasOwnProperty("validatorUrl"))
+            configObject.validatorUrl = null
+
+         // If oauth2RedirectUrl isn't specified, use the built-in default
+         if (!configObject.hasOwnProperty("oauth2RedirectUrl"))
+            configObject.oauth2RedirectUrl = window.location.href.replace("index.html", "oauth2-redirect.html").split('#')[0];
+
+         // Apply mandatory parameters
+         configObject.dom_id = "#swagger-ui";
+         configObject.presets = [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset];
+         configObject.layout = "StandaloneLayout";
+         configObject.plugins = [advancedFilterPlugin];
+
+         // Begin Swagger UI call region
+
+         const ui = SwaggerUIBundle(configObject);
+
+         ui.initOAuth(oauthConfigObject);
+
+         // End Swagger UI call region
+
+         window.ui = ui
+      }
+   </script>
+</body>
+</html>

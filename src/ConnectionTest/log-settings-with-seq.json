@@ -8,7 +8,7 @@
             "Args": {
                "IncludeScopes": true,
                "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console",
-               "restrictedToMinimumLevel": "Verbose"
+               "restrictedToMinimumLevel": "Information"
             }
          },
          {

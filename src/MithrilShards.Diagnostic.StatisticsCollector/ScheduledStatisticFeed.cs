@@ -97,13 +97,13 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public object GetLastResultsDump()
       {
-         return System.Text.Json.JsonSerializer.Serialize(new
+         return new
          {
             Title = StatisticFeedDefinition.Title,
             Time = LastResultsDate,
             Labels = from fieldDefinition in StatisticFeedDefinition.FieldsDefinition select fieldDefinition.Label,
             Values = lastResults
-         });
+         };
       }
 
       public void SetLastResults(IEnumerable<string?[]> results)

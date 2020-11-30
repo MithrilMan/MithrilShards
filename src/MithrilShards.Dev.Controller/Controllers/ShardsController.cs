@@ -5,27 +5,37 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.MithrilShards;
 using System.Linq;
+using System;
+using Microsoft.Extensions.Options;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Dev.Controller.Controllers
 {
-   [ApiController]
-   [Route("[controller]")]
-   public class ShardsControllerDev : ControllerBase
+   [Area(WebApiArea.AREA_DEV)]
+   public class ShardsController : MithrilControllerBase
    {
-      readonly ILogger<PeerManagementControllerDev> _logger;
+      readonly ILogger<PeerManagementController> _logger;
       readonly IEventBus _eventBus;
+      readonly IServiceProvider _serviceProvider;
       readonly Dictionary<string, (IMithrilShard shard, IMithrilShardSettings shardSettings)> _mithrilShards;
 
-      public ShardsControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IMithrilShard> mithrilShards, IEnumerable<IMithrilShardSettings> mithrilShardsSettings)
+      public ShardsController(ILogger<PeerManagementController> logger, IEventBus eventBus, IEnumerable<IMithrilShard> mithrilShards, IServiceProvider serviceProvider, IEnumerable<IMithrilShardSettings> mithrilShardsSettings)
       {
          _logger = logger;
          _eventBus = eventBus;
-         _mithrilShards = mithrilShards.ToDictionary(shard => shard.GetType().Name, shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)));
+         _serviceProvider = serviceProvider;
+
+         _mithrilShards = mithrilShards.ToDictionary(
+            shard => shard.GetType().Name,
+            shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)));
       }
 
+      /// <summary>
+      /// Lists the available shards.
+      /// </summary>
+      /// <returns></returns>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
-      [ProducesResponseType(StatusCodes.Status404NotFound)]
       public IActionResult GetShards()
       {
 
@@ -41,14 +51,34 @@ namespace MithrilShards.Dev.Controller.Controllers
             });
       }
 
-      [HttpGet("{shardType}")]
+      /// <summary>
+      /// Gets the shard configuration, if exists.
+      /// </summary>
+      /// <remarks>
+      /// A shard setting is not mandatory, so there could be shards without settings.
+      /// A shard can have at maximum one settings class.
+      /// There isn't a built-in mechanism to link between a setting and a shard, so by convention we consider a shard setting
+      /// being a setting that lies within the same assembly of the shard.
+      /// Multiple shards in the same assembly is not supported by this endpoints.
+      /// </remarks>
+      /// <param name="shardType">Type of the shard.</param>
+      /// <returns></returns>
+      [HttpGet()]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status404NotFound)]
-      public IActionResult GetShardConfiguration(string shardType)
+      public IActionResult GetShardConfiguration([FromQuery] string shardType)
       {
          if (_mithrilShards.TryGetValue(shardType, out (IMithrilShard shard, IMithrilShardSettings shardSettings) shardData))
          {
-            return Ok(shardData.shardSettings);
+            if (shardData.shardSettings == null)
+            {
+               return Ok(new object());
+            }
+            else
+            {
+               var settings = _serviceProvider.GetService(typeof(IOptions<>).MakeGenericType(shardData.shardSettings.GetType()));
+               return Ok(settings);
+            }
          }
          else
          {
