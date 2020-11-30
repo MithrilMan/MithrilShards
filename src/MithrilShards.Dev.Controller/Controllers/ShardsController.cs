@@ -30,6 +30,10 @@ namespace MithrilShards.Dev.Controller.Controllers
             shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)));
       }
 
+      /// <summary>
+      /// Lists the available shards.
+      /// </summary>
+      /// <returns></returns>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
       public IActionResult GetShards()
@@ -59,9 +63,10 @@ namespace MithrilShards.Dev.Controller.Controllers
       /// </remarks>
       /// <param name="shardType">Type of the shard.</param>
       /// <returns></returns>
-      [HttpGet("{shardType}")]
-      [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
-      public IActionResult GetShardConfiguration(string shardType)
+      [HttpGet()]
+      [ProducesResponseType(StatusCodes.Status200OK)]
+      [ProducesResponseType(StatusCodes.Status404NotFound)]
+      public IActionResult GetShardConfiguration([FromQuery] string shardType)
       {
          if (_mithrilShards.TryGetValue(shardType, out (IMithrilShard shard, IMithrilShardSettings shardSettings) shardData))
          {

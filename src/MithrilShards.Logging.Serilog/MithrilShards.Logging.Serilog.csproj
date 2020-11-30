@@ -6,6 +6,10 @@
      <Nullable>enable</Nullable>
   </PropertyGroup>
 
+   <PropertyGroup>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>

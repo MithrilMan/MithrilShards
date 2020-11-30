@@ -4,6 +4,6 @@ namespace MithrilShards.WebApi
 {
    [ApiController]
    [Produces("application/json")]
-   [Route("[area]/[controller]")]
-   public class MithrilControllerBase : ControllerBase { }
+   [Route("[area]/[controller]/[action]")]
+   public abstract class MithrilControllerBase : ControllerBase { }
 }

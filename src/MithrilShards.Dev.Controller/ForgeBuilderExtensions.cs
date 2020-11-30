@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core;
@@ -14,14 +13,10 @@ namespace MithrilShards.Dev.Controller
       /// Uses the bitcoin chain.
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
-      /// <param name="assemblyScaffoldEnabler">Action to wake up assembly that doesn't have an entry point, allowing to discover Dev Controllers in that assembly.
-      /// Useful to include these assemblies that didn't have an entry point and wouldn't be loaded.</param>
+      /// Useful to include these assemblies that didn't have an entry point and wouldn't be loaded.
       /// <returns></returns>
-      public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder, Action<DevAssemblyScaffolder>? assemblyScaffoldEnabler = null)
+      public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder)
       {
-         var scaffolder = new DevAssemblyScaffolder();
-         assemblyScaffoldEnabler?.Invoke(scaffolder);
-
          forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>(
             (hostBuildContext, services) =>
             {
@@ -37,10 +32,9 @@ namespace MithrilShards.Dev.Controller
                   var definition = new ApiServiceDefinition
                   {
                      Enabled = settings.Enabled,
-                     EndPoint = iPEndPoint,
                      Area = WebApiArea.AREA_DEV,
-                     Name = "Dev Controller",
-                     Description = "Controllers useful for debug purpose",
+                     Name = "Dev API",
+                     Description = "API useful for debug purpose.",
                      Version = "v1",
                   };
 
@@ -48,8 +42,6 @@ namespace MithrilShards.Dev.Controller
 
                   return definition;
                });
-
-               services.AddSingleton<DevAssemblyScaffolder>(scaffolder);
             });
 
          return forgeBuilder;

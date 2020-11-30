@@ -20,9 +20,12 @@ namespace MithrilShards.Chain.Bitcoin.Dev
          _blockFetcherManager = blockFetcherManager;
       }
 
+      /// <summary>
+      /// Gets a view into the Block Fetch Manager internal details.
+      /// </summary>
+      /// <returns></returns>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
-      [Route("GetInsight")]
       public ActionResult<string> GetInsight()
       {
          return Ok(((IDebugInsight)_blockFetcherManager).GetInsight());

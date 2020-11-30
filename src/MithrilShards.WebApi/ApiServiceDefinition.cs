@@ -8,8 +8,6 @@ namespace MithrilShards.WebApi
 {
    public class ApiServiceDefinition
    {
-      public IPEndPoint? EndPoint { get; set; }
-
       /// <summary>
       /// The name of the endpoint, used to generate a SwaggerEndpoint.
       /// </summary>
@@ -25,9 +23,10 @@ namespace MithrilShards.WebApi
       /// </summary>
       public string Area { get; set; } = string.Empty;
 
+      /// <summary>
+      /// Gets or sets the WEB API service version.
+      /// </summary>
       public string Version { get; set; } = "v1";
-
-      public bool Https { get; set; } = false;
 
       /// <summary>
       /// Gets or sets a value indicating whether this <see cref="ApiServiceDefinition"/> is enabled.

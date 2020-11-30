@@ -20,11 +20,15 @@
       ]
    },
    "StatisticsCollector": {
-      "ContinuousConsoleDisplay": true,
+      "ContinuousConsoleDisplay": false,
       "ContinuousConsoleDisplayRate": 5
    },
    "DevController": {
+      "Enabled": false
+   },
+   "WebApi": {
+      "EndPoint": "127.0.0.1:45080",
       "Enabled": false,
-      "EndPoint": "127.0.0.1:45013"
+      "Https": false
    }
 }

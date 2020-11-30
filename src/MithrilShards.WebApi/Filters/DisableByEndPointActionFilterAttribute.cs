@@ -46,7 +46,7 @@ namespace MithrilShards.Dev.Controller
          }
          else if (apiAreaDefinition.Enabled == false)
          {
-            context.Result = new ObjectResult($"Cannot execute the required action because the controller area is disabled.") { StatusCode = StatusCodes.Status501NotImplemented };
+            context.Result = new ObjectResult($"Cannot execute the required action because the API service {apiAreaDefinition.Area} is disabled.") { StatusCode = StatusCodes.Status501NotImplemented };
             return;
          }
 

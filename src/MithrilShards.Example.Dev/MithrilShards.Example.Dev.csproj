@@ -4,6 +4,10 @@
       <TargetFramework>netcoreapp3.1</TargetFramework>
    </PropertyGroup>
 
+   <PropertyGroup>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+   </PropertyGroup>
+
    <ItemGroup>
       <ProjectReference Include="..\MithrilShards.Example\MithrilShards.Example.csproj" />
       <ProjectReference Include="..\MithrilShards.Dev.Controller\MithrilShards.Dev.Controller.csproj" />

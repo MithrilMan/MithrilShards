@@ -17,15 +17,19 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
 using MithrilShards.WebApi.Filters.OperationFilters;
 using MithrilShards.Dev.Controller;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Net;
+using MithrilShards.WebApi.Conventions;
 
 namespace MithrilShards.Core.Forge
 {
    public static class ForgeBuilderExtensions
    {
-      private const string SWAGGER_ROUTE_PREFIX = "api";
+      private const string SWAGGER_ROUTE_PREFIX = "docs";
 
       /// <summary>
-      /// Uses the bitcoin chain.
+      /// Extension used by other shards to create custom <see cref="ApiServiceDefinition"/>.
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
       /// <returns></returns>
@@ -60,12 +64,39 @@ namespace MithrilShards.Core.Forge
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
       /// <returns></returns>
-      public static IForgeBuilder UseApi(this IForgeBuilder forgeBuilder)
+      public static IForgeBuilder UseApi(this IForgeBuilder forgeBuilder, Action<WebApiOptions>? options = null)
       {
-         forgeBuilder.AddShard<WebApiShard>((context, services) =>
+         var optionsInstance = new WebApiOptions();
+         options?.Invoke(optionsInstance);
+         optionsInstance.Scaffold();
+
+         forgeBuilder.AddShard<WebApiShard, WebApiSettings>((context, services) =>
          {
+            if (optionsInstance.EnablePublicApi)
+            {
+               services.AddSingleton<ApiServiceDefinition>(sp =>
+               {
+                  var settings = sp.GetService<IOptions<WebApiSettings>>().Value;
 
+                  if (!IPEndPoint.TryParse(settings.EndPoint, out IPEndPoint iPEndPoint))
+                  {
+                     ThrowHelper.ThrowArgumentException($"Wrong configuration parameter for {nameof(settings.EndPoint)}");
+                  }
 
+                  var definition = new ApiServiceDefinition
+                  {
+                     Enabled = settings.Enabled,
+                     Area = WebApiArea.AREA_API,
+                     Name = "API",
+                     Description = "General availability APIs",
+                     Version = "v1",
+                  };
+
+                  forgeBuilder.AddApiService(definition);
+
+                  return definition;
+               });
+            }
          }, preBuildAction: (iHostBuilder) =>
          {
             iHostBuilder.ConfigureWebHost(configure =>
@@ -73,19 +104,38 @@ namespace MithrilShards.Core.Forge
                configure
                   .UseKestrel(serverOptions =>
                   {
-                     IEnumerable<ApiServiceDefinition> apiServiceDefinitions = serverOptions.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>();
+                     var logger = serverOptions.ApplicationServices.GetService<ILogger<WebApiShard>>();
 
+                     IEnumerable<ApiServiceDefinition> apiServiceDefinitions = serverOptions.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>();
+                     var webApiSettings = serverOptions.ApplicationServices.GetService<IOptions<WebApiSettings>>().Value;
+                     webApiSettings.ValidateEndPoint(out IPEndPoint ipEndPoint);
+
+                     // sanity check of registered ApiServiceDefinition
                      foreach (var apiServiceDefinition in apiServiceDefinitions)
                      {
-                        if (!apiServiceDefinition.Enabled) continue; //don't listen disabled api services
+                        apiServiceDefinition.CheckValidity();
+                     }
 
-                        serverOptions.Listen(apiServiceDefinition.EndPoint, options =>
+                     //check for duplicated areas
+                     var duplicatedArea = apiServiceDefinitions.GroupBy(d => d.Area).FirstOrDefault(g => g.Count() > 1);
+                     if (duplicatedArea != null)
+                     {
+                        ThrowHelper.ThrowArgumentException($"Multiple {nameof(ApiServiceDefinition)} defined with the same Area {duplicatedArea.Key}");
+                     }
+
+                     if (webApiSettings.Enabled)
+                     {
+                        serverOptions.Listen(ipEndPoint, options =>
                          {
-                            if (apiServiceDefinition.Https)
+                            if (webApiSettings.Https)
                             {
                                options.UseHttps();
                             }
                          });
+
+                        string rootUrl = webApiSettings.GetListeningUrl();
+                        string apiUrl = $"{rootUrl}/{SWAGGER_ROUTE_PREFIX}";
+                        logger.LogInformation("Configured WEB API listener to {ApiEndPoint}. Swagger documentation at URL {SwaggerEndPoint}", rootUrl, apiUrl);
                      }
                   })
                   .ConfigureServices(services =>
@@ -94,8 +144,8 @@ namespace MithrilShards.Core.Forge
                      var logger = tempServiceProvider.GetService<ILogger<WebApiShard>>();
 
                      IEnumerable<Assembly> assembliesToScaffold = tempServiceProvider.GetService<IEnumerable<IMithrilShard>>()
-                     .Select(shard => shard.GetType().Assembly);
-                     // .Concat(_devAssemblyScaffolder?.GetAssemblies());
+                     .Select(shard => shard.GetType().Assembly)
+                     .Concat(optionsInstance.Scaffolder.GetAssemblies());
 
                      IEnumerable<ApiServiceDefinition> apiServiceDefinitions = tempServiceProvider.GetService<IEnumerable<ApiServiceDefinition>>();
 
@@ -110,7 +160,22 @@ namespace MithrilShards.Core.Forge
                            var documentFilterMethod = setup.GetType().GetMethod("DocumentFilter");
                            foreach (var apiServiceDefinition in apiServiceDefinitions)
                            {
-                              setup.SwaggerDoc($"{apiServiceDefinition.Area}-{apiServiceDefinition.Version}", new OpenApiInfo { Title = apiServiceDefinition.Name, Version = apiServiceDefinition.Version });
+                              setup.SwaggerDoc(
+                                 $"{apiServiceDefinition.Area}-{apiServiceDefinition.Version}",
+                                 new OpenApiInfo
+                                 {
+                                    Title = apiServiceDefinition.Name,
+                                    Version = $"{apiServiceDefinition.Area}-{apiServiceDefinition.Version}",
+                                    Description = apiServiceDefinition.Description
+                                 });
+
+                              setup.DocInclusionPredicate((x, api) =>
+                              {
+                                 // actually version number isn't considered
+                                 var parts = x.Split("-");
+                                 return parts[0] == api.GroupName;
+                              });
+
                               foreach (IDocumentFilter documentFilter in apiServiceDefinition.DocumentFilters)
                               {
                                  documentFilterMethod!.MakeGenericMethod(documentFilter.GetType()).Invoke(setup, null);
@@ -132,27 +197,27 @@ namespace MithrilShards.Core.Forge
                               }
                               else
                               {
-                                 logger.LogDebug("Cannot find API documentation file {ApiDocumentationPath}", xmlPath);
+                                 logger.LogTrace("Cannot find API documentation file {ApiDocumentationPath}", xmlPath);
                               }
                            }
                         });
 
                      var mvcBuilder = services
-                        .AddControllers(configure => configure.Filters.Add<DisableByEndPointActionFilterAttribute>())
+                        .AddControllers(configure =>
+                        {
+                           // adding filters to consume and produce json and to disable controllers that don't belong to an Area
+                           configure.Filters.Add(new ConsumesAttribute("application/json"));
+                           configure.Filters.Add(new ProducesAttribute("application/json"));
+                           configure.Filters.Add<DisableByEndPointActionFilterAttribute>();
+
+                           configure.Conventions.Add(new ApiExplorerGroupPerVersionConvention());
+                        })
                         .AddJsonOptions(options =>
                         {
                            options.JsonSerializerOptions.WriteIndented = true;
+                           options.JsonSerializerOptions.IgnoreNullValues = true;
                            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                         });
-
-                     //   .ConfigureApplicationPartManager(mgr =>
-                     //    {
-                     //       mgr.FeatureProviders.Clear();
-                     //       mgr.FeatureProviders.Add(new DevControllerFeatureProvider());
-                     //    })
-                     //.AddMvcOptions(options => options.Conventions.Add(new DevControllerConvetion()));
-
-
 
                      // creates application part for each shard and assembly containing controllers.
                      foreach (Assembly shardAssembly in assembliesToScaffold)
@@ -160,53 +225,64 @@ namespace MithrilShards.Core.Forge
                         mvcBuilder.AddApplicationPart(shardAssembly);
                      }
                   })
-                  .Configure(app => app
-                     .UseRouting()
-                     .UseSwagger()
-                     .UseSwaggerUI(setup =>
-                     {
-                        setup.RoutePrefix = SWAGGER_ROUTE_PREFIX;
-                        setup.InjectStylesheet("/swagger_ui/custom.css");
-
-                        IEnumerable<ApiServiceDefinition> apiServiceDefinitions = app.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>();
-                        var logger = app.ApplicationServices.GetService<ILogger<WebApiShard>>();
-
-                        logger.LogDebug("Configuring WEB API EndPoints.");
-
-                        foreach (var apiServiceDefinition in apiServiceDefinitions)
-                        {
-                           if (apiServiceDefinition.Enabled)
-                           {
-                              string swaggerEndPointUrl = $"/swagger/{apiServiceDefinition.Area}-{apiServiceDefinition.Version}/swagger.json";
-                              setup.SwaggerEndpoint(swaggerEndPointUrl, apiServiceDefinition.Name);
-
-                              string rootUrl = $"{(apiServiceDefinition.Https ? "https" : "http")}://{apiServiceDefinition.EndPoint}";
-                              string apiUrl = $"{rootUrl}/{SWAGGER_ROUTE_PREFIX}";
-                              logger.LogInformation("Configured API listener to {ApiEndPoint}. Swagger endpoint at URL {SwaggerEndPoint}", apiUrl, rootUrl + swaggerEndPointUrl);
-                           }
-                           else
-                           {
-                              logger.LogWarning("WEB API service {WebApiService} disabled, {WebApiServiceEndPoint} will not be available.", apiServiceDefinition.Name, apiServiceDefinition.EndPoint);
-                           }
-                        }
-
-                        app.UseStaticFiles(new StaticFileOptions
-                        {
-                           RequestPath = new PathString($"/swagger_ui"),
-                           FileProvider = new EmbeddedFileProvider(typeof(WebApiShard).Assembly, "MithrilShards.WebApi.Resources.swagger_ui")
-                        })
-                        .UseEndpoints(endpoints =>
-                        {
-                           endpoints.MapControllers();
-                        });
-
-
-                     })
-                  );
+                  .Configure(SwaggerConfiguration);
             });
          });
 
          return forgeBuilder;
+      }
+
+      private static void SwaggerConfiguration(IApplicationBuilder app)
+      {
+         IEnumerable<ApiServiceDefinition> apiServiceDefinitions = app.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>();
+         var logger = app.ApplicationServices.GetService<ILogger<WebApiShard>>();
+
+         var webApiSettings = app.ApplicationServices.GetService<IOptions<WebApiSettings>>().Value;
+         webApiSettings.ValidateEndPoint(out IPEndPoint ipEndPoint);
+
+         app
+            .UseRouting()
+            .UseSwagger(setup =>
+            {
+               setup.RouteTemplate = "docs/{documentName}/openapi.json";
+            })
+            .UseEndpoints(endpoints =>
+            {
+               endpoints.MapControllers();
+            })
+            .UseSwaggerUI(setup =>
+            {
+               setup.RoutePrefix = SWAGGER_ROUTE_PREFIX;
+               setup.InjectStylesheet("/swagger_ui/custom.css");
+               setup.DocumentTitle = "Mithril Shards WEB APIs";
+               setup.DisplayOperationId();
+               setup.EnableFilter();
+
+               setup.IndexStream = () => typeof(WebApiShard).Assembly.GetManifestResourceStream("MithrilShards.WebApi.Resources.swagger_ui.index.html");
+
+               logger.LogDebug("Configuring WEB API OpenAPI documents.");
+
+               foreach (var apiServiceDefinition in apiServiceDefinitions)
+               {
+                  if (apiServiceDefinition.Enabled)
+                  {
+                     string swaggerEndPointUrl = $"/docs/{apiServiceDefinition.Area}-{apiServiceDefinition.Version}/openapi.json";
+                     setup.SwaggerEndpoint(swaggerEndPointUrl, apiServiceDefinition.Name);
+
+                     var swaggerUIRoot = $"{webApiSettings.GetListeningUrl()}{swaggerEndPointUrl}";
+                     logger.LogInformation("{WebApiService} OpenApi service specification generated at {SwaggerEndPoint}", apiServiceDefinition.Name, swaggerUIRoot);
+                  }
+                  else
+                  {
+                     logger.LogWarning("WEB API service {WebApiService} disabled, area {WebApiServiceArea} will not be available.", apiServiceDefinition.Name, apiServiceDefinition.Area);
+                  }
+               }
+            })
+            .UseStaticFiles(new StaticFileOptions
+            {
+               RequestPath = new PathString($"/swagger_ui"),
+               FileProvider = new EmbeddedFileProvider(typeof(WebApiShard).Assembly, "MithrilShards.WebApi.Resources.swagger_ui")
+            });
       }
    }
 }

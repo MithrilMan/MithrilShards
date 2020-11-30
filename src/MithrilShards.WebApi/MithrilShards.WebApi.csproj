@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <None Remove="Resources\swagger_ui\custom.css" />
+    <None Remove="Resources\swagger_ui\index.html" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\swagger_ui\custom.css" />
+    <EmbeddedResource Include="Resources\swagger_ui\index.html" />
   </ItemGroup>
 
   <ItemGroup>

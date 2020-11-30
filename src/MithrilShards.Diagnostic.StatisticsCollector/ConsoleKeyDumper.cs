@@ -52,15 +52,16 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
       private bool DumpKeyPressed()
       {
+         bool found = false;
          while (Console.KeyAvailable)
          {
             if (Console.ReadKey(true).Key == ConsoleKey.S)
             {
-               return true;
+               found = true; //don't stop, keep consuming inputs
             }
          }
 
-         return false;
+         return found;
       }
    }
 }

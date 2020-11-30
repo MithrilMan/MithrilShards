@@ -23,9 +23,12 @@ namespace MithrilShards.Chain.Bitcoin.Dev
          _chainState = chainState;
       }
 
+      /// <summary>
+      /// Shows a textual representation of best header tree.
+      /// </summary>
+      /// <returns></returns>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK)]
-      [Route("ShowBestHeaderTree")]
       public ActionResult<string> ShowBestHeaderTree()
       {
          return Ok(DumpKnownTree(_chainState.BestHeader));
