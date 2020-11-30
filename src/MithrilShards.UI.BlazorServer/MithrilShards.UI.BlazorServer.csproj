@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+   <PropertyGroup>
+      <TargetFramework>netcoreapp3.1</TargetFramework>
+      <LangVersion>8.0</LangVersion>
+      <Nullable>enable</Nullable>
+      <OutputType>Library</OutputType>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <PackageReference Include="Blazorise.Bootstrap" Version="0.9.2.2" />
+      <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.2.2" />
+      <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
+         <PrivateAssets>all</PrivateAssets>
+         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.13" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
+   </ItemGroup>
+
+</Project>

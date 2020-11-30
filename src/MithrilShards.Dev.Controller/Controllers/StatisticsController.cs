@@ -6,14 +6,13 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Core.Statistics;
 using MithrilShards.Dev.Controller.Models.Responses;
 using MithrilShards.Diagnostic.StatisticsCollector.Models;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Dev.Controller.Controllers
 {
-   [ApiController]
-   [DevController]
+   [Area(WebApiArea.AREA_API)]
    [TypeFilter(typeof(StatisticOnlyActionFilterAttribute))]
-   [Route("[controller]")]
-   public class StatisticsController : ControllerBase
+   public class StatisticsController : MithrilControllerBase
    {
       private readonly ILogger<StatisticsController> _logger;
       // StatisticOnlyActionFilterAttribute will prevent to use actions in this controller if StatisticFeedsCollector isn't resolved

@@ -3,26 +3,26 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Example.Protocol.Processors;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Example.Dev
 {
    /// <summary>
    /// An example of a Dev Controller (controllers meant to be exposed to the Dev.Controller shard that exposes endpoints through a dedicated swagger endpoint.
-   /// In order to be discoverable by Dev Controller, this controller class name has to end with suffix "ControllerDev" or being decorated with a DevControllerAttribute.
+   /// In order to be discoverable by Dev Controller, this controller has to inherit from MithrilControllerBase class name has to end with suffix "ControllerDev" or being decorated with a DevControllerAttribute.
    ///
    /// In this example we are obtaining a reference to our PingPongProcessor in order to be able to add and remove quotes that can be sent as a ping response.
    /// PingPongProcessor is a processor that we registered thanks to assembly scaffolding in <see cref="ForgeBuilderExtensions.AddMessageProcessors"/> so we can
    /// just have a reference of it in our constructor and it will be injected automatically during the instantiation of this class.
    /// </summary>
-   /// <seealso cref="Microsoft.AspNetCore.Mvc.ControllerBase" />
-   [ApiController]
-   [Route("[controller]")]
-   public class ExampleControllerDev : ControllerBase
+   /// <seealso cref="MithrilControllerBase" />
+   [Area(WebApiArea.AREA_DEV)]
+   public class ExampleController : MithrilControllerBase
    {
-      private readonly ILogger<ExampleControllerDev> _logger;
+      private readonly ILogger<ExampleController> _logger;
       readonly IQuoteService _quoteService;
 
-      public ExampleControllerDev(ILogger<ExampleControllerDev> logger, IQuoteService quoteService)
+      public ExampleController(ILogger<ExampleController> logger, IQuoteService quoteService)
       {
          _logger = logger;
          _quoteService = quoteService;

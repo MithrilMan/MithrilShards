@@ -8,18 +8,18 @@ using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Events;
 using MithrilShards.Dev.Controller.Models.Requests;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Dev.Controller.Controllers
 {
-   [ApiController]
-   [Route("[controller]")]
-   public class PeerManagementControllerDev : ControllerBase
+   [Area(WebApiArea.AREA_DEV)]
+   public class PeerManagementController : MithrilControllerBase
    {
-      private readonly ILogger<PeerManagementControllerDev> _logger;
+      private readonly ILogger<PeerManagementController> _logger;
       readonly IEventBus _eventBus;
       readonly RequiredConnection? _requiredConnection;
 
-      public PeerManagementControllerDev(ILogger<PeerManagementControllerDev> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
+      public PeerManagementController(ILogger<PeerManagementController> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
       {
          _logger = logger;
          _eventBus = eventBus;

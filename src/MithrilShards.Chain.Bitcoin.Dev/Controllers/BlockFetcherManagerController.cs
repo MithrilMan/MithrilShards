@@ -4,19 +4,17 @@ using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
 using MithrilShards.Core.DevTools;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Dev.Controller;
+using MithrilShards.WebApi;
 
 namespace MithrilShards.Chain.Bitcoin.Dev
 {
-   [ApiController]
-   [DevController]
-   [Route("[controller]")]
-   public class BlockFetcherManagerControllerDev : ControllerBase
+   [Area(WebApiArea.AREA_DEV)]
+   public class BlockFetcherManagerController : MithrilControllerBase
    {
-      private readonly ILogger<ConsensusControllerDev> _logger;
+      private readonly ILogger<ConsensusController> _logger;
       readonly IBlockFetcherManager _blockFetcherManager;
 
-      public BlockFetcherManagerControllerDev(ILogger<ConsensusControllerDev> logger, IEventBus eventBus, IBlockFetcherManager blockFetcherManager)
+      public BlockFetcherManagerController(ILogger<ConsensusController> logger, IEventBus eventBus, IBlockFetcherManager blockFetcherManager)
       {
          _logger = logger;
          _blockFetcherManager = blockFetcherManager;

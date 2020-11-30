@@ -162,3 +162,9 @@ dotnet_analyzer_diagnostic.severity                               = silent
 
 # IDE1006: Naming Styles
 dotnet_diagnostic.IDE1006.severity                                = error
+
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity                                 = silent
+
+# CS1587: XML comment is not placed on a valid language element
+dotnet_diagnostic.CS1587.severity                                 = silent

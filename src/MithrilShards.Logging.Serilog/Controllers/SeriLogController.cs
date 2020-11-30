@@ -1,17 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core.Statistics;
-using MithrilShards.Dev.Controller;
+using MithrilShards.WebApi;
 using Serilog.Core;
 using Serilog.Events;
 
 namespace MithrilShards.Logging.Serilog.Controllers
 {
-   [ApiController]
-   [DevController]
-   [Route("[controller]")]
-   public class SeriLogController : ControllerBase
+   [Area(WebApiArea.AREA_API)]
+   public class SeriLogController : MithrilControllerBase
    {
       private readonly ILogger<SeriLogController> _logger;
       readonly LevelSwitcherManager _levelSwitcherManager;
