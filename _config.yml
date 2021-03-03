@@ -1,19 +1,22 @@
 # --- General options --- #
 
-remote_theme: daattali/beautiful-jekyll
+remote_theme: "daattali/beautiful-jekyl@5.0.0"
 
 baseurl: "secdev.github.io"
 
-title: Scapy
-description: Scapy - the Python-based interactive packet manipulation program & library.
+title: "Mithril Shards"
+description: "Mithril Shards - a modular framework to compose advanced P2P applications in dotnet core."
 
 # --- Navigation bar options --- #
 
 navbar-links:
   Home: index
-  Downloads: download/
-  Documentation: http://scapy.readthedocs.io/
-  Awesome Scapy: awesome-scapy/
+  Getting Started: "getting-started"
+#  Documentation: http://scapy.readthedocs.io/
+  Resources:
+    - Beautiful Jekyll: "https://beautifuljekyll.com"
+    - Learn markdown: "https://www.markdowntutorial.com/"
+  #Author's home: "https://deanattali.com"
 
 avatar: "./assets/img/logo.png"
 round-avatar: false
