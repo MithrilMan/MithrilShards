@@ -1,6 +1,6 @@
 # --- General options --- #
 
-remote_theme: "daattali/beautiful-jekyl@5.0.0"
+remote_theme: daattali/beautiful-jekyl
 
 baseurl: "secdev.github.io"
 
