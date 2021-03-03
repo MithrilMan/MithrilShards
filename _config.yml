@@ -5,13 +5,13 @@ title: "Mithril Shards"
 author: "Mithril Man"
 
 navbar-links:
-  About: "about"
+  Home: index
   Getting Started: "getting-started"
+#  Documentation: http://scapy.readthedocs.io/
   Resources:
     - Beautiful Jekyll: "https://beautifuljekyll.com"
     - Learn markdown: "https://www.markdowntutorial.com/"
   #Author's home: "https://deanattali.com"
-  
   
   # --- Logo --- #
 
