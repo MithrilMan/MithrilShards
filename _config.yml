@@ -2,7 +2,7 @@
 
 remote_theme: daattali/beautiful-jekyl
 
-baseurl: "secdev.github.io"
+baseurl: "mithrilman.github.io"
 
 title: "Mithril Shards"
 description: "Mithril Shards - a modular framework to compose advanced P2P applications in dotnet core."
@@ -12,22 +12,20 @@ description: "Mithril Shards - a modular framework to compose advanced P2P appli
 navbar-links:
   Home: index
   Getting Started: "getting-started"
-#  Documentation: http://scapy.readthedocs.io/
   Resources:
     - Beautiful Jekyll: "https://beautifuljekyll.com"
     - Learn markdown: "https://www.markdowntutorial.com/"
-  #Author's home: "https://deanattali.com"
 
 avatar: "./assets/img/logo.png"
 round-avatar: false
 
 # --- Footer options --- #
 
-author: Philippe Biondi and the Scapy community.
-url-pretty: "scapy.net"
+author: Mithril Man.
+#url-pretty: "scapy.net"
 
 social-network-links:
-  github: secdev
+  github: MithrilMan
 
 # Output options (more information on Jekyll's site)
 timezone: "Europe/Paris"
