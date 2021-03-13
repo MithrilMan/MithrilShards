@@ -1,12 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-     <Nullable>enable</Nullable>
-  </PropertyGroup>
-
    <PropertyGroup>
-      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <IsPackable>true</IsPackable>
    </PropertyGroup>
 
   <ItemGroup>

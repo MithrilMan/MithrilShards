@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.MithrilShards.Validation;
 
 namespace MithrilShards.Core.Forge
 {
@@ -51,12 +56,19 @@ namespace MithrilShards.Core.Forge
       /// <returns></returns>
       private void CreateDefaultConfigurationFile(FileLoadExceptionContext fileContext)
       {
-         _createDefaultConfigurationFileNeeded = true;
+         if (fileContext.Exception is FileNotFoundException)
+         {
+            _createDefaultConfigurationFileNeeded = true;
 
-         _logger.LogWarning($"Missing configuration file {ConfigurationFileName}, creating one with default values.");
+            _logger.LogWarning($"Missing configuration file {ConfigurationFileName}, creating one with default values.");
 
-         //default file created, no need to throw error
-         fileContext.Ignore = true;
+            //default file created, no need to throw error
+            fileContext.Ignore = true;
+         }
+         else
+         {
+            throw new ForgeBuilderException("Invalid settings file", fileContext.Exception);
+         }
       }
 
       public IForgeBuilder UseForge<TForgeImplementation>(string[] commandLineArgs, string configurationFile = "forge-settings.json") where TForgeImplementation : class, IForge
@@ -82,6 +94,7 @@ namespace MithrilShards.Core.Forge
 
             services
                .AddOptions()
+               .AddHostedService<ValidationHostedService>() // used to validate IOptions at startup, when they use ValidateOnStart (shards are automatically configured to validate asap)
                .AddSingleton<IServiceCollection>(services) // register forge service collection in order to create other sandboxed serviceProviders in other Hosts (e.g. for API purpose)
                .AddSingleton<IForge, TForgeImplementation>()
                .AddHostedService<TForgeImplementation>(serviceProvider => (TForgeImplementation)serviceProvider.GetRequiredService<IForge>())
@@ -108,20 +121,55 @@ namespace MithrilShards.Core.Forge
          where TMithrilShard : class, IMithrilShard
          where TMithrilShardSettings : class, IMithrilShardSettings, new()
       {
+         AddShard<TMithrilShard, TMithrilShardSettings, DataAnnotationValidateOptions<TMithrilShardSettings>>(configureDelegate, preBuildAction);
+
+         return this;
+      }
+
+      public IForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings, TMithrilShardSettingsValidator>(Action<HostBuilderContext, IServiceCollection> configureDelegate, Action<IHostBuilder>? preBuildAction = null)
+         where TMithrilShard : class, IMithrilShard
+         where TMithrilShardSettings : class, IMithrilShardSettings, new()
+         where TMithrilShardSettingsValidator : class, IValidateOptions<TMithrilShardSettings>
+      {
 
          AddShard<TMithrilShard>(configureDelegate, preBuildAction);
 
          //register shard configuration settings
          _hostBuilder.ConfigureServices((context, services) =>
          {
-            services.Configure<TMithrilShardSettings>(MithrilShardSettingsManager.GetSection<TMithrilShardSettings>(context.Configuration));
+            var optionsBuilder = services
+                .AddOptions<TMithrilShardSettings>()
+                .Bind(MithrilShardSettingsManager.GetSection<TMithrilShardSettings>(context.Configuration))
+                .ValidateOnStart();
+
+            optionsBuilder.Services.AddSingleton<IValidateOptions<TMithrilShardSettings>>(new DataAnnotationValidateOptions<TMithrilShardSettings>(optionsBuilder.Name));
 
             //register the shard configuration setting as IMithrilShardSettings in order to allow DefaultConfigurationWriter to write default its default values
             services.AddSingleton<IMithrilShardSettings, TMithrilShardSettings>();
+
+            //services.AddSingleton<IMithrilShardSettings>(container =>
+            //{
+            //   try
+            //   {
+            //      return container.GetService<IOptions<TMithrilShardSettings>>()!.Value;
+            //   }
+            //   catch (OptionsValidationException ex)
+            //   {
+            //      foreach (var validationFailure in ex.Failures)
+            //      {
+            //         _logger.LogError("Configuration problem in '{MithrilShardSettings}': {WrongSetting}", ex.OptionsName, validationFailure);
+            //      }
+
+            //      throw;
+            //   }
+            //});
+
          });
 
          return this;
       }
+
+
 
       /// <inheritdoc/>
       public IForgeBuilder AddShard<TMithrilShard>(Action<HostBuilderContext, IServiceCollection> configureDelegate, Action<IHostBuilder>? preBuildAction = null)
@@ -161,7 +209,21 @@ namespace MithrilShards.Core.Forge
             preBuildAction.Invoke(_hostBuilder);
          }
 
-         return _hostBuilder.RunConsoleAsync(cancellationToken);
+         try
+         {
+            return _hostBuilder.RunConsoleAsync(cancellationToken);
+         }
+         catch (OptionsValidationException ex)
+         {
+            _logger.LogError("Cannot run the forge because of configuration errors.");
+
+            foreach (var validationFailure in ex.Failures)
+            {
+               _logger.LogError("Configuration problem in '{MithrilShardSettings}': {WrongSetting}", ex.OptionsType.Name, validationFailure);
+            }
+
+            return Task.CompletedTask;
+         }
       }
 
       private void EnsureForgeIsSet()

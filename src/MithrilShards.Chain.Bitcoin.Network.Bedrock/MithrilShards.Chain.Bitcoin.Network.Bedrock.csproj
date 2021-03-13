@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+      <IsPackable>true</IsPackable>
+   </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MithrilShards.Network.Bedrock\MithrilShards.Network.Bedrock.csproj" />
-  </ItemGroup>
-
+   <ItemGroup>
+      <ProjectReference Include="..\MithrilShards.Network.Bedrock\MithrilShards.Network.Bedrock.csproj" />
+   </ItemGroup>
 </Project>

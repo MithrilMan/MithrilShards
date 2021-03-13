@@ -60,21 +60,11 @@ namespace MithrilShards.Core.Network
          return peerContext;
       }
 
-      protected EndPoint GetPublicEndPoint(EndPoint localEndPoint)
+      protected EndPoint? GetPublicEndPoint(EndPoint localEndPoint)
       {
          return _serverSettings.Listeners
-            .Where(binding =>
-            {
-               if (!IPEndPoint.TryParse(binding.EndPoint, out IPEndPoint parsedEndPoint))
-               {
-                  return false;
-               }
-               else
-               {
-                  return parsedEndPoint.Equals(localEndPoint) && binding.IsValidPublicEndPoint();
-               }
-            })
-            .Select(binding => IPEndPoint.Parse(binding.PublicEndPoint))
+            .Where(binding => binding.HasPublicEndPoint() && binding.GetIPEndPoint().Equals(localEndPoint))
+            .Select(binding => IPEndPoint.Parse(binding.PublicEndPoint!))
             .FirstOrDefault();
       }
    }

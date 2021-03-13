@@ -49,15 +49,9 @@ namespace MithrilShards.UI.BlazorServer
             return default;
          }
 
-         if (!IPEndPoint.TryParse(_settings.EndPoint, out IPEndPoint iPEndPoint))
-         {
-            ThrowHelper.ThrowArgumentException($"Wrong configuration parameter for {nameof(_settings.EndPoint)}");
-         }
-
-
          _webHost = new WebHostBuilder()
             .UseContentRoot(Directory.GetCurrentDirectory())
-            .UseKestrel(serverOptions => { serverOptions.Listen(iPEndPoint); })
+            .UseKestrel(serverOptions => { serverOptions.Listen(_settings.GetIPEndPoint()); })
             .Configure((context, app) =>
             {
                if (context.HostingEnvironment.IsDevelopment())
@@ -75,10 +69,6 @@ namespace MithrilShards.UI.BlazorServer
                app.UseStaticFiles();
 
                app.UseRouting();
-
-               app.ApplicationServices
-                   .UseBootstrapProviders()
-                   .UseFontAwesomeIcons();
 
                app.UseEndpoints(endpoints =>
                {
@@ -104,7 +94,14 @@ namespace MithrilShards.UI.BlazorServer
                   }
                   else if (service.Lifetime == ServiceLifetime.Singleton)
                   {
-                     services.AddSingleton(service.ServiceType, sp => _serviceProvider.GetServices(service.ServiceType).First(s => service.ImplementationType == null || s.GetType() == service.ImplementationType)); //resolve singletons from the main provider
+                     services.AddSingleton(service.ServiceType, sp =>
+                     {
+                        //resolve singletons from the main provider
+                        var instance = _serviceProvider.GetServices(service.ServiceType).First(s => service.ImplementationType == null || s?.GetType() == service.ImplementationType);
+                        if (instance == null) ThrowHelper.ThrowNullReferenceException($"Service type {service.ServiceType.Name} not found.");
+
+                        return instance;
+                     });
                   }
                   else
                   {

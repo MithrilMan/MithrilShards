@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using MithrilShards.Core.Forge;
 
 namespace MithrilShards.Core.MithrilShards
@@ -7,7 +8,7 @@ namespace MithrilShards.Core.MithrilShards
    /// Interface used to have a fallback mechanism to generate default <see cref="IMithrilShard"/> settings
    /// if <see cref="IForge"/> configuration file is missing
    /// </summary>
-   public interface IMithrilShardSettings
+   public interface IMithrilShardSettings : IValidatableObject
    {
 
       /// <summary>

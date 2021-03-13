@@ -245,7 +245,7 @@ namespace MithrilShards.Core.Network
       protected void OnPeerDisconnectionRequested(PeerDisconnectionRequired @event)
       {
          IPEndPoint endPoint = @event.EndPoint.AsIPEndPoint().EnsureIPv6();
-         IPeerContext peerContext = inboundPeers.Values
+         IPeerContext? peerContext = inboundPeers.Values
             .Concat(outboundPeers.Values.ToList())
             .FirstOrDefault(peer => peer.RemoteEndPoint.Equals(endPoint));
 

@@ -28,7 +28,7 @@
    "WebApi": {
       "EndPoint": "127.0.0.1:45020",
       "Enabled": true,
-      "Https": false
+      "Https": true
    },
    "DevController": {
       "Enabled": true

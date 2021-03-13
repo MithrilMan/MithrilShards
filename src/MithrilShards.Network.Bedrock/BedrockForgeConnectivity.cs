@@ -102,23 +102,14 @@ namespace MithrilShards.Network.Bedrock
 
                      foreach (ServerPeerBinding binding in _settings.Listeners)
                      {
-                        if (!binding.IsValidEndpoint(out IPEndPoint? parsedEndpoint))
+                        IPEndPoint localEndPoint = binding.GetIPEndPoint();
+
+                        if (!binding.HasPublicEndPoint())
                         {
-                           throw new Exception($"Configuration error: binding {binding.EndPoint} must be a valid address:port value. Current value: {binding.EndPoint ?? "NULL"}");
+                           binding.PublicEndPoint = new IPEndPoint(IPAddress.Loopback, localEndPoint.Port).ToString();
                         }
 
-                        if (binding.PublicEndPoint == null)
-                        {
-                           binding.PublicEndPoint = new IPEndPoint(IPAddress.Loopback, parsedEndpoint.Port).ToString();
-                        }
-
-                        if (!binding.IsValidPublicEndPoint())
-                        {
-                           throw new Exception($"Configuration error: binding {nameof(binding.PublicEndPoint)} must be a valid address:port value. Current value: {binding.PublicEndPoint ?? "NULL"}");
-                        }
-
-                        var localEndPoint = IPEndPoint.Parse(binding.EndPoint);
-                        var publicEndPoint = IPEndPoint.Parse(binding.PublicEndPoint);
+                        binding.TryGetPublicIPEndPoint(out IPEndPoint? publicEndPoint);
 
                         _logger.LogInformation("Added listener to local endpoint {ListenerLocalEndpoint}. (remote {ListenerPublicEndpoint})", localEndPoint, publicEndPoint);
 
