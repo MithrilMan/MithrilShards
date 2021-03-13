@@ -35,7 +35,7 @@ jobs:
         id: DO_PACK
         with:
           cond: ${{ github.event_name == 'workflow_dispatch' }}
-          if_true: ${{ github.event.inputs.run-test }}
+          if_true: ${{ github.event.inputs.create-packages }}
           if_false: 'true'
 
       - name: Dump variables
