@@ -25,6 +25,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: Dump input values
+      run: |
+        echo "run-test: ${{ github.event.inputs.run-test }}"
+        echo "create-packages: ${{ github.event.inputs.create-packages }}"
     - name: Checkout code
       uses: actions/checkout@v2
       with:
@@ -42,7 +46,7 @@ jobs:
       run: dotnet build --configuration Release /p:CI=true
 
     - name: Perform Tests
-      if: github.event.inputs.run-test != false
+      if: github.event.inputs.run-test != 'false'
       run: dotnet test -c Release --logger GitHubActions /p:CI=true
 
     - name: .NET Lib Pack
