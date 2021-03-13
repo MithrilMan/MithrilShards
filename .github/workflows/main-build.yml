@@ -1,6 +1,16 @@
 name: Main Build
 
 on:
+  workflow_dispatch:
+    inputs:
+      run-test:
+        description: specify if test has to be run
+        required: true
+        default: true
+      create-packages:
+        description: specify if packages have to be built
+        required: true
+        default: true
   pull_request:
   push:
     branches:
@@ -32,7 +42,9 @@ jobs:
       run: dotnet build --configuration Release /p:CI=true
 
     - name: Perform Tests
+      if: github.event.inputs.run-test != false
       run: dotnet test -c Release --logger GitHubActions /p:CI=true
 
     - name: .NET Lib Pack
+      if: github.event.inputs.create-packages != false
       run: dotnet pack --no-build -c Release /p:PackageOutputPath=%CD%\.nupkgs /p:CI=true
