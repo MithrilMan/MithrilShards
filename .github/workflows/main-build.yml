@@ -25,10 +25,21 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Dump input values
+    - name: Set Default environment variables
+      env:
+         DO_TEST: "true"
+         DO_PACK: "true"
+
+    - name: Override environment variables if manually triggered
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      env:
+         DO_TEST: ${{ github.event.inputs.run-test }}
+         DO_PACK: ${{ github.event.inputs.create-packages }}
+
+    - name: Dump environment variables
       run: |
-        echo "run-test: ${{ github.event.inputs.run-test }}"
-        echo "create-packages: ${{ github.event.inputs.create-packages }}"
+        echo VERSION=$(npm run version --silent) >> $GITHUB_ENV
+
     - name: Checkout code
       uses: actions/checkout@v2
       with:
@@ -46,9 +57,9 @@ jobs:
       run: dotnet build --configuration Release /p:CI=true
 
     - name: Perform Tests
-      if: github.event.inputs.run-test != 'false'
+      if: ${{env.DO_TEST}} == 'true'
       run: dotnet test -c Release --logger GitHubActions /p:CI=true
 
     - name: .NET Lib Pack
-      if: github.event.inputs.create-packages != false
+      if: ${{env.DO_PACK}} == 'true'
       run: dotnet pack --no-build -c Release /p:PackageOutputPath=%CD%\.nupkgs /p:CI=true
