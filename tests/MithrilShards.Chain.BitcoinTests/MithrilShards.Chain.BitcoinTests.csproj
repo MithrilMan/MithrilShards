@@ -20,7 +20,7 @@
    </ItemGroup>
 
    <ItemGroup>
-      <ProjectReference Include="..\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
+      <ProjectReference Include="..\..\src\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
    </ItemGroup>
 
    <ItemGroup>

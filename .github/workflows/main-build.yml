@@ -6,11 +6,11 @@ on:
       run-test:
         description: specify if test has to be run
         required: true
-        default: true
+        default: 'true'
       create-packages:
         description: specify if packages have to be built
         required: true
-        default: true
+        default: 'true'
   pull_request:
   push:
     branches:
