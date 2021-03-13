@@ -1,0 +1,52 @@
+name: Main Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      run-test:
+        description: specify if test has to be run
+        required: true
+        default: 'true'
+      create-packages:
+        description: specify if packages have to be built
+        required: true
+        default: 'true'
+  pull_request:
+  push:
+    branches:
+      - master
+    paths:
+      - '*'
+      - '!/Documentation/*' # Don't run workflow when files are only in the /Documentation directory
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: haya14busa/action-cond@v1
+        id: DO_TEST
+        with:
+          cond: ${{ github.event_name == 'workflow_dispatch' }}
+          if_true: ${{ github.event.inputs.run-test }}
+          if_false: 'true'
+
+      - uses: haya14busa/action-cond@v1
+        id: DO_PACK
+        with:
+          cond: ${{ github.event_name == 'workflow_dispatch' }}
+          if_true: ${{ github.event.inputs.run-test }}
+          if_false: 'true'
+
+      - name: Dump variables
+        run: |
+         echo "${{ steps.DO_TEST.outputs.value }}"
+         echo "${{ steps.DO_PACK.outputs.value }}"
+
+      - name: Check DO_TEST
+        if: steps.DO_TEST.outputs.value == 'true'
+        run: echo "DO_TEST is true"
+
+      - name: Check DO_PACK
+        if: steps.DO_PACK.outputs.value == 'true'
+        run: echo "DO_PACK is true"
