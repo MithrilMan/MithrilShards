@@ -28,6 +28,7 @@ jobs:
     steps:
     - name: Override environment variables if manually triggered
       if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: echo "Overriding options"
       env: #Set Default environment variables
          DO_TEST: github.event.inputs.run-test
          DO_PACK: github.event.inputs.create-packages
