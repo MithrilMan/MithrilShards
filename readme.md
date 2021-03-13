@@ -8,7 +8,7 @@ Target application: **DLT**.
 
 -- Work In Progres --
 
-![](https://github.com/MithrilMan/MithrilShards/workflows/Master/badge.svg)
+[![Main Build](https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml/badge.svg)](https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml)
 
 Discord server: https://discord.gg/T9kyKz4bAu
 Join to give feedback, ask for features, support, etc...
