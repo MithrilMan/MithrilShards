@@ -78,11 +78,6 @@ namespace MithrilShards.Core.Forge
                {
                   var settings = sp.GetService<IOptions<WebApiSettings>>().Value;
 
-                  if (!IPEndPoint.TryParse(settings.EndPoint, out IPEndPoint iPEndPoint))
-                  {
-                     ThrowHelper.ThrowArgumentException($"Wrong configuration parameter for {nameof(settings.EndPoint)}");
-                  }
-
                   var definition = new ApiServiceDefinition
                   {
                      Enabled = settings.Enabled,
@@ -108,7 +103,6 @@ namespace MithrilShards.Core.Forge
 
                      IEnumerable<ApiServiceDefinition> apiServiceDefinitions = serverOptions.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>();
                      var webApiSettings = serverOptions.ApplicationServices.GetService<IOptions<WebApiSettings>>().Value;
-                     webApiSettings.ValidateEndPoint(out IPEndPoint ipEndPoint);
 
                      // sanity check of registered ApiServiceDefinition
                      foreach (var apiServiceDefinition in apiServiceDefinitions)
@@ -125,7 +119,7 @@ namespace MithrilShards.Core.Forge
 
                      if (webApiSettings.Enabled)
                      {
-                        serverOptions.Listen(ipEndPoint, options =>
+                        serverOptions.Listen(webApiSettings.GetIPEndPoint(), options =>
                          {
                             if (webApiSettings.Https)
                             {
@@ -238,7 +232,6 @@ namespace MithrilShards.Core.Forge
          var logger = app.ApplicationServices.GetService<ILogger<WebApiShard>>();
 
          var webApiSettings = app.ApplicationServices.GetService<IOptions<WebApiSettings>>().Value;
-         webApiSettings.ValidateEndPoint(out IPEndPoint ipEndPoint);
 
          app
             .UseRouting()

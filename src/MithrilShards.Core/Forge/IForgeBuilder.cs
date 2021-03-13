@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MithrilShards.Core.MithrilShards;
 
 namespace MithrilShards.Core.Forge
@@ -18,6 +19,20 @@ namespace MithrilShards.Core.Forge
       /// <param name="configureDelegate">The configure delegate.</param>
       /// <returns></returns>
       IForgeBuilder ConfigureContext(Action<HostBuilderContext> configureDelegate);
+
+      /// <summary>
+      /// Adds a shard into the forge.
+      /// </summary>
+      /// <typeparam name="TMithrilShard">The type of the mithril shard.</typeparam>
+      /// <typeparam name="TMithrilShardSettings">The type of the mithril shard settings to register to allow application configuration.</typeparam>
+      /// <typeparam name="TMithrilShardSettingsValidator">The type of the mithril shard settings validator.</typeparam>
+      /// <param name="configureDelegate">The configure delegate.</param>
+      /// <param name="preBuildAction">The action to execute before the forge is built.</param>
+      /// <returns></returns>
+      IForgeBuilder AddShard<TMithrilShard, TMithrilShardSettings, TMithrilShardSettingsValidator>(Action<HostBuilderContext, IServiceCollection> configureDelegate, Action<IHostBuilder>? preBuildAction = null)
+         where TMithrilShard : class, IMithrilShard
+         where TMithrilShardSettings : class, IMithrilShardSettings, new()
+         where TMithrilShardSettingsValidator : class, IValidateOptions<TMithrilShardSettings>;
 
       /// <summary>
       /// Adds a shard into the forge.

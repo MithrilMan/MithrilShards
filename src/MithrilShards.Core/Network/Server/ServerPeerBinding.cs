@@ -1,6 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using MithrilShards.Core.Extensions;
+using MithrilShards.Core.MithrilShards.Validation.ValidationAttributes;
 
 namespace MithrilShards.Core.Network.Server
 {
@@ -10,10 +13,13 @@ namespace MithrilShards.Core.Network.Server
    public class ServerPeerBinding
    {
       /// <summary>IP address and port number on which the node server listens.</summary>
-      public string? EndPoint { get; set; }
+      [IPEndPointValidator]
+      [Required]
+      public string EndPoint { get; set; } = string.Empty;
 
       /// <summary>External IP address and port number used to access the node from external network.</summary>
       /// <remarks>Used to announce to external peers the address they connect to in order to reach our Forge server.</remarks>
+      [IPEndPointValidator]
       public string? PublicEndPoint { get; set; }
 
       /// <summary>
@@ -40,25 +46,19 @@ namespace MithrilShards.Core.Network.Server
          }
       }
 
-      public bool IsValidEndpoint([NotNullWhen(true)] out IPEndPoint? parsedEndpoint)
+      public IPEndPoint GetIPEndPoint()
       {
-         parsedEndpoint = null;
-         return EndPoint != null && IPEndPoint.TryParse(EndPoint, out parsedEndpoint);
+         return IPEndPoint.Parse(EndPoint);
       }
 
-      public bool IsValidPublicEndPoint()
+      public bool TryGetPublicIPEndPoint([MaybeNullWhen(false)] out IPEndPoint publicEndPoint)
       {
-         return PublicEndPoint != null && IPEndPoint.TryParse(PublicEndPoint, out _);
+         return IPEndPoint.TryParse(PublicEndPoint ?? string.Empty, out publicEndPoint);
       }
 
-      public bool TryGetIPEndPoint(out IPEndPoint endPoint)
+      public bool HasPublicEndPoint()
       {
-         return IPEndPoint.TryParse(EndPoint, out endPoint);
-      }
-
-      public bool TryGetPublicIPEndPoint(out IPEndPoint publicEndPoint)
-      {
-         return IPEndPoint.TryParse(PublicEndPoint, out publicEndPoint);
+         return PublicEndPoint != null;
       }
    }
 }

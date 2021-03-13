@@ -1,5 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
+using MithrilShards.Core.MithrilShards.Validation.ValidationAttributes;
 
 namespace MithrilShards.Core.Network.Server
 {
@@ -9,11 +10,13 @@ namespace MithrilShards.Core.Network.Server
    public class ClientPeerBinding
    {
       /// <summary>IP address and port number of the peer we wants to connect to.</summary>
-      public string? EndPoint { get; set; }
+      [IPEndPointValidator]
+      [Required]
+      public string EndPoint { get; set; } = string.Empty;
 
-      public bool TryGetIPEndPoint([MaybeNullWhen(false)]out IPEndPoint endPoint)
+      public IPEndPoint GetIPEndPoint()
       {
-         return IPEndPoint.TryParse(EndPoint, out endPoint);
+         return IPEndPoint.Parse(EndPoint);
       }
    }
 }

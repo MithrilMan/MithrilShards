@@ -1,22 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-     <LangVersion>8.0</LangVersion>
-     <Nullable>enable</Nullable>
-  </PropertyGroup>
-
    <PropertyGroup>
-      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <IsPackable>true</IsPackable>
    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.13" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
+   <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.0" />
   </ItemGroup>
 
    <ItemGroup>
@@ -28,5 +16,4 @@
     <ProjectReference Include="..\MithrilShards.Diagnostic.StatisticsCollector\MithrilShards.Diagnostic.StatisticsCollector.csproj" />
     <ProjectReference Include="..\MithrilShards.WebApi\MithrilShards.WebApi.csproj" />
   </ItemGroup>
-
 </Project>

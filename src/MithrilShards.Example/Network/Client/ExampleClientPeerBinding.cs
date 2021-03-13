@@ -1,5 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using MithrilShards.Core.MithrilShards.Validation.ValidationAttributes;
 
 namespace MithrilShards.Example.Network.Client
 {
@@ -9,6 +11,8 @@ namespace MithrilShards.Example.Network.Client
    public class ExampleClientPeerBinding
    {
       /// <summary>IP address and port number of the peer we wants to connect to.</summary>
+      [IPEndPointValidator]
+      [Required]
       public string? EndPoint { get; set; }
 
       public string? AdditionalInformation { get; set; }
@@ -17,7 +21,7 @@ namespace MithrilShards.Example.Network.Client
       {
          endPoint = null;
 
-         if (!IPEndPoint.TryParse(EndPoint, out IPEndPoint ipEndPoint))
+         if (!IPEndPoint.TryParse(EndPoint ?? string.Empty, out IPEndPoint? ipEndPoint))
          {
             return false;
          }

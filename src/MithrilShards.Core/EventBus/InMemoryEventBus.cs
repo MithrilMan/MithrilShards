@@ -78,7 +78,7 @@ namespace MithrilShards.Core.EventBus
             {
                List<ISubscription> allSubscriptions = _subscriptions[subscriptionToken.EventType];
 
-               ISubscription subscriptionToRemove = allSubscriptions.FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
+               ISubscription? subscriptionToRemove = allSubscriptions.FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
                if (subscriptionToRemove != null)
                {
                   _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);

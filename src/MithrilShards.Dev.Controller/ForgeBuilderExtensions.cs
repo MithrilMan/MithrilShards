@@ -24,11 +24,6 @@ namespace MithrilShards.Dev.Controller
                {
                   var settings = sp.GetService<IOptions<DevControllerSettings>>().Value;
 
-                  if (!IPEndPoint.TryParse(settings.EndPoint, out IPEndPoint iPEndPoint))
-                  {
-                     ThrowHelper.ThrowArgumentException($"Wrong configuration parameter for {nameof(settings.EndPoint)}");
-                  }
-
                   var definition = new ApiServiceDefinition
                   {
                      Enabled = settings.Enabled,

@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Linq;
 using System.Text.Json.Serialization;
 using MithrilShards.Core.Forge;
 
@@ -24,5 +27,15 @@ namespace MithrilShards.Core.MithrilShards
             return name;
          }
       }
+
+      /// <summary>
+      /// Determines whether the specified object is valid.
+      /// Allows for custom validation when the simple DataAnnotationValidateOptions using DataAnnotation is not enough (e.g. complex objects aren't automatically checked)
+      /// </summary>
+      /// <param name="validationContext">The validation context.</param>
+      /// <returns>
+      /// A collection that holds failed-validation information.
+      /// </returns>
+      public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext) => Enumerable.Empty<ValidationResult>();
    }
 }

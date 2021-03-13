@@ -38,9 +38,7 @@ namespace MithrilShards.Core.Network.Client
 
          connectionsToAttempt.AddRange(
             from connection in _settings.Connections
-            let endPoint = connection.TryGetIPEndPoint(out IPEndPoint? endPoint) ? endPoint : null
-            where endPoint != null
-            select new OutgoingConnectionEndPoint(endPoint)
+            select new OutgoingConnectionEndPoint(connection.GetIPEndPoint())
             );
       }
 
