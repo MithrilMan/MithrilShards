@@ -16,16 +16,21 @@ jobs:
 
     steps:
     - name: Checkout code
-    - uses: actions/checkout@v2
+      uses: actions/checkout@v2
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.201'
+
     - name: dotnet Restore
       run: dotnet restore -s "https://api.nuget.org/v3/index.json" -s "https://f.feedz.io/davidfowl/bedrockframework/nuget/index.json"
+
     - name: Build with dotnet
       run: dotnet build --configuration Release /p:CI=true
+
     - name: Perform Tests
       run: dotnet test -c Release --logger GitHubActions /p:CI=true
+
     - name: .NET Lib Pack
       run: dotnet pack --no-build -c Release /p:PackageOutputPath=%CD%\.nupkgs /p:CI=true
