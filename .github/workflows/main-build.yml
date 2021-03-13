@@ -24,12 +24,14 @@ jobs:
 
     runs-on: windows-latest
 
-    #Set Default environment variables
-    env:
+    steps:
+    - name: Set Default environment variables
+      run: echo "Set Default environment variables"
+       #Set Default environment variables
+      env:
          DO_TEST: "true"
          DO_PACK: "true"
 
-    steps:
     - name: Override environment variables if manually triggered
       if: ${{ github.event_name == 'workflow_dispatch' }}
       run: |
