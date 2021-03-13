@@ -32,15 +32,14 @@ jobs:
     steps:
     - name: Override environment variables if manually triggered
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      run: echo "Overriding options"
-      env:
-         DO_TEST: ${{ github.event.inputs.run-test }}
-         DO_PACK: ${{ github.event.inputs.create-packages }}
+      run: |
+         echo "Overriding options"
+         echo "DO_TEST=${{ github.event.inputs.run-test }}" >> $GITHUB_ENV
+         echo "DO_PACK=${{ github.event.inputs.create-packages }}" >> $GITHUB_ENV
 
     - name: Dump environment variables
       run: |
-        echo VERSION=$(npm run version --silent) >> $GITHUB_ENV
-      shell: bash
+        echo $GITHUB_ENV
 
     - name: Checkout code
       uses: actions/checkout@v2
