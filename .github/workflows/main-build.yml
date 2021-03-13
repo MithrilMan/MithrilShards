@@ -21,27 +21,26 @@ on:
 
 jobs:
   build:
-
     runs-on: windows-latest
-
-    steps:
-    - name: Set Default environment variables
-      run: echo "Set Default environment variables"
-       #Set Default environment variables
-      env:
+    env: #Set Default environment variables
          DO_TEST: "true"
          DO_PACK: "true"
-
+    steps:
     - name: Override environment variables if manually triggered
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      run: |
-         echo "Overriding options"
-         echo "DO_TEST=${{ github.event.inputs.run-test }}" >> $GITHUB_ENV
-         echo "DO_PACK=${{ github.event.inputs.create-packages }}" >> $GITHUB_ENV
+      env: #Set Default environment variables
+         DO_TEST: github.event.inputs.run-test
+         DO_PACK: github.event.inputs.create-packages
+
+#      run: |
+#         echo "Overriding options"
+#         echo "DO_TEST=${{ github.event.inputs.run-test }}" >> $GITHUB_ENV
+#         echo "DO_PACK=${{ github.event.inputs.create-packages }}" >> $GITHUB_ENV
 
     - name: Dump environment variables
       run: |
         echo $GITHUB_ENV
+        exit 0
 
     - name: Checkout code
       uses: actions/checkout@v2
