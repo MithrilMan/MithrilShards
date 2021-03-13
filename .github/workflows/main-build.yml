@@ -22,22 +22,47 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    env: #Set Default environment variables
-         DO_TEST: "true"
-         DO_PACK: "true"
+
     steps:
-    - name: Override environment variables if manually triggered
-      if: ${{ github.event_name == 'workflow_dispatch' }}
-      run: echo "Overriding options"
-      env: #Set Default environment variables
-         DO_TEST: ${{ github.event.inputs.run-test }}
-         DO_PACK: ${{ github.event.inputs.create-packages }}
+    - uses: haya14busa/action-cond@v1
+      id: DO_TEST
+      with:
+         cond: ${{ github.event_name == 'workflow_dispatch' }}
+         if_true: ${{ github.event.inputs.run-test }}
+         if_false: 'true'
 
-#      run: |
-#         echo "Overriding options"
-#         echo "DO_TEST=${{ github.event.inputs.run-test }}" >> $GITHUB_ENV
-#         echo "DO_PACK=${{ github.event.inputs.create-packages }}" >> $GITHUB_ENV
+    - uses: haya14busa/action-cond@v1
+      id: DO_PACK
+      with:
+         cond: ${{ github.event_name == 'workflow_dispatch' }}
+         if_true: ${{ github.event.inputs.create-packages }}
+         if_false: 'true'
 
-    - name: Dump environment variables
+    - name: Dump variables
       run: |
-        echo $GITHUB_ENV
+         echo "${{ steps.DO_TEST.outputs.value }}"
+         echo "${{ steps.DO_PACK.outputs.value }}"
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.201'
+
+    - name: dotnet Restore
+      run: dotnet restore -s "https://api.nuget.org/v3/index.json" -s "https://f.feedz.io/davidfowl/bedrockframework/nuget/index.json"
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release /p:CI=true
+
+    - name: Perform Tests
+      if: steps.DO_TEST.outputs.value == 'true'
+      run: dotnet test -c Release --logger GitHubActions /p:CI=true
+
+    - name: .NET Lib Pack
+      if: steps.DO_PACK.outputs.value == 'true'
+      run: dotnet pack --no-build -c Release /p:PackageOutputPath=%CD%\.nupkgs /p:CI=true
