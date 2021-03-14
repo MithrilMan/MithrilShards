@@ -223,6 +223,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       /// <param name="items">The items.</param>
       /// <param name="protocolVersion">The protocol version.</param>
       /// <param name="serializer">The serializer.</param>
+      /// <param name="options"></param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteArray<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType[]? items, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer, ProtocolTypeSerializerOptions? options = null)
@@ -250,6 +251,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       /// <param name="item">The item to serialize.</param>
       /// <param name="protocolVersion">The protocol version.</param>
       /// <param name="serializer">The serializer.</param>
+      /// <param name="options"></param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static int WriteWithSerializer<TSerializableType>(this IBufferWriter<byte> writer, TSerializableType item, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer, ProtocolTypeSerializerOptions? options = null)

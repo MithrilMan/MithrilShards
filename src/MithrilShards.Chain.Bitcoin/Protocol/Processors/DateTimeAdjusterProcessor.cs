@@ -25,10 +25,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       }
 
       /// <summary>
-      /// When the peer handshake, sends <see cref="SendCmpctMessage"/>  and <see cref="SendHeadersMessage"/> if the
+      /// When the peer handshake, sends <see cref="SendCmpctMessage" />  and <see cref="SendHeadersMessage" /> if the
       /// negotiated protocol allow that and update peer status based on its version message.
       /// </summary>
-      /// <param name="event">The event.</param>
       /// <returns></returns>
       protected override ValueTask OnPeerHandshakedAsync()
       {

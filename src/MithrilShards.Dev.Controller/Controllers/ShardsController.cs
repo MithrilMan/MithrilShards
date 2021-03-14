@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 using System.Linq;
 using System;
 using Microsoft.Extensions.Options;
@@ -27,7 +27,7 @@ namespace MithrilShards.Dev.Controller.Controllers
 
          _mithrilShards = mithrilShards.ToDictionary(
             shard => shard.GetType().Name,
-            shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)));
+            shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)))!;
       }
 
       /// <summary>

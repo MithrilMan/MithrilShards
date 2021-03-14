@@ -33,7 +33,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
             ThrowHelper.ThrowArgumentNullException(nameof(peerContext));
          }
 
-         IEnumerable<INetworkMessageProcessor> processors = _serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>();
+         IEnumerable<INetworkMessageProcessor> processors = _serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>()!;
          foreach (INetworkMessageProcessor processor in processors)
          {
             // skip processors that aren't enabled

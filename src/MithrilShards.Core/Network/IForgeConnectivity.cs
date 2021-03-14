@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 using MithrilShards.Core.Network.Client;
 
 namespace MithrilShards.Core.Network

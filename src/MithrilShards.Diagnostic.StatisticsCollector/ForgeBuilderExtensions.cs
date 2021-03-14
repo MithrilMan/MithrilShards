@@ -12,8 +12,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// Uses the bitcoin chain.
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
-      /// <param name="minimumSupportedVersion">The minimum version local nodes requires in order to connect to other peers.</param>
-      /// <param name="currentVersion">The current version local peer aim to use with connected peers.</param>
+      /// <param name="configuration">The action to configure the collector.</param>
       /// <returns></returns>
       public static IForgeBuilder UseStatisticsCollector(this IForgeBuilder forgeBuilder, Action<StatisticsCollectorOptions>? configuration = null)
       {

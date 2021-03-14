@@ -52,7 +52,7 @@ namespace MithrilShards.Network.Bedrock
          INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
          using IPeerContext peerContext = _peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
-                                                                                            connection.LocalEndPoint,
+                                                                                            connection.LocalEndPoint!,
                                                                                             connection.Features.Get<OutgoingConnectionEndPoint>(),
                                                                                             new NetworkMessageWriter(protocol, connection.CreateWriter()));
 

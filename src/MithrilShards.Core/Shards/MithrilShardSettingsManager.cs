@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MithrilShards.Core.Forge;
 
-namespace MithrilShards.Core.MithrilShards
+namespace MithrilShards.Core.Shards
 {
    /// <summary>
    /// Interface used to have a fallback mechanism to generate default <see cref="IMithrilShard"/> settings

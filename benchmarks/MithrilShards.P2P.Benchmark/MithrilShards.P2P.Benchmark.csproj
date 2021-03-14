@@ -3,8 +3,6 @@
    <PropertyGroup>
       <OutputType>Exe</OutputType>
       <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-      <Nullable>disable</Nullable>
-      <IsPackable>false</IsPackable>
    </PropertyGroup>
 
    <ItemGroup>
@@ -21,8 +19,8 @@
    </ItemGroup>
 
    <ItemGroup>
-      <ProjectReference Include="..\src\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
-      <ProjectReference Include="..\src\MithrilShards.Core\MithrilShards.Core.csproj" />
+      <ProjectReference Include="..\..\src\MithrilShards.Chain.Bitcoin\MithrilShards.Chain.Bitcoin.csproj" />
+      <ProjectReference Include="..\..\src\MithrilShards.Core\MithrilShards.Core.csproj" />
    </ItemGroup>
 
 </Project>

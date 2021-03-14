@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace MithrilShards.Core.MithrilShards
+namespace MithrilShards.Core.Shards
 {
    public interface IMithrilShard
    {

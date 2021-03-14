@@ -65,6 +65,8 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
       /// Initializes a new instance of the <see cref="Target"/> class from a compact value (big-endian representation).
       /// </summary>
       /// <param name="compactValue">The compact value.</param>
+      /// <param name="isNegative"></param>
+      /// <param name="isOverflow"></param>
       public Target(uint compactValue, out bool isNegative, out bool isOverflow)
       {
          Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));

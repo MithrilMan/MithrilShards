@@ -183,7 +183,7 @@ namespace MithrilShards.Example.Network.Bedrock
 
       /// <summary>
       /// Tries to read the command from the buffer fetching the next SIZE_COMMAND bytes.
-      /// <paramref name="reader"/> doesn't advance if failing, otherwise it advance by <see cref="SIZE_COMMAND"/>
+      /// <paramref name="reader"/> doesn't advance if failing, otherwise it advance by <see cref="ProtocolDefinition.SIZE_COMMAND"/>
       /// </summary>
       /// <param name="reader">The reader.</param>
       /// <returns>true if the command has been read, false otherwise (not enough bytes to read)</returns>
@@ -204,7 +204,7 @@ namespace MithrilShards.Example.Network.Bedrock
 
       /// <summary>
       /// Tries to read the payload length from the buffer.
-      /// <paramref name="reader"/> doesn't advance if failing, otherwise it advance by <see cref="SIZE_PAYLOAD_LENGTH"/>
+      /// <paramref name="reader"/> doesn't advance if failing, otherwise it advance by <see cref="ProtocolDefinition.SIZE_PAYLOAD_LENGTH"/>
       /// </summary>
       /// <param name="reader">The reader.</param>
       /// <returns>true if the payload length has been read, false otherwise (not enough bytes to read)</returns>
@@ -223,7 +223,7 @@ namespace MithrilShards.Example.Network.Bedrock
 
       /// <summary>
       /// Tries to read the checksum from the buffer.
-      /// <paramref name="reader"/> doesn't advance if failing, otherwise it advance by <see cref="SIZE_CHECKSUM"/>
+      /// <paramref name="reader"/> doesn't advance if failing, otherwise it advance by <see cref="ProtocolDefinition.SIZE_CHECKSUM"/>
       /// </summary>
       /// <param name="reader">The reader.</param>
       /// <returns>true if the checksum has been read, false otherwise (not enough bytes to read)</returns>

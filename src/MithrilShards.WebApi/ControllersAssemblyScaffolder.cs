@@ -17,7 +17,7 @@ namespace MithrilShards.WebApi
 
       /// <summary>
       /// Loads the assembly where <typeparamref name="T"/> is defined.
-      /// Use this to let the forge find controllers on assemblies that aren't exposed by an used <see cref="MithrilShards.Core.MithrilShards.IMithrilShard"/>.
+      /// Use this to let the forge find controllers on assemblies that aren't exposed by an used <see cref="MithrilShards.Core.Shards.IMithrilShard"/>.
       /// </summary>
       /// <typeparam name="T">The type that's defined in an assembly that contains controllers.</typeparam>
       public ControllersAssemblyScaffolder LoadAssemblyFromType<T>()

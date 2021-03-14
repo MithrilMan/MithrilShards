@@ -191,13 +191,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       /// <summary>
       /// When headers gets validated and they were unknown headers, we want to download the blocks
       /// </summary>
+      /// <param name="args">The arguments.</param>
       /// <remarks>
       /// During header sync, when we receive this event, a header validation occurred and from last validated header back
-      /// to <see cref="BlockHeaderValidationSucceeded.NewHeadersFoundCount"/> previous header, we need to fetch these blocks.
+      /// to <see cref="BlockHeaderValidationSucceeded.NewHeadersFoundCount" /> previous header, we need to fetch these blocks.
       /// When we receive a block with an unknown header, we'll get this event too so to be sure to not request a block we
-      /// have already, we ensure that the header node validity doesn't have the flag <see cref="HeaderDataAvailability.HasBlockData"/> set.
+      /// have already, we ensure that the header node validity doesn't have the flag <see cref="HeaderDataAvailability.HasBlockData" /> set.
       /// </remarks>
-      /// <param name="obj"></param>
       private async Task OnBlockHeaderValidationSucceededAsync(BlockHeaderValidationSucceeded args)
       {
          HeaderNode currentNode = args.LastValidatedHeaderNode;

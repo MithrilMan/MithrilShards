@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector
 {

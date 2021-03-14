@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Logging.Serilog
 {

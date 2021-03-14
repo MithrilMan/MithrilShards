@@ -38,7 +38,7 @@
 
       /// <summary>
       /// The header is invalid.
-      /// A <see cref="BlockValidationState"/> should contain more detail about the invalid data.
+      /// A <see cref="MithrilShards.Chain.Bitcoin.Consensus.Validation.BlockValidationState"/> should contain more detail about the invalid data.
       /// </summary>
       Invalid
    }

@@ -32,7 +32,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
       /// <param name="defaultValue">The default value.</param>
       /// <returns></returns>
       [return: MaybeNull]
-      public T Get<T>(string key, T defaultValue = default)
+      public T Get<T>(string key, T? defaultValue = default)
       {
          if (!_options.TryGetValue(key, out object? value)) return defaultValue;
 

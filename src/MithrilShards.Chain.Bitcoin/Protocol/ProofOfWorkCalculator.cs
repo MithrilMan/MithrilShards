@@ -113,7 +113,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
 
 
       /// <summary>
-      /// Calculate the difficulty adjustment interval in blocks based on settings defined in <see cref="IConsensus"/>.
+      /// Calculate the difficulty adjustment interval in blocks based on settings defined in <see cref="IConsensusParameters"/>.
       /// </summary>
       /// <returns>The difficulty adjustment interval in blocks.</returns>
       private long GetDifficultyAdjustmentInterval()

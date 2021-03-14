@@ -30,12 +30,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
       /// <summary>
       /// Tries the fetch the specified hash if minimum score is met.
       /// </summary>
-      /// <param name="hash">The hash.</param>
+      /// <param name="blockToDownload">The block to download.</param>
       /// <param name="minimumScore">The minimum score needed to fetch the block.</param>
-      /// <returns></returns>
-      /// </summary>
-      /// <param name="hash">The hash.</param>
-      /// <param name="minimumScore">The minimum score.</param>
       /// <returns></returns>
       Task<bool> TryFetchAsync(HeaderNode blockToDownload, uint minimumScore);
 

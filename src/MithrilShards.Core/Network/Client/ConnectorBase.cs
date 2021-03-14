@@ -44,9 +44,10 @@ namespace MithrilShards.Core.Network.Client
       /// <summary>
       /// Contains the logic to compute the delay adjustment.
       /// </summary>
-      /// <param name="hint">The hint.</param>
-      /// <remarks>Override this method to have a custom logic for delayed connection attempts.</remarks>
       /// <returns></returns>
+      /// <remarks>
+      /// Override this method to have a custom logic for delayed connection attempts.
+      /// </remarks>
       public virtual TimeSpan ComputeDelayAdjustment()
       {
          return DefaultDelayBetweenAttempts;

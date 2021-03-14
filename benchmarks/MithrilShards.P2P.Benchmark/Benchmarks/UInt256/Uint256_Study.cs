@@ -68,9 +68,9 @@ namespace AltUInt256
       protected ulong part4;
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
+      /// Initializes a new instance of the <see cref="UInt256" />, expect data in Little Endian.
       /// </summary>
-      /// <param name="data">The data.</param>
+      /// <param name="input">The byte array representing the UInt256 in little endian.</param>
       public UInt256(ReadOnlySpan<byte> input)
       {
          if (input.Length != EXPECTED_SIZE)
@@ -99,9 +99,9 @@ namespace AltUInt256
       protected ulong part4;
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
+      /// Initializes a new instance of the <see cref="UInt256" />, expect data in Little Endian.
       /// </summary>
-      /// <param name="data">The data.</param>
+      /// <param name="input">The input.</param>
       public UInt256_Updated(ReadOnlySpan<byte> input)
       {
          if (input.Length != EXPECTED_SIZE)
