@@ -3,6 +3,10 @@ name: Main Build
 on:
   workflow_dispatch:
     inputs:
+      single-runner:
+        description: specify if it has to run on a single runner only (ubuntu-latest)
+        required: true
+        default: 'true'
       run-test:
         description: specify if test has to be run
         required: true
@@ -47,6 +51,7 @@ jobs:
     outputs:
       DO_TEST: ${{ steps.DO_TEST.outputs.value }}
       DO_PACK: ${{ steps.DO_PACK.outputs.value }}
+      RUNNERS: ${{ steps.RUNNERS.outputs.matrix }}
     steps:
     - name: Set DO_TEST
       uses: haya14busa/action-cond@v1
@@ -55,6 +60,7 @@ jobs:
         cond: ${{ github.event_name == 'workflow_dispatch' }}
         if_true: ${{ github.event.inputs.run-test }}
         if_false: ${{ env.DEFAULT_DO_TEST }}
+
     - name: Set DO_PACK
       uses: haya14busa/action-cond@v1
       id: DO_PACK
@@ -62,18 +68,28 @@ jobs:
         cond: ${{ github.event_name == 'workflow_dispatch' }}
         if_true: ${{ github.event.inputs.create-packages }}
         if_false: ${{ env.DEFAULT_DO_PACK }}
+
+    - name: Set Runners OS Matrix
+      id: RUNNERS
+      run: |
+         if [ "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.single-runner == 'true' }}" = "true" ]
+         then
+            echo "::set-output name=matrix::{\"os\":[\"ubuntu-latest\"]}"
+         else
+            echo "::set-output name=matrix::{\"os\":[\"ubuntu-latest\",\"windows-latest\",\"macos-latest\"]}"
+         fi
+
     - name: Dump Variables # for debug purpose
       run: |
          echo "DO_TEST = ${{ steps.DO_TEST.outputs.value }}"
          echo "DO_PACK = ${{ steps.DO_PACK.outputs.value }}"
-
+         echo "RUNNERS = ${{ steps.RUNNERS.outputs.matrix }}"
 
   build:
     needs: set_variables
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+      matrix: ${{fromJSON(needs.set_variables.outputs.RUNNERS)}}
 
     steps:
     - name: Checkout code
@@ -109,6 +125,7 @@ jobs:
          if-no-files-found: error
 
 
+
   prerelease:
     needs: build
     if: needs.set_variables.outputs.DO_PACK && (github.ref == 'refs/heads/master' || github.event.inputs.publish-prerelease)
@@ -119,10 +136,12 @@ jobs:
       with:
          name: mithril-shards-nuget-package
     - name: Push to GitHub Feed
-      run: |
-         for f in ./mithril-shards-nuget-package/*.nupkg
-         do
-            curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
-         done
+      # The github token is automatically being pulled from the workflow
+      run: dotnet nuget push ./mithril-shards-nuget-package/*.nupkg --no-symbols --skip-duplicate
+      #run: |
+      #   for f in ./mithril-shards-nuget-package/*.nupkg
+      #   do
+      #      curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
+      #   done
 #    - name: Push to NuGet Feed
 #      run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
