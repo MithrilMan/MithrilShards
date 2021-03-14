@@ -9,8 +9,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MithrilShards.Core.MithrilShards;
-using MithrilShards.Core.MithrilShards.Validation;
+using MithrilShards.Core.Shards;
+using MithrilShards.Core.Shards.Validation;
 
 namespace MithrilShards.Core.Forge
 {

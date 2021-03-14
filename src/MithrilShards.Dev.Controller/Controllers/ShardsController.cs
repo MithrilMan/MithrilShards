@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 using System.Linq;
 using System;
 using Microsoft.Extensions.Options;

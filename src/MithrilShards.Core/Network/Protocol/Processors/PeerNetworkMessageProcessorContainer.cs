@@ -124,7 +124,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
 
 
       /// <summary>
-      /// Improve performance over a straight <see cref="MethodInfo.Invoke"/>, creating a compiled lambda expression that
+      /// Improve performance over a straight delegate Invoke, creating a compiled lambda expression that
       /// allow to have a call on a generic function that internally performs needed cast to invoke the proper open delegate.
       /// </summary>
       /// <param name="method">The method.</param>

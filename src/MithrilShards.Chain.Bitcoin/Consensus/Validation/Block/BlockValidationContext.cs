@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block
 {

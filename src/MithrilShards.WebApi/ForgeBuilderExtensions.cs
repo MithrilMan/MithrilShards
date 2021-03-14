@@ -7,7 +7,7 @@ using MithrilShards.WebApi;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 using System.Linq;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.Extensions.Logging;

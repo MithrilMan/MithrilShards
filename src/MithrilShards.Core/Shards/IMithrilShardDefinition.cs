@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MithrilShards.Core.MithrilShards
+namespace MithrilShards.Core.Shards
 {
    public interface IMithrilShardDefinition
    {

@@ -54,8 +54,8 @@ namespace MithrilShards.Network.Bedrock
          INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
          using IPeerContext peerContext = _peerContextFactory.CreateIncomingPeerContext(connection.ConnectionId,
-                                                                                            connection.LocalEndPoint.AsIPEndPoint().EnsureIPv6(),
-                                                                                            connection.RemoteEndPoint.AsIPEndPoint().EnsureIPv6(),
+                                                                                            connection.LocalEndPoint!.AsIPEndPoint().EnsureIPv6(),
+                                                                                            connection.RemoteEndPoint!.AsIPEndPoint().EnsureIPv6(),
                                                                                             new NetworkMessageWriter(protocol, connection.CreateWriter()));
 
          using CancellationTokenRegistration cancellationRegistration = peerContext.ConnectionCancellationTokenSource.Token.Register(() =>
@@ -112,7 +112,7 @@ namespace MithrilShards.Network.Bedrock
             return false;
          }
 
-         ServerPeerConnectionGuardResult result = (
+         ServerPeerConnectionGuardResult? result = (
             from guard in _serverPeerConnectionGuards
             let guardResult = guard.Check(peerContext)
             where guardResult.IsDenied
@@ -120,6 +120,8 @@ namespace MithrilShards.Network.Bedrock
             )
             .DefaultIfEmpty(ServerPeerConnectionGuardResult.Success)
             .FirstOrDefault();
+
+         if (result == null) return true; // no guards
 
          if (result.IsDenied)
          {

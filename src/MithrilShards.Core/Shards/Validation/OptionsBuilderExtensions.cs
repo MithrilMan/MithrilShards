@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace MithrilShards.Core.MithrilShards.Validation
+namespace MithrilShards.Core.Shards.Validation
 {
    public static class OptionsBuilderExtensions
    {

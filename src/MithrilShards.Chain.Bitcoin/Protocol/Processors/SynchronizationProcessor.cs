@@ -641,7 +641,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// Check whether the last unknown block header a peer advertised is finally known.
       /// </summary>
       /// <remarks>
-      /// If <see cref="status.LastUnknownBlockHash" /> is finally found in the headers tree, it means
+      /// If <see cref="BlockHeaderProcessorStatus.LastUnknownBlockHash" /> is finally found in the headers tree, it means
       /// it's no longer unknown and we set to null the status property.
       /// </remarks>
       private void ProcessBlockAvailability()

@@ -9,14 +9,14 @@ using MithrilShards.Core.Threading.Events;
 namespace MithrilShards.Core.Threading
 {
    /// <summary>
-   /// Implementations of <see cref="IPeriodicWork"/>.
-   /// Users of an <see cref="IPeriodicWork"/> should dispose it when it's not needed or call StartAsync using a cancellation token
+   /// Implementations of <see cref="IPeriodicWork" />.
+   /// Users of an <see cref="IPeriodicWork" /> should dispose it when it's not needed or call StartAsync using a cancellation token
    /// that's canceled when the periodic work is not needed anymore.
-   /// Canceling a periodic work using the token is the same as calling <see cref="StopAsync"/>.
+   /// Canceling a periodic work using the token is the same as calling <see cref="StopAsync" />.
    /// Calling Dispose has the same effect as calling StopAsync.
    /// </summary>
-   /// <seealso cref="System.IDisposable" />
    /// <seealso cref="MithrilShards.Core.Threading.IPeriodicWork" />
+   /// <seealso cref="System.IDisposable" />
    public sealed class PeriodicWork : IDisposable, IPeriodicWork
    {
       private readonly ILogger _logger;

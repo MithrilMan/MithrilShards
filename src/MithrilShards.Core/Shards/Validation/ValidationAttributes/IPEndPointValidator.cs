@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 
-namespace MithrilShards.Core.MithrilShards.Validation.ValidationAttributes
+namespace MithrilShards.Core.Shards.Validation.ValidationAttributes
 {
    /// <summary>
    /// Ensure the value is a valid IPEndPoint.

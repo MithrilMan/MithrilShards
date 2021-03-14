@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 using MithrilShards.Core.Network;
 
 namespace MithrilShards.Core.Forge

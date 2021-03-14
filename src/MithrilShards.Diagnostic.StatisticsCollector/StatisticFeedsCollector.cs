@@ -50,11 +50,11 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 
       /// <summary>
       /// Triggered when the application host is ready to start the service.
-      /// If <see cref="settings.ContinuousConsoleDisplay"/> is true, statistics will be collected
-      /// every <see cref="settings.ContinuousConsoleDisplayRate"/>, otherwise no statistics will be fetched automatically.
+      /// If <see cref="StatisticsCollectorSettings.ContinuousConsoleDisplay"/> is true, statistics will be collected
+      /// every <see cref="StatisticsCollectorSettings.ContinuousConsoleDisplayRate"/>, otherwise no statistics will be fetched automatically.
       /// </summary>
       /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-      /// <remarks>Changing <see cref="settings.ContinuousConsoleDisplay"/> at runtime won't affect automatically this behavior.</remarks>
+      /// <remarks>Changing <see cref="StatisticsCollectorSettings.ContinuousConsoleDisplay"/> at runtime won't affect automatically this behavior.</remarks>
       /// <returns></returns>
       public Task StartAsync(CancellationToken cancellationToken)
       {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace MithrilShards.Core.MithrilShards.Validation
+namespace MithrilShards.Core.Shards.Validation
 {
    internal class ValidationHostedService : IHostedService
    {

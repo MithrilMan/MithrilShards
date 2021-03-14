@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using MithrilShards.Core.MithrilShards.Validation.ValidationAttributes;
+using MithrilShards.Core.Shards.Validation.ValidationAttributes;
 
 namespace MithrilShards.Example.Network.Client
 {

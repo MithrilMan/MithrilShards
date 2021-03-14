@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
-using MithrilShards.Core.MithrilShards;
-using MithrilShards.Core.MithrilShards.Validation.ValidationAttributes;
+using MithrilShards.Core.Shards;
+using MithrilShards.Core.Shards.Validation.ValidationAttributes;
 
 namespace MithrilShards.UI.BlazorServer
 {
