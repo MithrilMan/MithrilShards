@@ -30,18 +30,24 @@ jobs:
       DO_TEST: ${{ steps.DO_TEST.outputs.value }}
       DO_PACK: ${{ steps.DO_PACK.outputs.value }}
     steps:
-    - uses: haya14busa/action-cond@v1
+    - name: Set DO_TEST
+      uses: haya14busa/action-cond@v1
       id: DO_TEST
       with:
         cond: ${{ github.event_name == 'workflow_dispatch' }}
         if_true: ${{ github.event.inputs.run-test }}
         if_false: ${{ env.DEFAULT_DO_TEST }}
-    - uses: haya14busa/action-cond@v1
+    - name: Set DO_PACK
+      uses: haya14busa/action-cond@v1
       id: DO_PACK
       with:
         cond: ${{ github.event_name == 'workflow_dispatch' }}
         if_true: ${{ github.event.inputs.create-packages }}
         if_false: ${{ env.DEFAULT_DO_PACK }}
+    - name: Dump Variables # for debug purpose
+      run: |
+         echo "DO_TEST = ${{ steps.DO_TEST.outputs.value }}"
+         echo "DO_PACK = ${{ steps.DO_PACK.outputs.value }}"
 
   build:
     needs: set_variables
