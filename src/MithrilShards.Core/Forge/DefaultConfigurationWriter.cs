@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Core.Forge
 {

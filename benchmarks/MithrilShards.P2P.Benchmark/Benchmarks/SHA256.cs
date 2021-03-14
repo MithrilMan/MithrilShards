@@ -26,7 +26,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Benchmark]
       public NBitcoin.uint256 NBitcoin_Hash256()
       {
-         return NBitcoin.Crypto.Hashes.Hash256(_data);
+         return NBitcoin.Crypto.Hashes.DoubleSHA256(_data);
       }
 
       [Benchmark]

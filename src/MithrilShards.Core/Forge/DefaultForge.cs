@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 using MithrilShards.Core.Network;
 
 namespace MithrilShards.Core.Forge
@@ -98,7 +98,7 @@ namespace MithrilShards.Core.Forge
 
       public List<(string name, string version)> GetMeltedShardsNames()
       {
-         if (_mithrilShards?.Count() == 0) return new List<(string name, string version)>();
+         if (_mithrilShards.Count() == 0) return new List<(string name, string version)>();
 
          return _mithrilShards.Select(shard => (
             name: shard.GetType().Name,

@@ -59,6 +59,7 @@ namespace MithrilShards.Core.Threading
       /// <summary>
       /// Starts the asynchronous periodic work.
       /// </summary>
+      /// <param name="label"></param>
       /// <param name="cancellation">The cancellation token.</param>
       /// <param name="interval">
       /// The interval of time that will be awaited before executing again the work.
@@ -70,6 +71,7 @@ namespace MithrilShards.Core.Threading
       /// <summary>
       /// Starts the asynchronous periodic work with a dynamic interval between iterations.
       /// </summary>
+      /// <param name="label"></param>
       /// <param name="cancellation">The cancellation token.</param>
       /// <param name="interval">A function that return the interval of time to wait before next execution.</param>
       /// <param name="work">The work to execute.</param>

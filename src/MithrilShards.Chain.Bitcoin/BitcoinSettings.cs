@@ -1,5 +1,5 @@
 ﻿using MithrilShards.Chain.Bitcoin.DataTypes;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Chain.Bitcoin
 {

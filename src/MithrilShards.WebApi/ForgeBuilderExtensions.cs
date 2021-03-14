@@ -7,7 +7,7 @@ using MithrilShards.WebApi;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using MithrilShards.Core.MithrilShards;
+using MithrilShards.Core.Shards;
 using System.Linq;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.Extensions.Logging;
@@ -19,7 +19,6 @@ using MithrilShards.WebApi.Filters.OperationFilters;
 using MithrilShards.Dev.Controller;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net;
 using MithrilShards.WebApi.Conventions;
 
 namespace MithrilShards.Core.Forge
@@ -29,9 +28,10 @@ namespace MithrilShards.Core.Forge
       private const string SWAGGER_ROUTE_PREFIX = "docs";
 
       /// <summary>
-      /// Extension used by other shards to create custom <see cref="ApiServiceDefinition"/>.
+      /// Extension used by other shards to create custom <see cref="ApiServiceDefinition" />.
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
+      /// <param name="apiServiceDefinition">The API service definition.</param>
       /// <returns></returns>
       public static IForgeBuilder AddApiService(this IForgeBuilder forgeBuilder, ApiServiceDefinition apiServiceDefinition)
       {
@@ -63,6 +63,7 @@ namespace MithrilShards.Core.Forge
       /// Uses the bitcoin chain.
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
+      /// <param name="options"></param>
       /// <returns></returns>
       public static IForgeBuilder UseApi(this IForgeBuilder forgeBuilder, Action<WebApiOptions>? options = null)
       {
@@ -76,7 +77,7 @@ namespace MithrilShards.Core.Forge
             {
                services.AddSingleton<ApiServiceDefinition>(sp =>
                {
-                  var settings = sp.GetService<IOptions<WebApiSettings>>().Value;
+                  var settings = sp.GetService<IOptions<WebApiSettings>>()!.Value;
 
                   var definition = new ApiServiceDefinition
                   {
@@ -101,8 +102,8 @@ namespace MithrilShards.Core.Forge
                   {
                      var logger = serverOptions.ApplicationServices.GetService<ILogger<WebApiShard>>();
 
-                     IEnumerable<ApiServiceDefinition> apiServiceDefinitions = serverOptions.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>();
-                     var webApiSettings = serverOptions.ApplicationServices.GetService<IOptions<WebApiSettings>>().Value;
+                     IEnumerable<ApiServiceDefinition> apiServiceDefinitions = serverOptions.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>()!;
+                     var webApiSettings = serverOptions.ApplicationServices.GetService<IOptions<WebApiSettings>>()!.Value;
 
                      // sanity check of registered ApiServiceDefinition
                      foreach (var apiServiceDefinition in apiServiceDefinitions)
@@ -137,11 +138,11 @@ namespace MithrilShards.Core.Forge
                      var tempServiceProvider = services.BuildServiceProvider();
                      var logger = tempServiceProvider.GetService<ILogger<WebApiShard>>();
 
-                     IEnumerable<Assembly> assembliesToScaffold = tempServiceProvider.GetService<IEnumerable<IMithrilShard>>()
+                     IEnumerable<Assembly> assembliesToScaffold = tempServiceProvider.GetService<IEnumerable<IMithrilShard>>()!
                      .Select(shard => shard.GetType().Assembly)
                      .Concat(optionsInstance.Scaffolder.GetAssemblies());
 
-                     IEnumerable<ApiServiceDefinition> apiServiceDefinitions = tempServiceProvider.GetService<IEnumerable<ApiServiceDefinition>>();
+                     IEnumerable<ApiServiceDefinition> apiServiceDefinitions = tempServiceProvider.GetService<IEnumerable<ApiServiceDefinition>>()!;
 
                      services
                         .AddRouting()
@@ -228,10 +229,10 @@ namespace MithrilShards.Core.Forge
 
       private static void SwaggerConfiguration(IApplicationBuilder app)
       {
-         IEnumerable<ApiServiceDefinition> apiServiceDefinitions = app.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>();
-         var logger = app.ApplicationServices.GetService<ILogger<WebApiShard>>();
+         IEnumerable<ApiServiceDefinition> apiServiceDefinitions = app.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>()!;
+         var logger = app.ApplicationServices.GetService<ILogger<WebApiShard>>()!;
 
-         var webApiSettings = app.ApplicationServices.GetService<IOptions<WebApiSettings>>().Value;
+         var webApiSettings = app.ApplicationServices.GetService<IOptions<WebApiSettings>>()!.Value;
 
          app
             .UseRouting()

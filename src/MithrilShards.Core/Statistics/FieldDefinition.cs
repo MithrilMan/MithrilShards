@@ -35,9 +35,10 @@ namespace MithrilShards.Core.Statistics
       public Func<(object? value, int widthHint), string>? ValueFormatter { get; }
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="FieldDefinition"/> class.
+      /// Initializes a new instance of the <see cref="FieldDefinition" /> class.
       /// </summary>
       /// <param name="label">The label.</param>
+      /// <param name="description">The description.</param>
       /// <param name="widthHint">The width hint.</param>
       /// <param name="unitOfMeasure">The unit of measure.</param>
       /// <param name="valueFormatter">The value formatter (null if value doesn't need to be formatted).</param>

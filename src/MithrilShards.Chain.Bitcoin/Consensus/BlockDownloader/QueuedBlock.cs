@@ -3,7 +3,7 @@
    /// <summary>
    /// Represents a block queued to be downloaded.
    /// </summary>
-   /// <seealso cref="Network.IBlockDownloader" />
+   /// <seealso cref="BlockFetcherManager" />
    public class QueuedBlock
    {
       /// <summary>

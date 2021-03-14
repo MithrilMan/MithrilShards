@@ -31,7 +31,7 @@ namespace MithrilShards.Dev.Controller
 
       public override void OnActionExecuting(ActionExecutingContext context)
       {
-         var area = (string)context.RouteData.Values["area"];
+         var area = (string?)context.RouteData.Values["area"];
 
          ApiServiceDefinition? apiAreaDefinition = _apiServiceDefinitions.FirstOrDefault(definition => definition.Area == area);
          if (area == null)

@@ -15,7 +15,7 @@ namespace MithrilShards.Core.Network.Client
    /// <summary>
    /// Tries to connect to peers configured to be connected.
    /// </summary>
-   /// <seealso cref="MithrilShards.Core.Network.Client.IConnector" />
+   /// <seealso cref="MithrilShards.Core.Network.Client.ConnectorBase" />
    public class RequiredConnection : ConnectorBase
    {
       private const int INNER_DELAY = 500;

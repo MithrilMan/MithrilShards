@@ -5,7 +5,7 @@ namespace MithrilShards.Core.Network.Events
    /// <summary>
    /// A peer message has been sent successfully.
    /// </summary>
-   /// <seealso cref="Stratis.Bitcoin.EventBus.EventBase" />
+   /// <seealso cref="MithrilShards.Core.Network.Events.PeerEventBase" />
    public class PeerMessageSent : PeerEventBase
    {
       /// <summary>

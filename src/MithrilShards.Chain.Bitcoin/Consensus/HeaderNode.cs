@@ -53,7 +53,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Number of transactions in the chain up to and including this block.
       /// This value will be non-zero only if and only if transactions for this block and all its parents are available.
       /// Change to 64-bit type when necessary
-      /// </value>
+      /// </summary>
       /// <remarks>It's an in-memory value only that get computed during the header tree building and validation.</remarks>
       public uint ChainTxCount { get; set; }
 

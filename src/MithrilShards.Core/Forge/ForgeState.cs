@@ -5,10 +5,10 @@
       /// <summary>Assigned when <see cref="IForge"/> instance is created.</summary>
       Created,
 
-      /// <summary>Assigned when <see cref="IForge.Start"/> is called.</summary>
+      /// <summary>Assigned when <see cref="IForge"/> StartAsync is called.</summary>
       Starting,
 
-      /// <summary>Assigned when <see cref="IForge.Start"/> finished executing.</summary>
+      /// <summary>Assigned when <see cref="IForge"/> StartAsync finished executing.</summary>
       Started,
 
       /// <summary>Assigned when <see cref="IForge"/> is shutting down.</summary>

@@ -75,7 +75,6 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <summary>
       /// Creates the table builder for a specific <see cref="StatisticFeedDefinition" />.
       /// </summary>
-      /// <param name="definition">The definition.</param>
       /// <returns></returns>
       private TableBuilder CreateTableBuilder()
       {

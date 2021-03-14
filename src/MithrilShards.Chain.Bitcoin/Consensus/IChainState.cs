@@ -25,11 +25,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       void Commit();
 
       /// <summary>
-      /// Tries to get the a <see cref="HeaderNode"/> from an hash, looking in the best chain.
+      /// Tries to get the a <see cref="HeaderNode" /> from an hash, looking in the best chain.
       /// </summary>
       /// <param name="blockHash">The block hash.</param>
-      /// <param name="height">The height if found, -1 otherwise.</param>
-      /// <returns><c>true</c> if the result has been found, <see langword="false"/> otherwise.</returns>
+      /// <param name="node">The node.</param>
+      /// <returns>
+      ///   <c>true</c> if the result has been found, <see langword="false" /> otherwise.
+      /// </returns>
       bool TryGetBestChainHeaderNode(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node);
 
       /// <summary>
@@ -37,6 +39,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// May be present on best chain or on a fork.
       /// </summary>
       /// <param name="hash">The hash.</param>
+      /// <param name="node"></param>
       /// <returns>
       ///   <c>true</c> if the specified hash is known; otherwise, <c>false</c>.
       /// </returns>
@@ -86,6 +89,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Tries to get the header node on best chain at the specified height.
       /// </summary>
       /// <param name="height">The height.</param>
+      /// <param name="headerNode"></param>
       bool TryGetAtHeight(int height, [MaybeNullWhen(false)] out HeaderNode? headerNode);
    }
 }

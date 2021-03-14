@@ -17,7 +17,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       ValidTree   /*       */ = 0b_00000000_00000001,
 
       /// <summary>
-      /// Only first tx is coinbase, 2 <= coinbase input, script length <= 100, transactions valid, no duplicate txids, sigops, size, merkle root.
+      /// Only first tx is coinbase, 2 &lt;= coinbase input, script length &lt;= 100, transactions valid, no duplicate txids, sigops, size, merkle root.
       /// Implies all parents are at least TREE but not necessarily TRANSACTIONS.
       /// </summary>
       ValidTransactions /* */ = 0b_00000000_00000010,

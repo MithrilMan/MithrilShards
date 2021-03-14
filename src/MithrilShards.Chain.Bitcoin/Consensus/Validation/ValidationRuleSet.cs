@@ -58,7 +58,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
                item: definition,
                dependencies: definition.GetDependencies()
                   .Select(dependency => definitions.FirstOrDefault(definition => definition == dependency))
-                  .Where(dependency => dependency != null) // ignore missing rules. Proper check on mandatory rules has been performed in VerifyValidationRules
+                  .Where(dependency => dependency != null)! // ignore missing rules. Proper check on mandatory rules has been performed in VerifyValidationRules
                );
          }
 
@@ -80,8 +80,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       /// <summary>
       /// Verifies that all registered validation rules have all dependent rules registered too and order rules based on their dependency graph.
       /// </summary>
-      /// <typeparam name="TValidationRule">The type of the validation rules.</typeparam>
-      /// <param name="rules">The rules to verify.</param>
+      /// <returns></returns>
       protected virtual List<RuleDefinition> VerifyValidationRules()
       {
          // ensures that registered rules dependencies are honored

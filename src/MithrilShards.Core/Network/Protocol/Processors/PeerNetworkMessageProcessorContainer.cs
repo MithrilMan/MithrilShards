@@ -101,7 +101,10 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       /// Processes the message using mapped message handlers.
       /// </summary>
       /// <param name="message">The message.</param>
-      /// <returns><see langword="true"/> if message has been processed, <see langword="false"/> otherwise.</returns>
+      /// <param name="cancellation">The cancellation.</param>
+      /// <returns>
+      ///   <see langword="true" /> if message has been processed, <see langword="false" /> otherwise.
+      /// </returns>
       public async ValueTask<bool> ProcessMessageAsync(INetworkMessage message, CancellationToken cancellation)
       {
          if (!_mapping.TryGetValue(message.GetType(), out List<ProcessorHandler>? handlers)) return false;
@@ -121,7 +124,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
 
 
       /// <summary>
-      /// Improve performance over a straight <see cref="MethodInfo.Invoke"/>, creating a compiled lambda expression that
+      /// Improve performance over a straight delegate Invoke, creating a compiled lambda expression that
       /// allow to have a call on a generic function that internally performs needed cast to invoke the proper open delegate.
       /// </summary>
       /// <param name="method">The method.</param>
@@ -134,7 +137,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
          ParameterExpression arguments = Expression.Parameter(typeof(object[]), "arguments");
 
          MethodCallExpression call = Expression.Call(
-            Expression.Convert(instance, method.DeclaringType),
+            Expression.Convert(instance, method.DeclaringType!),
             method,
             method.GetParameters()
                .Select((parameter, index) => Expression.Convert(Expression.ArrayIndex(arguments, Expression.Constant(index)), parameter.ParameterType))

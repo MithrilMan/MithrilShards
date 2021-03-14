@@ -11,8 +11,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
    /// <summary>
    /// Merkle root calculator, implementing bitcoin flawed logic.
    /// </summary>
+   /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.IMerkleRootCalculator" />
    /// <remarks>
-   /// Here a copy & past of original bitcoin comment on the flawled implementation:
+   /// Here a copy and past of original bitcoin comment on the flawled implementation:
    /// WARNING! If you're reading this because you're learning about crypto
    /// and/or designing a new system that will use merkle trees, keep in mind
    /// that the following merkle tree algorithm has a serious flaw related to
@@ -54,7 +55,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
    /// This implementation doesn't check the attempt of using duplicate transactions, that check
    /// is done by <see cref="CheckMerkleRoot"/> validation rule.
    /// </remarks>
-   /// <seealso cref="Consensus.IMerkleRootCalculator" />
    public class BitcoinFlawedMerkleRootCalculator : IMerkleRootCalculator
    {
       readonly ILogger<BitcoinFlawedMerkleRootCalculator> _logger;

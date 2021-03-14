@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using MithrilShards.Core.Forge;
 
-namespace MithrilShards.Core.MithrilShards
+namespace MithrilShards.Core.Shards
 {
    /// <summary>
    /// Base class to have a fallback mechanism to generate default <see cref="IMithrilShard"/> settings

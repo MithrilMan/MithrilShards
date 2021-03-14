@@ -5,12 +5,12 @@ namespace MithrilShards.Core.Network.Events
    /// <summary>
    /// A peer message failed to be sent.
    /// </summary>
-   /// <seealso cref="Stratis.Bitcoin.EventBus.EventBase" />
+   /// <seealso cref="MithrilShards.Core.Network.Events.PeerEventBase" />
    public class PeerMessageSendFailure : PeerEventBase
    {
       /// <summary>
       /// The failed message. Can be null if the exception was caused during the Message creation.
-      /// </value>
+      /// </summary>
       public INetworkMessage Message { get; }
 
       public System.Exception Exception { get; }

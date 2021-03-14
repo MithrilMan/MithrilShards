@@ -25,8 +25,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// <summary>
       /// The block number or timestamp at which this transaction is unlocked:
       /// 0             = Not locked.
-      /// < 500000000   = Block number at which this transaction is unlocked.
-      /// >= 500000000  = UNIX timestamp at which this transaction is unlocked.
+      /// &lt;= 500000000  = Block number at which this transaction is unlocked.
+      /// &gt;= 500000000  = UNIX timestamp at which this transaction is unlocked.
       ///
       /// If all TxIn inputs have final (0xffffffff) sequence numbers then LockTime is irrelevant.
       /// Otherwise, the transaction may not be added to a block until after LockTime

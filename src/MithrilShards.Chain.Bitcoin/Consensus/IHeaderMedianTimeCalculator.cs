@@ -5,9 +5,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    public interface IHeaderMedianTimeCalculator
    {
       /// <summary>
-      /// Calculate (backward) the median block time over <see cref="medianTimeSpan" /> window from this entry in the chain.
+      /// Calculate (backward) the median block time over a median TimeSpan window from this entry in the chain.
       /// </summary>
-      /// <param name="startingBlock">The starting block.</param>
+      /// <param name="startingBlockHash">The starting block hash.</param>
       /// <param name="startingBlockHeight">Height of the starting block.</param>
       /// <returns>
       /// The median block time.

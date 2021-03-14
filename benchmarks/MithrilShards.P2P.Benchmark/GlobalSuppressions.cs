@@ -12,6 +12,7 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2208:Instantiate argument exceptions correctly", Justification = "<Pending>")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "CA1823")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1823: Avoid unused private fields")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "<Pending>")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CS8632:The annotation for nullable reference types should only be used in code within a nullable")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Compiler Warning", "CS1573")]

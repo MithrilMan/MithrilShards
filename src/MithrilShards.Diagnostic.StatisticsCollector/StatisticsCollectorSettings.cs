@@ -1,4 +1,4 @@
-﻿using MithrilShards.Core.MithrilShards;
+﻿using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector
 {

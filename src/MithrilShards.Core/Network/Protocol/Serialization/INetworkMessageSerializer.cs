@@ -17,6 +17,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
       /// </summary>
       /// <param name="message">The message to serialize.</param>
       /// <param name="protocolVersion">The protocol version to use to serialize the message.</param>
+      /// <param name="peerContext"></param>
       /// <param name="output">The output buffer used to store data into.</param>
       void Serialize(INetworkMessage message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output);
 

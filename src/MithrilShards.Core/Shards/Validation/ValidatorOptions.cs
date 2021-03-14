@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MithrilShards.Core.MithrilShards.Validation
+namespace MithrilShards.Core.Shards.Validation
 {
    internal class ValidatorOptions
    {

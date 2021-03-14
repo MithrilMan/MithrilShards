@@ -7,10 +7,10 @@ using MithrilShards.Core.Network.Client;
 namespace MithrilShards.Core.Forge
 {
    /// <summary>
-   /// Fake <see cref="IForgeConnectivity"/> implementation that acts as a placeholder and remember to the user assembling shards that
-   /// a valid <see cref="IForgeConnectivity"/> implementation must be registered wit an instance of <see cref="IForgeBuilder"/>
+   /// Fake <see cref="IForgeConnectivity" /> implementation that acts as a placeholder and remember to the user assembling shards that
+   /// a valid <see cref="IForgeConnectivity" /> implementation must be registered wit an instance of <see cref="IForgeBuilder" />
    /// </summary>
-   /// <seealso cref="MithrilShards.Core.Forge.IForgeServer" />
+   /// <seealso cref="MithrilShards.Core.Network.IForgeConnectivity" />
    public sealed class FakeForgeConnectivity : IForgeConnectivity
    {
       const string ERROR = "A valid concrete implementation of IForgeConnectivity must be registered on a IForgeBuilder.";

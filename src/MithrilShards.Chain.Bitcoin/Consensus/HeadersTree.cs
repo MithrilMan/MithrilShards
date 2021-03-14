@@ -96,7 +96,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Tries to get the <see cref="HeaderNode" /> on best chain at a specified height.
       /// </summary>
       /// <param name="height">The height.</param>
-      /// <param name="node">The header node having the passed <paramref name="blockHash"/>.</param>
+      /// <param name="node">The header node at the specified height.</param>
       /// <returns>
       ///   <c>true</c> if the result has been found, <see langword="false" /> otherwise.
       /// </returns>
@@ -255,7 +255,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Tries to get the height of an hash on the best chain (no lock).
       /// </summary>
       /// <param name="blockHash">The block hash.</param>
-      /// <param name="height">The height.</param>
+      /// <param name="node">The node.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       private bool TryGetNodeOnBestChainNoLock(UInt256 blockHash, [MaybeNullWhen(false)] out HeaderNode node)
