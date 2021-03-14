@@ -11,6 +11,10 @@ on:
         description: specify if packages have to be built
         required: true
         default: 'true'
+      publish-prerelease:
+        description: specify if nuget packages has to be published on github feed
+        required: true
+        default: 'true'
   pull_request:
   issues:
   push:
@@ -19,6 +23,20 @@ on:
     paths:
       - '*'
       - '!/Documentation/*' # Don't run workflow when files are only in the /Documentation directory
+
+
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # GitHub Packages Feed settings
+  GITHUB_FEED: https://nuget.pkg.github.com/MithrilMan/index.json/
+  GITHUB_USER: MithrilMan
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_API_KEY }}
 
 jobs:
   set_variables:
@@ -49,6 +67,7 @@ jobs:
          echo "DO_TEST = ${{ steps.DO_TEST.outputs.value }}"
          echo "DO_PACK = ${{ steps.DO_PACK.outputs.value }}"
 
+
   build:
     needs: set_variables
     runs-on: ${{ matrix.os }}
@@ -71,11 +90,11 @@ jobs:
       run: dotnet restore -s "https://api.nuget.org/v3/index.json" -s "https://f.feedz.io/davidfowl/bedrockframework/nuget/index.json"
 
     - name: Build with dotnet
-      run: dotnet build --configuration Release /p:CI=true
+      run: dotnet build --configuration Release --no-restore /p:CI=true
 
     - name: Perform Tests
       if: needs.set_variables.outputs.DO_TEST == 'true'
-      run: dotnet test -c Release --logger GitHubActions /p:CI=true
+      run: dotnet test -c Release --no-build --logger GitHubActions /p:CI=true
 
     - name: .NET Lib Pack
       if: matrix.os == 'ubuntu-latest' && needs.set_variables.outputs.DO_PACK == 'true'
@@ -88,3 +107,22 @@ jobs:
          name: mithril-shards-nuget-package
          path: ${{ github.workspace }}\.nupkgs
          if-no-files-found: error
+
+
+  prerelease:
+    needs: build
+    if: needs.set_variables.outputs.DO_PACK && (github.ref == 'refs/heads/master' || github.event.inputs.publish-prerelease)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v1
+      with:
+         name: mithril-shards-nuget-package
+    - name: Push to GitHub Feed
+      run: |
+         for f in ./mithril-shards-nuget-package/*.nupkg
+         do
+            curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
+         done
+#    - name: Push to NuGet Feed
+#      run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
