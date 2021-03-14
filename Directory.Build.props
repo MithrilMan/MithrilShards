@@ -1,6 +1,6 @@
 <Project>
    <PropertyGroup>
-      <Copyright>2020 Mithril Man, Inc.</Copyright>
+      <Copyright>2020 Mithril Man.</Copyright>
 
       <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>

@@ -22,7 +22,7 @@ namespace MithrilShards.Dev.Controller
             {
                services.AddSingleton<ApiServiceDefinition>(sp =>
                {
-                  var settings = sp.GetService<IOptions<DevControllerSettings>>().Value;
+                  var settings = sp.GetService<IOptions<DevControllerSettings>>()!.Value;
 
                   var definition = new ApiServiceDefinition
                   {

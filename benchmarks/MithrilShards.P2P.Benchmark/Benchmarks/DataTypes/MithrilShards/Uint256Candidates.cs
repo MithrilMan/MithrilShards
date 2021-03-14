@@ -41,9 +41,10 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
       private readonly long[] _data;
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
+      /// Initializes a new instance of the <see cref="UInt256" />, expect data in Little Endian.
       /// </summary>
-      /// <param name="data">The data.</param>
+      /// <param name="input">The input.</param>
+      /// <exception cref="System.FormatException">the byte array should be 32 bytes long</exception>
       public UInt256As4Long(ReadOnlySpan<byte> input)
       {
          if (input.Length != EXPECTED_SIZE)
@@ -74,9 +75,9 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
       private readonly ulong _part4;
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="UInt256"/>, expect data in Little Endian.
+      /// Initializes a new instance of the <see cref="UInt256" />, expect data in Little Endian.
       /// </summary>
-      /// <param name="data">The data.</param>
+      /// <param name="input">The input.</param>
       public UInt256As4Jhon(ReadOnlySpan<byte> input)
       {
          Span<byte> dst = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _part1, EXPECTED_SIZE / sizeof(ulong)));

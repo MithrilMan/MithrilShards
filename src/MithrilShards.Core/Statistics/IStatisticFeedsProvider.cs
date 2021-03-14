@@ -10,8 +10,6 @@ namespace MithrilShards.Core.Statistics
       /// <summary>
       /// Handy placeholder that feeds provider should use to Register a feed definition.
       /// </summary>
-      /// <param name="statisticFeedsCollector">The statistic feeds collector used to register feeds.</param>
-      /// <returns></returns>
       void RegisterStatisticFeeds();
 
       /// <summary>

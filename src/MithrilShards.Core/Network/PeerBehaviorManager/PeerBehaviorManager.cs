@@ -111,7 +111,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       /// <summary>
       /// Adds the specified peer to the list of connected peer.
       /// </summary>
-      /// <param name="peerContext">The peer context.</param>
+      /// <param name="event">The event.</param>
       private void AddConnectedPeer(PeerConnected @event)
       {
          _connectedPeers[@event.PeerContext.PeerId] = new PeerScore(@event.PeerContext, INITIAL_SCORE);
@@ -121,7 +121,7 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       /// <summary>
       /// Removes the specified peer from the list of connected peer.
       /// </summary>
-      /// <param name="peerContext">The peer context.</param>
+      /// <param name="event">The event.</param>
       private void RemoveConnectedPeer(PeerDisconnected @event)
       {
          if (!_connectedPeers.Remove(@event.PeerContext.PeerId))

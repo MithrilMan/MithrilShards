@@ -42,7 +42,7 @@ namespace MithrilShards.Dev.Controller.Controllers
             return NotFound($"Cannot produce output because {nameof(RequiredConnection)} is not available");
          }
 
-         if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint ipEndPoint))
+         if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
          {
             return BadRequest("Incorrect endpoint");
          }
@@ -61,7 +61,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       [ProducesResponseType(StatusCodes.Status400BadRequest)]
       public IActionResult Disconnect(PeerManagementDisconnectRequest request)
       {
-         if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint ipEndPoint))
+         if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
          {
             return BadRequest("Incorrect endpoint");
          }

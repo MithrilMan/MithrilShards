@@ -6,7 +6,7 @@ namespace MithrilShards.Core.Network.Events
    /// <summary>
    /// Event that is published whenever the node tries to connect to a peer.
    /// </summary>
-   /// <seealso cref="Stratis.Bitcoin.EventBus.EventBase" />
+   /// <seealso cref="MithrilShards.Core.EventBus.EventBase" />
    public class PeerConnectionAttempt : EventBase
    {
       public IPEndPoint RemoteEndPoint { get; }

@@ -83,8 +83,9 @@ namespace MithrilShards.Example.Protocol.Processors
          return default;
       }
 
-      /// <summary>Method invoked when the peer handshakes and <see cref="_isHandshakeAware"/> is set to <see langword="true"/>.</summary>
-      /// <param name="event">The event.</param>
+      /// <summary>
+      /// Method invoked when the peer handshakes and <see cref="_isHandshakeAware" /> is set to <see langword="true" />.
+      /// </summary>
       /// <returns></returns>
       protected virtual ValueTask OnPeerHandshakedAsync()
       {
@@ -92,10 +93,12 @@ namespace MithrilShards.Example.Protocol.Processors
       }
 
       /// <summary>
-      /// Registers a <see cref="IEventBus"/> message <paramref name="handler"/> that will be automatically
+      /// Registers a <see cref="IEventBus" /> message <paramref name="handler" /> that will be automatically
       /// unregistered once the component gets disposed.
       /// </summary>
-      /// <param name="subscription">The subscription.</param>
+      /// <typeparam name="TEventBase">The type of the event base.</typeparam>
+      /// <param name="handler">The handle that will be invoked when if <paramref name="clause"/> is fulfilled.</param>
+      /// <param name="clause">The clause.</param>
       protected void RegisterLifeTimeEventHandler<TEventBase>(Func<TEventBase, ValueTask> handler, Func<TEventBase, bool>? clause = null) where TEventBase : EventBase
       {
          _eventSubscriptionManager.RegisterSubscriptions(eventBus.Subscribe<TEventBase>(async (message) =>
@@ -175,11 +178,12 @@ namespace MithrilShards.Example.Protocol.Processors
       }
 
       /// <summary>
-      /// Execute an action in case the condition evaluates to true after <paramref name="timeout"/> expires.
+      /// Execute an action in case the condition evaluates to true after <paramref name="timeout" /> expires.
       /// </summary>
       /// <param name="condition">The condition that, when evaluated to true, causes the peer to be disconnected.</param>
       /// <param name="timeout">The timeout that will trigger the condition evaluation.</param>
       /// <param name="action">The condition that, when evaluated to true, causes the peer to be disconnected.</param>
+      /// <param name="cancellation">The cancellation token.</param>
       /// <returns></returns>
       protected Task ExecuteIfAsync(Func<ValueTask<bool>> condition, TimeSpan timeout, Func<ValueTask> action, CancellationToken cancellation = default)
       {
@@ -230,7 +234,7 @@ namespace MithrilShards.Example.Protocol.Processors
       /// <param name="minVersion">The minimum version that has to be supported in order to return true.</param>
       /// <remarks>
       /// This is useful when there is logic that has to be executed only if a specified version of the negotiated protocol
-      /// is supported and would require multiple call of <see cref="SendMessageAsync"/> with the minVersion overload.
+      /// is supported and would require multiple call of <see cref="SendMessageAsync(int, INetworkMessage, CancellationToken)"/> with the minVersion overload.
       /// </remarks>
       /// <returns></returns>
       protected bool IsSupported(int minVersion)

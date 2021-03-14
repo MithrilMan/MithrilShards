@@ -111,10 +111,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       }
 
       /// <summary>
-      /// When the peer handshake, sends <see cref="SendCmpctMessage"/>  and <see cref="SendHeadersMessage"/> if the
+      /// When the peer handshake, sends <see cref="SendCmpctMessage" />  and <see cref="SendHeadersMessage" /> if the
       /// negotiated protocol allow that and update peer status based on its version message.
       /// </summary>
-      /// <param name="event">The event.</param>
       /// <returns></returns>
       protected override async ValueTask OnPeerHandshakedAsync()
       {
@@ -418,7 +417,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          header.Hash = _blockHeaderHashCalculator.ComputeHash(header, protocolVersion);
 
          // compute transaction hashes in parallel to speed up the operation and check sent headers are sequential.
-         Parallel.ForEach(message.Block.Transactions, transaction =>
+         Parallel.ForEach(message.Block.Transactions!, transaction =>
          {
             transaction.Hash = _transactionHashCalculator.ComputeHash(transaction, protocolVersion);
             transaction.WitnessHash = _transactionHashCalculator.ComputeWitnessHash(transaction, protocolVersion);
@@ -553,7 +552,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       }
 
       /// <summary>
-      /// If this looks like it could be a block announcement (headersCount < MAX_BLOCKS_TO_ANNOUNCE),
+      /// If this looks like it could be a block announcement (headersCount less than MAX_BLOCKS_TO_ANNOUNCE),
       /// use special logic for handling headers that don't connect:
       /// - Send a getheaders message in response to try to connect the chain.
       /// - The peer can send up to MAX_UNCONNECTING_HEADERS in a row that don't connect before giving DoS points
@@ -642,7 +641,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// Check whether the last unknown block header a peer advertised is finally known.
       /// </summary>
       /// <remarks>
-      /// If <see cref="status.LastUnknownBlockHash"/> is finally found in the headers tree, it means
+      /// If <see cref="status.LastUnknownBlockHash" /> is finally found in the headers tree, it means
       /// it's no longer unknown and we set to null the status property.
       /// </remarks>
       private void ProcessBlockAvailability()

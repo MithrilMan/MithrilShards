@@ -31,7 +31,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       /// <typeparam name="T">The type of the object stored in context data.</typeparam>
       /// <param name="key">The key.</param>
       /// <param name="data">The data.</param>
-      /// <seealso cref=""/>
       void SetData<T>(string key, T data) where T : notnull;
 
       /// <summary>

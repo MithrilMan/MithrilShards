@@ -22,7 +22,7 @@ namespace MithrilShards.Core.EventBus
       void Unsubscribe(SubscriptionToken token);
 
       /// <summary>
-      /// Publishes the specified event to any subscribers for the <see cref="TEventBase"/> event type
+      /// Publishes the specified event to any subscribers for the <typeparamref name="TEventBase"/> event type
       /// </summary>
       /// <typeparam name="TEventBase">The type of event</typeparam>
       /// <param name="eventItem">Event to publish</param>

@@ -131,7 +131,6 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// Fetches the feed statistic of a specific feed.
       /// </summary>
       /// <param name="feed">The feed.</param>
-      /// <param name="feedDefinition">The feed definition.</param>
       /// <param name="useTableBuilder">If set to <c>true</c> use the feed tableBuilder to build an human readable output.</param>
       private void FetchFeedStatisticNoLock(ScheduledStatisticFeed feed, bool useTableBuilder)
       {
@@ -191,7 +190,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <returns></returns>
       public IStatisticFeedResult GetFeedDump(string feedId, bool humanReadable)
       {
-         ScheduledStatisticFeed feed = _scheduledFeeds.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
+         ScheduledStatisticFeed? feed = _scheduledFeeds.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
          if (feed == null)
          {
             throw new ArgumentException("feedId not found");

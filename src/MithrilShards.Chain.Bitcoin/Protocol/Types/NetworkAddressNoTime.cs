@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
 
       public IPEndPoint EndPoint
       {
-         get { return new IPEndPoint(new IPAddress(IP), Port); }
+         get { return new IPEndPoint(new IPAddress(IP!), Port); }
          set
          {
             if (value == null)

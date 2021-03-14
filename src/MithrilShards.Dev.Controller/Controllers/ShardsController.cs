@@ -27,7 +27,7 @@ namespace MithrilShards.Dev.Controller.Controllers
 
          _mithrilShards = mithrilShards.ToDictionary(
             shard => shard.GetType().Name,
-            shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)));
+            shard => (shard, mithrilShardsSettings.FirstOrDefault(settings => settings.GetType().Assembly == shard.GetType().Assembly)))!;
       }
 
       /// <summary>

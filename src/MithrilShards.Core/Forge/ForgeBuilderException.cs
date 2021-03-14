@@ -3,9 +3,9 @@
 namespace MithrilShards.Core.Forge
 {
    /// <summary>
-   /// Exception thrown by <see cref="ForgeBuilder.Build"/>.
+   /// Exception thrown by <see cref="ForgeBuilder" />.
    /// </summary>
-   /// <seealso cref="ForgeBuilder.Build"/>
+   /// <seealso cref="System.Exception" />
    [Serializable]
    public class ForgeBuilderException : Exception
    {

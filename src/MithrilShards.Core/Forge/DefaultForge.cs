@@ -98,7 +98,7 @@ namespace MithrilShards.Core.Forge
 
       public List<(string name, string version)> GetMeltedShardsNames()
       {
-         if (_mithrilShards?.Count() == 0) return new List<(string name, string version)>();
+         if (_mithrilShards.Count() == 0) return new List<(string name, string version)>();
 
          return _mithrilShards.Select(shard => (
             name: shard.GetType().Name,

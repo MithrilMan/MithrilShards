@@ -26,9 +26,9 @@ namespace MithrilShards.Core.EventBus
       private readonly object _subscriptionsLock = new object();
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="InMemoryEventBus"/> class.
+      /// Initializes a new instance of the <see cref="InMemoryEventBus" /> class.
       /// </summary>
-      /// <param name="loggerFactory">The logger factory.</param>
+      /// <param name="logger">The logger.</param>
       /// <param name="subscriptionErrorHandler">The subscription error handler. If null the default one will be used</param>
       public InMemoryEventBus(ILogger<InMemoryEventBus> logger, ISubscriptionErrorHandler subscriptionErrorHandler)
       {

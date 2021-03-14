@@ -45,7 +45,7 @@ namespace MithrilShards.Core.Network
 
          for (int i = 0; i < Connections.Count; i++)
          {
-            var connection = (ClientPeerBinding?)Connections[i];
+            ClientPeerBinding connection = Connections[i];
             List<ValidationResult> results = new List<ValidationResult>();
             Validator.TryValidateObject(connection, new ValidationContext(connection), results, true);
             foreach (var result in results)
@@ -61,7 +61,7 @@ namespace MithrilShards.Core.Network
 
          for (int i = 0; i < Listeners.Count; i++)
          {
-            var listener = (ServerPeerBinding?)Listeners[i];
+            ServerPeerBinding listener = Listeners[i];
             List<ValidationResult> results = new List<ValidationResult>();
             Validator.TryValidateObject(listener, new ValidationContext(listener), results, true);
             foreach (var result in results)

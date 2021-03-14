@@ -11,9 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeStyle", "CodeStyle", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectionTest", "src\ConnectionTest\ConnectionTest.csproj", "{D93C5DFE-431A-4A18-8260-7E989C5B54E9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmark", "Benchmark", "{AEDA167A-43CB-40E7-935B-BF12DCBE339A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.P2P.Benchmark", "MithrilShards.P2P.Benchmark\MithrilShards.P2P.Benchmark.csproj", "{60A45997-FDF2-4D8E-A00A-2203FDEC2102}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".benchmarks", ".benchmarks", "{AEDA167A-43CB-40E7-935B-BF12DCBE339A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{59B8229B-8557-4987-B758-5E41D996DCD2}"
 	ProjectSection(SolutionItems) = preProject
@@ -91,7 +89,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Chain.Bitcoin
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{B135E247-566F-4C7B-A029-17AA7DC92163}"
 	ProjectSection(SolutionItems) = preProject
+		tests\.editorconfig = tests\.editorconfig
 		tests\Directory.Build.props = tests\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.P2P.Benchmark", "benchmarks\MithrilShards.P2P.Benchmark\MithrilShards.P2P.Benchmark.csproj", "{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{B137F4E3-ACE7-498F-81CE-22A174C72C91}"
+	ProjectSection(SolutionItems) = preProject
+		benchmarks\.editorconfig = benchmarks\.editorconfig
+		benchmarks\Directory.Build.props = benchmarks\Directory.Build.props
 	EndProjectSection
 EndProject
 Global
@@ -104,10 +111,6 @@ Global
 		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D93C5DFE-431A-4A18-8260-7E989C5B54E9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{60A45997-FDF2-4D8E-A00A-2203FDEC2102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{60A45997-FDF2-4D8E-A00A-2203FDEC2102}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{60A45997-FDF2-4D8E-A00A-2203FDEC2102}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{60A45997-FDF2-4D8E-A00A-2203FDEC2102}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -172,13 +175,16 @@ Global
 		{E7121392-CC85-458B-B398-51AEE02A6623}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7121392-CC85-458B-B398-51AEE02A6623}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7121392-CC85-458B-B398-51AEE02A6623}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4745214D-E97C-41B1-A1A3-5C8237C59B72} = {BDB5B467-A0FD-4054-9950-C708F61E499D}
-		{60A45997-FDF2-4D8E-A00A-2203FDEC2102} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
 		{59B8229B-8557-4987-B758-5E41D996DCD2} = {BDB5B467-A0FD-4054-9950-C708F61E499D}
 		{BBD15267-F1C4-4D1E-B4C5-08D7A91B1343} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
 		{155873E1-E405-44A8-B2BE-0DDFB46AE409} = {BDB5B467-A0FD-4054-9950-C708F61E499D}
@@ -198,6 +204,8 @@ Global
 		{776C40B1-3E70-476C-A3DA-F3E098460911} = {BDB5B467-A0FD-4054-9950-C708F61E499D}
 		{E7121392-CC85-458B-B398-51AEE02A6623} = {73FF5914-1F61-48DA-9E72-4A2FA4C82123}
 		{B135E247-566F-4C7B-A029-17AA7DC92163} = {73FF5914-1F61-48DA-9E72-4A2FA4C82123}
+		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
+		{B137F4E3-ACE7-498F-81CE-22A174C72C91} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}

@@ -74,7 +74,7 @@ namespace MithrilShards.Core.Network
       /// <summary>
       /// Adds the specified peer to the list of connected peer.
       /// </summary>
-      /// <param name="peerContext">The peer context.</param>
+      /// <param name="event">The event.</param>
       private void AddConnectedPeer(PeerConnected @event)
       {
          IPEndPoint ipEndPoint = @event.PeerContext.RemoteEndPoint.EnsureIPv6();
@@ -101,7 +101,7 @@ namespace MithrilShards.Core.Network
       /// <summary>
       /// Removes the specified peer from the list of connected peer.
       /// </summary>
-      /// <param name="peerContext">The peer context.</param>
+      /// <param name="event">The event.</param>
       private void OnPeerDisconnected(PeerDisconnected @event)
       {
          ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? inboundPeers : outboundPeers;

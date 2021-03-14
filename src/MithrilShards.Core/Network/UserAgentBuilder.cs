@@ -29,7 +29,6 @@ namespace MithrilShards.Core.Network
       /// <summary>
       /// Gets the user agent.
       /// </summary>
-      /// <param name="includeShards">if set to <c>true</c> include shards name and version.</param>
       /// <returns></returns>
       public virtual string GetUserAgent()
       {

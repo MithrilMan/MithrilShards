@@ -159,7 +159,6 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       /// Reads the byte array, reading first a VarInt of the size of the array, followed by the full array data.
       /// </summary>
       /// <param name="reader">The reader.</param>
-      /// <param name="length">The length.</param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static byte[]? ReadByteArray(ref this SequenceReader<byte> reader)
@@ -212,6 +211,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       /// <param name="reader">The reader.</param>
       /// <param name="protocolVersion">The protocol version.</param>
       /// <param name="serializer">The serializer.</param>
+      /// <param name="options"></param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static TSerializableType[] ReadArray<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer, ProtocolTypeSerializerOptions? options = null)
@@ -235,6 +235,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization
       /// <param name="reader">The reader.</param>
       /// <param name="protocolVersion">The protocol version.</param>
       /// <param name="serializer">The serializer.</param>
+      /// <param name="options"></param>
       /// <returns></returns>
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       public static TSerializableType ReadWithSerializer<TSerializableType>(ref this SequenceReader<byte> reader, int protocolVersion, IProtocolTypeSerializer<TSerializableType> serializer, ProtocolTypeSerializerOptions? options = null)

@@ -33,6 +33,7 @@ namespace MithrilShards.Chain.Events
       /// Initializes a new instance of the <see cref="BlockHeaderValidationSucceeded" /> class.
       /// </summary>
       /// <param name="validatedBlock">The validated block.</param>
+      /// <param name="isNewBlock"></param>
       /// <param name="peerContext">The peer context.</param>
       public BlockValidationSucceeded(Block validatedBlock, bool isNewBlock, IPeerContext? peerContext)
       {

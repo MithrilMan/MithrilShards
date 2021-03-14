@@ -3,9 +3,8 @@
 namespace MithrilShards.Core.EventBus
 {
    /// <summary>
-   /// Basic abstract implementation of <see cref="IEvent"/>.
+   /// Basic abstract event implementation.
    /// </summary>
-   /// <seealso cref="Stratis.Bitcoin.EventBus.IEvent" />
    public abstract class EventBase
    {
       /// <inheritdoc />

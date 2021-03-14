@@ -24,9 +24,10 @@ namespace MithrilShards.Core.Network.Client
       /// <summary>
       /// Compute the delay to apply between next connection attempt.
       /// </summary>
-      /// <param name="hint">The hint.</param>
-      /// <remarks>Override this method to have a custom logic for delayed connection attempts.</remarks>
       /// <returns></returns>
+      /// <remarks>
+      /// Override this method to have a custom logic for delayed connection attempts.
+      /// </remarks>
       TimeSpan ComputeDelayAdjustment();
    }
 }
