@@ -6,6 +6,7 @@
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
       <PackageId>$(AssemblyName)</PackageId>
+      <IsPackable>false</IsPackable>
 
       <PackageReleaseNotes>https://github.com/MithrilMan/MithrilShards/releases</PackageReleaseNotes>
       <PackageProjectUrl>https://github.com/MithrilMan/MithrilShards</PackageProjectUrl>

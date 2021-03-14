@@ -12,6 +12,7 @@ on:
         required: true
         default: 'true'
   pull_request:
+  issues:
   push:
     branches:
       - master
@@ -20,29 +21,36 @@ on:
       - '!/Documentation/*' # Don't run workflow when files are only in the /Documentation directory
 
 jobs:
-  build:
-    runs-on: windows-latest
-
+  set_variables:
+    runs-on: 'ubuntu-latest'
+    env:
+      DEFAULT_DO_TEST: 'true'
+      DEFAULT_DO_PACK: 'true'
+    outputs:
+      DO_TEST: ${{ steps.DO_TEST.outputs.value }}
+      DO_PACK: ${{ steps.DO_PACK.outputs.value }}
     steps:
     - uses: haya14busa/action-cond@v1
       id: DO_TEST
       with:
-         cond: ${{ github.event_name == 'workflow_dispatch' }}
-         if_true: ${{ github.event.inputs.run-test }}
-         if_false: 'true'
-
+        cond: ${{ github.event_name == 'workflow_dispatch' }}
+        if_true: ${{ github.event.inputs.run-test }}
+        if_false: ${{ env.DEFAULT_DO_TEST }}
     - uses: haya14busa/action-cond@v1
       id: DO_PACK
       with:
-         cond: ${{ github.event_name == 'workflow_dispatch' }}
-         if_true: ${{ github.event.inputs.create-packages }}
-         if_false: 'true'
+        cond: ${{ github.event_name == 'workflow_dispatch' }}
+        if_true: ${{ github.event.inputs.create-packages }}
+        if_false: ${{ env.DEFAULT_DO_PACK }}
 
-    - name: Dump variables
-      run: |
-         echo "${{ steps.DO_TEST.outputs.value }}"
-         echo "${{ steps.DO_PACK.outputs.value }}"
+  build:
+    needs: set_variables
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
 
+    steps:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
@@ -60,9 +68,16 @@ jobs:
       run: dotnet build --configuration Release /p:CI=true
 
     - name: Perform Tests
-      if: steps.DO_TEST.outputs.value == 'true'
+      if: matrix.os == 'ubuntu-latest' && needs.set_variables.outputs.DO_TEST == 'true'
       run: dotnet test -c Release --logger GitHubActions /p:CI=true
 
     - name: .NET Lib Pack
-      if: steps.DO_PACK.outputs.value == 'true'
-      run: dotnet pack --no-build -c Release /p:PackageOutputPath=%CD%\.nupkgs /p:CI=true
+      if: matrix.os == 'ubuntu-latest' && needs.set_variables.outputs.DO_PACK == 'true'
+      run: dotnet pack --no-build -c Release /p:PackageOutputPath=${{ github.workspace }}\.nupkgs /p:CI=true
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+         name: my-artifact
+         path: ${{ github.workspace }}\.nupkgs
+         if-no-files-found: error
