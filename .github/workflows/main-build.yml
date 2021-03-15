@@ -138,6 +138,7 @@ jobs:
     - name: Push to GitHub Feed
       # The github token is automatically being pulled from the workflow
       run: dotnet nuget push ./mithril-shards-nuget-package/*.nupkg --no-symbols --skip-duplicate
+
       #run: |
       #   for f in ./mithril-shards-nuget-package/*.nupkg
       #   do
