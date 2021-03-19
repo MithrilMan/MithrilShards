@@ -1,7 +1,4 @@
-﻿<!-- START doctoc -->
-<!-- END doctoc -->
-
-## Premise
+﻿## Premise
 
 This folder contains technical documentation that helps to understand the choices behind the implementation and design of current project.
 
