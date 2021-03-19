@@ -1,0 +1,20 @@
+name: Generate TOC
+on:
+  push:
+#    branches:
+#      - master
+    paths:
+      - '**.md' # runs only if a markdown file is pushed
+jobs:
+  generateTOC:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Generate TOC
+      run: make deps generateTOC
+    - name: Auto commit
+      uses: stefanzweifel/git-auto-commit-action@v2.1.0
+      with:
+        commit_message: Apply TOC generated for markdown documents
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
