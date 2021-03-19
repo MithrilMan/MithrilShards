@@ -1,29 +1,24 @@
-﻿#### Table of Contents
-
-[Premise](#premise)
-[Project Overview](#overview)
-[Network Protocol](#network_protocol)
-
-
-
-## <a name="premise">Premise</a>
+﻿## Premise
 
 This folder contains technical documentation that helps to understand the choices behind the implementation and design of current project.
 
-Personally I'm not a fan of bitcoin core code base, it's very confusing, lack of an homogeneous design and architecture and suffers from old bad choices and lack of proper documentation too.
+Personally I'm not a fan of bitcoin core code base: even if it improved since early days, it's confusing, it lacks of an homogeneous design and architecture and suffers from old bad choices and above all lacks of proper technical documentation, following the mantra "source code is the documentation".
 
-One of my goal is to have an extensive documentation on current implementation details in order to be maintainable and more easy to follow.
+To be clear, I don't blame who contributes on bitcoin core, I'm just stating objective facts and I hope to fix some of these issues with my project but I don't pretend to have documentation always in sync with latest changes because it's a huge effort and I agree at some extents that source code is the final judge and I encourage you to dig into it if you want to go deeper in implementation details or verify that an information written here is correct and please, if you find any issue about documentation, feel free to open an issue and I'll be happy to fix it (even a PR with your corrections can be valuable!).
 
-I would be happy to know that it could be useful to someone who may find it interesting and help in understanding why an approach has been chosen over another.
+To me a proper documentation doesn't have to explain the source code (source code should be as much readable as possible) but it should give insights about the process that leads toward specific implementations and have indications about good practice to work within the built library.
 
-The effort of keeping everything updated would be huge so I can't promise the documentation will always be up to date, refers to source code as the final judge and/or if you want to go deeper in implementation details.
+
+Beside this premise, I'm writing this documentation as if I were the target, in order to have a maintainable and easy to follow repository and of course be able to give good understanding about how to extend this project further with custom features (shards) to people that may be interested.
+
+Nevertheless I would be happy to know that it could be useful to someone who may find it interesting and help in understanding why an approach has been chosen over another!
 
 Also if you have question or want to discuss about technical details, you can use the repository [Discussion section](https://github.com/MithrilMan/MithrilShards/discussions).
 
 
 
 
-## <a name="overview">Project Overview</a>
+## Project Overview
 
 **Bitcoin Mithril Shard** has been built on top of **Mithril Shards** framework.
 Mithril Shards goal is to be a framework and toolkit to build *<u>modular and distributed/P2P applications using .Net 5</u>* stack, focusing both on good design, good practices and performance.

@@ -1,18 +1,4 @@
-# Network
-
-
-
-#### Table of Contents
-
-[Overview](#overview)
-
-[Peer Context](#peercontext)
-
-___
-
-
-
-# <a name="overview">Network Protocol</a>
+# Network Protocol
 
 The Bitcoin network protocol is a TCP protocol whos serializes messages starting with a special, 4 bytes, constant data that's called *Magic bytes*, followed by 12 bytes representing the *command name*, 4 bytes representing the *payload size* and 4 bytes with the checksum of the payload.
 More specific information about bitcoin protocol [can be found here.](https://developer.bitcoin.org/reference/p2p_networking.html) 
@@ -29,13 +15,21 @@ Before being able to handshake, whenever a connection has been established betwe
 
 
 
-## <a name="peercontext">Peer Context</a>
+## Peer Context
 
 Default Mithril Shards implementation uses `PeerContext` class to store, amongh other thigns, informations like peer unique identification, direction (inbound/outbound) remote and local endpoints, user agent identification, negotiated protocol version and other attachable properties leveraging the .Net [IFeatureCollection](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.features.ifeaturecollection?view=aspnetcore-5.0) interface.
 
 Bitcoin needs some additional information and some of the properties that are ubiquitous needed among all optional Bitcoin features (shards) like wallet, apis, indexer, etc... have been defined directly into `BitcoinPeerContext` that extends the defualt `PeerContext`. Some of the additional properties are Permissions (that may change the FN behavior based on its set) and TimeOffset, that's an important aspect for the consensus logic.
 
-The peer context creation is handled by the core Mithril Shard network implementation and since it can't know about the `BitcoinPeerContext` properties, it rely on a peer context factory, in this case we are talking about `BitcoinPeerContextFactory` class.
+Another important property exposed by peer context is the `ConnectionCancellationTokenSource` property, that's a CancellationTokenSource that can be used to trigger the disconnection from a peer. It's internally used to know when the connection has been closed, to stop the execution of async methods that rely on an active connection to a remote peer.
+
+As per `IPeerContext` interface, `ConnectionCancellationTokenSource` can only be read so it's important that custom implementation of `IPeerContext` don't change it's value out of constructor.
+This property is actively used within message processors (more about it in a later section).
+
+The cancellation of `ConnectionCancellationTokenSource` shouldn't be canceled directly, to force a peer disconnection an event of type `PeerDisconnectionRequired` has to be published on the event bus, but for simplicity `BitcoinPeerContext` implements a `Disconnect` method that does that. So anytime you have a need to disconnect a peer, just call `thePeerContext.Disconnect("My Disconnection reason!")`.
+You can find already usage of it in message processor classes.
+
+The peer context creation is handled by the core Mithril Shard network implementation and since it can't know about the `BitcoinPeerContext` properties, it relies on a peer context factory, in this case we are talking about `BitcoinPeerContextFactory` class.
 
 It leverages the generic class `PeerContextFactory<>` and its implementation is bare bone, no need to override anything.
 
@@ -43,7 +37,47 @@ It leverages the generic class `PeerContextFactory<>` and its implementation is 
 public class PeerContextFactory<TPeerContext> : IPeerContextFactory where TPeerContext : IPeerContext
 ```
 
-Once the peer context has been context has been created, a sanity check is performed to see if the two peers can connect to each other before trying to handshake. The behavior is very similar to both inbound and outbound connections.
+
+
+## Accepting a connection
+
+Once the peer context has been created, a sanity check is performed to see if the two peers can connect to each other before trying to handshake and the behavior is very similar to both inbound and outbound connections.
+
+The only difference is that actually for outgoing connection the check is done before trying to connect but very likely it would be done as per incoming connection soon.
+
+What happens when an incoming connection has been accepted is that the connection has to pass all registered (in the DI containers) implementations of `IServerPeerConnectionGuard` interface.
+
+### `ServerPeerConnectionGuardBase` 
+
+In Bitcoin shard all guard rules are extending `ServerPeerConnectionGuardBase` implementation that's a simple class:
+
+```c#
+public abstract class ServerPeerConnectionGuardBase : IServerPeerConnectionGuard
+   {
+      protected readonly ILogger logger;
+      protected readonly ForgeConnectivitySettings settings;
+
+      public ServerPeerConnectionGuardBase(ILogger logger, IOptions<ForgeConnectivitySettings> options)
+      {
+         this.logger = logger;
+         settings = options.Value;
+      }
+
+      public ServerPeerConnectionGuardResult Check(IPeerContext peerContext)
+      {
+         string? denyReason = TryGetDenyReason(peerContext);
+         if (!string.IsNullOrEmpty(denyReason))
+         {
+            logger.LogDebug("Peer connection guard not passed: {denyReason}", denyReason);
+            return ServerPeerConnectionGuardResult.Deny(denyReason);
+         }
+
+         return ServerPeerConnectionGuardResult.Allow();
+      }
+
+      internal abstract string? TryGetDenyReason(IPeerContext peerContext);
+   }
+```
 
 Network protocol is implemented through the serialization of classes which implement `INetworkMessage` interface and are decorated with `NetworkMessageAttribute` that works in synergy with an implementation of `INetworkMessageSerializer` to implement network serialization.
 
