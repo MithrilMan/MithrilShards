@@ -12,12 +12,6 @@ jobs:
   generateTOC:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Generate TOC
-      run: make deps generateTOC
-    - name: Auto commit
-      uses: stefanzweifel/git-auto-commit-action@v2.1.0
+    - uses: technote-space/toc-generator@v4
       with:
-        commit_message: Apply TOC generated for markdown documents
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
