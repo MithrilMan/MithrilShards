@@ -1,3 +1,6 @@
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 # Network Protocol
 
 The Bitcoin network protocol is a TCP protocol whos serializes messages starting with a special, 4 bytes, constant data that's called *Magic bytes*, followed by 12 bytes representing the *command name*, 4 bytes representing the *payload size* and 4 bytes with the checksum of the payload.
@@ -47,6 +50,8 @@ The only difference is that actually for outgoing connection the check is done b
 
 What happens when an incoming connection has been accepted is that the connection has to pass all registered (in the DI containers) implementations of `IServerPeerConnectionGuard` interface.
 
+
+
 ### `ServerPeerConnectionGuardBase` 
 
 In Bitcoin shard all guard rules are extending `ServerPeerConnectionGuardBase` implementation that's a simple class:
@@ -78,6 +83,10 @@ public abstract class ServerPeerConnectionGuardBase : IServerPeerConnectionGuard
       internal abstract string? TryGetDenyReason(IPeerContext peerContext);
    }
 ```
+
+
+
+
 
 Network protocol is implemented through the serialization of classes which implement `INetworkMessage` interface and are decorated with `NetworkMessageAttribute` that works in synergy with an implementation of `INetworkMessageSerializer` to implement network serialization.
 
