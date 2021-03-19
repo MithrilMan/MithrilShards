@@ -1,8 +1,13 @@
 name: Generate TOC
 on:
+  workflow_dispatch:
   push:
-    paths:
-    - '**.md' # runs only if a markdown file is pushed
+#    branches:
+#      - master
+#    paths:
+#    - '**.md' # runs only if a markdown file is pushed
+
+
 jobs:
   generateTOC:
     runs-on: ubuntu-latest
