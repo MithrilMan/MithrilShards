@@ -1,3 +1,25 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Open Iconic v1.1.1](#open-iconic-v111)
+    - [Open Iconic is the open source sibling of Iconic. It is a hyper-legible collection of 223 icons with a tiny footprint&mdash;ready to use with Bootstrap and Foundation. View the collection](#open-iconic-is-the-open-source-sibling-of-iconic-it-is-a-hyper-legible-collection-of-223-icons-with-a-tiny-footprintmdashready-to-use-with-bootstrap-and-foundation-view-the-collection)
+  - [What's in Open Iconic?](#whats-in-open-iconic)
+  - [Getting Started](#getting-started)
+      - [For code samples and everything else you need to get started with Open Iconic, check out our Icons and Reference sections.](#for-code-samples-and-everything-else-you-need-to-get-started-with-open-iconic-check-out-our-icons-and-reference-sections)
+    - [General Usage](#general-usage)
+      - [Using Open Iconic's SVGs](#using-open-iconics-svgs)
+      - [Using Open Iconic's SVG Sprite](#using-open-iconics-svg-sprite)
+      - [Using Open Iconic's Icon Font...](#using-open-iconics-icon-font)
+        - […with Bootstrap](#with-bootstrap)
+        - […with Foundation](#with-foundation)
+        - […on its own](#on-its-own)
+  - [License](#license)
+    - [Icons](#icons)
+    - [Fonts](#fonts)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 [Open Iconic v1.1.1](http://useiconic.com/open)
 ===========
 

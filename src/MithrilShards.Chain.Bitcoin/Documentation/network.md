@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Network Protocol](#network-protocol)
+  - [Peer Context](#peer-context)
+  - [Accepting a connection](#accepting-a-connection)
+    - [`ServerPeerConnectionGuardBase`](#serverpeerconnectionguardbase)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Network Protocol
 
 The Bitcoin network protocol is a TCP protocol whos serializes messages starting with a special, 4 bytes, constant data that's called *Magic bytes*, followed by 12 bytes representing the *command name*, 4 bytes representing the *payload size* and 4 bytes with the checksum of the payload.

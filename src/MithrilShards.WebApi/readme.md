@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Note about swagger documentation](#note-about-swagger-documentation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ﻿Contains classes to implement API features.
 
 To be able to use APIs, API feature has to be enabled with .UseApi

@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Premise](#premise)
+- [Project Overview](#project-overview)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ﻿## Premise
 
 This folder contains technical documentation that helps to understand the choices behind the implementation and design of current project.

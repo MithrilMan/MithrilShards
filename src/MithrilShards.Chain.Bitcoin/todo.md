@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Implement peer permissions.](#implement-peer-permissions)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ﻿## Implement peer permissions.
 
 On Bitcoin core, peer permissions are a way to specify special permissions to peers that are whitelisted or whitebinded.
