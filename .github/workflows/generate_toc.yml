@@ -1,10 +1,8 @@
 name: Generate TOC
 on:
   push:
-#    branches:
-#      - master
     paths:
-      - '**.md' # runs only if a markdown file is pushed
+    - '**.md' # runs only if a markdown file is pushed
 jobs:
   generateTOC:
     runs-on: ubuntu-latest
