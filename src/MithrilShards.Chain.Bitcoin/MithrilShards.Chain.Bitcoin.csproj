@@ -8,10 +8,6 @@
    </ItemGroup>
 
    <ItemGroup>
-      <Folder Include="Encoders\" />
-   </ItemGroup>
-
-   <ItemGroup>
       <PackageReference Include="Microsoft.VisualStudio.Threading" Version="16.9.60" />
    </ItemGroup>
 

@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [PACKETS EXAMPLE](#packets-example)
+    - [Bitcoin Regtest](#bitcoin-regtest)
+        - [sendheaders](#sendheaders)
+        - [sendcmpct](#sendcmpct)
+        - [ping](#ping)
+        - [getheaders](#getheaders)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # PACKETS EXAMPLE
 
 ### Bitcoin Regtest

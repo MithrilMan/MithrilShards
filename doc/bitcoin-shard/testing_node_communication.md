@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Testing node communication](#testing-node-communication)
+  - [Troubleshooting](#troubleshooting)
+        - [System.Net.Sockets.SocketException (10013)](#systemnetsocketssocketexception-10013)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
+title: Testing node communication
+description: Mithril Shards bitcoin implementation, testing node
+
+---
+
 # Testing node communication
 
 In order to test the Forge implementation, I used the handy [bitcoin testnet in a box](https://github.com/freewil/bitcoin-testnet-box)	

@@ -1,4 +1,13 @@
-﻿# Needs
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Needs](#needs)
+  - [Possible implementation](#possible-implementation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Needs
 
 When we get headers from peers, in order to validate the chain we need to fetch blocks.
 

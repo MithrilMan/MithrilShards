@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Chain.Bitcoin.Consensus;
+using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.EventBus;
@@ -64,7 +65,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             return true;
          }
 
-         if (_ibdState.IsDownloadingBlocks())
+         if (_ibdState.IsDownloadingBlocks() && !PeerContext.Permissions.Has(BitcoinPeerPermissions.DOWNLOAD))
          {
             logger.LogDebug("Ignoring getheaders from {PeerId} because node is in initial block download state.", PeerContext.PeerId);
             return true;

@@ -1,0 +1,96 @@
+site_name: Mithril Shards
+site_url: https://mithrilman.github.io/mithrilshards
+repo_name: mithrilshards
+repo_url: https://github.com/mithrilman/mithrilshards
+edit_uri: ""
+site_author: Mithril Man
+copyright: Mithril Man 2020
+
+extra_javascript:
+  - https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js
+extra_css:
+  - extra_css/custom.css
+
+# change directory names here
+docs_dir: doc
+site_dir: ./doc_site
+
+theme:
+    name: material
+
+    icon:
+      repo: fontawesome/brands/github
+
+    features:
+      - navigation.instant
+      #- navigation.sections
+      #- navigation.tabs
+      #- navigation.tabs.sticky # for insiders only
+      - navigation.indexes # for insiders only
+      - navigation.top # for insiders only
+      #- header.autohide
+      #- toc.integrate
+
+    palette:
+      # Light mode
+      - media: "(prefers-color-scheme: light)"
+        scheme: default
+        primary: blue grey
+        accent: blue
+        toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+      # Dark mode
+      - media: "(prefers-color-scheme: dark)"
+        scheme: slate
+        primary: blue
+        accent: blue
+        toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+
+markdown_extensions:
+  - toc:
+      permalink: false
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  #- meta
+  - admonition
+  - pymdownx.highlight:
+      use_pygments: true
+      linenums: true
+      noclasses: false #set to true to enable pygments_style option
+      pygments_style: 'vs'
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+
+plugins:
+  - search
+  - git-revision-date
+  #- section-index
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/MithrilMan/MithrilShards
+  generator: false
+#  version:
+#    provider: mike
+
+nav:
+  - index.md
+  - Mithril Shards:
+    #- mithril-shards/index.md
+    - mithril-shards/dev-controller.md
+  - Bitcoin Shard:
+    - bitcoin-shard/index.md
+    - bitcoin-shard/network.md
+    - bitcoin-shard/testing_node_communication.md
+  - Issue Tracker: 'https://github.com/MithrilMan/MithrilShards/issues'

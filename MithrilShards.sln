@@ -13,13 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectionTest", "src\Conne
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".benchmarks", ".benchmarks", "{AEDA167A-43CB-40E7-935B-BF12DCBE339A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{59B8229B-8557-4987-B758-5E41D996DCD2}"
-	ProjectSection(SolutionItems) = preProject
-		Documentation\note.md = Documentation\note.md
-		readme.md = readme.md
-		Documentation\todo.md = Documentation\todo.md
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Core", "src\MithrilShards.Core\MithrilShards.Core.csproj", "{2777F4C4-4BD2-4DE6-AEC6-8BDBF2012369}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Logging.Serilog", "src\MithrilShards.Logging.Serilog\MithrilShards.Logging.Serilog.csproj", "{143DF3B2-3E57-45D9-BC8D-D99C340E3987}"
@@ -42,6 +35,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{54E1A44C-2EAC-440E-8802-B2EDCC328624}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\main-build.yml = .github\workflows\main-build.yml
+		.github\workflows\publish-doc.yml = .github\workflows\publish-doc.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.Dev.Controller", "src\MithrilShards.Dev.Controller\MithrilShards.Dev.Controller.csproj", "{7F79C482-85AD-4F12-8484-FBD22D5DDAF9}"
@@ -100,6 +94,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{B137F4
 		benchmarks\.editorconfig = benchmarks\.editorconfig
 		benchmarks\Directory.Build.props = benchmarks\Directory.Build.props
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{B5529C29-3CC7-41C6-AC76-B10B8FDD429C}"
+	ProjectSection(SolutionItems) = preProject
+		local_doc.bat = local_doc.bat
+		mkdocs.yml = mkdocs.yml
+		readme.md = readme.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "doc-placeholder", "doc\doc-placeholder.csproj", "{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -179,13 +182,16 @@ Global
 		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4745214D-E97C-41B1-A1A3-5C8237C59B72} = {BDB5B467-A0FD-4054-9950-C708F61E499D}
-		{59B8229B-8557-4987-B758-5E41D996DCD2} = {BDB5B467-A0FD-4054-9950-C708F61E499D}
 		{BBD15267-F1C4-4D1E-B4C5-08D7A91B1343} = {5628DBAE-A281-4E46-A018-88D5337FA5D1}
 		{155873E1-E405-44A8-B2BE-0DDFB46AE409} = {BDB5B467-A0FD-4054-9950-C708F61E499D}
 		{C1B18295-7204-48B6-B6B1-5FA036B8ACE8} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
@@ -206,6 +212,7 @@ Global
 		{B135E247-566F-4C7B-A029-17AA7DC92163} = {73FF5914-1F61-48DA-9E72-4A2FA4C82123}
 		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
 		{B137F4E3-ACE7-498F-81CE-22A174C72C91} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
+		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D} = {B5529C29-3CC7-41C6-AC76-B10B8FDD429C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}
