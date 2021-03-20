@@ -1,0 +1,1 @@
+Tutto quello che la dependency injection injetta ed è disposable, viene automaticamente disposed

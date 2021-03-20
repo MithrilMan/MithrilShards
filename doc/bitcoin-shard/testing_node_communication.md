@@ -1,12 +1,8 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+---
+title: Testing node communication
+description: Mithril Shards bitcoin implementation, testing node
 
-- [Testing node communication](#testing-node-communication)
-  - [Troubleshooting](#troubleshooting)
-        - [System.Net.Sockets.SocketException (10013)](#systemnetsocketssocketexception-10013)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+---
 
 # Testing node communication
 

@@ -1,17 +1,10 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [Network Protocol](#network-protocol)
-  - [Peer Context](#peer-context)
-  - [Accepting a connection](#accepting-a-connection)
-    - [`ServerPeerConnectionGuardBase`](#serverpeerconnectionguardbase)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
+---
+title: Network implementation
+description: Mithril Shards bitcoin implementation, network implementation
+---
 # Network Protocol
 
-The Bitcoin network protocol is a TCP protocol whos serializes messages starting with a special, 4 bytes, constant data that's called *Magic bytes*, followed by 12 bytes representing the *command name*, 4 bytes representing the *payload size* and 4 bytes with the checksum of the payload.
+The Bitcoin network protocol is a TCP protocol that serializes messages starting from a special 4 bytes constant data called *Magic bytes*, followed by 12 bytes representing the *command name*, 4 bytes representing the *payload size* and 4 bytes with the checksum of the payload.
 More specific information about bitcoin protocol [can be found here.](https://developer.bitcoin.org/reference/p2p_networking.html) 
 
 Mithril Shards implements a low level stack of interfaces and implementations that allow to focus on the application logic instead on low level details.
@@ -28,9 +21,9 @@ Before being able to handshake, whenever a connection has been established betwe
 
 ## Peer Context
 
-Default Mithril Shards implementation uses `PeerContext` class to store, amongh other thigns, informations like peer unique identification, direction (inbound/outbound) remote and local endpoints, user agent identification, negotiated protocol version and other attachable properties leveraging the .Net [IFeatureCollection](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.features.ifeaturecollection?view=aspnetcore-5.0) interface.
+Default Mithril Shards implementation uses `PeerContext` class to store, among other things, information like peer unique identification, direction (inbound/outbound) remote and local endpoints, user agent identification, negotiated protocol version and other attachable properties leveraging the .Net [IFeatureCollection](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.features.ifeaturecollection?view=aspnetcore-5.0) interface.
 
-Bitcoin needs some additional information and some of the properties that are ubiquitous needed among all optional Bitcoin features (shards) like wallet, apis, indexer, etc... have been defined directly into `BitcoinPeerContext` that extends the defualt `PeerContext`. Some of the additional properties are Permissions (that may change the FN behavior based on its set) and TimeOffset, that's an important aspect for the consensus logic.
+Bitcoin needs some additional information and some of the properties that are ubiquitous needed among all optional Bitcoin features (shards) like wallet, APIs, indexer, etc... have been defined directly into `BitcoinPeerContext` that extends the default `PeerContext`. Some of the additional properties are Permissions (that may change the FN behavior based on its set) and TimeOffset, that's an important aspect for the consensus logic.
 
 Another important property exposed by peer context is the `ConnectionCancellationTokenSource` property, that's a CancellationTokenSource that can be used to trigger the disconnection from a peer. It's internally used to know when the connection has been closed, to stop the execution of async methods that rely on an active connection to a remote peer.
 
@@ -92,9 +85,66 @@ public abstract class ServerPeerConnectionGuardBase : IServerPeerConnectionGuard
    }
 ```
 
+This class implements the plumbing code required to run (and log in case of rule check not passed) the guard rule, so a guard rule implementation has just to focus on its guarding logic.
+A simple example is the `MaxConnectionThresholdGuard` rule that ensure that an incoming transaction doesn't exceed the maximum allowed number of inbound connections:
 
+```c# hl_lines="12-20"
+public class MaxConnectionThresholdGuard : ServerPeerConnectionGuardBase
+   {
+      readonly IConnectivityPeerStats _peerStats;
 
+      public MaxConnectionThresholdGuard(ILogger<MaxConnectionThresholdGuard> logger,
+                                         IOptions<ForgeConnectivitySettings> settings,
+                                         IConnectivityPeerStats serverPeerStats) : base(logger, settings)
+      {
+         _peerStats = serverPeerStats;
+      }
 
+      internal override string? TryGetDenyReason(IPeerContext peerContext)
+      {
+         if (_peerStats.ConnectedInboundPeersCount >= settings.MaxInboundConnections)
+         {
+            return "Inbound connection refused: max connection threshold reached.";
+         }
+
+         return null;
+      }
+   }
+```
+
+In order to be used during connection check, these guard classes have to be registered in the DI container.
+`MaxConnectionThresholdGuard` for example is registered into the extension that register the bitcoin shard by using
+
+```
+services.AddSingleton<IServerPeerConnectionGuard, InitialBlockDownloadStateGuard>()
+```
+
+This allow the flexibility of having custom guard rule simply by implementing a rule and register in the DI container, any required service will be injected automatically; of course if it relies on a custom service not already available in my implementation, that service has to be registered too.
+
+!!! info
+	These classes have to be registered as singleton and therefor must be stateless
 
 Network protocol is implemented through the serialization of classes which implement `INetworkMessage` interface and are decorated with `NetworkMessageAttribute` that works in synergy with an implementation of `INetworkMessageSerializer` to implement network serialization.
 
+## Handshake
+
+Once a connection has been accepted between two nodes, they start exchanging messages in order to handshake and prove each other they are two compatible nodes that can exchange informations.
+
+!!! info
+	Bitcoin protocol doesn't punish nodes that send unknown messages. I think however that a node has to monitor its connected peer activities and punish them if they send too many unknown messages causing our node to waste resources.
+
+Without going too deeper into bitcoin handshake process, the exchanges messages are summarized by this sequence diagram:
+
+```mermaid
+sequenceDiagram
+	participant L as Local
+    participant R as Remote
+    L-->>+R:Connects to
+    L->>+R:Version
+    R->>L:Version
+	R->>L:Verack
+    L->>R:Verack
+```
+
+!!! info
+	Bitcoin protocol doesn't define a specific order for the `Remote` node to send its `Verack` and `Version` message so `Local` node has to account that and accept these messages in any order.

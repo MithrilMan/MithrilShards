@@ -1,12 +1,4 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [If you have problem serving embedded resources](#if-you-have-problem-serving-embedded-resources)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-﻿## If you have problem serving embedded resources
+## If you have problem serving embedded resources
 
 When using embedded resources, remember that some characters are transformed.
 
