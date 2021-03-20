@@ -1,17 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [Mithril Shards](#mithril-shards)
-  - [Goal](#goal)
-  - [Current Tech](#current-tech)
-  - [Blockchain tech inside](#blockchain-tech-inside)
-  - [Why Mithril Shards?](#why-mithril-shards)
-  - [Call to Action!](#call-to-action)
-  - [CI](#ci)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ---
 title: Welcome
 description: Mithril Shards home page

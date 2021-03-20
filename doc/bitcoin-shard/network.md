@@ -1,15 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [Network Protocol](#network-protocol)
-  - [Peer Context](#peer-context)
-  - [Accepting a connection](#accepting-a-connection)
-    - [`ServerPeerConnectionGuardBase`](#serverpeerconnectionguardbase)
-  - [Handshake](#handshake)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ---
 title: Network implementation
 description: Mithril Shards bitcoin implementation, network implementation
