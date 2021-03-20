@@ -38,7 +38,7 @@ As a proof of concept, a new Bitcoin full node is being developed using this lib
 
 Well... let's bullet some facts
 
-- I like fantasy a lot, [J.R.R. Tolkien](https://en.wikipedia.org/wiki/J._R._R._Tolkien) of course has been one of my reads and mithril is a fictional metal in its universe.
+- I like fantasy a lot, [J.R.R. Tolkien](https://en.wikipedia.org/wiki/J._R._R._Tolkien) of course has been one of my reads and mithril is a fictional metal in his universe.
 - The main properties of [mithri](https://en.wikipedia.org/wiki/Mithril#Properties) are: being very strong, light and in its pure form very malleable to work with.
 - I'm a developer that like to curate its software to be extensible and solid.
 
