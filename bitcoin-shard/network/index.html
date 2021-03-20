@@ -1,0 +1,751 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <meta name="author" content="Mithril Man">
+      
+      
+        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/bitcoin-shard/network/">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
+    
+    
+      
+        <title>Network - Mithril Shards</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2c0c5eaf.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.7fa14f5b.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../extra_css/custom.css">
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="blue">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#network-protocol" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Mithril Shards
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Network
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="md-header__options">
+      
+    </div>
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/mithrilman/mithrilshards" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mithrilshards
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    Mithril Shards
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/mithrilman/mithrilshards" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mithrilshards
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      <label class="md-nav__link" for="__nav_2">
+        Mithril Shards
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Mithril Shards" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Mithril Shards
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mithril-shards/dev-controller/" class="md-nav__link">
+        Dev controller
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      <label class="md-nav__link" for="__nav_3">
+        Bitcoin Shard
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Bitcoin Shard" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Bitcoin Shard
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        Index
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Network
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Network
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#peer-context" class="md-nav__link">
+    Peer Context
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accepting-a-connection" class="md-nav__link">
+    Accepting a connection
+  </a>
+  
+    <nav class="md-nav" aria-label="Accepting a connection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#serverpeerconnectionguardbase" class="md-nav__link">
+    ServerPeerConnectionGuardBase
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handshake" class="md-nav__link">
+    Handshake
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing_node_communication/" class="md-nav__link">
+        Testing node communication
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/MithrilMan/MithrilShards/issues" class="md-nav__link">
+        Issue Tracker
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#peer-context" class="md-nav__link">
+    Peer Context
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accepting-a-connection" class="md-nav__link">
+    Accepting a connection
+  </a>
+  
+    <nav class="md-nav" aria-label="Accepting a connection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#serverpeerconnectionguardbase" class="md-nav__link">
+    ServerPeerConnectionGuardBase
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handshake" class="md-nav__link">
+    Handshake
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<p><strong>Table of Contents</strong></p>
+<ul>
+<li><a href="#network-protocol">Network Protocol</a></li>
+<li><a href="#peer-context">Peer Context</a></li>
+<li><a href="#accepting-a-connection">Accepting a connection</a><ul>
+<li><a href="#serverpeerconnectionguardbase"><code>ServerPeerConnectionGuardBase</code></a></li>
+</ul>
+</li>
+<li><a href="#handshake">Handshake</a></li>
+</ul>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+<hr />
+<p>title: Network implementation
+description: Mithril Shards bitcoin implementation, network implementation</p>
+<hr />
+<h1 id="network-protocol">Network Protocol</h1>
+<p>The Bitcoin network protocol is a TCP protocol that serializes messages starting from a special 4 bytes constant data called <em>Magic bytes</em>, followed by 12 bytes representing the <em>command name</em>, 4 bytes representing the <em>payload size</em> and 4 bytes with the checksum of the payload.
+More specific information about bitcoin protocol <a href="https://developer.bitcoin.org/reference/p2p_networking.html">can be found here.</a> </p>
+<p>Mithril Shards implements a low level stack of interfaces and implementations that allow to focus on the application logic instead on low level details.
+A default implementation uses Bedrock Framework to leverage the low level communication between peers and this is what's used in the Bitcoin shard to provide P2P connectivity.</p>
+<p>A typical Bitcoin full node (henceforth called <em>FN</em>) is able to connect to other nodes and accept incoming connections.
+Before two peers can exchange information, they have to perform an handshake to prove that they can understand each other (more details on the the bitcoin network protocol can be found on this <a href="https://developer.bitcoin.org/devguide/p2p_network.html">bitcoin developer resource</a>).</p>
+<p>Before being able to handshake, whenever a connection has been established between two peers the FN stores some metadata about the remote peer. This data is stored into a class that implements IPeerContext interface and its implementation represents our next section.</p>
+<h2 id="peer-context">Peer Context</h2>
+<p>Default Mithril Shards implementation uses <code>PeerContext</code> class to store, among other things, information like peer unique identification, direction (inbound/outbound) remote and local endpoints, user agent identification, negotiated protocol version and other attachable properties leveraging the .Net <a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.features.ifeaturecollection?view=aspnetcore-5.0">IFeatureCollection</a> interface.</p>
+<p>Bitcoin needs some additional information and some of the properties that are ubiquitous needed among all optional Bitcoin features (shards) like wallet, APIs, indexer, etc... have been defined directly into <code>BitcoinPeerContext</code> that extends the default <code>PeerContext</code>. Some of the additional properties are Permissions (that may change the FN behavior based on its set) and TimeOffset, that's an important aspect for the consensus logic.</p>
+<p>Another important property exposed by peer context is the <code>ConnectionCancellationTokenSource</code> property, that's a CancellationTokenSource that can be used to trigger the disconnection from a peer. It's internally used to know when the connection has been closed, to stop the execution of async methods that rely on an active connection to a remote peer.</p>
+<p>As per <code>IPeerContext</code> interface, <code>ConnectionCancellationTokenSource</code> can only be read so it's important that custom implementation of <code>IPeerContext</code> don't change it's value out of constructor.
+This property is actively used within message processors (more about it in a later section).</p>
+<p>The cancellation of <code>ConnectionCancellationTokenSource</code> shouldn't be canceled directly, to force a peer disconnection an event of type <code>PeerDisconnectionRequired</code> has to be published on the event bus, but for simplicity <code>BitcoinPeerContext</code> implements a <code>Disconnect</code> method that does that. So anytime you have a need to disconnect a peer, just call <code>thePeerContext.Disconnect("My Disconnection reason!")</code>.
+You can find already usage of it in message processor classes.</p>
+<p>The peer context creation is handled by the core Mithril Shard network implementation and since it can't know about the <code>BitcoinPeerContext</code> properties, it relies on a peer context factory, in this case we are talking about <code>BitcoinPeerContextFactory</code> class.</p>
+<p>It leverages the generic class <code>PeerContextFactory&lt;&gt;</code> and its implementation is bare bone, no need to override anything.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">class</span> <span class="nc">PeerContextFactory</span><span class="p">&lt;</span><span class="n">TPeerContext</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IPeerContextFactory</span> <span class="k">where</span> <span class="n">TPeerContext</span> <span class="p">:</span> <span class="n">IPeerContext</span>
+</code></pre></div>
+</td></tr></table>
+<h2 id="accepting-a-connection">Accepting a connection</h2>
+<p>Once the peer context has been created, a sanity check is performed to see if the two peers can connect to each other before trying to handshake and the behavior is very similar to both inbound and outbound connections.</p>
+<p>The only difference is that actually for outgoing connection the check is done before trying to connect but very likely it would be done as per incoming connection soon.</p>
+<p>What happens when an incoming connection has been accepted is that the connection has to pass all registered (in the DI containers) implementations of <code>IServerPeerConnectionGuard</code> interface.</p>
+<h3 id="serverpeerconnectionguardbase"><code>ServerPeerConnectionGuardBase</code></h3>
+<p>In Bitcoin shard all guard rules are extending <code>ServerPeerConnectionGuardBase</code> implementation that's a simple class:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="nc">ServerPeerConnectionGuardBase</span> <span class="p">:</span> <span class="n">IServerPeerConnectionGuard</span>
+   <span class="p">{</span>
+      <span class="k">protected</span> <span class="k">readonly</span> <span class="n">ILogger</span> <span class="n">logger</span><span class="p">;</span>
+      <span class="k">protected</span> <span class="k">readonly</span> <span class="n">ForgeConnectivitySettings</span> <span class="n">settings</span><span class="p">;</span>
+
+      <span class="k">public</span> <span class="nf">ServerPeerConnectionGuardBase</span><span class="p">(</span><span class="n">ILogger</span> <span class="n">logger</span><span class="p">,</span> <span class="n">IOptions</span><span class="p">&lt;</span><span class="n">ForgeConnectivitySettings</span><span class="p">&gt;</span> <span class="n">options</span><span class="p">)</span>
+      <span class="p">{</span>
+         <span class="k">this</span><span class="p">.</span><span class="n">logger</span> <span class="p">=</span> <span class="n">logger</span><span class="p">;</span>
+         <span class="n">settings</span> <span class="p">=</span> <span class="n">options</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="k">public</span> <span class="n">ServerPeerConnectionGuardResult</span> <span class="nf">Check</span><span class="p">(</span><span class="n">IPeerContext</span> <span class="n">peerContext</span><span class="p">)</span>
+      <span class="p">{</span>
+         <span class="kt">string?</span> <span class="n">denyReason</span> <span class="p">=</span> <span class="n">TryGetDenyReason</span><span class="p">(</span><span class="n">peerContext</span><span class="p">);</span>
+         <span class="k">if</span> <span class="p">(!</span><span class="kt">string</span><span class="p">.</span><span class="n">IsNullOrEmpty</span><span class="p">(</span><span class="n">denyReason</span><span class="p">))</span>
+         <span class="p">{</span>
+            <span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Peer connection guard not passed: {denyReason}&quot;</span><span class="p">,</span> <span class="n">denyReason</span><span class="p">);</span>
+            <span class="k">return</span> <span class="n">ServerPeerConnectionGuardResult</span><span class="p">.</span><span class="n">Deny</span><span class="p">(</span><span class="n">denyReason</span><span class="p">);</span>
+         <span class="p">}</span>
+
+         <span class="k">return</span> <span class="n">ServerPeerConnectionGuardResult</span><span class="p">.</span><span class="n">Allow</span><span class="p">();</span>
+      <span class="p">}</span>
+
+      <span class="k">internal</span> <span class="k">abstract</span> <span class="kt">string?</span> <span class="n">TryGetDenyReason</span><span class="p">(</span><span class="n">IPeerContext</span> <span class="n">peerContext</span><span class="p">);</span>
+   <span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>This class implements the plumbing code required to run (and log in case of rule check not passed) the guard rule, so a guard rule implementation has just to focus on its guarding logic.
+A simple example is the <code>MaxConnectionThresholdGuard</code> rule that ensure that an incoming transaction doesn't exceed the maximum allowed number of inbound connections:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">class</span> <span class="nc">MaxConnectionThresholdGuard</span> <span class="p">:</span> <span class="n">ServerPeerConnectionGuardBase</span>
+   <span class="p">{</span>
+      <span class="k">readonly</span> <span class="n">IConnectivityPeerStats</span> <span class="n">_peerStats</span><span class="p">;</span>
+
+      <span class="k">public</span> <span class="nf">MaxConnectionThresholdGuard</span><span class="p">(</span><span class="n">ILogger</span><span class="p">&lt;</span><span class="n">MaxConnectionThresholdGuard</span><span class="p">&gt;</span> <span class="n">logger</span><span class="p">,</span>
+                                         <span class="n">IOptions</span><span class="p">&lt;</span><span class="n">ForgeConnectivitySettings</span><span class="p">&gt;</span> <span class="n">settings</span><span class="p">,</span>
+                                         <span class="n">IConnectivityPeerStats</span> <span class="n">serverPeerStats</span><span class="p">)</span> <span class="p">:</span> <span class="k">base</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+      <span class="p">{</span>
+         <span class="n">_peerStats</span> <span class="p">=</span> <span class="n">serverPeerStats</span><span class="p">;</span>
+      <span class="p">}</span>
+
+<span class="hll">      <span class="k">internal</span> <span class="k">override</span> <span class="kt">string?</span> <span class="n">TryGetDenyReason</span><span class="p">(</span><span class="n">IPeerContext</span> <span class="n">peerContext</span><span class="p">)</span>
+</span><span class="hll">      <span class="p">{</span>
+</span><span class="hll">         <span class="k">if</span> <span class="p">(</span><span class="n">_peerStats</span><span class="p">.</span><span class="n">ConnectedInboundPeersCount</span> <span class="p">&gt;=</span> <span class="n">settings</span><span class="p">.</span><span class="n">MaxInboundConnections</span><span class="p">)</span>
+</span><span class="hll">         <span class="p">{</span>
+</span><span class="hll">            <span class="k">return</span> <span class="s">&quot;Inbound connection refused: max connection threshold reached.&quot;</span><span class="p">;</span>
+</span><span class="hll">         <span class="p">}</span>
+</span><span class="hll">
+</span><span class="hll">         <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+</span><span class="hll">      <span class="p">}</span>
+</span>   <span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>In order to be used during connection check, these guard classes have to be registered in the DI container.
+<code>MaxConnectionThresholdGuard</code> for example is registered into the extension that register the bitcoin shard by using</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>services.AddSingleton&lt;IServerPeerConnectionGuard, InitialBlockDownloadStateGuard&gt;()
+</code></pre></div>
+</td></tr></table>
+<p>This allow the flexibility of having custom guard rule simply by implementing a rule and register in the DI container, any required service will be injected automatically; of course if it relies on a custom service not already available in my implementation, that service has to be registered too.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>These classes have to be registered as singleton and therefor must be stateless</p>
+</div>
+<p>Network protocol is implemented through the serialization of classes which implement <code>INetworkMessage</code> interface and are decorated with <code>NetworkMessageAttribute</code> that works in synergy with an implementation of <code>INetworkMessageSerializer</code> to implement network serialization.</p>
+<h2 id="handshake">Handshake</h2>
+<p>Once a connection has been accepted between two nodes, they start exchanging messages in order to handshake and prove each other they are two compatible nodes that can exchange informations.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Bitcoin protocol doesn't punish nodes that send unknown messages. I think however that a node has to monitor its connected peer activities and punish them if they send too many unknown messages causing our node to waste resources.</p>
+</div>
+<p>Without going too deeper into bitcoin handshake process, the exchanges messages are summarized by this sequence diagram:</p>
+<div class="mermaid">sequenceDiagram
+    participant L as Local
+    participant R as Remote
+    L--&gt;&gt;+R:Connects to
+    L-&gt;&gt;+R:Version
+    R-&gt;&gt;L:Version
+    R-&gt;&gt;L:Verack
+    L-&gt;&gt;R:Verack</div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Bitcoin protocol doesn't define a specific order for the <code>Remote</code> node to send its <code>Verack</code> and <code>Version</code> message so <code>Local</code> node has to account that and accept these messages in any order.</p>
+</div>
+                
+                  
+                    
+
+<hr>
+<div class="md-source-date">
+  <small>
+    
+      Last update: 2021-03-20
+    
+  </small>
+</div>
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Index
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="../testing_node_communication/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Testing node communication
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Mithril Man 2020
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+  <div class="md-footer-social">
+    
+      
+      
+        
+        
+      
+      <a href="https://github.com/MithrilMan/MithrilShards" target="_blank" rel="noopener" title="github.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+      </a>
+    
+  </div>
+
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
