@@ -1,5 +1,5 @@
 ---
-title: Network implementation
+title: Dev Controller
 description: Mithril Shards bitcoin implementation, network implementation
 ---
 
