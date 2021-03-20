@@ -6,6 +6,8 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="Mithril Shards bitcoin implementation, network implementation">
+      
       
       
         <meta name="author" content="Mithril Man">
@@ -18,7 +20,7 @@
     
     
       
-        <title>Network - Mithril Shards</title>
+        <title>Network implementation - Mithril Shards</title>
       
     
     
@@ -96,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Network
+              Network implementation
             
           </span>
         </div>
@@ -204,7 +206,7 @@
   
     <li class="md-nav__item">
       <a href="../.." class="md-nav__link">
-        Home
+        Welcome
       </a>
     </li>
   
@@ -240,7 +242,7 @@
   
     <li class="md-nav__item">
       <a href="../../mithril-shards/dev-controller/" class="md-nav__link">
-        Dev controller
+        Network implementation
       </a>
     </li>
   
@@ -284,7 +286,7 @@
   
     <li class="md-nav__item">
       <a href="../" class="md-nav__link">
-        Index
+        Overview
       </a>
     </li>
   
@@ -304,12 +306,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Network
+          Network implementation
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Network
+        Network implementation
       </a>
       
         
@@ -471,25 +473,7 @@
               
                 
                 
-                <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-<p><strong>Table of Contents</strong></p>
-<ul>
-<li><a href="#network-protocol">Network Protocol</a></li>
-<li><a href="#peer-context">Peer Context</a></li>
-<li><a href="#accepting-a-connection">Accepting a connection</a><ul>
-<li><a href="#serverpeerconnectionguardbase"><code>ServerPeerConnectionGuardBase</code></a></li>
-</ul>
-</li>
-<li><a href="#handshake">Handshake</a></li>
-</ul>
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-<hr />
-<p>title: Network implementation
-description: Mithril Shards bitcoin implementation, network implementation</p>
-<hr />
-<h1 id="network-protocol">Network Protocol</h1>
+                <h1 id="network-protocol">Network Protocol</h1>
 <p>The Bitcoin network protocol is a TCP protocol that serializes messages starting from a special 4 bytes constant data called <em>Magic bytes</em>, followed by 12 bytes representing the <em>command name</em>, 4 bytes representing the <em>payload size</em> and 4 bytes with the checksum of the payload.
 More specific information about bitcoin protocol <a href="https://developer.bitcoin.org/reference/p2p_networking.html">can be found here.</a> </p>
 <p>Mithril Shards implements a low level stack of interfaces and implementations that allow to focus on the application logic instead on low level details.
@@ -681,7 +665,7 @@ A simple example is the <code>MaxConnectionThresholdGuard</code> rule that ensur
               <span class="md-footer__direction">
                 Previous
               </span>
-              Index
+              Overview
             </div>
           </div>
         </a>
