@@ -12,8 +12,8 @@ extra_css:
   - extra_css/custom.css
 
 # change directory names here
-docs_dir: doc
-site_dir: ./doc_site
+docs_dir: docs
+site_dir: ./docs_site
 
 theme:
     name: material
@@ -34,7 +34,7 @@ theme:
     palette:
       # Light mode
       - media: "(prefers-color-scheme: light)"
-        scheme: default
+        scheme: slate
         primary: blue grey
         accent: blue
         toggle:
@@ -52,6 +52,10 @@ theme:
 
 
 markdown_extensions:
+  - abbr
+  - pymdownx.snippets:
+      base_path: docs/_snippets
+      check_paths: true
   - toc:
       permalink: false
   - pymdownx.emoji:
@@ -74,6 +78,11 @@ markdown_extensions:
 plugins:
   - search
   - git-revision-date
+  - exclude-search:
+      exclude:
+        - _private/*.md
+        - _snippets/*.*
+        - _abbr.md
   #- section-index
 
 extra:
@@ -87,7 +96,8 @@ extra:
 nav:
   - index.md
   - Mithril Shards:
-    #- mithril-shards/index.md
+    - mithril-shards/index.md
+    - mithril-shards/default-forge.md
     - mithril-shards/dev-controller.md
   - Bitcoin Shard:
     - bitcoin-shard/index.md

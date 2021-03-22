@@ -16,6 +16,27 @@ The project is very ambitious and it's currently developed just by me as a pet p
 
 
 
+## How things started
+
+I have DLT experience in the past years and one of my previous experience has been working for a blockchain tech firm that had a FN implementation in C#.
+I really love C# and .Net core has improved a lot performance too.
+
+Workin on their codebase I saw lot of things that could have been improved, both in design and in performance. Their implementation started as a kind of 1-1 porting of bitcoin core source with all the cons that it brings.
+
+So I thought about diving into this titanic effort of creating a full node in C# starting from scratch, mainly to go as deeper as possible into technical details, trying to focus both on a proper architecture design and performance improvements.
+
+One of the first thing I implemented was of course the basic handshake process between two nodes, to achieve that My I started by following bitcoin core source because unluckily that's the only part that contains kind of specifications, it's hard to find a detailed updated technical documentations (even this [protocol documentation](https://en.bitcoin.it/wiki/Protocol_documentation) page contains wrong informations, even if it's still useful).
+
+I started using .Net TCP classes, using an internal state machine to handle peer connection statuses, then I found [Bedrock Framework](https://github.com/davidfowl/BedrockFramework), that allowed me to abstract better my code and rely on it for the low level connection stuff (at the time of writing this documentation, that library is still in alpha and my concern about that project activity [has been appeased](https://github.com/davidfowl/BedrockFramework/issues/105) ).
+
+As soon as I started defining properly my design, I found it interesting to abstract most of the stuff into an agnostic library that allows me to create a P2P application in a modular way and attach additional features when needed, and this is how Mithril Shards started.
+
+Since then I added more and more stuff, both for generic Mithril Shards project and for specific Bitcoin needs.
+
+The [Example Shard](https://github.com/MithrilMan/MithrilShards/tree/master/src/MithrilShards.Example) (that composed by multiple projects) showcase how you can create a custom P2P software leveraging networking, custom messages, WEB Api endpoints Diagnostic tools, everything with a proper logging system.
+
+
+
 ## Current Tech
 
 A random list of available tech used within Mithril Shards.
@@ -28,19 +49,14 @@ A random list of available tech used within Mithril Shards.
 
 
 
-## Blockchain tech inside
-
-As a proof of concept, a new Bitcoin full node is being developed using this library, actually hosted in this repository (it's a WIP project).
-
-
-
-## Why Mithril Shards?
+## Why the Mithril Shards name?
 
 Well... let's bullet some facts
 
 - I like fantasy a lot, [J.R.R. Tolkien](https://en.wikipedia.org/wiki/J._R._R._Tolkien) of course has been one of my reads and mithril is a fictional metal in his universe.
 - The main properties of [mithri](https://en.wikipedia.org/wiki/Mithril#Properties) are: being very strong, light and in its pure form very malleable to work with.
 - I'm a developer that like to curate its software to be extensible and solid.
+- My github handle is MithrilMan, guess what?
 
 Now take these informations, mix them up, and you'll see that to I aim to have a robust, fast and flexible project!
 So this explain mithril, while about *Shards*, is because I see this project as a mix of shards that can be assembled togheter to give you a precious artifact!
@@ -62,3 +78,6 @@ In fact you shouldn't be surprised that the root class is called Forge... who sa
 | ------------------------------------------------------------ |
 | [![Main Build](https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml/badge.svg)](https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml) |
 
+
+
+--8<-- "refs.txt"

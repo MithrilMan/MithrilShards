@@ -1,9 +1,7 @@
 ---
 title: Dev Controller
-description: Mithril Shards bitcoin implementation, network implementation
+description: Mithril Shards implementation, DevController class
 ---
-
-# MithrilShards.Dev.Controller
 
 This shard allows to have control over the forge, to perform some operation needed during development.
 
