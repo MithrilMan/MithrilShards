@@ -206,7 +206,7 @@
   
     <li class="md-nav__item">
       <a href="../.." class="md-nav__link">
-        Welcome
+        Welcome!
       </a>
     </li>
   
@@ -226,13 +226,13 @@
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
       
       <label class="md-nav__link" for="__nav_2">
-        Mithril Shards
+        Mithril Shards Core
         <span class="md-nav__icon md-icon"></span>
       </label>
-      <nav class="md-nav" aria-label="Mithril Shards" data-md-level="1">
+      <nav class="md-nav" aria-label="Mithril Shards Core" data-md-level="1">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
-          Mithril Shards
+          Mithril Shards Core
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -294,11 +294,34 @@
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
       
       <label class="md-nav__link" for="__nav_3">
+        Shards
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Shards" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Shards
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
+      
+      <label class="md-nav__link" for="__nav_3_1">
         Bitcoin Shard
         <span class="md-nav__icon md-icon"></span>
       </label>
-      <nav class="md-nav" aria-label="Bitcoin Shard" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
+      <nav class="md-nav" aria-label="Bitcoin Shard" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
           <span class="md-nav__icon md-icon"></span>
           Bitcoin Shard
         </label>
@@ -310,7 +333,7 @@
   
     <li class="md-nav__item">
       <a href="../" class="md-nav__link">
-        Index
+        Overview
       </a>
     </li>
   
@@ -401,6 +424,12 @@
       <a href="../testing_node_communication/" class="md-nav__link">
         Testing node communication
       </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -501,13 +530,13 @@
 <p>The Bitcoin network protocol is a TCP protocol that serializes messages starting from a special 4 bytes constant data called <em>Magic bytes</em>, followed by 12 bytes representing the <em>command name</em>, 4 bytes representing the <em>payload size</em> and 4 bytes with the checksum of the payload.
 More specific information about bitcoin protocol <a href="https://developer.bitcoin.org/reference/p2p_networking.html">can be found here.</a> </p>
 <p>Mithril Shards implements a low level stack of interfaces and implementations that allow to focus on the application logic instead on low level details.
-A default implementation uses Bedrock Framework to leverage the low level communication between peers and this is what's used in the Bitcoin shard to provide P2P connectivity.</p>
-<p>A typical Bitcoin full node (henceforth called <em>FN</em>) is able to connect to other nodes and accept incoming connections.
+A default implementation uses Bedrock Framework to leverage the low level communication between peers and this is what's used in the Bitcoin shard to provide <abbr title="Peer to Peer">P2P</abbr> connectivity.</p>
+<p>A typical Bitcoin full node (henceforth called <em><abbr title="Full Node">FN</abbr></em>) is able to connect to other nodes and accept incoming connections.
 Before two peers can exchange information, they have to perform an handshake to prove that they can understand each other (more details on the the bitcoin network protocol can be found on this <a href="https://developer.bitcoin.org/devguide/p2p_network.html">bitcoin developer resource</a>).</p>
-<p>Before being able to handshake, whenever a connection has been established between two peers the FN stores some metadata about the remote peer. This data is stored into a class that implements IPeerContext interface and its implementation represents our next section.</p>
+<p>Before being able to handshake, whenever a connection has been established between two peers the <abbr title="Full Node">FN</abbr> stores some metadata about the remote peer. This data is stored into a class that implements IPeerContext interface and its implementation represents our next section.</p>
 <h2 id="peer-context">Peer Context</h2>
 <p>Default Mithril Shards implementation uses <code>PeerContext</code> class to store, among other things, information like peer unique identification, direction (inbound/outbound) remote and local endpoints, user agent identification, negotiated protocol version and other attachable properties leveraging the .Net <a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.features.ifeaturecollection?view=aspnetcore-5.0">IFeatureCollection</a> interface.</p>
-<p>Bitcoin needs some additional information and some of the properties that are ubiquitous needed among all optional Bitcoin features (shards) like wallet, APIs, indexer, etc... have been defined directly into <code>BitcoinPeerContext</code> that extends the default <code>PeerContext</code>. Some of the additional properties are Permissions (that may change the FN behavior based on its set) and TimeOffset, that's an important aspect for the consensus logic.</p>
+<p>Bitcoin needs some additional information and some of the properties that are ubiquitous needed among all optional Bitcoin features (shards) like wallet, APIs, indexer, etc... have been defined directly into <code>BitcoinPeerContext</code> that extends the default <code>PeerContext</code>. Some of the additional properties are Permissions (that may change the <abbr title="Full Node">FN</abbr> behavior based on its set) and TimeOffset, that's an important aspect for the consensus logic.</p>
 <p>Another important property exposed by peer context is the <code>ConnectionCancellationTokenSource</code> property, that's a CancellationTokenSource that can be used to trigger the disconnection from a peer. It's internally used to know when the connection has been closed, to stop the execution of async methods that rely on an active connection to a remote peer.</p>
 <p>As per <code>IPeerContext</code> interface, <code>ConnectionCancellationTokenSource</code> can only be read so it's important that custom implementation of <code>IPeerContext</code> don't change it's value out of constructor.
 This property is actively used within message processors (more about it in a later section).</p>
@@ -689,7 +718,7 @@ A simple example is the <code>MaxConnectionThresholdGuard</code> rule that ensur
               <span class="md-footer__direction">
                 Previous
               </span>
-              Index
+              Overview
             </div>
           </div>
         </a>
@@ -747,7 +776,7 @@ A simple example is the <code>MaxConnectionThresholdGuard</code> rule that ensur
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.a1c7c35e.min.js"></script>

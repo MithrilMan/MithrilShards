@@ -20,7 +20,7 @@
     
     
       
-        <title>Welcome - Mithril Shards</title>
+        <title>Welcome! - Mithril Shards</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mithril-shards" class="md-skip">
+        <a href="#goal" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Welcome
+              Welcome!
             
           </span>
         </div>
@@ -210,23 +210,19 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
-        
-      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Welcome
+          Welcome!
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="." class="md-nav__link md-nav__link--active">
-        Welcome
+        Welcome!
       </a>
       
         
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -299,13 +295,13 @@
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
       
       <label class="md-nav__link" for="__nav_2">
-        Mithril Shards
+        Mithril Shards Core
         <span class="md-nav__icon md-icon"></span>
       </label>
-      <nav class="md-nav" aria-label="Mithril Shards" data-md-level="1">
+      <nav class="md-nav" aria-label="Mithril Shards Core" data-md-level="1">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
-          Mithril Shards
+          Mithril Shards Core
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -365,11 +361,32 @@
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
       
       <label class="md-nav__link" for="__nav_3">
+        Shards
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Shards" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Shards
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
+      
+      <label class="md-nav__link" for="__nav_3_1">
         Bitcoin Shard
         <span class="md-nav__icon md-icon"></span>
       </label>
-      <nav class="md-nav" aria-label="Bitcoin Shard" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
+      <nav class="md-nav" aria-label="Bitcoin Shard" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
           <span class="md-nav__icon md-icon"></span>
           Bitcoin Shard
         </label>
@@ -381,7 +398,7 @@
   
     <li class="md-nav__item">
       <a href="bitcoin-shard/" class="md-nav__link">
-        Index
+        Overview
       </a>
     </li>
   
@@ -407,6 +424,12 @@
       <a href="bitcoin-shard/testing_node_communication/" class="md-nav__link">
         Testing node communication
       </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -446,8 +469,6 @@
                     
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -511,35 +532,36 @@
               
                 
                 
-                <h1 id="mithril-shards">Mithril Shards</h1>
-<h2 id="goal">Goal</h2>
-<p>Mithril Shards goal is to implement a .NET 5 extensible P2P network &amp; distributed services library from scratch with focus on architecture and performance.</p>
-<p>Allows you to define custom network serialization protocol, easily handle payload messages and interact with the software leveraging any available features (named Shards) like WEB Api endpoints, Blazor UI,  and a lot of other exciting stuffs that community can implements and release to the public too!</p>
+                  <h1>Welcome!</h1>
+                
+                <h2 id="goal">Goal</h2>
+<p>Mithril Shards goal is to implement a .NET 5 extensible <abbr title="Peer to Peer">P2P</abbr> network &amp; distributed services library from scratch with focus on architecture and performance.</p>
+<p>Allows you to define custom network serialization protocol, easily handle payload messages and interact with the software leveraging any available features (named Shards) like WEB Api endpoints, Blazor <abbr title="User Interface">UI</abbr>,  and a lot of other exciting stuffs that community can implements and release to the public too!</p>
 <p>The project is very ambitious and it's currently developed just by me as a pet project but a huge effort has gone into already and some part of this unique code base has been already reused in other blockchain technologies to improve their performance.</p>
 <h2 id="how-things-started">How things started</h2>
 <p>I have <abbr title="Distributed Ledger Technology">DLT</abbr> experience in the past years and one of my previous experience has been working for a blockchain tech firm that had a <abbr title="Full Node">FN</abbr> implementation in C#.
 I really love C# and .Net core has improved a lot performance too.</p>
 <p>Workin on their codebase I saw lot of things that could have been improved, both in design and in performance. Their implementation started as a kind of 1-1 porting of bitcoin core source with all the cons that it brings.</p>
 <p>So I thought about diving into this titanic effort of creating a full node in C# starting from scratch, mainly to go as deeper as possible into technical details, trying to focus both on a proper architecture design and performance improvements.</p>
-<p>One of the first thing I implemented was of course the basic handshake process between two nodes, to achieve that My I started by following bitcoin core source because unluckily that's the only part that contains kind of specifications, it's hard to find a detailed updated technical documentations (even this <a href="https://en.bitcoin.it/wiki/Protocol_documentation">protocol documentation</a> page contains wrong informations, even if it's still useful).</p>
-<p>I started using .Net TCP classes, using an internal state machine to handle peer connection statuses, then I found <a href="https://github.com/davidfowl/BedrockFramework">Bedrock Framework</a>, that allowed me to abstract better my code and rely on it for the low level connection stuff (at the time of writing this documentation, that library is still in alpha and my concern about that project activity <a href="https://github.com/davidfowl/BedrockFramework/issues/105">has been appeased</a> ).</p>
-<p>As soon as I started defining properly my design, I found it interesting to abstract most of the stuff into an agnostic library that allows me to create a P2P application in a modular way and attach additional features when needed, and this is how Mithril Shards started.</p>
+<p>One of the first thing I implemented was of course the basic handshake process between two nodes, to achieve that My I started by following bitcoin core source because unluckily that's the only part that contains kind of specifications, it's hard to find a detailed updated technical documentations (even this <a href="https://en.bitcoin.it/wiki/Protocol_documentation" target="_blank">protocol documentation</a> page contains wrong informations, even if it's still useful).</p>
+<p>I started using .Net TCP classes, using an internal state machine to handle peer connection statuses, then I found <a href="https://github.com/davidfowl/BedrockFramework" target="_blank">Bedrock Framework</a>, that allowed me to abstract better my code and rely on it for the low level connection stuff (at the time of writing this documentation, that library is still in alpha and my concern about that project activity <a href="https://github.com/davidfowl/BedrockFramework/issues/105" target="_blank">has been appeased</a> ).</p>
+<p>As soon as I started defining properly my design, I found it interesting to abstract most of the stuff into an agnostic library that allows me to create a <abbr title="Peer to Peer">P2P</abbr> application in a modular way and attach additional features when needed, and this is how Mithril Shards started.</p>
 <p>Since then I added more and more stuff, both for generic Mithril Shards project and for specific Bitcoin needs.</p>
-<p>The <a href="https://github.com/MithrilMan/MithrilShards/tree/master/src/MithrilShards.Example">Example Shard</a> (that composed by multiple projects) showcase how you can create a custom P2P software leveraging networking, custom messages, WEB Api endpoints Diagnostic tools, everything with a proper logging system.</p>
+<p>The <a href="https://github.com/MithrilMan/MithrilShards/tree/master/src/MithrilShards.Example" target="_blank">Example Shard</a> (that composed by multiple projects) showcase how you can create a custom <abbr title="Peer to Peer">P2P</abbr> software leveraging networking, custom messages, WEB Api endpoints Diagnostic tools, everything with a proper logging system.</p>
 <h2 id="current-tech">Current Tech</h2>
 <p>A random list of available tech used within Mithril Shards.</p>
 <ul>
-<li><a href="https://dotnet.microsoft.com/download/dotnet/5.0">.Net 5</a> - ... for everything.</li>
-<li><a href="https://github.com/davidfowl/BedrockFramework/">Bedrock Framework</a> - TCP/IP default connectivity implementation.</li>
-<li><a href="https://github.com/domaindrivendev/Swashbuckle.AspNetCore">Swashbuckle</a> - to handle WEB Api (multiple) documents and have a playground to test APIs with swagger.</li>
-<li><a href="https://github.com/serilog/serilog-aspnetcore">Serilog</a> - default logging implementation.</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet">BenchmarkDotNet</a> - a benchmark framework, very handy to benchmark different approach during implementation phases.</li>
+<li><a href="https://dotnet.microsoft.com/download/dotnet/5.0" target="_blank">.Net 5</a> - ... for everything.</li>
+<li><a href="https://github.com/davidfowl/BedrockFramework/" target="_blank">Bedrock Framework</a> - TCP/IP default connectivity implementation.</li>
+<li><a href="https://github.com/domaindrivendev/Swashbuckle.AspNetCore" target="_blank">Swashbuckle</a> - to handle WEB Api (multiple) documents and have a playground to test APIs with swagger.</li>
+<li><a href="https://github.com/serilog/serilog-aspnetcore" target="_blank">Serilog</a> - default logging implementation.</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet" target="_blank">BenchmarkDotNet</a> - a benchmark framework, very handy to benchmark different approach during implementation phases.</li>
 </ul>
 <h2 id="why-the-mithril-shards-name">Why the Mithril Shards name?</h2>
 <p>Well... let's bullet some facts</p>
 <ul>
-<li>I like fantasy a lot, <a href="https://en.wikipedia.org/wiki/J._R._R._Tolkien">J.R.R. Tolkien</a> of course has been one of my reads and mithril is a fictional metal in his universe.</li>
-<li>The main properties of <a href="https://en.wikipedia.org/wiki/Mithril#Properties">mithri</a> are: being very strong, light and in its pure form very malleable to work with.</li>
+<li>I like fantasy a lot, <a href="https://en.wikipedia.org/wiki/J._R._R._Tolkien" target="_blank">J.R.R. Tolkien</a> of course has been one of my reads and mithril is a fictional metal in his universe.</li>
+<li>The main properties of <a href="https://en.wikipedia.org/wiki/Mithril#Properties" target="_blank">mithri</a> are: being very strong, light and in its pure form very malleable to work with.</li>
 <li>I'm a developer that like to curate its software to be extensible and solid.</li>
 <li>My github handle is MithrilMan, guess what?</li>
 </ul>
@@ -549,7 +571,7 @@ So this explain mithril, while about <em>Shards</em>, is because I see this proj
 <h2 id="call-to-action">Call to Action!</h2>
 <div class="admonition tip">
 <p class="admonition-title">Join to give feedback, ask for features, support, etc...</p>
-<p>Discord server: <a href="https://discord.gg/T9kyKz4bAu">https://discord.gg/T9kyKz4bAu</a>  </p>
+<p>Discord server: <a href="https://discord.gg/T9kyKz4bAu" target="_blank">https://discord.gg/T9kyKz4bAu</a>  </p>
 </div>
 <h2 id="ci">CI</h2>
 <table>
@@ -560,7 +582,7 @@ So this explain mithril, while about <em>Shards</em>, is because I see this proj
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml"><img alt="Main Build" src="https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml/badge.svg" /></a></td>
+<td><a href="https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml" target="_blank"><img alt="Main Build" src="https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml/badge.svg" /></a></td>
 </tr>
 </tbody>
 </table>
@@ -647,7 +669,7 @@ So this explain mithril, while about <em>Shards</em>, is because I see this proj
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.instant", "navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
       <script src="assets/javascripts/bundle.a1c7c35e.min.js"></script>
