@@ -1,12 +1,13 @@
 ---
 title: Testing node communication
 description: Mithril Shards bitcoin implementation, testing node
-
 ---
+
+--8<-- "refs.txt"
 
 # Testing node communication
 
-In order to test the Forge implementation, I used the handy [bitcoin testnet in a box](https://github.com/freewil/bitcoin-testnet-box)	
+In order to test the Forge implementation, I used the handy [bitcoin testnet in a box](https://github.com/freewil/bitcoin-testnet-box){:target="_blank"}	
 
 I used the docker implementation:
 

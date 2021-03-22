@@ -2,6 +2,6 @@
     max-width: initial;
 }
 
-.mermaid {
+.mermaid > svg {
    background-color: #bababa;
 }
