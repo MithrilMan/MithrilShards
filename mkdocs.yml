@@ -83,7 +83,7 @@ plugins:
       exclude:
         - _private/*.md
         - _snippets/*.*
-        - _abbr.md
+        - extra_css/*.*
   #- section-index
 
 extra:
