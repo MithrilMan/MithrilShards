@@ -58,7 +58,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="blue">
       
   
     
@@ -243,6 +243,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-things-started" class="md-nav__link">
+    How things started
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#current-tech" class="md-nav__link">
     Current Tech
   </a>
@@ -250,15 +257,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#blockchain-tech-inside" class="md-nav__link">
-    Blockchain tech inside
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-mithril-shards" class="md-nav__link">
-    Why Mithril Shards?
+  <a href="#why-the-mithril-shards-name" class="md-nav__link">
+    Why the Mithril Shards name?
   </a>
   
 </li>
@@ -314,6 +314,30 @@
   
   
     <li class="md-nav__item">
+      <a href="mithril-shards/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="mithril-shards/default-forge/" class="md-nav__link">
+        DefaultForge
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="mithril-shards/dev-controller/" class="md-nav__link">
         Dev Controller
       </a>
@@ -357,7 +381,7 @@
   
     <li class="md-nav__item">
       <a href="bitcoin-shard/" class="md-nav__link">
-        Overview
+        Index
       </a>
     </li>
   
@@ -440,6 +464,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-things-started" class="md-nav__link">
+    How things started
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#current-tech" class="md-nav__link">
     Current Tech
   </a>
@@ -447,15 +478,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#blockchain-tech-inside" class="md-nav__link">
-    Blockchain tech inside
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-mithril-shards" class="md-nav__link">
-    Why Mithril Shards?
+  <a href="#why-the-mithril-shards-name" class="md-nav__link">
+    Why the Mithril Shards name?
   </a>
   
 </li>
@@ -492,6 +516,16 @@
 <p>Mithril Shards goal is to implement a .NET 5 extensible P2P network &amp; distributed services library from scratch with focus on architecture and performance.</p>
 <p>Allows you to define custom network serialization protocol, easily handle payload messages and interact with the software leveraging any available features (named Shards) like WEB Api endpoints, Blazor UI,  and a lot of other exciting stuffs that community can implements and release to the public too!</p>
 <p>The project is very ambitious and it's currently developed just by me as a pet project but a huge effort has gone into already and some part of this unique code base has been already reused in other blockchain technologies to improve their performance.</p>
+<h2 id="how-things-started">How things started</h2>
+<p>I have <abbr title="Distributed Ledger Technology">DLT</abbr> experience in the past years and one of my previous experience has been working for a blockchain tech firm that had a <abbr title="Full Node">FN</abbr> implementation in C#.
+I really love C# and .Net core has improved a lot performance too.</p>
+<p>Workin on their codebase I saw lot of things that could have been improved, both in design and in performance. Their implementation started as a kind of 1-1 porting of bitcoin core source with all the cons that it brings.</p>
+<p>So I thought about diving into this titanic effort of creating a full node in C# starting from scratch, mainly to go as deeper as possible into technical details, trying to focus both on a proper architecture design and performance improvements.</p>
+<p>One of the first thing I implemented was of course the basic handshake process between two nodes, to achieve that My I started by following bitcoin core source because unluckily that's the only part that contains kind of specifications, it's hard to find a detailed updated technical documentations (even this <a href="https://en.bitcoin.it/wiki/Protocol_documentation">protocol documentation</a> page contains wrong informations, even if it's still useful).</p>
+<p>I started using .Net TCP classes, using an internal state machine to handle peer connection statuses, then I found <a href="https://github.com/davidfowl/BedrockFramework">Bedrock Framework</a>, that allowed me to abstract better my code and rely on it for the low level connection stuff (at the time of writing this documentation, that library is still in alpha and my concern about that project activity <a href="https://github.com/davidfowl/BedrockFramework/issues/105">has been appeased</a> ).</p>
+<p>As soon as I started defining properly my design, I found it interesting to abstract most of the stuff into an agnostic library that allows me to create a P2P application in a modular way and attach additional features when needed, and this is how Mithril Shards started.</p>
+<p>Since then I added more and more stuff, both for generic Mithril Shards project and for specific Bitcoin needs.</p>
+<p>The <a href="https://github.com/MithrilMan/MithrilShards/tree/master/src/MithrilShards.Example">Example Shard</a> (that composed by multiple projects) showcase how you can create a custom P2P software leveraging networking, custom messages, WEB Api endpoints Diagnostic tools, everything with a proper logging system.</p>
 <h2 id="current-tech">Current Tech</h2>
 <p>A random list of available tech used within Mithril Shards.</p>
 <ul>
@@ -501,14 +535,13 @@
 <li><a href="https://github.com/serilog/serilog-aspnetcore">Serilog</a> - default logging implementation.</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet">BenchmarkDotNet</a> - a benchmark framework, very handy to benchmark different approach during implementation phases.</li>
 </ul>
-<h2 id="blockchain-tech-inside">Blockchain tech inside</h2>
-<p>As a proof of concept, a new Bitcoin full node is being developed using this library, actually hosted in this repository (it's a WIP project).</p>
-<h2 id="why-mithril-shards">Why Mithril Shards?</h2>
+<h2 id="why-the-mithril-shards-name">Why the Mithril Shards name?</h2>
 <p>Well... let's bullet some facts</p>
 <ul>
 <li>I like fantasy a lot, <a href="https://en.wikipedia.org/wiki/J._R._R._Tolkien">J.R.R. Tolkien</a> of course has been one of my reads and mithril is a fictional metal in his universe.</li>
 <li>The main properties of <a href="https://en.wikipedia.org/wiki/Mithril#Properties">mithri</a> are: being very strong, light and in its pure form very malleable to work with.</li>
 <li>I'm a developer that like to curate its software to be extensible and solid.</li>
+<li>My github handle is MithrilMan, guess what?</li>
 </ul>
 <p>Now take these informations, mix them up, and you'll see that to I aim to have a robust, fast and flexible project!
 So this explain mithril, while about <em>Shards</em>, is because I see this project as a mix of shards that can be assembled togheter to give you a precious artifact!</p>
@@ -539,7 +572,7 @@ So this explain mithril, while about <em>Shards</em>, is because I see this proj
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-20
+      Last update: 2021-03-22
     
   </small>
 </div>
@@ -562,13 +595,13 @@ So this explain mithril, while about <em>Shards</em>, is because I see this proj
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
       
-        <a href="mithril-shards/dev-controller/" class="md-footer__link md-footer__link--next" rel="next">
+        <a href="mithril-shards/" class="md-footer__link md-footer__link--next" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Dev Controller
+              Overview
             </div>
           </div>
           <div class="md-footer__button md-icon">

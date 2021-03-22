@@ -6,24 +6,28 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="Mithril Shards implementation overview">
+      
       
       
         <meta name="author" content="Mithril Man">
       
       
-      <link rel="icon" href="/mithrilshards/assets/images/favicon.png">
+        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/mithril-shards/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
     
     
       
-        <title>Mithril Shards</title>
+        <title>Overview - Mithril Shards</title>
       
     
     
-      <link rel="stylesheet" href="/mithrilshards/assets/stylesheets/main.2c0c5eaf.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.2c0c5eaf.min.css">
       
         
-        <link rel="stylesheet" href="/mithrilshards/assets/stylesheets/palette.7fa14f5b.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.7fa14f5b.min.css">
         
       
     
@@ -38,7 +42,7 @@
     
     
     
-      <link rel="stylesheet" href="/mithrilshards/extra_css/custom.css">
+      <link rel="stylesheet" href="../extra_css/custom.css">
     
     
       
@@ -63,6 +67,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#architecture-overview" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -70,7 +79,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/mithrilshards/." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href=".." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -89,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Overview
             
           </span>
         </div>
@@ -164,7 +173,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/mithrilshards/." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href=".." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -196,7 +205,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/mithrilshards/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         Welcome
       </a>
     </li>
@@ -209,12 +218,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
       
       <label class="md-nav__link" for="__nav_2">
         Mithril Shards
@@ -230,11 +241,52 @@
             
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="/mithrilshards/mithril-shards/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Overview
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Overview
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    Architecture Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-project" class="md-nav__link">
+    Example project
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -244,7 +296,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/mithrilshards/mithril-shards/default-forge/" class="md-nav__link">
+      <a href="default-forge/" class="md-nav__link">
         DefaultForge
       </a>
     </li>
@@ -256,7 +308,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/mithrilshards/mithril-shards/dev-controller/" class="md-nav__link">
+      <a href="dev-controller/" class="md-nav__link">
         Dev Controller
       </a>
     </li>
@@ -298,7 +350,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/mithrilshards/bitcoin-shard/" class="md-nav__link">
+      <a href="../bitcoin-shard/" class="md-nav__link">
         Index
       </a>
     </li>
@@ -310,7 +362,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/mithrilshards/bitcoin-shard/network/" class="md-nav__link">
+      <a href="../bitcoin-shard/network/" class="md-nav__link">
         Network implementation
       </a>
     </li>
@@ -322,7 +374,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/mithrilshards/bitcoin-shard/testing_node_communication/" class="md-nav__link">
+      <a href="../bitcoin-shard/testing_node_communication/" class="md-nav__link">
         Testing node communication
       </a>
     </li>
@@ -357,11 +409,90 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    Architecture Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-project" class="md-nav__link">
+    Example project
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
-  <h1>404 - Not found</h1>
+                
+                
+                  <h1>Overview</h1>
+                
+                <h2 id="architecture-overview">Architecture Overview</h2>
+<p>Mithril Shards is a modular framework for building P2P Applications that can be expanded by additional features like WEB Api endpoints, <abbr title="Message Queue">MQ</abbr> based services, SignalR hubs, cross platform UI and much more.</p>
+<p>Pretending to be into a Tolkien universe, I thought of defining features as <em>shards</em>, where each shard of mithril can be put into a forge and fused togheter with other mithril shards, to create a final artifact.</p>
+<p>To find analogies with .net naming conventions:</p>
+<ul>
+<li><strong>Forge</strong> (to be more precise, <strong>ForgeBuilder</strong>) is a <a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.hostbuilder?view=dotnet-plat-ext-5.0">HostBuilder</a> on steroids (actually it encapsulate a HostBuilder instance).</li>
+<li><strong>Shard</strong> is an application part that gets merged into the hostbuilder, using dependency injection, extending its functionality </li>
+<li><strong>Artifact</strong> is just an allegoric view of the result of <code>forgeBuilderInstance.RunConsoleAsync()</code>.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Current naming may be subject to changes.</p>
+</div>
+<p>To build an application using these concepts, we have to create a ForgeBuilder, specify which Forge type to use and then we can put into the forge all the shards we need by calling <code>AddShard</code> method.</p>
+<p>Since a shard may require complex configurations and inject service implementations it may need, usually you don't want to call that method directly but instead you'd want to have a <code>IForgeBuilder</code> extension that you can put in a class in your shard project, where your initialization logic happens.
+That's how .Net core features and services are injected into the host builder and I think it's a good thing to use a similar approach because would be more friendly to devs used to .Net conventions.</p>
+<p>After all shards are added and ForgeBuilder is started by <code>RunConsoleAsync</code>, the forge will take care of all the plumbing stuff, initializing all the shards.</p>
+<p>The entry point is our forge builder class.
+After declaring an instance we have to specify which implementation of Forge we want to use.
+Actually the only available implementation is <a href="/mithril-shards/default-forge">DefaultForge</a></p>
+<h2 id="example-project">Example project</h2>
+<p>The best way to see it in action is by inspecting the Example project I've created for that purpose.</p>
+                
+                  
+                    
+
+<hr>
+<div class="md-source-date">
+  <small>
+    
+      Last update: 2021-03-22
+    
+  </small>
+</div>
+                  
+                
+              
+              
+                
+
 
               
             </article>
@@ -371,6 +502,39 @@
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href=".." class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Welcome
+            </div>
+          </div>
+        </a>
+      
+      
+        <a href="default-forge/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              DefaultForge
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -408,10 +572,10 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "/mithrilshards", "features": ["navigation.instant", "navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "/mithrilshards/assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="/mithrilshards/assets/javascripts/bundle.a1c7c35e.min.js"></script>
+      <script src="../assets/javascripts/bundle.a1c7c35e.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js"></script>
       
