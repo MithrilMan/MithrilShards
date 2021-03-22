@@ -1,3 +1,5 @@
 *[DLT]: Distributed Ledger Technology
 *[FN]: Full Node
 *[MQ]: Message Queue
+*[P2P]: Peer to Peer
+*[UI]: User Interface

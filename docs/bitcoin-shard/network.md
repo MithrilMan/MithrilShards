@@ -2,6 +2,8 @@
 title: Network implementation
 description: Mithril Shards bitcoin implementation, network implementation
 ---
+--8<-- "refs.txt"
+
 # Network Protocol
 
 The Bitcoin network protocol is a TCP protocol that serializes messages starting from a special 4 bytes constant data called *Magic bytes*, followed by 12 bytes representing the *command name*, 4 bytes representing the *payload size* and 4 bytes with the checksum of the payload.

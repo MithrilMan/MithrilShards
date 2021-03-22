@@ -22,7 +22,7 @@ theme:
       repo: fontawesome/brands/github
 
     features:
-      - navigation.instant
+      #- navigation.instant # problems with mermaid
       #- navigation.sections
       #- navigation.tabs
       #- navigation.tabs.sticky # for insiders only
@@ -53,6 +53,7 @@ theme:
 
 markdown_extensions:
   - abbr
+  - attr_list #needed to use {:target="_blank"} on links
   - pymdownx.snippets:
       base_path: docs/_snippets
       check_paths: true
@@ -95,12 +96,13 @@ extra:
 
 nav:
   - index.md
-  - Mithril Shards:
+  - Mithril Shards Core:
     - mithril-shards/index.md
     - mithril-shards/default-forge.md
     - mithril-shards/dev-controller.md
-  - Bitcoin Shard:
-    - bitcoin-shard/index.md
-    - bitcoin-shard/network.md
-    - bitcoin-shard/testing_node_communication.md
+  - Shards:
+     - Bitcoin Shard:
+       - bitcoin-shard/index.md
+       - bitcoin-shard/network.md
+       - bitcoin-shard/testing_node_communication.md
   - Issue Tracker: 'https://github.com/MithrilMan/MithrilShards/issues'

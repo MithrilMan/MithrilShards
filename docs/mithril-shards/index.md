@@ -2,6 +2,8 @@
 title: Overview
 description: Mithril Shards implementation overview
 ---
+--8<-- "refs.txt"
+
 ## Architecture Overview
 
 Mithril Shards is a modular framework for building P2P Applications that can be expanded by additional features like WEB Api endpoints, MQ based services, SignalR hubs, cross platform UI and much more.
@@ -10,7 +12,7 @@ Pretending to be into a Tolkien universe, I thought of defining features as *sha
 
 To find analogies with .net naming conventions:
 
-- **Forge** (to be more precise, **ForgeBuilder**) is a [HostBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.hostbuilder?view=dotnet-plat-ext-5.0) on steroids (actually it encapsulate a HostBuilder instance).
+- **Forge** (to be more precise, **ForgeBuilder**) is a [HostBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.hostbuilder?view=dotnet-plat-ext-5.0){:target="_blank"} on steroids (actually it encapsulate a HostBuilder instance).
 - **Shard** is an application part that gets merged into the hostbuilder, using dependency injection, extending its functionality 
 - **Artifact** is just an allegoric view of the result of `forgeBuilderInstance.RunConsoleAsync()`.
 
@@ -33,11 +35,3 @@ Actually the only available implementation is [DefaultForge]
 ## Example project
 
 The best way to see it in action is by inspecting the Example project I've created for that purpose.
-
-
-
-
-
-
-
---8<-- "refs.txt"

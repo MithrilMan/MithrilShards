@@ -1,10 +1,8 @@
 ---
-title: Welcome
+title: Welcome!
 description: Mithril Shards home page
 ---
-# Mithril Shards
-
-
+--8<-- "refs.txt"
 
 ## Goal
 
@@ -25,15 +23,15 @@ Workin on their codebase I saw lot of things that could have been improved, both
 
 So I thought about diving into this titanic effort of creating a full node in C# starting from scratch, mainly to go as deeper as possible into technical details, trying to focus both on a proper architecture design and performance improvements.
 
-One of the first thing I implemented was of course the basic handshake process between two nodes, to achieve that My I started by following bitcoin core source because unluckily that's the only part that contains kind of specifications, it's hard to find a detailed updated technical documentations (even this [protocol documentation](https://en.bitcoin.it/wiki/Protocol_documentation) page contains wrong informations, even if it's still useful).
+One of the first thing I implemented was of course the basic handshake process between two nodes, to achieve that My I started by following bitcoin core source because unluckily that's the only part that contains kind of specifications, it's hard to find a detailed updated technical documentations (even this [protocol documentation](https://en.bitcoin.it/wiki/Protocol_documentation){:target="_blank"} page contains wrong informations, even if it's still useful).
 
-I started using .Net TCP classes, using an internal state machine to handle peer connection statuses, then I found [Bedrock Framework](https://github.com/davidfowl/BedrockFramework), that allowed me to abstract better my code and rely on it for the low level connection stuff (at the time of writing this documentation, that library is still in alpha and my concern about that project activity [has been appeased](https://github.com/davidfowl/BedrockFramework/issues/105) ).
+I started using .Net TCP classes, using an internal state machine to handle peer connection statuses, then I found [Bedrock Framework](https://github.com/davidfowl/BedrockFramework){:target="_blank"}, that allowed me to abstract better my code and rely on it for the low level connection stuff (at the time of writing this documentation, that library is still in alpha and my concern about that project activity [has been appeased](https://github.com/davidfowl/BedrockFramework/issues/105){:target="_blank"} ).
 
 As soon as I started defining properly my design, I found it interesting to abstract most of the stuff into an agnostic library that allows me to create a P2P application in a modular way and attach additional features when needed, and this is how Mithril Shards started.
 
 Since then I added more and more stuff, both for generic Mithril Shards project and for specific Bitcoin needs.
 
-The [Example Shard](https://github.com/MithrilMan/MithrilShards/tree/master/src/MithrilShards.Example) (that composed by multiple projects) showcase how you can create a custom P2P software leveraging networking, custom messages, WEB Api endpoints Diagnostic tools, everything with a proper logging system.
+The [Example Shard](https://github.com/MithrilMan/MithrilShards/tree/master/src/MithrilShards.Example){:target="_blank"} (that composed by multiple projects) showcase how you can create a custom P2P software leveraging networking, custom messages, WEB Api endpoints Diagnostic tools, everything with a proper logging system.
 
 
 
@@ -41,11 +39,11 @@ The [Example Shard](https://github.com/MithrilMan/MithrilShards/tree/master/src/
 
 A random list of available tech used within Mithril Shards.
 
-- [.Net 5](https://dotnet.microsoft.com/download/dotnet/5.0) - ... for everything.
-- [Bedrock Framework](https://github.com/davidfowl/BedrockFramework/) - TCP/IP default connectivity implementation.
-- [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) - to handle WEB Api (multiple) documents and have a playground to test APIs with swagger.
-- [Serilog](https://github.com/serilog/serilog-aspnetcore) - default logging implementation.
-- [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) - a benchmark framework, very handy to benchmark different approach during implementation phases.
+- [.Net 5](https://dotnet.microsoft.com/download/dotnet/5.0){:target="_blank"} - ... for everything.
+- [Bedrock Framework](https://github.com/davidfowl/BedrockFramework/){:target="_blank"} - TCP/IP default connectivity implementation.
+- [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore){:target="_blank"} - to handle WEB Api (multiple) documents and have a playground to test APIs with swagger.
+- [Serilog](https://github.com/serilog/serilog-aspnetcore){:target="_blank"} - default logging implementation.
+- [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet){:target="_blank"} - a benchmark framework, very handy to benchmark different approach during implementation phases.
 
 
 
@@ -53,8 +51,8 @@ A random list of available tech used within Mithril Shards.
 
 Well... let's bullet some facts
 
-- I like fantasy a lot, [J.R.R. Tolkien](https://en.wikipedia.org/wiki/J._R._R._Tolkien) of course has been one of my reads and mithril is a fictional metal in his universe.
-- The main properties of [mithri](https://en.wikipedia.org/wiki/Mithril#Properties) are: being very strong, light and in its pure form very malleable to work with.
+- I like fantasy a lot, [J.R.R. Tolkien](https://en.wikipedia.org/wiki/J._R._R._Tolkien){:target="_blank"} of course has been one of my reads and mithril is a fictional metal in his universe.
+- The main properties of [mithri](https://en.wikipedia.org/wiki/Mithril#Properties){:target="_blank"} are: being very strong, light and in its pure form very malleable to work with.
 - I'm a developer that like to curate its software to be extensible and solid.
 - My github handle is MithrilMan, guess what?
 
@@ -68,7 +66,7 @@ In fact you shouldn't be surprised that the root class is called Forge... who sa
 ## Call to Action!
 
 !!! tip "Join to give feedback, ask for features, support, etc..."
-	Discord server: [https://discord.gg/T9kyKz4bAu](https://discord.gg/T9kyKz4bAu)  
+	Discord server: [https://discord.gg/T9kyKz4bAu](https://discord.gg/T9kyKz4bAu){:target="_blank"}  
 
 
 
@@ -76,8 +74,4 @@ In fact you shouldn't be surprised that the root class is called Forge... who sa
 
 | Current status                                               |
 | ------------------------------------------------------------ |
-| [![Main Build](https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml/badge.svg)](https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml) |
-
-
-
---8<-- "refs.txt"
+| [![Main Build](https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml/badge.svg)](https://github.com/MithrilMan/MithrilShards/actions/workflows/main-build.yml){:target="_blank"} |
