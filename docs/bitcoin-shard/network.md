@@ -13,7 +13,7 @@ Mithril Shards implements a low level stack of interfaces and implementations th
 A default implementation uses Bedrock Framework to leverage the low level communication between peers and this is what's used in the Bitcoin shard to provide P2P connectivity.
 
 A typical Bitcoin full node (henceforth called *FN*) is able to connect to other nodes and accept incoming connections.
-Before two peers can exchange information, they have to perform an handshake to prove that they can understand each other (more details on the the bitcoin network protocol can be found on this [bitcoin developer resource](https://developer.bitcoin.org/devguide/p2p_network.html)){:target="_blank"}.
+Before two peers can exchange information, they have to perform an handshake to prove that they can understand each other (more details on the the bitcoin network protocol can be found on this [bitcoin developer resource](https://developer.bitcoin.org/devguide/p2p_network.html){:target="_blank"}).
 
 Before being able to handshake, whenever a connection has been established between two peers the FN stores some metadata about the remote peer. This data is stored into a class that implements IPeerContext interface and its implementation represents our next section.
 
