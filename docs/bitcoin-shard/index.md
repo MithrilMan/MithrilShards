@@ -10,7 +10,10 @@ This folder contains technical documentation that helps to understand the choice
 
 Personally I'm not a fan of bitcoin core code base: even if it improved since early days, it's confusing, it lacks of an homogeneous design and architecture and suffers from old bad choices and above all lacks of proper technical documentation, following the mantra "source code is the documentation".
 
-To be clear, I don't blame who contributes on bitcoin core, I'm just stating objective facts and I hope to fix some of these issues with my project but I don't pretend to have documentation always in sync with latest changes because it's a huge effort and I agree at some extents that source code is the final judge and I encourage you to dig into it if you want to go deeper in implementation details or verify that an information written here is correct and please, if you find any issue about documentation, feel free to open an issue and I'll be happy to fix it (even a PR with your corrections can be valuable!).
+To be clear, I don't blame who contributes on bitcoin core, I'm just stating objective facts and I hope to fix some of these issues with my project.
+I don't pretend to have all the documentation always in sync with latest changes because it's a huge effort and I agree at a large extent that source code is the final judge and I encourage you to dig into it if you want to go deeper in implementation details or verify that an information written here is correct.
+
+Please, if you find any issue about documentation, [feel free to open an issue](https://github.com/MithrilMan/MithrilShards/issues/new?assignees=&labels=documentation&template=documentation-issue.md&title=){:target="_blank"} and I'll be happy to fix it (even a PR with your corrections can be valuable!).
 
 To me a proper documentation doesn't have to explain the source code (source code should be as much readable as possible) but it should give insights about the process that leads toward specific implementations and have indications about good practice to work within the built library.
 
