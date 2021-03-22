@@ -27,6 +27,7 @@ on:
     paths:
       - '*'
       - '!/docs/*' # Don't run workflow when files are only in the /Documentation directory
+      - '!/.github/.workflows/*' # Don't run workflow when only workflow files updated
 
 
 env:
