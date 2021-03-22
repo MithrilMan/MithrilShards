@@ -95,14 +95,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{B137F4
 		benchmarks\Directory.Build.props = benchmarks\Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{B5529C29-3CC7-41C6-AC76-B10B8FDD429C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B5529C29-3CC7-41C6-AC76-B10B8FDD429C}"
 	ProjectSection(SolutionItems) = preProject
 		local_doc.bat = local_doc.bat
 		mkdocs.yml = mkdocs.yml
 		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "doc-placeholder", "doc\doc-placeholder.csproj", "{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "docs-placeholder", "docs\docs-placeholder.csproj", "{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

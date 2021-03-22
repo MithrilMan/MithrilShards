@@ -1,6 +1,7 @@
 ---
 title: Overview
 description: Mithril Shards bitcoin implementation overview
+--8<-- "refs.txt"
 ---
 ## Premise
 
@@ -17,7 +18,7 @@ Beside this premise, I'm writing this documentation as if I were the target, in 
 
 Nevertheless I would be happy to know that it could be useful to someone who may find it interesting and help in understanding why an approach has been chosen over another!
 
-Also if you have question or want to discuss about technical details, you can use the repository [Discussion section](https://github.com/MithrilMan/MithrilShards/discussions).
+Also if you have question or want to discuss about technical details, you can use the repository [Discussion section](https://github.com/MithrilMan/MithrilShards/discussions).[DefaultForge]
 
 
 
