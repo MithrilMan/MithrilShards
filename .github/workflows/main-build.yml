@@ -26,7 +26,7 @@ on:
       - master
     paths:
       - '*'
-      - '!/doc/*' # Don't run workflow when files are only in the /Documentation directory
+      - '!/docs/*' # Don't run workflow when files are only in the /Documentation directory
 
 
 env:
