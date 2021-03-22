@@ -24,6 +24,7 @@ on:
       - '*'
       - '!/docs/*' # Don't run workflow when files are only in the /Documentation directory
       - '!/.github/.workflows/*' # Don't run workflow when only workflow files updated
+      - '!mkdocs.yml'
   push:
     branches:
       - master
@@ -31,6 +32,7 @@ on:
       - '*'
       - '!/docs/*' # Don't run workflow when files are only in the /Documentation directory
       - '!/.github/.workflows/*' # Don't run workflow when only workflow files updated
+      - '!mkdocs.yml'
 
 
 env:

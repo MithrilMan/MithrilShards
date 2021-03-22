@@ -8,6 +8,7 @@ on:
       - master
     paths:
     - '**.md' # runs only if a markdown file is pushed
+    - 'mkdocs.yml'
 
 jobs:
   deploy:
