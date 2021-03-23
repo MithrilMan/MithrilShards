@@ -6,21 +6,21 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Mithril Shards bitcoin implementation, testing node">
+        <meta name="description" content="Mithril Shards bitcoin implementation overview">
       
       
       
         <meta name="author" content="Mithril Man">
       
       
-        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/bitcoin-shard/testing_node_communication/">
+        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/shards/bitcoin/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
     
     
       
-        <title>Testing node communication - Mithril Shards</title>
+        <title>Overview - Mithril Shards</title>
       
     
     
@@ -42,7 +42,7 @@
     
     
     
-      <link rel="stylesheet" href="../../extra_css/custom.css">
+      <link rel="stylesheet" href="../../_mkdocs/extra_css/custom.css">
     
     
       
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#testing-node-communication" class="md-skip">
+        <a href="#premise" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Testing node communication
+              Overview
             
           </span>
         </div>
@@ -253,6 +253,18 @@
   
   
     <li class="md-nav__item">
+      <a href="../../mithril-shards/forge-builder/" class="md-nav__link">
+        ForgeBuilder
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../mithril-shards/default-forge/" class="md-nav__link">
         DefaultForge
       </a>
@@ -307,6 +319,18 @@
             
   
   
+  
+    <li class="md-nav__item">
+      <a href="../serilog/" class="md-nav__link">
+        Serilog
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
     
   
   
@@ -314,42 +338,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" checked>
       
-      <label class="md-nav__link" for="__nav_3_1">
-        Bitcoin Shard
+      <label class="md-nav__link" for="__nav_3_2">
+        Bitcoin
         <span class="md-nav__icon md-icon"></span>
       </label>
-      <nav class="md-nav" aria-label="Bitcoin Shard" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_1">
+      <nav class="md-nav" aria-label="Bitcoin" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
           <span class="md-nav__icon md-icon"></span>
-          Bitcoin Shard
+          Bitcoin
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
-        Overview
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../network/" class="md-nav__link">
-        Network implementation
-      </a>
-    </li>
-  
-
           
             
   
@@ -361,23 +361,19 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
-        
-      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Testing node communication
+          Overview
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Testing node communication
+        Overview
       </a>
       
         
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -387,22 +383,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    Troubleshooting
-  </a>
-  
-    <nav class="md-nav" aria-label="Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#systemnetsocketssocketexception-10013" class="md-nav__link">
-    System.Net.Sockets.SocketException (10013)
+  <a href="#premise" class="md-nav__link">
+    Premise
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#project-overview" class="md-nav__link">
+    Project Overview
+  </a>
   
 </li>
       
@@ -410,6 +400,30 @@
   
 </nav>
       
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="network/" class="md-nav__link">
+        Network implementation
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="testing_node_communication/" class="md-nav__link">
+        Testing node communication
+      </a>
     </li>
   
 
@@ -456,8 +470,6 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -466,22 +478,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    Troubleshooting
-  </a>
-  
-    <nav class="md-nav" aria-label="Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#systemnetsocketssocketexception-10013" class="md-nav__link">
-    System.Net.Sockets.SocketException (10013)
+  <a href="#premise" class="md-nav__link">
+    Premise
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#project-overview" class="md-nav__link">
+    Project Overview
+  </a>
   
 </li>
       
@@ -498,27 +504,36 @@
               
                 
                 
-                <h1 id="testing-node-communication">Testing node communication</h1>
-<p>In order to test the Forge implementation, I used the handy <a href="https://github.com/freewil/bitcoin-testnet-box" target="_blank">bitcoin testnet in a box</a>    </p>
-<p>I used the docker implementation:</p>
-<p><code>docker pull freewil/bitcoin-testnet-box</code></p>
-<p>then I modified the suggested docker run arguments, in order to open the node port, this way, to run the image with an reachable testnet node, run the image as</p>
-<p><code>docker run -t -i -p 19000:19000 -p 19001:19001 -p 19011:19011 freewil/bitcoin-testnet-box</code></p>
-<p>after that, in the tty console, write <code>make start</code> to start the node and this way you can connect to the testnet box using the endpoint <code>127.0.0.1:19000</code></p>
-<p>If everything is going as expected and you ran the Forge within bitcoin-testnet network, you should see something similar to this</p>
-<p><img alt="img" src="https://cdn.discordapp.com/attachments/662122241190002699/662122563270475776/unknown.png" /></p>
-<p>At the time of the screenshot (2nd of January 2020) only the handshake implementation was ready, this is why of warnings following the successful handshake.</p>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<h5 id="systemnetsocketssocketexception-10013">System.Net.Sockets.SocketException (10013)</h5>
-<p>In case you receive this error while trying to open some port for listening, the reason may be your OS is excluding some port ranges for some reason.
-To check if the port is reserved, you can use the command</p>
-<p><code>netsh interface ipv4 show excludedportrange tcp</code></p>
-<p>you'll see a list of port ranges that may include the port you are trying to open.
-To fix that your best bet is to just change the port you want to use in your configuration file, otherwise you need to understand why a specific port range is being reserved and eventually change it.</p>
-<p>You can delete the excludedportrange if you want and you know what you are doing, using commands like</p>
-<p><code>netsh int ipv4 delete excludedportrange protocol=tcp startport=45000 numberofports=100</code></p>
-<p>and add new ones with 
-<code>netsh int ipv4 add excludedportrange protocol=tcp startport=45000 numberofports=100</code></p>
+                  <h1>Overview</h1>
+                
+                <h2 id="premise">Premise</h2>
+<p>This folder contains technical documentation that helps to understand the choices behind the implementation and design of current project.</p>
+<p>Personally I'm not a fan of bitcoin core code base: even if it improved since early days, it's confusing, it lacks of an homogeneous design and architecture and suffers from old bad choices and above all lacks of proper technical documentation, following the mantra "source code is the documentation".</p>
+<p>To be clear, I don't blame who contributes on bitcoin core, I'm just stating objective facts and I hope to fix some of these issues with my project.
+I don't pretend to have all the documentation always in sync with latest changes because it's a huge effort and I agree at a large extent that source code is the final judge and I encourage you to dig into it if you want to go deeper in implementation details or verify that an information written here is correct.</p>
+<p>Please, if you find any issue about documentation, <a href="https://github.com/MithrilMan/MithrilShards/issues/new?assignees=&amp;labels=documentation&amp;template=documentation-issue.md&amp;title=" target="_blank">feel free to open an issue</a> and I'll be happy to fix it (even a PR with your corrections can be valuable!).</p>
+<p>To me a proper documentation doesn't have to explain the source code (source code should be as much readable as possible) but it should give insights about the process that leads toward specific implementations and have indications about good practice to work within the built library.</p>
+<p>Beside this premise, I'm writing this documentation as if I were the target, in order to have a maintainable and easy to follow repository and of course be able to give good understanding about how to extend this project further with custom features (shards) to people that may be interested.</p>
+<p>Nevertheless I would be happy to know that it could be useful to someone who may find it interesting and help in understanding why an approach has been chosen over another!</p>
+<p>Also if you have question or want to discuss about technical details, you can use the repository <a href="https://github.com/MithrilMan/MithrilShards/discussions" target="_blank">Discussion section</a>.</p>
+<h2 id="project-overview">Project Overview</h2>
+<p><strong>Bitcoin Mithril Shard</strong> has been built on top of <strong>Mithril Shards</strong> framework.
+Mithril Shards goal is to be a framework and toolkit to build <em><u>modular and distributed/<abbr title="Peer to Peer">P2P</abbr> applications using .Net 5</u></em> stack, focusing both on good design, good practices and performance.</p>
+<p>Core functionalities can be glued togheter to compose the needed application, ranging from a <abbr title="Peer to Peer">P2P</abbr> network layer, WEB Api layer, Diagnostic tools, cross platform <abbr title="User Interface">UI</abbr> based on blazor, distributed eventing using SignalR, <abbr title="Message Queue">MQ</abbr> brokers like RabbitMq or any kind of other useful libraries.</p>
+<p>Thanks to its design, anyone can build it's own Shard to create other features that can be used by Mithril Shards community.</p>
+<p>More details about Mithril Shards can be found on the main documentation (TODO).</p>
+<p>Bitcoin shard is a very good example about how to build a fully functional full node for bitcoin, leveraging all the juicy features that Mithril Shards exposes.</p>
+<ul>
+<li>Network layer is implemented by leveraging <a href="https://github.com/davidfowl/BedrockFramework" target="_blank">Bedrock Framework</a> for the TCP implementation using both Client and Server connections.
+  Data is serialized thanks to an well defined set of interfaces and classes that allows to implement an easy to read and maintain code.</li>
+<li>Incoming messages are dispatched to "Message Processors" that allow to handle the application logic following a good practice of separation of concerns.</li>
+<li>Meaningful events are dispatched using a <em>message bus</em> implementation that can reach any component in any application layer.</li>
+<li>A WEB Api infrastructure allow to create WEB Api endpoint easily and each feature can have its set of API published on different document specifications.
+  Swagger is used as a <abbr title="User Interface">UI</abbr> to expose these API documents and allows to execute these APIs straight from that interface.</li>
+<li>For development/debugging purpose, a Shard inject some useful endpoint to inspect internal details of the running application.</li>
+<li>Logging is done using structured logging, makes use of Serilog to persist them and a configuration example shows how to use <a href="https://datalust.co/seq" target="_blank">Seq</a> to have a very good <abbr title="User Interface">UI</abbr> to view logs, filter them, etc...</li>
+<li>Blazor is used to implement a cross platform <abbr title="User Interface">UI</abbr> as a companion for the full node.</li>
+</ul>
                 
                   
                     
@@ -527,7 +542,7 @@ To fix that your best bet is to just change the port you want to use in your con
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-22
+      Last update: 2021-03-23
     
   </small>
 </div>
@@ -544,43 +559,77 @@ To fix that your best bet is to just change the port you want to use in your con
         </div>
       </main>
       
-        
+        <!-- [LIGHTBOX CONTAINER] -->
+<div id="lb-back">
+   <div id="lb-img"></div>
+</div>
+
+
+
+<!-- Footer -->
 <footer class="md-footer">
-  
-    <nav class="md-footer__inner md-grid" aria-label="Footer">
+
+   <!-- Link to previous and/or next page -->
+   
+   <nav class="md-footer__inner md-grid"
+        aria-label="Footer">
+
+      <!-- Link to previous page -->
       
-        <a href="../network/" class="md-footer__link md-footer__link--prev" rel="prev">
-          <div class="md-footer__button md-icon">
+      <a href="../serilog/"
+         class="md-footer__link md-footer__link--prev"
+         rel="prev">
+         <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-          </div>
-          <div class="md-footer__title">
+         </div>
+         <div class="md-footer__title">
             <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Network implementation
+               <span class="md-footer__direction">
+                  Previous
+               </span>
+               Serilog
             </div>
-          </div>
-        </a>
+         </div>
+      </a>
       
+
+      <!-- Link to next page -->
       
-    </nav>
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-          <div class="md-footer-copyright__highlight">
-            Mithril Man 2020
-          </div>
-        
-        Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-          Material for MkDocs
-        </a>
-        
-      </div>
+      <a href="network/"
+         class="md-footer__link md-footer__link--next"
+         rel="next">
+         <div class="md-footer__title">
+            <div class="md-ellipsis">
+               <span class="md-footer__direction">
+                  Next
+               </span>
+               Network implementation
+            </div>
+         </div>
+         <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+         </div>
+      </a>
       
+   </nav>
+   
+
+   <!-- Further information -->
+   <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+
+         <!-- Copyright and theme information -->
+         <div class="md-footer-copyright">
+            
+            <div class="md-footer-copyright__highlight">
+               Mithril Man 2020
+            </div>
+            
+            
+         </div>
+
+         <!-- Social links -->
+         
   <div class="md-footer-social">
     
       
@@ -594,8 +643,8 @@ To fix that your best bet is to just change the port you want to use in your con
     
   </div>
 
-    </div>
-  </div>
+      </div>
+   </div>
 </footer>
       
     </div>
@@ -608,6 +657,8 @@ To fix that your best bet is to just change the port you want to use in your con
       <script src="../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js"></script>
+      
+        <script src="../../_mkdocs/extra_js/custom.js"></script>
       
     
   </body>

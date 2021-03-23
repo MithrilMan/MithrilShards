@@ -1,0 +1,7 @@
+[Serilog]: https://github.com/serilog/serilog-aspnetcore
+
+[mithrilshards]: https://github.com/MithrilMan/MithrilShards/
+[ForgeBuilder]: /mithril-shards/forge-builder
+[DefaultForge]: /mithril-shards/default-forge
+[example project]: /mithril-shards/example-project/
+[SerilogShard]: /mithril-shards/shards/serilog/index

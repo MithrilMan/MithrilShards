@@ -6,26 +6,28 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="Mithril Shards, SerilogShard">
+      
       
       
         <meta name="author" content="Mithril Man">
       
       
-        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/_private/bitcoin/todo/">
+        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/shards/serilog/">
       
-      <link rel="icon" href="../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
     
     
       
-        <title>Todo - Mithril Shards</title>
+        <title>Overview - Mithril Shards</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.2c0c5eaf.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2c0c5eaf.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.7fa14f5b.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.7fa14f5b.min.css">
         
       
     
@@ -40,7 +42,7 @@
     
     
     
-      <link rel="stylesheet" href="../../../_mkdocs/extra_css/custom.css">
+      <link rel="stylesheet" href="../../_mkdocs/extra_css/custom.css">
     
     
       
@@ -66,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#implement-peer-permissions" class="md-skip">
+        <a href="#console-sink" class="md-skip">
           Skip to content
         </a>
       
@@ -77,7 +79,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href="../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -96,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Todo
+              Overview
             
           </span>
         </div>
@@ -171,7 +173,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href="../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -203,7 +205,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         Welcome!
       </a>
     </li>
@@ -239,7 +241,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../mithril-shards/" class="md-nav__link">
+      <a href="../../mithril-shards/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -251,7 +253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../mithril-shards/forge-builder/" class="md-nav__link">
+      <a href="../../mithril-shards/forge-builder/" class="md-nav__link">
         ForgeBuilder
       </a>
     </li>
@@ -263,7 +265,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../mithril-shards/default-forge/" class="md-nav__link">
+      <a href="../../mithril-shards/default-forge/" class="md-nav__link">
         DefaultForge
       </a>
     </li>
@@ -275,7 +277,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../mithril-shards/dev-controller/" class="md-nav__link">
+      <a href="../../mithril-shards/dev-controller/" class="md-nav__link">
         Dev Controller
       </a>
     </li>
@@ -294,12 +296,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
       
       <label class="md-nav__link" for="__nav_3">
         Shards
@@ -315,11 +319,52 @@
             
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../../shards/serilog/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Serilog
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Serilog
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#console-sink" class="md-nav__link">
+    Console Sink
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seq-sink" class="md-nav__link">
+    Seq Sink
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -350,7 +395,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../shards/bitcoin/" class="md-nav__link">
+      <a href="../bitcoin/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -362,7 +407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../shards/bitcoin/network/" class="md-nav__link">
+      <a href="../bitcoin/network/" class="md-nav__link">
         Network implementation
       </a>
     </li>
@@ -374,7 +419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../shards/bitcoin/testing_node_communication/" class="md-nav__link">
+      <a href="../bitcoin/testing_node_communication/" class="md-nav__link">
         Testing node communication
       </a>
     </li>
@@ -431,15 +476,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#implement-peer-permissions" class="md-nav__link">
-    Implement peer permissions.
+  <a href="#console-sink" class="md-nav__link">
+    Console Sink
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#redesign-classes-to-hold-chain-state" class="md-nav__link">
-    Redesign classes to hold Chain state
+  <a href="#seq-sink" class="md-nav__link">
+    Seq Sink
   </a>
   
 </li>
@@ -457,36 +502,98 @@
               
                 
                 
-                  <h1>Todo</h1>
+                  <h1>Serilog</h1>
                 
-                <h2 id="implement-peer-permissions">Implement peer permissions.</h2>
-<p>On Bitcoin core, peer permissions are a way to specify special permissions to peers that are whitelisted or whitebinded.</p>
-<ul>
-<li><strong>Whitebind</strong> allows to define an endpoint to which peers that connects to inherit the permissions defined for that whitebind.</li>
-</ul>
-<p><code>[host]:port</code></p>
-<ul>
-<li><strong>Whitelist</strong> allows to define specific permissions to peers connecting from specific IP address or CIDR notated network
-  <code>1.2.3.4</code>
-  <code>1.2.3.0/24</code></li>
-</ul>
-<p>Bitcoin core syntax for such configuration is </p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>-whitelist=bloomfilter@127.0.0.1/32.
--whitebind=bloomfilter,relay,noban@127.0.0.1:10020
+                <p>SerilogShard allows to inject <a href="https://github.com/serilog/serilog-aspnetcore" target="_blank">Serilog</a> log provider into the forge, allowing every service to leverage it to produce a proper loggin implementation for the application.</p>
+<p>It can be injected into the forge just by using the IForgeBuilder extension</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">static</span> <span class="n">IForgeBuilder</span> <span class="nf">UseSerilog</span><span class="p">(</span><span class="k">this</span> <span class="n">IForgeBuilder</span> <span class="n">forgeBuilder</span><span class="p">,</span> <span class="kt">string?</span> <span class="n">configurationFile</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span>
 </code></pre></div>
 </td></tr></table>
-<p>I've already implemented a class <code>BitcoinPeerPermissions</code> but I've not yet decided how to allow to specify such permissions.
-Since my implementation is json friendly, I'd prefer to specify settings by config file in a more structured way (command line is still possible even if more awkward)</p>
-<h2 id="redesign-classes-to-hold-chain-state">Redesign classes to hold Chain state</h2>
-<p>Current <code>IChainState</code> implementation (and the interface itself) is a result of many iteration starting from different point and converging into something I'm not happy with.</p>
-<p>These classes are very important so need a proper design and performance tuning.</p>
-<p>Some important aspects are:</p>
-<ul>
-<li>the memory footprint required to host the current chain representation in memory</li>
-<li>the lookup speed during IBD and during data fetch to serve other peers</li>
-<li>the tradeoff between in-memory stored data and data on disk that has to be fetched per request (consider a caching layer)</li>
-</ul>
+<p><code>configurationFile</code> is optional, and can contain the path of a <abbr title="JavaScript Object Notation">JSON</abbr> configuration file, refers to Serilog documentation to see how to configure it properly.</p>
+<p>If no <code>configurationFile</code> is specified, the forge configuration file is used.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using an explicit configuration file allows to have more control over the configuration files used during debug and deploy, because allows you to have a file for application configuration, and a different set of configuration files specific for logging, where you can pre-configure a set of filters based on your needs</p>
+</div>
+<p>An example of a configuration section is this:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="p">{</span>
+   <span class="nt">&quot;Serilog&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;Using&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;Serilog.Sinks.Console&quot;</span><span class="p">,</span> <span class="s2">&quot;Serilog.Sinks.Seq&quot;</span> <span class="p">],</span>
+      <span class="nt">&quot;Enrich&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;FromLogContext&quot;</span><span class="p">,</span> <span class="s2">&quot;WithMachineName&quot;</span><span class="p">,</span> <span class="s2">&quot;WithThreadId&quot;</span> <span class="p">],</span>
+      <span class="nt">&quot;WriteTo&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span>
+            <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Console&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Args&quot;</span><span class="p">:</span> <span class="p">{</span>
+               <span class="nt">&quot;IncludeScopes&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+               <span class="nt">&quot;theme&quot;</span><span class="p">:</span> <span class="s2">&quot;Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console&quot;</span>
+            <span class="p">}</span>
+         <span class="p">},</span>
+         <span class="p">{</span>
+            <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Seq&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Args&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;serverUrl&quot;</span><span class="p">:</span> <span class="s2">&quot;http://localhost:5341&quot;</span> <span class="p">}</span>
+         <span class="p">}</span>
+      <span class="p">],</span>
+      <span class="nt">&quot;MinimumLevel&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="nt">&quot;Default&quot;</span><span class="p">:</span> <span class="s2">&quot;Debug&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;Override&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;Bedrock.Framework&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Microsoft&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;System&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning&quot;</span>
+         <span class="p">}</span>
+      <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>In this example we are defining two serilog sinks: <a href="#console-sink">console</a> and <a href="seq-sink">seq sink</a>.</p>
+<p><code>MinimulLevel</code> section allows to configure the filter based on logging severity level, in this case the default level is Debug and we have a couple of override to rise the level to warning for all classes belonging to namespace <em>Bedrok.Framework</em>, <em>Microsoft</em> and <em>System</em></p>
+<p>Tweaking these settings is important to reduce the noise of unwanted logs of 3rd party libraries and focus our attention on logs that matter to us.</p>
+<h3 id="console-sink">Console Sink</h3>
+<p>Console configure the logger to use console output and in the <code>WriteTo</code> section we specify to include scopes and use a theme to colorize the output.</p>
+<p>An output example is this</p>
+<p><img alt="image-20210323114518695" class="zoom" src="../../img/image-20210323114518695.png" /></p>
+<h3 id="seq-sink">Seq Sink</h3>
+<p><a href="https://datalust.co/seq" target="_blank">Seq</a>  is an interesting web application that can be configured to receive logs generated by Serilog, it has a free plan for single user and in my case it was a good choice for development purpose because I can host it in my local environment and leverage its feature to be able to investigate problems. It can be both installed locally or be hosted in a docker container.</p>
+<p>In the example above it has been configured to receive logs on port 5341</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="p">{</span>
+   <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Seq&quot;</span><span class="p">,</span>
+   <span class="nt">&quot;Args&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;serverUrl&quot;</span><span class="p">:</span> <span class="s2">&quot;http://localhost:5341&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>It shares the same MinimumLevel section to configure which logs will be persisted but can have dynamic overrides.</p>
+<p>Seq allows you to query, create filters, signals and show structured logs in a friendly way, for further information refers to Seq website.</p>
+<p>An example of Seq interface with a couple of expanded logs, to show you additional information you can found in these logs</p>
+<p><img alt="image-20210323144656256" class="zoom" src="../../img/image-20210323144656256.png" /></p>
                 
                   
                     
@@ -495,7 +602,7 @@ Since my implementation is json friendly, I'd prefer to specify settings by conf
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-22
+      Last update: 2021-03-23
     
   </small>
 </div>
@@ -523,6 +630,48 @@ Since my implementation is json friendly, I'd prefer to specify settings by conf
 <footer class="md-footer">
 
    <!-- Link to previous and/or next page -->
+   
+   <nav class="md-footer__inner md-grid"
+        aria-label="Footer">
+
+      <!-- Link to previous page -->
+      
+      <a href="../../mithril-shards/dev-controller/"
+         class="md-footer__link md-footer__link--prev"
+         rel="prev">
+         <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+         </div>
+         <div class="md-footer__title">
+            <div class="md-ellipsis">
+               <span class="md-footer__direction">
+                  Previous
+               </span>
+               Dev Controller
+            </div>
+         </div>
+      </a>
+      
+
+      <!-- Link to next page -->
+      
+      <a href="../bitcoin/"
+         class="md-footer__link md-footer__link--next"
+         rel="next">
+         <div class="md-footer__title">
+            <div class="md-ellipsis">
+               <span class="md-footer__direction">
+                  Next
+               </span>
+               Overview
+            </div>
+         </div>
+         <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+         </div>
+      </a>
+      
+   </nav>
    
 
    <!-- Further information -->
@@ -562,14 +711,14 @@ Since my implementation is json friendly, I'd prefer to specify settings by conf
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js"></script>
       
-        <script src="../../../_mkdocs/extra_js/custom.js"></script>
+        <script src="../../_mkdocs/extra_js/custom.js"></script>
       
     
   </body>

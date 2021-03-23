@@ -6,19 +6,21 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="Mithril Shards bitcoin implementation, testing node">
+      
       
       
         <meta name="author" content="Mithril Man">
       
       
-        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/_private/bitcoin/todo/">
+        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/shards/bitcoin/testing_node_communication/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
     
     
       
-        <title>Todo - Mithril Shards</title>
+        <title>Testing node communication - Mithril Shards</title>
       
     
     
@@ -66,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#implement-peer-permissions" class="md-skip">
+        <a href="#testing-node-communication" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Todo
+              Testing node communication
             
           </span>
         </div>
@@ -294,12 +296,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
       
       <label class="md-nav__link" for="__nav_3">
         Shards
@@ -317,7 +321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../shards/serilog/" class="md-nav__link">
+      <a href="../../serilog/" class="md-nav__link">
         Serilog
       </a>
     </li>
@@ -327,12 +331,14 @@
             
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" checked>
       
       <label class="md-nav__link" for="__nav_3_2">
         Bitcoin
@@ -350,7 +356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../shards/bitcoin/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -362,7 +368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../shards/bitcoin/network/" class="md-nav__link">
+      <a href="../network/" class="md-nav__link">
         Network implementation
       </a>
     </li>
@@ -372,11 +378,62 @@
             
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../../shards/bitcoin/testing_node_communication/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Testing node communication
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Testing node communication
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    Troubleshooting
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#systemnetsocketssocketexception-10013" class="md-nav__link">
+    System.Net.Sockets.SocketException (10013)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -423,6 +480,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -431,16 +490,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#implement-peer-permissions" class="md-nav__link">
-    Implement peer permissions.
+  <a href="#troubleshooting" class="md-nav__link">
+    Troubleshooting
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#systemnetsocketssocketexception-10013" class="md-nav__link">
+    System.Net.Sockets.SocketException (10013)
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#redesign-classes-to-hold-chain-state" class="md-nav__link">
-    Redesign classes to hold Chain state
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -457,36 +522,27 @@
               
                 
                 
-                  <h1>Todo</h1>
-                
-                <h2 id="implement-peer-permissions">Implement peer permissions.</h2>
-<p>On Bitcoin core, peer permissions are a way to specify special permissions to peers that are whitelisted or whitebinded.</p>
-<ul>
-<li><strong>Whitebind</strong> allows to define an endpoint to which peers that connects to inherit the permissions defined for that whitebind.</li>
-</ul>
-<p><code>[host]:port</code></p>
-<ul>
-<li><strong>Whitelist</strong> allows to define specific permissions to peers connecting from specific IP address or CIDR notated network
-  <code>1.2.3.4</code>
-  <code>1.2.3.0/24</code></li>
-</ul>
-<p>Bitcoin core syntax for such configuration is </p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code>-whitelist=bloomfilter@127.0.0.1/32.
--whitebind=bloomfilter,relay,noban@127.0.0.1:10020
-</code></pre></div>
-</td></tr></table>
-<p>I've already implemented a class <code>BitcoinPeerPermissions</code> but I've not yet decided how to allow to specify such permissions.
-Since my implementation is json friendly, I'd prefer to specify settings by config file in a more structured way (command line is still possible even if more awkward)</p>
-<h2 id="redesign-classes-to-hold-chain-state">Redesign classes to hold Chain state</h2>
-<p>Current <code>IChainState</code> implementation (and the interface itself) is a result of many iteration starting from different point and converging into something I'm not happy with.</p>
-<p>These classes are very important so need a proper design and performance tuning.</p>
-<p>Some important aspects are:</p>
-<ul>
-<li>the memory footprint required to host the current chain representation in memory</li>
-<li>the lookup speed during IBD and during data fetch to serve other peers</li>
-<li>the tradeoff between in-memory stored data and data on disk that has to be fetched per request (consider a caching layer)</li>
-</ul>
+                <h1 id="testing-node-communication">Testing node communication</h1>
+<p>In order to test the Forge implementation, I used the handy <a href="https://github.com/freewil/bitcoin-testnet-box" target="_blank">bitcoin testnet in a box</a>    </p>
+<p>I used the docker implementation:</p>
+<p><code>docker pull freewil/bitcoin-testnet-box</code></p>
+<p>then I modified the suggested docker run arguments, in order to open the node port, this way, to run the image with an reachable testnet node, run the image as</p>
+<p><code>docker run -t -i -p 19000:19000 -p 19001:19001 -p 19011:19011 freewil/bitcoin-testnet-box</code></p>
+<p>after that, in the tty console, write <code>make start</code> to start the node and this way you can connect to the testnet box using the endpoint <code>127.0.0.1:19000</code></p>
+<p>If everything is going as expected and you ran the Forge within bitcoin-testnet network, you should see something similar to this</p>
+<p><img alt="img" src="https://cdn.discordapp.com/attachments/662122241190002699/662122563270475776/unknown.png" /></p>
+<p>At the time of the screenshot (2nd of January 2020) only the handshake implementation was ready, this is why of warnings following the successful handshake.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h5 id="systemnetsocketssocketexception-10013">System.Net.Sockets.SocketException (10013)</h5>
+<p>In case you receive this error while trying to open some port for listening, the reason may be your OS is excluding some port ranges for some reason.
+To check if the port is reserved, you can use the command</p>
+<p><code>netsh interface ipv4 show excludedportrange tcp</code></p>
+<p>you'll see a list of port ranges that may include the port you are trying to open.
+To fix that your best bet is to just change the port you want to use in your configuration file, otherwise you need to understand why a specific port range is being reserved and eventually change it.</p>
+<p>You can delete the excludedportrange if you want and you know what you are doing, using commands like</p>
+<p><code>netsh int ipv4 delete excludedportrange protocol=tcp startport=45000 numberofports=100</code></p>
+<p>and add new ones with 
+<code>netsh int ipv4 add excludedportrange protocol=tcp startport=45000 numberofports=100</code></p>
                 
                   
                     
@@ -495,7 +551,7 @@ Since my implementation is json friendly, I'd prefer to specify settings by conf
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-22
+      Last update: 2021-03-23
     
   </small>
 </div>
@@ -523,6 +579,32 @@ Since my implementation is json friendly, I'd prefer to specify settings by conf
 <footer class="md-footer">
 
    <!-- Link to previous and/or next page -->
+   
+   <nav class="md-footer__inner md-grid"
+        aria-label="Footer">
+
+      <!-- Link to previous page -->
+      
+      <a href="../network/"
+         class="md-footer__link md-footer__link--prev"
+         rel="prev">
+         <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+         </div>
+         <div class="md-footer__title">
+            <div class="md-ellipsis">
+               <span class="md-footer__direction">
+                  Previous
+               </span>
+               Network implementation
+            </div>
+         </div>
+      </a>
+      
+
+      <!-- Link to next page -->
+      
+   </nav>
    
 
    <!-- Further information -->
