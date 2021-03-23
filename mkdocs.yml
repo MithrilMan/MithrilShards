@@ -8,8 +8,9 @@ copyright: Mithril Man 2020
 
 extra_javascript:
   - https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js
+  - _mkdocs/extra_js/custom.js
 extra_css:
-  - extra_css/custom.css
+  - _mkdocs/extra_css/custom.css
 
 # change directory names here
 docs_dir: docs
@@ -17,6 +18,7 @@ site_dir: ./docs_site
 
 theme:
     name: material
+    custom_dir: docs/_mkdocs/overrides
 
     icon:
       repo: fontawesome/brands/github
@@ -55,7 +57,7 @@ markdown_extensions:
   - abbr
   - attr_list #needed to use {:target="_blank"} on links
   - pymdownx.snippets:
-      base_path: docs/_snippets
+      base_path: docs/_mkdocs/snippets
       check_paths: true
   - toc:
       permalink: false
@@ -98,11 +100,14 @@ nav:
   - index.md
   - Mithril Shards Core:
     - mithril-shards/index.md
+    - mithril-shards/forge-builder.md
     - mithril-shards/default-forge.md
     - mithril-shards/dev-controller.md
   - Shards:
-     - Bitcoin Shard:
-       - bitcoin-shard/index.md
-       - bitcoin-shard/network.md
-       - bitcoin-shard/testing_node_communication.md
+     - Serilog:
+         shards/serilog/index.md
+     - Bitcoin:
+       - shards/bitcoin/index.md
+       - shards/bitcoin/network.md
+       - shards/bitcoin/testing_node_communication.md
   - Issue Tracker: 'https://github.com/MithrilMan/MithrilShards/issues'

@@ -1,2 +1,0 @@
-[mithrilshards]: https://github.com/MithrilMan/MithrilShards/
-[DefaultForge]: /mithril-shards/default-forge

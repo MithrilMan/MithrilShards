@@ -1,0 +1,56 @@
+.md-grid {
+   max-width: initial;
+}
+
+.mermaid > svg {
+   background-color: #bababa;
+}
+
+/*.zoom {
+   width: 100%;
+   height: auto;*/
+/* ease | ease-in | ease-out | linear */
+/*transition: transform ease-in-out 0.3s;
+}
+
+.zoom:hover {
+   transform: scale(1.2);
+   z-index:9999;
+}*/
+
+/* [IMAGE] */
+.zoom {
+   cursor: zoom-in;
+}
+
+/* [LIGHTBOX BACKGROUND] */
+#lb-back {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100vw;
+   height: 100vh;
+   background: rgba(0, 0, 0, 0.5);
+   z-index: 999;
+   visibility: hidden;
+   opacity: 0;
+   transition: all ease 0.4s;
+}
+
+   #lb-back.show {
+      visibility: visible;
+      opacity: 1;
+   }
+
+/* [LIGHTBOX IMAGE] */
+#lb-img {
+   position: relative;
+   top: 50%;
+   transform: translateY(-50%);
+   text-align: center;
+}
+
+   #lb-img img {
+      width: 100%;
+      height: auto;
+   }
