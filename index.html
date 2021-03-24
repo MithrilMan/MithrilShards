@@ -239,15 +239,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-things-started" class="md-nav__link">
-    How things started
+  <a href="#current-tech" class="md-nav__link">
+    Current Tech
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#current-tech" class="md-nav__link">
-    Current Tech
+  <a href="#how-things-started" class="md-nav__link">
+    How things started
   </a>
   
 </li>
@@ -662,15 +662,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-things-started" class="md-nav__link">
-    How things started
+  <a href="#current-tech" class="md-nav__link">
+    Current Tech
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#current-tech" class="md-nav__link">
-    Current Tech
+  <a href="#how-things-started" class="md-nav__link">
+    How things started
   </a>
   
 </li>
@@ -713,27 +713,28 @@
                 
                 <h2 id="goal">Goal</h2>
 <p>Mithril Shards goal is to implement a .NET 5 extensible <abbr title="Peer to Peer">P2P</abbr> network &amp; distributed services library from scratch with focus on architecture and performance.</p>
-<p>Allows you to define custom network serialization protocol, easily handle payload messages and interact with the software leveraging any available features (named Shards) like WEB Api endpoints, Blazor <abbr title="User Interface">UI</abbr>,  and a lot of other exciting stuffs that community can implements and release to the public too!</p>
+<p>Allows you to define custom network serialization protocol, easily handle payload messages and interact with the software leveraging any available features (named Shards) like Web <abbr title="Application Program Interface">API</abbr> endpoints, cross platform Blazor <abbr title="User Interface">UI</abbr>,  and a lot of other exciting stuffs that community can implement and release to the public too!</p>
 <p>The project is very ambitious and it's currently developed just by me as a pet project but a huge effort has gone into already and some part of this unique code base has been already reused in other blockchain technologies to improve their performance.</p>
-<h2 id="how-things-started">How things started</h2>
-<p>I have <abbr title="Distributed Ledger Technology">DLT</abbr> experience in the past years and one of my previous experience has been working for a blockchain tech firm that had a <abbr title="Full Node">FN</abbr> implementation in C#.
-I really love C# and .Net core has improved a lot performance too.</p>
-<p>Workin on their codebase I saw lot of things that could have been improved, both in design and in performance. Their implementation started as a kind of 1-1 porting of bitcoin core source with all the cons that it brings.</p>
-<p>So I thought about diving into this titanic effort of creating a full node in C# starting from scratch, mainly to go as deeper as possible into technical details, trying to focus both on a proper architecture design and performance improvements.</p>
-<p>One of the first thing I implemented was of course the basic handshake process between two nodes, to achieve that My I started by following bitcoin core source because unluckily that's the only part that contains kind of specifications, it's hard to find a detailed updated technical documentations (even this <a href="https://en.bitcoin.it/wiki/Protocol_documentation" target="_blank">protocol documentation</a> page contains wrong informations, even if it's still useful).</p>
-<p>I started using .Net TCP classes, using an internal state machine to handle peer connection statuses, then I found <a href="https://github.com/davidfowl/BedrockFramework" target="_blank">Bedrock Framework</a>, that allowed me to abstract better my code and rely on it for the low level connection stuff (at the time of writing this documentation, that library is still in alpha and my concern about that project activity <a href="https://github.com/davidfowl/BedrockFramework/issues/105" target="_blank">has been appeased</a> ).</p>
-<p>As soon as I started defining properly my design, I found it interesting to abstract most of the stuff into an agnostic library that allows me to create a <abbr title="Peer to Peer">P2P</abbr> application in a modular way and attach additional features when needed, and this is how Mithril Shards started.</p>
-<p>Since then I added more and more stuff, both for generic Mithril Shards project and for specific Bitcoin needs.</p>
-<p>The <a href="https://github.com/MithrilMan/MithrilShards/tree/master/src/MithrilShards.Example" target="_blank">Example Shard</a> (that composed by multiple projects) showcase how you can create a custom <abbr title="Peer to Peer">P2P</abbr> software leveraging networking, custom messages, WEB Api endpoints Diagnostic tools, everything with a proper logging system.</p>
 <h2 id="current-tech">Current Tech</h2>
 <p>A random list of available tech used within Mithril Shards.</p>
 <ul>
 <li><a href="https://dotnet.microsoft.com/download/dotnet/5.0" target="_blank">.Net 5</a> - ... for everything.</li>
 <li><a href="https://github.com/davidfowl/BedrockFramework/" target="_blank">Bedrock Framework</a> - TCP/IP default connectivity implementation.</li>
-<li><a href="https://github.com/domaindrivendev/Swashbuckle.AspNetCore" target="_blank">Swashbuckle</a> - to handle Web <abbr title="Application Program Interface">API</abbr> (multiple) documents and have a playground to test APIs with swagger.</li>
+<li><a href="https://github.com/domaindrivendev/Swashbuckle.AspNetCore" target="_blank">Swashbuckle</a> - to handle Web <abbr title="Application Program Interface">API</abbr> in a configurable, multi-area environment and have a playground to test APIs with swagger.</li>
 <li><a href="https://github.com/serilog/serilog-aspnetcore" target="_blank">Serilog</a> - default logging implementation.</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet" target="_blank">BenchmarkDotNet</a> - a benchmark framework, very handy to benchmark different approach during implementation phases.</li>
 </ul>
+<h2 id="how-things-started">How things started</h2>
+<p>I have <abbr title="Distributed Ledger Technology">DLT</abbr> experience in the past years and one of my previous experience has been working for a blockchain tech firm that had a <abbr title="Full Node">FN</abbr> implementation in C#.
+I really love C# and .Net core has improved a lot performance too.</p>
+<p>Working on their codebase I saw lot of things that could have been improved, both in design and in performance.
+Their implementation started as a kind of 1-1 porting of bitcoin core source with all the cons that it brings.</p>
+<p>So I thought about diving into this titanic effort of creating a full node in C# starting from scratch, mainly to go as deeper as possible into technical details, trying to focus both on a proper architecture design and performance improvements.</p>
+<p>One of the first thing I implemented was of course the basic handshake process between two nodes and to achieve that, I started by following bitcoin core source because unluckily that's the only part that contains kind of specifications: it's hard to find a detailed updated technical documentations, even this <a href="https://en.bitcoin.it/wiki/Protocol_documentation" target="_blank">protocol documentation</a> page contains wrong information, even if it's still useful.</p>
+<p>I started using .Net TCP classes, using an internal state machine to handle peer connection statuses, then I found <a href="https://github.com/davidfowl/BedrockFramework" target="_blank">Bedrock Framework</a>, that allowed me to abstract better my code and rely on it for the low level connection stuff (at the time of writing this documentation, that library is still in alpha and my concern about that project activity <a href="https://github.com/davidfowl/BedrockFramework/issues/105" target="_blank">has been appeased</a> ).</p>
+<p>As soon as I started defining properly my design, I found it interesting to abstract most of the stuff into an agnostic library that would allows me to create a <abbr title="Peer to Peer">P2P</abbr> application in a modular way and attach additional features when needed, and this is how Mithril Shards started.</p>
+<p>Since then I added more and more stuff, both for generic Mithril Shards project and for specific Bitcoin needs.</p>
+<p>The multi project <a href="https://github.com/MithrilMan/MithrilShards/tree/master/src/MithrilShards.Example" target="_blank">Example Shard</a> showcases how you can create a custom <abbr title="Peer to Peer">P2P</abbr> software leveraging networking, custom messages, Web <abbr title="Application Program Interface">API</abbr> endpoints Diagnostic tools, everything with a proper logging system.</p>
 <h2 id="why-the-mithril-shards-name">Why the Mithril Shards name?</h2>
 <p>Well... let's bullet some facts</p>
 <ul>
@@ -742,8 +743,8 @@ I really love C# and .Net core has improved a lot performance too.</p>
 <li>I'm a developer that like to curate its software to be extensible and solid.</li>
 <li>My github handle is MithrilMan, guess what?</li>
 </ul>
-<p>Now take these informations, mix them up, and you'll see that to I aim to have a robust, fast and flexible project!
-So this explain mithril, while about <em>Shards</em>, is because I see this project as a mix of shards that can be assembled togheter to give you a precious artifact!</p>
+<p>Now take these information, mix them up, and you'll see that to I aim to have a robust, fast and flexible project!
+So this explain mithril, while about <em>Shards</em>, is because I see this project as a mix of shards that can be assembled together to give you a precious artifact!</p>
 <p>In fact you shouldn't be surprised that the root class is called Forge... who says we can't have a bit of fun while designing a software?</p>
 <h2 id="call-to-action">Call to Action!</h2>
 <div class="admonition tip">
@@ -771,7 +772,7 @@ So this explain mithril, while about <em>Shards</em>, is because I see this proj
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-24
+      Last update: 2021-03-25
     
   </small>
 </div>
