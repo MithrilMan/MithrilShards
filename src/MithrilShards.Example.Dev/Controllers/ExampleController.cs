@@ -62,6 +62,7 @@ namespace MithrilShards.Example.Dev
       /// <returns></returns>
       [HttpPost]
       [ProducesResponseType(StatusCodes.Status200OK)]
+      [ProducesResponseType(StatusCodes.Status400BadRequest)]
       public ActionResult RemoveQuote([Range(1, int.MaxValue)] int quoteIndex)
       {
          if (_quoteService.Quotes.Count > quoteIndex)
@@ -73,12 +74,12 @@ namespace MithrilShards.Example.Dev
             }
             else
             {
-               return Problem($"Error while removing quote at index {quoteIndex}.");
+               return ValidationProblem($"Error while removing quote at index {quoteIndex}.");
             }
          }
          else
          {
-            return BadRequest($"Quote index out of range, available quotes: {_quoteService.Quotes.Count}.");
+            return ValidationProblem($"Quote index out of range, available quotes: {_quoteService.Quotes.Count}.");
          }
       }
 

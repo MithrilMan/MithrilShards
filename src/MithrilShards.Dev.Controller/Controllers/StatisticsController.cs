@@ -58,7 +58,7 @@ namespace MithrilShards.Dev.Controller.Controllers
          }
          catch (System.ArgumentException)
          {
-            return NotFound($"Feed {feedId} not found!");
+            return ValidationProblem($"Feed {feedId} not found!");
          }
       }
 

@@ -33,18 +33,17 @@ namespace MithrilShards.Dev.Controller.Controllers
       /// <returns></returns>
       [HttpPost]
       [ProducesResponseType(StatusCodes.Status200OK)]
-      [ProducesResponseType(StatusCodes.Status404NotFound)]
       [ProducesResponseType(StatusCodes.Status400BadRequest)]
       public IActionResult Connect(PeerManagementConnectRequest request)
       {
          if (_requiredConnection == null)
          {
-            return NotFound($"Cannot produce output because {nameof(RequiredConnection)} is not available");
+            return ValidationProblem($"Cannot produce output because {nameof(RequiredConnection)} is not available");
          }
 
          if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
          {
-            return BadRequest("Incorrect endpoint");
+            return ValidationProblem("Incorrect endpoint");
          }
 
          _requiredConnection.TryAddEndPoint(ipEndPoint);
@@ -63,7 +62,7 @@ namespace MithrilShards.Dev.Controller.Controllers
       {
          if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
          {
-            return BadRequest("Incorrect endpoint");
+            return ValidationProblem("Incorrect endpoint");
          }
 
          _eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));

@@ -120,7 +120,7 @@ public IActionResult Connect(PeerManagementConnectRequest request)
 
    if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
    {
-      return BadRequest("Incorrect endpoint");
+      return ValidationProblem("Incorrect endpoint");
    }
 
    _requiredConnection.TryAddEndPoint(ipEndPoint);
@@ -130,5 +130,27 @@ public IActionResult Connect(PeerManagementConnectRequest request)
 
 In this example, this action will return 404 (not found) if the member variables _requiredConnection isn't set, or 400 (bad request) if the input peer isn't formatted properly as a valid endpoint. If everything goes fine it will instead return 200 (ok).
 
+!!! tip
+	In case of action problems, instead of calling BadRequest or Problem method extensions, use `ValidationProblem`, it uses a ValidationProblemDetails response that's consistent with automatic validation error responses, [as stated here](https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-5.0#default-badrequest-response){:target="_blank"}.
+	In the example above, NotFound could be replaced with ValidationProblem too for a consistent behavior.
 
+### Producing documentation for Swagger UI
 
+In order to produce proper documentation to be shown on Swagger UI, [XML comments within C#](https://docs.microsoft.com/it-it/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-5.0&tabs=visual-studio#xml-comments){:target="_blank"} source can be used but the build process has to generate a documentation file.
+
+The easier way is to edit your project file adding this snippet:
+
+```xml
+<PropertyGroup>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+</PropertyGroup>
+```
+
+For Mithril Shards project defined within the Mithril Shard solution folder this is not necessary because that snippet is already defined in `Directory.Build.props` file.
+
+!!! note
+	WebApiShard already take care of including documentation files by looking at files with the name of the assembly that contains the controller, with an `.xml` extension.  
+	`var xmlFile = $"{assembly.GetName().Name}.xml";`
+
+!!! tip
+	Directory.Build.props file is a powerful way to set common project configurations for complex solutions with multiple projects, [you can read more about it here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019){:target="_blank"}.
