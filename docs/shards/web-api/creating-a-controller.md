@@ -65,7 +65,7 @@ The name of the controller class is important because by default the actions imp
 - action is the name of the action we can invoke
 
 ExampleController action GetQuotes URL will then become `api/Example/GetQuotes`.
-This represents the part of the url to append to the WebApiShard configured Endpoint, so if we configured it to `127.0.0.1:45030` the complete url will be `http://127.0.0.1:45020/api/Example/GetQuotes` (or https if we enabled Https).
+This represents the part of the URL to append to the WebApiShard configured Endpoint, so if we configured it to `127.0.0.1:45030` the complete URL will be `http://127.0.0.1:45020/api/Example/GetQuotes` (or https if we enabled Https).
 
 
 
