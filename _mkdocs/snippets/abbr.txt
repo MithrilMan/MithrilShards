@@ -6,3 +6,4 @@
 *[P2P]: Peer to Peer
 *[UI]: User Interface
 *[JSON]: JavaScript Object Notation
+*[URL]: Uniform Resource Locator

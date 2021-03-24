@@ -764,8 +764,8 @@ The name of the controller class is important because by default the actions imp
 <li>controller is the name of the Controller class, stripping out "Controller" part, e.g. ExampleController will become "Example"</li>
 <li>action is the name of the action we can invoke</li>
 </ul>
-<p>ExampleController action GetQuotes URL will then become <code>api/Example/GetQuotes</code>.
-This represents the part of the url to append to the WebApiShard configured Endpoint, so if we configured it to <code>127.0.0.1:45030</code> the complete url will be <code>http://127.0.0.1:45020/api/Example/GetQuotes</code> (or https if we enabled Https).</p>
+<p>ExampleController action GetQuotes <abbr title="Uniform Resource Locator">URL</abbr> will then become <code>api/Example/GetQuotes</code>.
+This represents the part of the <abbr title="Uniform Resource Locator">URL</abbr> to append to the WebApiShard configured Endpoint, so if we configured it to <code>127.0.0.1:45030</code> the complete <abbr title="Uniform Resource Locator">URL</abbr> will be <code>http://127.0.0.1:45020/api/Example/GetQuotes</code> (or https if we enabled Https).</p>
 <h3 id="inject-services-into-constructor">Inject services into constructor</h3>
 <p>Line 7-10 is the Controller constructor.
 A controller is created automatically at each web request and the parameters declared in the constructor will be populated by using DI
