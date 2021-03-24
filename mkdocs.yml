@@ -105,7 +105,15 @@ nav:
     - mithril-shards/dev-controller.md
   - Shards:
      - Serilog:
-         shards/serilog/index.md
+       -  shards/serilog/index.md
+     - WebApi:
+       -  shards/web-api/index.md
+       -  shards/web-api/using-webapishard.md
+       -  shards/web-api/areas.md
+       -  shards/web-api/creating-a-controller.md
+       -  shards/web-api/swagger-ui.md
+     - DevController:
+       -  shards/dev-controller/index.md
      - Bitcoin:
        - shards/bitcoin/index.md
        - shards/bitcoin/network.md

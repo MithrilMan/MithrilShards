@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -32,7 +33,7 @@ namespace MithrilShards.Example.Dev
       /// </summary>
       /// <returns></returns>
       [HttpGet]
-      [ProducesResponseType(StatusCodes.Status200OK)]
+      [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string>))]
       public ActionResult GetQuotes()
       {
          return Ok(_quoteService.Quotes);

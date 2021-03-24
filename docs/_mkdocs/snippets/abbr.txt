@@ -1,3 +1,5 @@
+*[API]: Application Program Interface
+*[API]: Application Program Interface
 *[DLT]: Distributed Ledger Technology
 *[FN]: Full Node
 *[MQ]: Message Queue

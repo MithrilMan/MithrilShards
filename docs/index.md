@@ -41,7 +41,7 @@ A random list of available tech used within Mithril Shards.
 
 - [.Net 5](https://dotnet.microsoft.com/download/dotnet/5.0){:target="_blank"} - ... for everything.
 - [Bedrock Framework](https://github.com/davidfowl/BedrockFramework/){:target="_blank"} - TCP/IP default connectivity implementation.
-- [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore){:target="_blank"} - to handle WEB Api (multiple) documents and have a playground to test APIs with swagger.
+- [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore){:target="_blank"} - to handle Web API (multiple) documents and have a playground to test APIs with swagger.
 - [Serilog](https://github.com/serilog/serilog-aspnetcore){:target="_blank"} - default logging implementation.
 - [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet){:target="_blank"} - a benchmark framework, very handy to benchmark different approach during implementation phases.
 

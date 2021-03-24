@@ -4,4 +4,12 @@
 [ForgeBuilder]: /mithril-shards/forge-builder
 [DefaultForge]: /mithril-shards/default-forge
 [example project]: /mithril-shards/example-project/
-[SerilogShard]: /mithril-shards/shards/serilog/index
+[SerilogShard]: /shards/serilog
+
+[WebApiShard]: /shards/web-api
+[WebApiSettings]: /shards/web-api/using-webapishard#webapisettings
+[ApiServiceDefinition]: /shards/web-api/areas#apiservicedefinition
+[Creating a Controller]: /shards/web-api/areas#creating-a-controller
+
+[DevControllerShard]: /shards/dev-controller
+
