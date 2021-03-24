@@ -6,9 +6,9 @@ description: Mithril Shards implementation overview
 
 ## Architecture Overview
 
-Mithril Shards is a modular framework for building P2P Applications that can be expanded by additional features like WEB Api endpoints, MQ based services, SignalR hubs, cross platform UI and much more.
+Mithril Shards is a modular framework for building P2P Applications that can be expanded by additional features like Web API endpoints, MQ based services, SignalR hubs, cross platform UI and much more.
 
-Pretending to be into a Tolkien universe, I thought of defining features as *shards*, where each shard of mithril can be put into a forge and fused togheter with other mithril shards, to create a final artifact.
+Pretending to be into a Tolkien universe, I thought of defining features as *shards*, where each shard of mithril can be put into a forge and fused together with other mithril shards, to create a final artifact.
 
 To find analogies with .net naming conventions:
 
