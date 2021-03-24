@@ -281,8 +281,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../dev-controller/" class="md-nav__link">
-        Dev Controller
+      <a href="../dev-controller.md" class="md-nav__link">
+        None
       </a>
     </li>
   
@@ -322,10 +322,37 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
+      
+      <label class="md-nav__link" for="__nav_3_1">
+        Serilog
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Serilog" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Serilog
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
     <li class="md-nav__item">
       <a href="../../shards/serilog/" class="md-nav__link">
-        Serilog
+        Overview
       </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -341,11 +368,137 @@
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
       
       <label class="md-nav__link" for="__nav_3_2">
+        WebApi
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="WebApi" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          WebApi
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../shards/web-api/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../shards/web-api/using-webapishard/" class="md-nav__link">
+        Using WebApiShard
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../shards/web-api/areas/" class="md-nav__link">
+        WEB API Areas
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../shards/web-api/creating-a-controller/" class="md-nav__link">
+        Creating a Controller
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../shards/web-api/swagger-ui/" class="md-nav__link">
+        Using Swagger UI
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+      
+      <label class="md-nav__link" for="__nav_3_3">
+        DevController
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="DevController" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          DevController
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../shards/dev-controller/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" type="checkbox" id="__nav_3_4" >
+      
+      <label class="md-nav__link" for="__nav_3_4">
         Bitcoin
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Bitcoin" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_2">
+        <label class="md-nav__title" for="__nav_3_4">
           <span class="md-nav__icon md-icon"></span>
           Bitcoin
         </label>
@@ -430,7 +583,7 @@
                   <h1>ForgeBuilder</h1>
                 
                 <p>ForgeBuilder class represents the entry point of a Mithril Shards application, it allows to add a shard by calling the generic <code>AddShard</code> method, with different overloads that accept an optional strongly typed shard setting file with an optional setting file validator.</p>
-<p>By using <code>ConfigureLogging</code> it's possible to configure logging, it's basically a wrapper on  the inner hostbiulder ConfigureLogging method, you could use it to have a finer control over logging configuration and available providers, but the easier way to log is by using the available <a href="/mithril-shards/shards/serilog/index">SerilogShard</a> that uses Serilog to configure the logging and relies on a configurable setting file where you can specify which sink to use.
+<p>By using <code>ConfigureLogging</code> it's possible to configure logging, it's basically a wrapper on  the inner hostbiulder ConfigureLogging method, you could use it to have a finer control over logging configuration and available providers, but the easier way to log is by using the available <a href="/shards/serilog">SerilogShard</a> that uses Serilog to configure the logging and relies on a configurable setting file where you can specify which sink to use.
 You can find more details on its specific documentation page and an example of its usage in the <a href="/mithril-shards/example-project/">example project</a></p>
 <p>After declaring an instance we have to specify which implementation of Forge we want to use.
 Actually the only available implementation is <a href="/mithril-shards/default-forge">DefaultForge</a> class.</p>

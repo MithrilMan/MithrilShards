@@ -1,39 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url>
      <loc>https://mithrilman.github.io/mithrilshards/</loc>
-     <lastmod>2021-03-23</lastmod>
+     <lastmod>2021-03-24</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://mithrilman.github.io/mithrilshards/mithril-shards/</loc>
-     <lastmod>2021-03-23</lastmod>
+     <lastmod>2021-03-24</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://mithrilman.github.io/mithrilshards/mithril-shards/forge-builder/</loc>
-     <lastmod>2021-03-23</lastmod>
+     <lastmod>2021-03-24</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://mithrilman.github.io/mithrilshards/mithril-shards/default-forge/</loc>
-     <lastmod>2021-03-23</lastmod>
-     <changefreq>daily</changefreq>
-    </url><url>
-     <loc>https://mithrilman.github.io/mithrilshards/mithril-shards/dev-controller/</loc>
-     <lastmod>2021-03-23</lastmod>
+     <lastmod>2021-03-24</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://mithrilman.github.io/mithrilshards/shards/serilog/</loc>
-     <lastmod>2021-03-23</lastmod>
+     <lastmod>2021-03-24</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://mithrilman.github.io/mithrilshards/shards/web-api/</loc>
+     <lastmod>2021-03-24</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://mithrilman.github.io/mithrilshards/shards/web-api/using-webapishard/</loc>
+     <lastmod>2021-03-24</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://mithrilman.github.io/mithrilshards/shards/web-api/areas/</loc>
+     <lastmod>2021-03-24</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://mithrilman.github.io/mithrilshards/shards/web-api/creating-a-controller/</loc>
+     <lastmod>2021-03-24</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://mithrilman.github.io/mithrilshards/shards/web-api/swagger-ui/</loc>
+     <lastmod>2021-03-24</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://mithrilman.github.io/mithrilshards/shards/dev-controller/</loc>
+     <lastmod>2021-03-24</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://mithrilman.github.io/mithrilshards/shards/bitcoin/</loc>
-     <lastmod>2021-03-23</lastmod>
+     <lastmod>2021-03-24</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://mithrilman.github.io/mithrilshards/shards/bitcoin/network/</loc>
-     <lastmod>2021-03-23</lastmod>
+     <lastmod>2021-03-24</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://mithrilman.github.io/mithrilshards/shards/bitcoin/testing_node_communication/</loc>
-     <lastmod>2021-03-23</lastmod>
+     <lastmod>2021-03-24</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

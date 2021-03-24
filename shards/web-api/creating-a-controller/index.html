@@ -6,28 +6,28 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Mithril Shards, SerilogShard">
+        <meta name="description" content="Mithril Shards, WebApiShard, Creating a Controller">
       
       
       
         <meta name="author" content="Mithril Man">
       
       
-        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/shards/serilog/">
+        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/shards/web-api/creating-a-controller/">
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
     
     
       
-        <title>Overview - Mithril Shards</title>
+        <title>Creating a Controller - Mithril Shards</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.2c0c5eaf.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2c0c5eaf.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.7fa14f5b.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.7fa14f5b.min.css">
         
       
     
@@ -42,7 +42,7 @@
     
     
     
-      <link rel="stylesheet" href="../../_mkdocs/extra_css/custom.css">
+      <link rel="stylesheet" href="../../../_mkdocs/extra_css/custom.css">
     
     
       
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#console-sink" class="md-skip">
+        <a href="#define-the-area" class="md-skip">
           Skip to content
         </a>
       
@@ -79,7 +79,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href="../../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -98,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              Creating a Controller
             
           </span>
         </div>
@@ -173,7 +173,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href="../../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -205,7 +205,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         Welcome!
       </a>
     </li>
@@ -241,7 +241,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../mithril-shards/" class="md-nav__link">
+      <a href="../../../mithril-shards/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -253,7 +253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../mithril-shards/forge-builder/" class="md-nav__link">
+      <a href="../../../mithril-shards/forge-builder/" class="md-nav__link">
         ForgeBuilder
       </a>
     </li>
@@ -265,7 +265,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../mithril-shards/default-forge/" class="md-nav__link">
+      <a href="../../../mithril-shards/default-forge/" class="md-nav__link">
         DefaultForge
       </a>
     </li>
@@ -277,7 +277,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../mithril-shards/dev-controller.md" class="md-nav__link">
+      <a href="../../../mithril-shards/dev-controller.md" class="md-nav__link">
         None
       </a>
     </li>
@@ -319,14 +319,12 @@
             
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
       
       <label class="md-nav__link" for="__nav_3_1">
         Serilog
@@ -342,52 +340,11 @@
             
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Overview
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../serilog/" class="md-nav__link">
         Overview
       </a>
-      
-        
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#console-sink" class="md-nav__link">
-    Console Sink
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#seq-sink" class="md-nav__link">
-    Seq Sink
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -401,12 +358,14 @@
             
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" checked>
       
       <label class="md-nav__link" for="__nav_3_2">
         WebApi
@@ -424,7 +383,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../web-api/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -436,7 +395,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../web-api/using-webapishard/" class="md-nav__link">
+      <a href="../using-webapishard/" class="md-nav__link">
         Using WebApiShard
       </a>
     </li>
@@ -448,7 +407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../web-api/areas/" class="md-nav__link">
+      <a href="../areas/" class="md-nav__link">
         WEB API Areas
       </a>
     </li>
@@ -458,11 +417,66 @@
             
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../web-api/creating-a-controller/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Creating a Controller
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Creating a Controller
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#define-the-area" class="md-nav__link">
+    Define the area
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#declare-controller-type" class="md-nav__link">
+    Declare controller Type
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inject-services-into-constructor" class="md-nav__link">
+    Inject services into constructor
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implement-an-action" class="md-nav__link">
+    Implement an action
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -472,7 +486,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../web-api/swagger-ui/" class="md-nav__link">
+      <a href="../swagger-ui/" class="md-nav__link">
         Using Swagger UI
       </a>
     </li>
@@ -511,7 +525,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dev-controller/" class="md-nav__link">
+      <a href="../../dev-controller/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -550,7 +564,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bitcoin/" class="md-nav__link">
+      <a href="../../bitcoin/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -562,7 +576,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bitcoin/network/" class="md-nav__link">
+      <a href="../../bitcoin/network/" class="md-nav__link">
         Network implementation
       </a>
     </li>
@@ -574,7 +588,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bitcoin/testing_node_communication/" class="md-nav__link">
+      <a href="../../bitcoin/testing_node_communication/" class="md-nav__link">
         Testing node communication
       </a>
     </li>
@@ -631,15 +645,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#console-sink" class="md-nav__link">
-    Console Sink
+  <a href="#define-the-area" class="md-nav__link">
+    Define the area
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#seq-sink" class="md-nav__link">
-    Seq Sink
+  <a href="#declare-controller-type" class="md-nav__link">
+    Declare controller Type
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inject-services-into-constructor" class="md-nav__link">
+    Inject services into constructor
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implement-an-action" class="md-nav__link">
+    Implement an action
   </a>
   
 </li>
@@ -657,20 +685,96 @@
               
                 
                 
-                  <h1>Overview</h1>
+                  <h1>Creating a Controller</h1>
                 
-                <p>SerilogShard allows to inject <a href="https://github.com/serilog/serilog-aspnetcore" target="_blank">Serilog</a> log provider into the forge, allowing every service to leverage it to produce a proper loggin implementation for the application.</p>
-<p>It can be injected into the forge just by using the IForgeBuilder extension</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">static</span> <span class="n">IForgeBuilder</span> <span class="nf">UseSerilog</span><span class="p">(</span><span class="k">this</span> <span class="n">IForgeBuilder</span> <span class="n">forgeBuilder</span><span class="p">,</span> <span class="kt">string?</span> <span class="n">configurationFile</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span>
+                <p>To create a controller that can be exposed by the WebApiShard we can take advantage of the <code>MithrilControllerBase</code> class.</p>
+<p>We can take a look at the controller implemented in the <a href="/mithril-shards/example-project/">example project</a>, to dissect it and discuss about its implementation.</p>
+<p>Let's take a meaningful part of that class and let's dissect it by highlighting some code part:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="hll"><span class="na">[Area(WebApiArea.AREA_API)]</span>
+</span><span class="hll"><span class="k">public</span> <span class="k">class</span> <span class="nc">ExampleController</span> <span class="p">:</span> <span class="n">MithrilControllerBase</span>
+</span><span class="p">{</span>
+   <span class="k">private</span> <span class="k">readonly</span> <span class="n">ILogger</span><span class="p">&lt;</span><span class="n">ExampleController</span><span class="p">&gt;</span> <span class="n">_logger</span><span class="p">;</span>
+   <span class="k">readonly</span> <span class="n">IQuoteService</span> <span class="n">_quoteService</span><span class="p">;</span>
+
+<span class="hll">   <span class="k">public</span> <span class="nf">ExampleController</span><span class="p">(</span><span class="n">ILogger</span><span class="p">&lt;</span><span class="n">ExampleController</span><span class="p">&gt;</span> <span class="n">logger</span><span class="p">,</span> <span class="n">IQuoteService</span> <span class="n">quoteService</span><span class="p">)</span>
+</span><span class="hll">   <span class="p">{</span>
+</span><span class="hll">      <span class="n">_logger</span> <span class="p">=</span> <span class="n">logger</span><span class="p">;</span>
+</span><span class="hll">      <span class="n">_quoteService</span> <span class="p">=</span> <span class="n">quoteService</span><span class="p">;</span>
+</span>   <span class="p">}</span>
+
+<span class="hll"><span class="na">   [HttpGet]</span>
+</span><span class="hll"><span class="na">   [ProducesResponseType(StatusCodes.Status200OK)]</span>
+</span><span class="hll">   <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">GetQuotes</span><span class="p">()</span>
+</span><span class="hll">   <span class="p">{</span>
+</span><span class="hll">      <span class="k">return</span> <span class="nf">Ok</span><span class="p">(</span><span class="n">_quoteService</span><span class="p">.</span><span class="n">Quotes</span><span class="p">);</span>
+</span><span class="hll">   <span class="p">}</span>
+</span></code></pre></div>
+</td></tr></table>
+<h3 id="define-the-area">Define the area</h3>
+<p>Line 1 describes, using <a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.areaattribute?view=aspnetcore-5.0" target="_blank">AreaAttribute</a>, the area we want this controller to be included.</p>
+<p>WebApiArea is an helper class that just contains a bounch of constant string of known areas: "api" and "dev".</p>
+<ul>
+<li>"api" ( <code>WebApiArea.AREA_API</code> ) is the area where generic purpose controller should be placed.
+  They are meant to be used by end users or 3rd party integration, to interact with our application.</li>
+<li>"dev" ( <code>WebApiArea.AREA_DEV</code> ) is the area where Dev controllers should be placed.
+  Dev controllers are controllers useful during debug that can expose internal details or are risky to be used in a 
+  public environment.
+  They may be risky to execute by an end user that doesn't have good technical details knowledge about the application and generally you want to enable them when you are developing or you need to collect more information on a running instance of your application.</li>
+</ul>
+<p>There are some Controllers that are available out of the box when you use Mithril Shards features, an example is <a href="/shards/serilog">SerilogShard</a> that includes SeriLogController that allows to control Log filters at runtime and it's exposed in the "api" area, while many more Controllers are exposed in "dev" area like the ones included by <a href="/shards/dev-controller">DevControllerShard</a>.</p>
+<h3 id="declare-controller-type">Declare controller Type</h3>
+<p>Line 2 is the Controller class definition and it just declare our <code>ExampleController</code> class that inherit from MithrilControllerBase.
+The name of the controller class is important because by default the actions implemented in the controller will have a route like the one defined by RouteAttribute that decorates the MithrilControllerBase</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="na">[Route(&quot;[area]</span><span class="p">/[</span><span class="n">controller</span><span class="p">]/[</span><span class="n">action</span><span class="p">]</span><span class="s">&quot;)]</span>
 </code></pre></div>
 </td></tr></table>
-<p><code>configurationFile</code> is optional, and can contain the path of a <abbr title="JavaScript Object Notation">JSON</abbr> configuration file, refers to Serilog documentation to see how to configure it properly.</p>
-<p>If no <code>configurationFile</code> is specified, the forge configuration file is used.</p>
+<ul>
+<li>area will be replaced by the are we declared our controller belongs to (e.g. "api").</li>
+<li>controller is the name of the Controller class, stripping out "Controller" part, e.g. ExampleController will become "Example"</li>
+<li>action is the name of the action we can invoke</li>
+</ul>
+<p>ExampleController action GetQuotes URL will then become <code>api/Example/GetQuotes</code>.
+This represents the part of the url to append to the WebApiShard configured Endpoint, so if we configured it to <code>127.0.0.1:45030</code> the complete url will be <code>http://127.0.0.1:45020/api/Example/GetQuotes</code> (or https if we enabled Https).</p>
+<h3 id="inject-services-into-constructor">Inject services into constructor</h3>
+<p>Line 7-10 is the Controller constructor.
+A controller is created automatically at each web request and the parameters declared in the constructor will be populated by using DI
+In this example, <code>ILogger&lt;ExampleController&gt; logger</code> gets populated with strongly typed instance of our logger and IQuoteService quoteService with the instance of the concrete implementation of our <code>IQuoteService</code> that in our <a href="/mithril-shards/example-project/">example project</a> we registered as a singleton</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="p">.</span><span class="n">AddSingleton</span><span class="p">&lt;</span><span class="n">IQuoteService</span><span class="p">,</span> <span class="n">QuoteService</span><span class="p">&gt;()</span>
+</code></pre></div>
+</td></tr></table>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Using an explicit configuration file allows to have more control over the configuration files used during debug and deploy, because allows you to have a file for application configuration, and a different set of configuration files specific for logging, where you can pre-configure a set of filters based on your needs</p>
+<p>It's important to know the life cycle of our injected service because they may impact performance. If the constructor of a service is slow and that service is defined as Transient (or Scoped) every action will have to wait its completion before being able to perform its job.</p>
 </div>
-<p>An example of a configuration section is this:</p>
+<h3 id="implement-an-action">Implement an action</h3>
+<p>Lines 13-18 declare and implement an action.</p>
+<p>In this case, the action is declared as <code>HttpGet</code>, this mean that it will only respond to GET requests. If you try to access that action with others HTTP verbs, it will return a status error <code>405 Method Not Allowed</code></p>
+<p><code>[ProducesResponseType(StatusCodes.Status200OK)]</code> declare known action status that can be returned by the action.
+It's just an helpful attribute useful to produce a better documentation on swagger interface and document definition but the action itself may even generate different statuses. This documentation however don't cover canonical Web <abbr title="Application Program Interface">API</abbr> implementation, so <a href="https://docs.microsoft.com/it-it/aspnet/core/web-api/advanced/conventions?view=aspnetcore-5.0" target="_blank">refer to .Net documentation</a>. to read more about it.</p>
+<p>To return an action result, the method <code>Ok</code> is invoked, passing the payload (that will be serialized in <abbr title="JavaScript Object Notation">JSON</abbr>) as a response.</p>
+<p>To document better the result type, we could specify in ProduceResponseTypeAttribute the returned type, it could be helpful for the consumer to know which type of object to receive back and which properties it exposes.
+In this example it's a simple list of string but it can be any <abbr title="JavaScript Object Notation">JSON</abbr> serializable type:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="na">[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List&lt;string&gt;))]</span>
+</code></pre></div>
+</td></tr></table>
+<p>As an additional example, this is the code of a DEV controller action that generates different status based on internal state of the node</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -689,66 +793,28 @@
 <span class="normal">16</span>
 <span class="normal">17</span>
 <span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="p">{</span>
-   <span class="nt">&quot;Serilog&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nt">&quot;Using&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;Serilog.Sinks.Console&quot;</span><span class="p">,</span> <span class="s2">&quot;Serilog.Sinks.Seq&quot;</span> <span class="p">],</span>
-      <span class="nt">&quot;Enrich&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;FromLogContext&quot;</span><span class="p">,</span> <span class="s2">&quot;WithMachineName&quot;</span><span class="p">,</span> <span class="s2">&quot;WithThreadId&quot;</span> <span class="p">],</span>
-      <span class="nt">&quot;WriteTo&quot;</span><span class="p">:</span> <span class="p">[</span>
-         <span class="p">{</span>
-            <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Console&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;Args&quot;</span><span class="p">:</span> <span class="p">{</span>
-               <span class="nt">&quot;IncludeScopes&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-               <span class="nt">&quot;theme&quot;</span><span class="p">:</span> <span class="s2">&quot;Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console&quot;</span>
-            <span class="p">}</span>
-         <span class="p">},</span>
-         <span class="p">{</span>
-            <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Seq&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;Args&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;serverUrl&quot;</span><span class="p">:</span> <span class="s2">&quot;http://localhost:5341&quot;</span> <span class="p">}</span>
-         <span class="p">}</span>
-      <span class="p">],</span>
-      <span class="nt">&quot;MinimumLevel&quot;</span><span class="p">:</span> <span class="p">{</span>
-         <span class="nt">&quot;Default&quot;</span><span class="p">:</span> <span class="s2">&quot;Debug&quot;</span><span class="p">,</span>
-         <span class="nt">&quot;Override&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;Bedrock.Framework&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;Microsoft&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;System&quot;</span><span class="p">:</span> <span class="s2">&quot;Warning&quot;</span>
-         <span class="p">}</span>
-      <span class="p">}</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="na">[HttpPost]</span>
+<span class="na">[ProducesResponseType(StatusCodes.Status200OK)]</span>
+<span class="na">[ProducesResponseType(StatusCodes.Status404NotFound)]</span>
+<span class="na">[ProducesResponseType(StatusCodes.Status400BadRequest)]</span>
+<span class="k">public</span> <span class="n">IActionResult</span> <span class="nf">Connect</span><span class="p">(</span><span class="n">PeerManagementConnectRequest</span> <span class="n">request</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="k">if</span> <span class="p">(</span><span class="n">_requiredConnection</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>
+   <span class="p">{</span>
+      <span class="k">return</span> <span class="nf">NotFound</span><span class="p">(</span><span class="err">$</span><span class="s">&quot;Cannot produce output because {nameof(RequiredConnection)} is not available&quot;</span><span class="p">);</span>
    <span class="p">}</span>
+
+   <span class="k">if</span> <span class="p">(!</span><span class="n">IPEndPoint</span><span class="p">.</span><span class="n">TryParse</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">EndPoint</span><span class="p">,</span> <span class="k">out</span> <span class="n">IPEndPoint</span><span class="p">?</span> <span class="n">ipEndPoint</span><span class="p">))</span>
+   <span class="p">{</span>
+      <span class="k">return</span> <span class="nf">BadRequest</span><span class="p">(</span><span class="s">&quot;Incorrect endpoint&quot;</span><span class="p">);</span>
+   <span class="p">}</span>
+
+   <span class="n">_requiredConnection</span><span class="p">.</span><span class="n">TryAddEndPoint</span><span class="p">(</span><span class="n">ipEndPoint</span><span class="p">);</span>
+   <span class="k">return</span> <span class="nf">Ok</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre></div>
 </td></tr></table>
-<p>In this example we are defining two serilog sinks: <a href="#console-sink">console</a> and <a href="seq-sink">seq sink</a>.</p>
-<p><code>MinimulLevel</code> section allows to configure the filter based on logging severity level, in this case the default level is Debug and we have a couple of override to rise the level to warning for all classes belonging to namespace <em>Bedrok.Framework</em>, <em>Microsoft</em> and <em>System</em></p>
-<p>Tweaking these settings is important to reduce the noise of unwanted logs of 3rd party libraries and focus our attention on logs that matter to us.</p>
-<h3 id="console-sink">Console Sink</h3>
-<p>Console configure the logger to use console output and in the <code>WriteTo</code> section we specify to include scopes and use a theme to colorize the output.</p>
-<p>An output example is this</p>
-<p><img alt="image-20210323114518695" class="zoom" src="../../img/image-20210323114518695.png" /></p>
-<h3 id="seq-sink">Seq Sink</h3>
-<p><a href="https://datalust.co/seq" target="_blank">Seq</a>  is an interesting web application that can be configured to receive logs generated by Serilog, it has a free plan for single user and in my case it was a good choice for development purpose because I can host it in my local environment and leverage its feature to be able to investigate problems. It can be both installed locally or be hosted in a docker container.</p>
-<p>In the example above it has been configured to receive logs on port 5341</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="p">{</span>
-   <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Seq&quot;</span><span class="p">,</span>
-   <span class="nt">&quot;Args&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;serverUrl&quot;</span><span class="p">:</span> <span class="s2">&quot;http://localhost:5341&quot;</span> <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
-<p>It shares the same MinimumLevel section to configure which logs will be persisted but can have dynamic overrides.</p>
-<p>Seq allows you to query, create filters, signals and show structured logs in a friendly way, for further information refers to Seq website.</p>
-<p>An example of Seq interface with a couple of expanded logs, to show you additional information you can found in these logs</p>
-<p><img alt="image-20210323144656256" class="zoom" src="../../img/image-20210323144656256.png" /></p>
+<p>In this example, this action will return 404 (not found) if the member variables _requiredConnection isn't set, or 400 (bad request) if the input peer isn't formatted properly as a valid endpoint. If everything goes fine it will instead return 200 (ok).</p>
                 
                   
                     
@@ -757,7 +823,7 @@
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-23
+      Last update: 2021-03-24
     
   </small>
 </div>
@@ -791,7 +857,7 @@
 
       <!-- Link to previous page -->
       
-      <a href="../../mithril-shards/default-forge/"
+      <a href="../areas/"
          class="md-footer__link md-footer__link--prev"
          rel="prev">
          <div class="md-footer__button md-icon">
@@ -802,7 +868,7 @@
                <span class="md-footer__direction">
                   Previous
                </span>
-               DefaultForge
+               WEB API Areas
             </div>
          </div>
       </a>
@@ -810,7 +876,7 @@
 
       <!-- Link to next page -->
       
-      <a href="../web-api/"
+      <a href="../swagger-ui/"
          class="md-footer__link md-footer__link--next"
          rel="next">
          <div class="md-footer__title">
@@ -818,7 +884,7 @@
                <span class="md-footer__direction">
                   Next
                </span>
-               Overview
+               Using Swagger UI
             </div>
          </div>
          <div class="md-footer__button md-icon">
@@ -866,14 +932,14 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js"></script>
       
-        <script src="../../_mkdocs/extra_js/custom.js"></script>
+        <script src="../../../_mkdocs/extra_js/custom.js"></script>
       
     
   </body>

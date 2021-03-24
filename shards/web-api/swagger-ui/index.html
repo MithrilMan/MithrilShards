@@ -6,28 +6,28 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Mithril Shards implementation, DefaultForge">
+        <meta name="description" content="Mithril Shards, WebApiShard, Using Swagger UI">
       
       
       
         <meta name="author" content="Mithril Man">
       
       
-        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/mithril-shards/default-forge/">
+        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/shards/web-api/swagger-ui/">
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
     
     
       
-        <title>DefaultForge - Mithril Shards</title>
+        <title>Using Swagger UI - Mithril Shards</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.2c0c5eaf.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2c0c5eaf.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.7fa14f5b.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.7fa14f5b.min.css">
         
       
     
@@ -42,7 +42,7 @@
     
     
     
-      <link rel="stylesheet" href="../../_mkdocs/extra_css/custom.css">
+      <link rel="stylesheet" href="../../../_mkdocs/extra_css/custom.css">
     
     
       
@@ -67,6 +67,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#todo" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -74,7 +79,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href="../../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -93,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DefaultForge
+              Using Swagger UI
             
           </span>
         </div>
@@ -168,7 +173,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href="../../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -200,7 +205,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         Welcome!
       </a>
     </li>
@@ -213,14 +218,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
       
       <label class="md-nav__link" for="__nav_2">
         Mithril Shards Core
@@ -238,7 +241,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../../mithril-shards/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -250,7 +253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../forge-builder/" class="md-nav__link">
+      <a href="../../../mithril-shards/forge-builder/" class="md-nav__link">
         ForgeBuilder
       </a>
     </li>
@@ -260,18 +263,11 @@
             
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../mithril-shards/default-forge/" class="md-nav__link">
         DefaultForge
       </a>
-      
     </li>
   
 
@@ -281,7 +277,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dev-controller.md" class="md-nav__link">
+      <a href="../../../mithril-shards/dev-controller.md" class="md-nav__link">
         None
       </a>
     </li>
@@ -300,12 +296,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
       
       <label class="md-nav__link" for="__nav_3">
         Shards
@@ -344,7 +342,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/serilog/" class="md-nav__link">
+      <a href="../../serilog/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -360,12 +358,14 @@
             
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" checked>
       
       <label class="md-nav__link" for="__nav_3_2">
         WebApi
@@ -383,7 +383,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/web-api/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -395,7 +395,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/web-api/using-webapishard/" class="md-nav__link">
+      <a href="../using-webapishard/" class="md-nav__link">
         Using WebApiShard
       </a>
     </li>
@@ -407,7 +407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/web-api/areas/" class="md-nav__link">
+      <a href="../areas/" class="md-nav__link">
         WEB API Areas
       </a>
     </li>
@@ -419,7 +419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/web-api/creating-a-controller/" class="md-nav__link">
+      <a href="../creating-a-controller/" class="md-nav__link">
         Creating a Controller
       </a>
     </li>
@@ -429,11 +429,20 @@
             
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../shards/web-api/swagger-ui/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Using Swagger UI
       </a>
+      
     </li>
   
 
@@ -470,7 +479,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/dev-controller/" class="md-nav__link">
+      <a href="../../dev-controller/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -509,7 +518,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/bitcoin/" class="md-nav__link">
+      <a href="../../bitcoin/" class="md-nav__link">
         Overview
       </a>
     </li>
@@ -521,7 +530,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/bitcoin/network/" class="md-nav__link">
+      <a href="../../bitcoin/network/" class="md-nav__link">
         Network implementation
       </a>
     </li>
@@ -533,7 +542,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../shards/bitcoin/testing_node_communication/" class="md-nav__link">
+      <a href="../../bitcoin/testing_node_communication/" class="md-nav__link">
         Testing node communication
       </a>
     </li>
@@ -574,17 +583,29 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                  <h1>DefaultForge</h1>
-                
-                <p>The entry point is our forge builder class.
-After declaring an instance we have to specify which implementation of Forge we want to use.
-Actually the only available implementation is DefaultForge</p>
+                <h1 id="todo">TODO <img alt="😴" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f634.svg" title=":sleeping:" /></h1>
                 
                   
                     
@@ -593,7 +614,7 @@ Actually the only available implementation is DefaultForge</p>
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-22
+      Last update: 2021-03-24
     
   </small>
 </div>
@@ -627,7 +648,7 @@ Actually the only available implementation is DefaultForge</p>
 
       <!-- Link to previous page -->
       
-      <a href="../forge-builder/"
+      <a href="../creating-a-controller/"
          class="md-footer__link md-footer__link--prev"
          rel="prev">
          <div class="md-footer__button md-icon">
@@ -638,7 +659,7 @@ Actually the only available implementation is DefaultForge</p>
                <span class="md-footer__direction">
                   Previous
                </span>
-               ForgeBuilder
+               Creating a Controller
             </div>
          </div>
       </a>
@@ -646,7 +667,7 @@ Actually the only available implementation is DefaultForge</p>
 
       <!-- Link to next page -->
       
-      <a href="../../shards/serilog/"
+      <a href="../../dev-controller/"
          class="md-footer__link md-footer__link--next"
          rel="next">
          <div class="md-footer__title">
@@ -702,14 +723,14 @@ Actually the only available implementation is DefaultForge</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js"></script>
       
-        <script src="../../_mkdocs/extra_js/custom.js"></script>
+        <script src="../../../_mkdocs/extra_js/custom.js"></script>
       
     
   </body>

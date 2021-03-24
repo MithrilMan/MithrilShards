@@ -277,8 +277,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../mithril-shards/dev-controller/" class="md-nav__link">
-        Dev Controller
+      <a href="../../mithril-shards/dev-controller.md" class="md-nav__link">
+        None
       </a>
     </li>
   
@@ -320,10 +320,163 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
+      
+      <label class="md-nav__link" for="__nav_3_1">
+        Serilog
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Serilog" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Serilog
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
     <li class="md-nav__item">
       <a href="../serilog/" class="md-nav__link">
-        Serilog
+        Overview
       </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      <label class="md-nav__link" for="__nav_3_2">
+        WebApi
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="WebApi" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          WebApi
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../web-api/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../web-api/using-webapishard/" class="md-nav__link">
+        Using WebApiShard
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../web-api/areas/" class="md-nav__link">
+        WEB API Areas
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../web-api/creating-a-controller/" class="md-nav__link">
+        Creating a Controller
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../web-api/swagger-ui/" class="md-nav__link">
+        Using Swagger UI
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+      
+      <label class="md-nav__link" for="__nav_3_3">
+        DevController
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="DevController" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          DevController
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dev-controller/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -338,14 +491,14 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" type="checkbox" id="__nav_3_4" checked>
       
-      <label class="md-nav__link" for="__nav_3_2">
+      <label class="md-nav__link" for="__nav_3_4">
         Bitcoin
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="Bitcoin" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_2">
+        <label class="md-nav__title" for="__nav_3_4">
           <span class="md-nav__icon md-icon"></span>
           Bitcoin
         </label>
@@ -528,8 +681,8 @@ Mithril Shards goal is to be a framework and toolkit to build <em><u>modular and
   Data is serialized thanks to an well defined set of interfaces and classes that allows to implement an easy to read and maintain code.</li>
 <li>Incoming messages are dispatched to "Message Processors" that allow to handle the application logic following a good practice of separation of concerns.</li>
 <li>Meaningful events are dispatched using a <em>message bus</em> implementation that can reach any component in any application layer.</li>
-<li>A WEB Api infrastructure allow to create WEB Api endpoint easily and each feature can have its set of API published on different document specifications.
-  Swagger is used as a <abbr title="User Interface">UI</abbr> to expose these API documents and allows to execute these APIs straight from that interface.</li>
+<li>A WEB Api infrastructure allow to create WEB Api endpoint easily and each feature can have its set of <abbr title="Application Program Interface">API</abbr> published on different document specifications.
+  Swagger is used as a <abbr title="User Interface">UI</abbr> to expose these <abbr title="Application Program Interface">API</abbr> documents and allows to execute these APIs straight from that interface.</li>
 <li>For development/debugging purpose, a Shard inject some useful endpoint to inspect internal details of the running application.</li>
 <li>Logging is done using structured logging, makes use of Serilog to persist them and a configuration example shows how to use <a href="https://datalust.co/seq" target="_blank">Seq</a> to have a very good <abbr title="User Interface">UI</abbr> to view logs, filter them, etc...</li>
 <li>Blazor is used to implement a cross platform <abbr title="User Interface">UI</abbr> as a companion for the full node.</li>
@@ -576,7 +729,7 @@ Mithril Shards goal is to be a framework and toolkit to build <em><u>modular and
 
       <!-- Link to previous page -->
       
-      <a href="../serilog/"
+      <a href="../dev-controller/"
          class="md-footer__link md-footer__link--prev"
          rel="prev">
          <div class="md-footer__button md-icon">
@@ -587,7 +740,7 @@ Mithril Shards goal is to be a framework and toolkit to build <em><u>modular and
                <span class="md-footer__direction">
                   Previous
                </span>
-               Serilog
+               Overview
             </div>
          </div>
       </a>
