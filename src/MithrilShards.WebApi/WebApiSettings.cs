@@ -11,7 +11,7 @@ namespace MithrilShards.WebApi
       public string EndPoint { get; set; } = "127.0.0.1:45020";
 
       /// <summary>
-      /// Gets or sets a value indicating whether this <see cref="WebApiSettings"/> is enabled.
+      /// Gets or sets a value indicating whether this <see cref="WebApiShard"/> is enabled.
       /// </summary>
       /// <value>
       ///   <c>true</c> if enabled; otherwise, <c>false</c>.

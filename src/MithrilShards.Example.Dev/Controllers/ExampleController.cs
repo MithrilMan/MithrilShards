@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Example.Protocol.Processors;
 using MithrilShards.WebApi;
 
 namespace MithrilShards.Example.Dev
@@ -11,12 +10,12 @@ namespace MithrilShards.Example.Dev
    /// An example of a Dev Controller (controllers meant to be exposed to the Dev.Controller shard that exposes endpoints through a dedicated swagger endpoint.
    /// In order to be discoverable by Dev Controller, this controller has to inherit from MithrilControllerBase class name has to end with suffix "ControllerDev" or being decorated with a DevControllerAttribute.
    ///
-   /// In this example we are obtaining a reference to our PingPongProcessor in order to be able to add and remove quotes that can be sent as a ping response.
-   /// PingPongProcessor is a processor that we registered thanks to assembly scaffolding in AddMessageProcessors so we can
+   /// In this example we are obtaining a reference to IQuoteService in order to be able to add and remove quotes that can be sent as a ping response.
+   /// IQuoteService is a service that has been registered in our DI container during the shard registration so we can
    /// just have a reference of it in our constructor and it will be injected automatically during the instantiation of this class.
    /// </summary>
    /// <seealso cref="MithrilControllerBase" />
-   [Area(WebApiArea.AREA_DEV)]
+   [Area(WebApiArea.AREA_API)]
    public class ExampleController : MithrilControllerBase
    {
       private readonly ILogger<ExampleController> _logger;
@@ -50,7 +49,7 @@ namespace MithrilShards.Example.Dev
       {
          _quoteService.Quotes.Add(quote);
 
-         _logger.LogDebug("A new quote has been added to {DevController}: `{Quote}`", nameof(PingPongProcessor), quote);
+         _logger.LogDebug("A new quote has been added: `{Quote}`", quote);
 
          return Ok($"Quote `{quote}` added.");
       }
@@ -93,6 +92,5 @@ namespace MithrilShards.Example.Dev
          _quoteService.Quotes.Clear();
          return Ok();
       }
-
    }
 }

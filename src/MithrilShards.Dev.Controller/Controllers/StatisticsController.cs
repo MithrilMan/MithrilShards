@@ -10,7 +10,7 @@ using MithrilShards.WebApi;
 
 namespace MithrilShards.Dev.Controller.Controllers
 {
-   [Area(WebApiArea.AREA_API)]
+   [Area(WebApiArea.AREA_DEV)]
    [TypeFilter(typeof(StatisticOnlyActionFilterAttribute))]
    public class StatisticsController : MithrilControllerBase
    {

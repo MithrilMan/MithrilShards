@@ -45,11 +45,11 @@ namespace MithrilShards.Example.Node
               .UseSerilog(logSettings)
               .UseBedrockForgeServer<ExampleNetworkProtocolMessageSerializer>()
               .UseStatisticsCollector(options => options.DumpOnConsoleOnKeyPress = true)
-              /// we are injecting ExampleDev type to allow <see cref="MithrilShards.WebApi.WebApiShard"/> to find all the controllers defined there
-              /// because only controllers defined in an included shard assembly are discovered automatically.
-              /// Passing ExampleDev will cause dotnet runtime to load the assembly where ExampleDev lies and every controllers defined there will be
-              /// found later during <see cref="MithrilShards.WebApi.WebApiShard"/> initialization.
-              .UseApi(options => options.AssemblyScaffoldEnabler = (assemblyScaffoldEnabler) => assemblyScaffoldEnabler.LoadAssemblyFromType<ExampleDev>())
+              /// we are injecting ExampleDev type to allow <see cref="MithrilShards.WebApi.WebApiShard"/> to find all the controllers
+              /// defined there because only controllers defined in an included shard assemblies are discovered automatically.
+              /// Passing ExampleDev will cause dotnet runtime to load the assembly where ExampleDev Type is defined and every
+              /// controllers defined there will be found later during <see cref="MithrilShards.WebApi.WebApiShard"/> initialization.
+              .UseApi(options => options.ControllersSeeker = (seeker) => seeker.LoadAssemblyFromType<ExampleDev>())
               .UseDevController()
               .UseExample(KnownVersion.V1, protocolVersion)
               .RunConsoleAsync()

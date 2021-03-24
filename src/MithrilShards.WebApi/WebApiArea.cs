@@ -12,10 +12,11 @@
       public const string AREA_API = "api";
 
       /// <summary>
-      /// The area where Dev controllers has to be placed.
-      /// Dev controllers are controllers useful during debug but that can expose
-      /// too many internal details or are risky to be used.
-      /// They may be risky to execute by an end user that doesn't have good technical details knowledge about the application.
+      /// The area where Dev controllers should be placed.
+      /// Dev controllers are controllers useful during debug that can expose internal details
+      /// or are risky to be used in a public environment
+      /// They may be risky to execute by an end user that doesn't have good technical details
+      /// knowledge about the application.
       /// </summary>
       public const string AREA_DEV = "dev";
    }

@@ -10,15 +10,15 @@ namespace MithrilShards.WebApi
       /// <summary>
       /// Action that allow to discover controllers in assemblies that don't have an entry explicit point.
       /// </summary>
-      public Action<ControllersAssemblyScaffolder>? AssemblyScaffoldEnabler { get; set; }
+      public Action<ControllersAssemblySeeker>? ControllersSeeker { get; set; }
 
-      public ControllersAssemblyScaffolder Scaffolder { get; } = new ControllersAssemblyScaffolder();
+      public ControllersAssemblySeeker Seeker { get; } = new ControllersAssemblySeeker();
 
       public bool EnablePublicApi { get; set; } = true;
 
-      internal void Scaffold()
+      internal void DiscoverControllers()
       {
-         AssemblyScaffoldEnabler?.Invoke(Scaffolder);
+         ControllersSeeker?.Invoke(Seeker);
       }
    }
 }

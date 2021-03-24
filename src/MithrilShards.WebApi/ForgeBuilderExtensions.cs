@@ -69,7 +69,7 @@ namespace MithrilShards.Core.Forge
       {
          var optionsInstance = new WebApiOptions();
          options?.Invoke(optionsInstance);
-         optionsInstance.Scaffold();
+         optionsInstance.DiscoverControllers();
 
          forgeBuilder.AddShard<WebApiShard, WebApiSettings>((context, services) =>
          {
@@ -138,9 +138,9 @@ namespace MithrilShards.Core.Forge
                      var tempServiceProvider = services.BuildServiceProvider();
                      var logger = tempServiceProvider.GetService<ILogger<WebApiShard>>();
 
-                     IEnumerable<Assembly> assembliesToScaffold = tempServiceProvider.GetService<IEnumerable<IMithrilShard>>()!
+                     IEnumerable<Assembly> assembliesToInspect = tempServiceProvider.GetService<IEnumerable<IMithrilShard>>()!
                      .Select(shard => shard.GetType().Assembly)
-                     .Concat(optionsInstance.Scaffolder.GetAssemblies());
+                     .Concat(optionsInstance.Seeker.GetAssemblies());
 
                      IEnumerable<ApiServiceDefinition> apiServiceDefinitions = tempServiceProvider.GetService<IEnumerable<ApiServiceDefinition>>()!;
 
@@ -182,9 +182,9 @@ namespace MithrilShards.Core.Forge
                            /// Adds XML documentation to swagger in order to produce a better documentation on swagger UI.
                            /// Can work only if the assembly has been compiled with the option to generate the XML documentation file
                            /// and the xml file name is the same as the assembly name (except the extension).
-                           foreach (Assembly shardAssembly in assembliesToScaffold)
+                           foreach (Assembly assembly in assembliesToInspect)
                            {
-                              var xmlFile = $"{shardAssembly.GetName().Name}.xml";
+                              var xmlFile = $"{assembly.GetName().Name}.xml";
                               var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                               if (File.Exists(xmlPath))
                               {
@@ -215,9 +215,9 @@ namespace MithrilShards.Core.Forge
                         });
 
                      // creates application part for each shard and assembly containing controllers.
-                     foreach (Assembly shardAssembly in assembliesToScaffold)
+                     foreach (Assembly assembly in assembliesToInspect)
                      {
-                        mvcBuilder.AddApplicationPart(shardAssembly);
+                        mvcBuilder.AddApplicationPart(assembly);
                      }
                   })
                   .Configure(SwaggerConfiguration);
