@@ -31,7 +31,10 @@ namespace MithrilShards.Example.Dev
       /// <summary>
       /// Gets the available quotes.
       /// </summary>
-      /// <returns></returns>
+      /// <response code="200">The list of known quotes.</response>
+      /// <remarks>
+      /// Returns a list of all known quotes.
+      /// </remarks>
       [HttpGet]
       [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string>))]
       public ActionResult GetQuotes()
@@ -42,8 +45,11 @@ namespace MithrilShards.Example.Dev
       /// <summary>
       /// Adds a quote.
       /// </summary>
-      /// <param name="quote">The quote.</param>
-      /// <returns></returns>
+      /// <param name="quote" example="Tu quoque, Brute, fili mi!">The quote to add.</param>
+      /// <response code="200">The quote that has been added.</response>
+      /// <remarks>
+      /// Adds a quote to the quotes list.
+      /// </remarks>
       [HttpPost]
       [ProducesResponseType(StatusCodes.Status200OK)]
       public ActionResult AddQuote(string quote)
@@ -52,14 +58,17 @@ namespace MithrilShards.Example.Dev
 
          _logger.LogDebug("A new quote has been added: `{Quote}`", quote);
 
-         return Ok($"Quote `{quote}` added.");
+         return Ok(quote);
       }
 
-      /// <summary>
-      /// Removes a quote.
-      /// </summary>
-      /// <param name="quoteIndex">Index of the quote to be removed.</param>
-      /// <returns></returns>
+      /// <summary>Removes a quote at the specified index position.</summary>
+      /// <param name="quoteIndex" example="3">Index of the quote to be removed.</param>
+      /// <response code="200">The quote that has been removed.</response>
+      /// <remarks>
+      /// Attempts to remove an entry from the available quotes at the index (0 based) specified by quoteIndex parameter.
+      /// If the operation succeeds, the removed quote is returned, otherwise a status 400 error is generated
+      /// with the failure reason (ex. index out of range)
+      /// </remarks>
       [HttpPost]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -70,7 +79,8 @@ namespace MithrilShards.Example.Dev
             string removedQuote = _quoteService.Quotes[quoteIndex];
             if (_quoteService.Quotes.Remove(removedQuote))
             {
-               return Ok($"Quote `{removedQuote}` removed.");
+               _logger.LogDebug("Quote `{RemovedQuote}` removed.", removedQuote);
+               return Ok(removedQuote);
             }
             else
             {
@@ -86,7 +96,7 @@ namespace MithrilShards.Example.Dev
       /// <summary>
       /// Clears the quotes, removing all entries.
       /// </summary>
-      /// <returns></returns>
+      /// <remarks>Removes all the quotes.</remarks>
       [HttpPost]
       [ProducesResponseType(StatusCodes.Status200OK)]
       public ActionResult ClearQuotes()

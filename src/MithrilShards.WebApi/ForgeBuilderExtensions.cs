@@ -84,7 +84,7 @@ namespace MithrilShards.Core.Forge
                      Enabled = settings.Enabled,
                      Area = WebApiArea.AREA_API,
                      Name = "API",
-                     Description = "General availability APIs",
+                     Description = optionsInstance.PublicApiDescription,
                      Version = "v1",
                   };
 
@@ -220,14 +220,14 @@ namespace MithrilShards.Core.Forge
                         mvcBuilder.AddApplicationPart(assembly);
                      }
                   })
-                  .Configure(SwaggerConfiguration);
+                  .Configure(app => SwaggerConfiguration(app, optionsInstance));
             });
          });
 
          return forgeBuilder;
       }
 
-      private static void SwaggerConfiguration(IApplicationBuilder app)
+      private static void SwaggerConfiguration(IApplicationBuilder app, WebApiOptions options)
       {
          IEnumerable<ApiServiceDefinition> apiServiceDefinitions = app.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>()!;
          var logger = app.ApplicationServices.GetService<ILogger<WebApiShard>>()!;
@@ -248,8 +248,7 @@ namespace MithrilShards.Core.Forge
             {
                setup.RoutePrefix = SWAGGER_ROUTE_PREFIX;
                setup.InjectStylesheet("/swagger_ui/custom.css");
-               setup.DocumentTitle = "Mithril Shards WEB APIs";
-               setup.DisplayOperationId();
+               setup.DocumentTitle = options.Title;
                setup.EnableFilter();
 
                setup.IndexStream = () => typeof(WebApiShard).Assembly.GetManifestResourceStream("MithrilShards.WebApi.Resources.swagger_ui.index.html");

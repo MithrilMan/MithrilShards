@@ -75,6 +75,11 @@ forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>((hostBuildConte
 
 In this example you can see that `Area` is set to `WebApiArea.AREA_DEV` that's simply a constant string that's the equivalent of set it to `"dev"` and Enabled is set to `settings.Enabled`, this way it's enabled or disabled based on the `DevControllerSettings` configuration.
 
+!!! note
+	Each different ApiServiceDefinition generates an OpenAPI document following its specification.
+	Swagger UI allows to select which document to show, see [Using Swagger UI] section.
+	An OpenAPI document can be used by tools like [AutoRest](https://github.com/Azure/autorest){:target="_blank"} to generate automatically clients for RESTful API, not just for C# but for many other languages (after all OpenAPI is an agnostic specification).
+
 
 
 ### Creating custom areas

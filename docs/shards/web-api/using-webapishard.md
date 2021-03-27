@@ -44,6 +44,16 @@ The ***public area*** corresponds to the [ApiServiceDefinition](#apiservicedefin
 
 If you are creating an application where a public area is never needed, you may want to use this property rather than relying on external configuration file that may be missing or edited.
 
+### PublicApiDescription
+
+This settings allow to customize the description used to describe public API.  
+Defaults to `Mithril Shards public API`.
+
+### Title
+
+Configures the Swagger UI page title, useful for branding.  
+Defaults to `Mithril Shards Web API`.
+
 
 
 ## WebApiSettings
