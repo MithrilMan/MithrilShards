@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#todo" class="md-skip">
+        <a href="#swagger-ui-elements" class="md-skip">
           Skip to content
         </a>
       
@@ -436,12 +436,71 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
-        
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Using Swagger UI
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         Using Swagger UI
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#swagger-ui-elements" class="md-nav__link">
+    Swagger UI Elements
+  </a>
+  
+    <nav class="md-nav" aria-label="Swagger UI Elements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#document-selection" class="md-nav__link">
+    Document Selection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openapi-document-url" class="md-nav__link">
+    OpenAPI document URL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-box" class="md-nav__link">
+    Search Box
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performing-an-api-request" class="md-nav__link">
+    Performing an API request
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -591,8 +650,55 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
-    
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#swagger-ui-elements" class="md-nav__link">
+    Swagger UI Elements
+  </a>
+  
+    <nav class="md-nav" aria-label="Swagger UI Elements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#document-selection" class="md-nav__link">
+    Document Selection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openapi-document-url" class="md-nav__link">
+    OpenAPI document URL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-box" class="md-nav__link">
+    Search Box
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performing-an-api-request" class="md-nav__link">
+    Performing an API request
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -605,7 +711,79 @@
               
                 
                 
-                <h1 id="todo">TODO <img alt="😴" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f634.svg" title=":sleeping:" /></h1>
+                  <h1>Using Swagger UI</h1>
+                
+                <p><a href="https://swagger.io/tools/swagger-ui/" target="_blank">Swagger <abbr title="User Interface">UI</abbr></a> allows to visualize and interact with the WEB Api resources generated from OpenAPI toolset.<br />
+WebApiShard makes use of it and thus we can have a nice <abbr title="User Interface">UI</abbr> to test and document our <abbr title="Application Program Interface">API</abbr>.</p>
+<p>As stated in <a href="/shards/web-api/areas#apiservicedefinition">ApiServiceDefinition</a> section, each area generates a different OpenAPI document and we can use tool like Swagger <abbr title="User Interface">UI</abbr> to convert that specification to turn that document into an <abbr title="User Interface">UI</abbr> that allows us to test and read documentation about our exposed <abbr title="Application Program Interface">API</abbr> resources.</p>
+<p>An OpenAPI document can even be used by tools like <a href="https://github.com/Azure/autorest" target="_blank">AutoRest</a> to generate automatically clients (in different programming languages) for RESTful <abbr title="Application Program Interface">API</abbr>!</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Mithril Shards customizes a bit the look of Swagger <abbr title="User Interface">UI</abbr> but it will be familiar to who is already used to work with it.</p>
+</div>
+<p>The address to access swagger <abbr title="User Interface">UI</abbr> depends on <a href="/shards/web-api/using-webapishard#webapisettings">WebApiSettings</a> <code>EndPoint</code> parameter.</p>
+<p>If we consider the default EndPoint <code>127.0.0.1:45020</code>, a WebApiShard enabled application exposes Swagger at the url </p>
+<h2 id="swagger-ui-elements">Swagger <abbr title="User Interface">UI</abbr> Elements</h2>
+<p>Without going too deeper into documenting the <abbr title="User Interface">UI</abbr> (there are a lot of resources on the web about <a href="https://swagger.io/tools/swagger-ui/" target="_blank">Swagger <abbr title="User Interface">UI</abbr></a> and anyway it's pretty straightforward) I want to highlight a couple of sections</p>
+<p><img alt="image-20210326120313808" class="zoom" src="../../../img/image-20210326120313808.png" /></p>
+<h3 id="document-selection">Document Selection</h3>
+<p>It's a combo box that allows you to select one of the <a href="/shards/web-api/areas#apiservicedefinition">ApiServiceDefinition</a> defined area that are currently enabled.
+In this example we have selected <abbr title="Application Program Interface">API</abbr> that corresponds to our <code>WebApiArea.API</code> (or simply "api") area defined by WebApiShard itself.<br />
+You can see another option, DEV Api, that corresponds to the <code>WebApiArea.DEV</code> (or simply "dev") area defined by <a href="/shards/dev-controller">DevControllerShard</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The displayed name corresponds to ApiServiceDefinition <code>Name</code> property.</p>
+</div>
+<h3 id="openapi-document-url">OpenAPI document <abbr title="Uniform Resource Locator">URL</abbr></h3>
+<p>It's the url of the selected OpenAPI document.<br />
+It can be used to generate RESTful clients with tools like <a href="https://github.com/Azure/autorest" target="_blank">AutoRest</a>.</p>
+<h3 id="search-box">Search Box</h3>
+<p>Allows to filter Web <abbr title="Application Program Interface">API</abbr> resources by their name or description.</p>
+<h2 id="performing-an-api-request">Performing an <abbr title="Application Program Interface">API</abbr> request</h2>
+<p>By clicking on an <abbr title="Application Program Interface">API</abbr> entry, it's possible to execute it by clicking on <code>Try it out</code> button, filling the required data (in this example the field <code>quote</code>) and then pressing the "Execute" button that will be displayed</p>
+<p><img alt="image-20210327205530223" src="../../../img/image-20210327205530223.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is possible to provide examples and more documentation by using C# XML comments, you can find more information in the section <a href="https://github.com/domaindrivendev/Swashbuckle.AspNetCore#include-descriptions-from-xml-comments" target="_blank">Include Descriptions</a> from XML Comments on Swashbuckle.AspNetCore repository or by looking at the <code>ExampleController</code> source code in the MithrilShards.Example.Dev project.</p>
+</div>
+<p>The screenshot above shows the AddQuote action in the <a href="/mithril-shards/example-project/">example project</a> and it has been fully documented:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
+<span class="c1">/// Adds a quote.</span>
+<span class="c1">/// &lt;/summary&gt;</span>
+<span class="c1">/// &lt;param name=&quot;quote&quot; example=&quot;Tu quoque, Brute, fili mi!&quot;&gt;The quote to add.&lt;/param&gt;</span>
+<span class="c1">/// &lt;response code=&quot;200&quot;&gt;The quote that has been added.&lt;/response&gt;</span>
+<span class="c1">/// &lt;remarks&gt;</span>
+<span class="c1">/// Adds a quote to the quotes list.</span>
+<span class="c1">/// &lt;/remarks&gt;</span>
+<span class="na">[HttpPost]</span>
+<span class="na">[ProducesResponseType(StatusCodes.Status200OK)]</span>
+<span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">AddQuote</span><span class="p">(</span><span class="kt">string</span> <span class="n">quote</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="n">_quoteService</span><span class="p">.</span><span class="n">Quotes</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">quote</span><span class="p">);</span>
+
+   <span class="n">_logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;A new quote has been added: `{Quote}`&quot;</span><span class="p">,</span> <span class="n">quote</span><span class="p">);</span>
+
+   <span class="k">return</span> <span class="nf">Ok</span><span class="p">(</span><span class="n">quote</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
                 
                   
                     
@@ -614,7 +792,7 @@
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-24
+      Last update: 2021-03-27
     
   </small>
 </div>

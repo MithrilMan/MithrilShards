@@ -10,6 +10,7 @@
 [WebApiSettings]: /shards/web-api/using-webapishard#webapisettings
 [ApiServiceDefinition]: /shards/web-api/areas#apiservicedefinition
 [Creating a Controller]: /shards/web-api/areas#creating-a-controller
+[Using Swagger UI]: /shards/web-api/areas#using-swagger-ui
 
 [DevControllerShard]: /shards/dev-controller
 

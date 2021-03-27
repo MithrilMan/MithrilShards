@@ -767,6 +767,12 @@ It contains an <code>Enabled</code> property used to enable or disable that spec
 </code></pre></div>
 </td></tr></table>
 <p>In this example you can see that <code>Area</code> is set to <code>WebApiArea.AREA_DEV</code> that's simply a constant string that's the equivalent of set it to <code>"dev"</code> and Enabled is set to <code>settings.Enabled</code>, this way it's enabled or disabled based on the <code>DevControllerSettings</code> configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each different ApiServiceDefinition generates an OpenAPI document following its specification.
+Swagger <abbr title="User Interface">UI</abbr> allows to select which document to show, see <a href="/shards/web-api/areas#using-swagger-ui">Using Swagger <abbr title="User Interface">UI</abbr></a> section.
+An OpenAPI document can be used by tools like <a href="https://github.com/Azure/autorest" target="_blank">AutoRest</a> to generate automatically clients for RESTful <abbr title="Application Program Interface">API</abbr>, not just for C# but for many other languages (after all OpenAPI is an agnostic specification).</p>
+</div>
 <h3 id="creating-custom-areas">Creating custom areas</h3>
 <p>The process to create a custom area is the same as the one shown in the example above, the only difference is the <code>Area</code> value, that can be any string.</p>
 <p>In order to have controllers assigned to such area, a controller has to be decorated with an Area attribute like in this example:</p>
@@ -784,7 +790,7 @@ It contains an <code>Enabled</code> property used to enable or disable that spec
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-24
+      Last update: 2021-03-27
     
   </small>
 </div>
