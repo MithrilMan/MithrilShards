@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using MithrilShards.Core;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -24,7 +23,7 @@ namespace MithrilShards.WebApi
       public string Area { get; set; } = string.Empty;
 
       /// <summary>
-      /// Gets or sets the WEB API service version.
+      /// Gets or sets the Web API service version.
       /// </summary>
       public string Version { get; set; } = "v1";
 

@@ -6,12 +6,20 @@
 
    <ItemGroup>
       <None Remove="forge-settings.json" />
+      <None Remove="forge-settings2.json" />
+      <None Remove="forge-settings3.json" />
       <None Remove="log-settings-with-seq.json" />
    </ItemGroup>
 
    <ItemGroup>
       <Content Include="forge-settings.json">
          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="forge-settings2.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="forge-settings3.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="log-settings-with-seq.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>

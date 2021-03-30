@@ -12,5 +12,6 @@
 [Creating a Controller]: /shards/web-api/areas#creating-a-controller
 [Using Swagger UI]: /shards/web-api/areas#using-swagger-ui
 
-[DevControllerShard]: /shards/dev-controller
+[DevControllerShard]: /shards/dev-controller/
 
+[BedrockForgeConnectivityShard]: /shards/bedrock-forge-connectivity/

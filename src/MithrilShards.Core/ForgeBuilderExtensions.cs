@@ -48,7 +48,7 @@ namespace MithrilShards.Core
       {
          services
             //fake or null implementations
-            .AddSingleton<IForgeConnectivity, FakeForgeConnectivity>()
+            .AddSingleton<IForgeClientConnectivity, FakeForgeConnectivity>()
 
             .AddSingleton<INetworkMessageSerializerManager, NetworkMessageSerializerManager>()
             .AddSingleton<INetworkMessageProcessorFactory, NetworkMessageProcessorFactory>()

@@ -5,7 +5,7 @@
 }
 
 .topbar-wrapper .link:after {
-   content: 'Mithril Shard WEB APIs';
+   content: 'Mithril Shard Web API';
    color: #fff;
    visibility: visible;
    display: block;

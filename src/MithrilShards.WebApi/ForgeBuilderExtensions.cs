@@ -137,6 +137,14 @@ namespace MithrilShards.Core.Forge
                   {
                      var tempServiceProvider = services.BuildServiceProvider();
                      var logger = tempServiceProvider.GetService<ILogger<WebApiShard>>();
+                     var webApiSettings = tempServiceProvider.GetService<IOptions<WebApiSettings>>()!.Value;
+
+
+                     if (!webApiSettings.Enabled)
+                     {
+                        logger.LogDebug("Web API services disabled, skipping Initialization.");
+                        return;
+                     }
 
                      IEnumerable<Assembly> assembliesToInspect = tempServiceProvider.GetService<IEnumerable<IMithrilShard>>()!
                      .Select(shard => shard.GetType().Assembly)
@@ -229,10 +237,16 @@ namespace MithrilShards.Core.Forge
 
       private static void SwaggerConfiguration(IApplicationBuilder app, WebApiOptions options)
       {
-         IEnumerable<ApiServiceDefinition> apiServiceDefinitions = app.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>()!;
          var logger = app.ApplicationServices.GetService<ILogger<WebApiShard>>()!;
-
          var webApiSettings = app.ApplicationServices.GetService<IOptions<WebApiSettings>>()!.Value;
+
+         if (!webApiSettings.Enabled)
+         {
+            logger.LogDebug("Web API services disabled, skipping SwaggerConfiguration.");
+            return;
+         }
+
+         IEnumerable<ApiServiceDefinition> apiServiceDefinitions = app.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>()!;
 
          app
             .UseRouting()

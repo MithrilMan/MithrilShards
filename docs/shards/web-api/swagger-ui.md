@@ -5,7 +5,7 @@ description: Mithril Shards, WebApiShard, Using Swagger UI
 
 --8<-- "refs.txt"
 
-[Swagger UI](https://swagger.io/tools/swagger-ui/){:target="_blank"} allows to visualize and interact with the WEB Api resources generated from OpenAPI toolset.  
+[Swagger UI](https://swagger.io/tools/swagger-ui/){:target="_blank"} allows to visualize and interact with the Web API resources generated from OpenAPI toolset.  
 WebApiShard makes use of it and thus we can have a nice UI to test and document our API.
 
 As stated in [ApiServiceDefinition] section, each area generates a different OpenAPI document and we can use tool like Swagger UI to convert that specification to turn that document into an UI that allows us to test and read documentation about our exposed API resources.

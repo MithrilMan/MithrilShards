@@ -22,7 +22,7 @@ namespace MithrilShards.Example.Network.Client
                                 IEventBus eventBus,
                                 IOptions<ExampleSettings> options,
                                 IConnectivityPeerStats serverPeerStats,
-                                IForgeConnectivity forgeConnectivity,
+                                IForgeClientConnectivity forgeConnectivity,
                                 IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
       {
          _settings = options.Value!;

@@ -4,7 +4,7 @@ description: Mithril Shards, WebApiShard Overview
 ---
 --8<-- "refs.txt"
 
-WebApiShard is an important shard that allows to expose Web API(s) endpoints based on [OpeAPI specifications](https://swagger.io/specification/){:target="_blank"}.
+WebApiShard is an important shard that allows to expose Web API endpoints based on [OpeAPI specifications](https://swagger.io/specification/){:target="_blank"}.
 
 [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore){:target="_blank"} is used under the hood and you can find more technical information about OpenAPI, REST APIs and Swagger concepts on [microsoft documentation](https://docs.microsoft.com/it-it/aspnet/core/tutorials/web-api-help-pages-using-swagger?view=aspnetcore-5.0){:target="_blank"}.
 
@@ -16,7 +16,7 @@ To add the shard to the forge, the `IForgeBuilder` extension `UseApi` has to be 
 public static IForgeBuilder UseApi(this IForgeBuilder forgeBuilder, Action<WebApiOptions>? options = null)
 ```
 
-WebApiShard implements the WEB API controllers using the standard aspnet [ControllerBase](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.controllerbase?view=aspnetcore-5.0){:target="_blank"} class but decorates it with a set of default attributes needed to expose these controllers in the right context.
+WebApiShard implements the Web API controllers using the standard aspnet [ControllerBase](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.controllerbase?view=aspnetcore-5.0){:target="_blank"} class but decorates it with a set of default attributes needed to expose these controllers in the right context.
 To create a proper WebApiShard controller, an abstract base class `MithrilControllerBase` exists that applies already the required attributes.
 
 ```c#
@@ -31,7 +31,7 @@ By default two areas are defined but custom areas can be created easily.
 
 ```c#
 /// <summary>
-/// Placeholder to define known core WEB API areas.
+/// Placeholder to define known core Web API areas.
 /// This class may be extended to add more const for 3rd party areas.
 /// </summary>
 public abstract class WebApiArea

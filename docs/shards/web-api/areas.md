@@ -1,6 +1,6 @@
 ---
-title: WEB API Areas
-description: Mithril Shards, WebApiShard, WEB API Areas
+title: Web API Areas
+description: Mithril Shards, WebApiShard, Web API Areas
 ---
 
 --8<-- "refs.txt"
@@ -12,7 +12,7 @@ By default two areas are defined:
 
 ```c#
 /// <summary>
-/// Placeholder to define known core WEB API areas.
+/// Placeholder to define known core Web API areas.
 /// This class may be extended to add more const for 3rd party areas.
 /// </summary>
 public abstract class WebApiArea

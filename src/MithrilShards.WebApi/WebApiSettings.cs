@@ -19,7 +19,7 @@ namespace MithrilShards.WebApi
       public bool Enabled { get; set; } = true;
 
       /// <summary>
-      /// Gets or sets a value indicating whether WEB APIs should be exposed on HTTPS.
+      /// Gets or sets a value indicating whether Web API should be exposed on HTTPS.
       /// </summary>
       /// <value>
       ///   <c>true</c> if using HTTPS; otherwise, <c>false</c>.

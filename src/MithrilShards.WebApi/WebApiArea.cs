@@ -1,7 +1,7 @@
 ﻿namespace MithrilShards.WebApi
 {
    /// <summary>
-   /// Placeholder to define known core WEB API areas.
+   /// Placeholder to define known core Web API areas.
    /// This class may be extended to add more const for 3rd party areas.
    /// </summary>
    public abstract class WebApiArea

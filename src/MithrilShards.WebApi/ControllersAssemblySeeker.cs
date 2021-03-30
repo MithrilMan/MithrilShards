@@ -6,7 +6,7 @@ namespace MithrilShards.WebApi
 {
    /// <summary>
    /// Class used to discover Controllers in assembly that aren't exposed by a Shard and have controllers that
-   /// have to be added to a WEB API service.
+   /// have to be added to a Web API service.
    /// </summary>
    public class ControllersAssemblySeeker
    {

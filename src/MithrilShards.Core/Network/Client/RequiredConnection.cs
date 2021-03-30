@@ -31,7 +31,7 @@ namespace MithrilShards.Core.Network.Client
                                 IEventBus eventBus,
                                 IOptions<ForgeConnectivitySettings> options,
                                 IConnectivityPeerStats serverPeerStats,
-                                IForgeConnectivity forgeConnectivity,
+                                IForgeClientConnectivity forgeConnectivity,
                                 IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
       {
          _settings = options.Value!;

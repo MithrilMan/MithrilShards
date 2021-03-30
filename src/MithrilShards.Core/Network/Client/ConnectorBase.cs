@@ -12,7 +12,7 @@ namespace MithrilShards.Core.Network.Client
       protected ILogger logger;
       protected IEventBus eventBus;
       protected readonly IConnectivityPeerStats peerStats;
-      protected readonly IForgeConnectivity forgeConnectivity;
+      protected readonly IForgeClientConnectivity forgeConnectivity;
       protected readonly IPeriodicWork connectionLoop;
 
       protected IConnectionManager? connectionManager;
@@ -22,7 +22,7 @@ namespace MithrilShards.Core.Network.Client
       public ConnectorBase(ILogger logger,
                            IEventBus eventBus,
                            IConnectivityPeerStats serverPeerStats,
-                           IForgeConnectivity forgeConnectivity,
+                           IForgeClientConnectivity forgeConnectivity,
                            IPeriodicWork connectionLoop)
       {
          this.logger = logger;

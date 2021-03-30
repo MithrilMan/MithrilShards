@@ -17,7 +17,6 @@ namespace MithrilShards.Example.Node
    {
       static async Task Main(string[] args)
       {
-
          // Create a root command with some options
          var rootCommand = new RootCommand {
             new Option<string>(
@@ -43,7 +42,7 @@ namespace MithrilShards.Example.Node
             await new ForgeBuilder()
               .UseForge<DefaultForge>(args, settings)
               .UseSerilog(logSettings)
-              .UseBedrockForgeServer<ExampleNetworkProtocolMessageSerializer>()
+              .UseBedrockNetwork<ExampleNetworkProtocolMessageSerializer>()
               .UseStatisticsCollector(options => options.DumpOnConsoleOnKeyPress = true)
               /// we are injecting ExampleDev type to allow <see cref="MithrilShards.WebApi.WebApiShard"/> to find all the controllers
               /// defined there because only controllers defined in an included shard assemblies are discovered automatically.

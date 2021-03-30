@@ -32,7 +32,7 @@ Also if you have question or want to discuss about technical details, you can us
 **Bitcoin Mithril Shard** has been built on top of **Mithril Shards** framework.
 Mithril Shards goal is to be a framework and toolkit to build *<u>modular and distributed/P2P applications using .Net 5</u>* stack, focusing both on good design, good practices and performance.
 
-Core functionalities can be glued togheter to compose the needed application, ranging from a P2P network layer, WEB Api layer, Diagnostic tools, cross platform UI based on blazor, distributed eventing using SignalR, MQ brokers like RabbitMq or any kind of other useful libraries.
+Core functionalities can be glued togheter to compose the needed application, ranging from a P2P network layer, Web Api layer, Diagnostic tools, cross platform UI based on blazor, distributed eventing using SignalR, MQ brokers like RabbitMq or any kind of other useful libraries.
 
 Thanks to its design, anyone can build it's own Shard to create other features that can be used by Mithril Shards community.
 
@@ -44,7 +44,7 @@ Bitcoin shard is a very good example about how to build a fully functional full 
   Data is serialized thanks to an well defined set of interfaces and classes that allows to implement an easy to read and maintain code.
 - Incoming messages are dispatched to "Message Processors" that allow to handle the application logic following a good practice of separation of concerns.
 - Meaningful events are dispatched using a *message bus* implementation that can reach any component in any application layer.
-- A WEB Api infrastructure allow to create WEB Api endpoint easily and each feature can have its set of API published on different document specifications.
+- A Web API infrastructure allow to create Web API endpoint easily and each feature can have its set of API published on different document specifications.
   Swagger is used as a UI to expose these API documents and allows to execute these APIs straight from that interface.
 - For development/debugging purpose, a Shard inject some useful endpoint to inspect internal details of the running application.
 - Logging is done using structured logging, makes use of Serilog to persist them and a configuration example shows how to use [Seq](https://datalust.co/seq){:target="_blank"} to have a very good UI to view logs, filter them, etc...
