@@ -129,8 +129,6 @@ namespace MithrilShards.Core.Forge
          where TMithrilShardSettingsValidator : class, IValidateOptions<TMithrilShardSettings>
       {
 
-         AddShard<TMithrilShard>(configureDelegate, preBuildAction);
-
          //register shard configuration settings
          _hostBuilder.ConfigureServices((context, services) =>
          {
@@ -144,24 +142,10 @@ namespace MithrilShards.Core.Forge
             //register the shard configuration setting as IMithrilShardSettings in order to allow DefaultConfigurationWriter to write default its default values
             services.AddSingleton<IMithrilShardSettings, TMithrilShardSettings>();
 
-            //services.AddSingleton<IMithrilShardSettings>(container =>
-            //{
-            //   try
-            //   {
-            //      return container.GetService<IOptions<TMithrilShardSettings>>()!.Value;
-            //   }
-            //   catch (OptionsValidationException ex)
-            //   {
-            //      foreach (var validationFailure in ex.Failures)
-            //      {
-            //         _logger.LogError("Configuration problem in '{MithrilShardSettings}': {WrongSetting}", ex.OptionsName, validationFailure);
-            //      }
-
-            //      throw;
-            //   }
-            //});
-
+            context.SetShardSettings<TMithrilShardSettings>(services);
          });
+
+         AddShard<TMithrilShard>(configureDelegate, preBuildAction);
 
          return this;
       }
@@ -174,16 +158,16 @@ namespace MithrilShards.Core.Forge
       {
          _ = configureDelegate ?? throw new ArgumentNullException(nameof(configureDelegate));
 
-         if (preBuildAction != null)
-         {
-            _preBuildActions.Add(preBuildAction);
-         }
-
          _hostBuilder.ConfigureServices((context, services) =>
          {
             services.AddSingleton<IMithrilShard, TMithrilShard>();
             configureDelegate(context, services);
          });
+
+         if (preBuildAction != null)
+         {
+            _preBuildActions.Add(preBuildAction);
+         }
 
          return this;
       }

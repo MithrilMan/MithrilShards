@@ -18,5 +18,5 @@ Current available controllers are [PeerManagementController](#PeerManagementCont
 This controller exposes actions useful to connect or disconnect from a specific peer.  
 It leverages `RequiredConnection` service whose task is to periodically try to connect to a issued list of peers.
 
-The list of peers can be issued both by Connect API or by configuration file using the `Connect` property of `ForgeConnectivitySettings` settings, used by [BedrockForgeConnectivityShard].
+The list of peers can be issued both by Connect API or by configuration file using the `Connect` property of `ForgeConnectivitySettings` settings, used by [BedrockNetworkShard].
 

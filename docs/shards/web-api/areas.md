@@ -51,25 +51,18 @@ It contains an `Enabled` property used to enable or disable that specific area a
 [DevControllerShard] code shows an example of how to register an area during the shard registration:
 
 ```c#
-forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>((hostBuildContext, services) =>
+forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>((context, services) =>
 {
-   services.AddSingleton<ApiServiceDefinition>(sp =>
+   if (context.GetShardSettings<DevControllerSettings>()!.Enabled)
    {
-      var settings = sp.GetService<IOptions<DevControllerSettings>>()!.Value;
-
-      var definition = new ApiServiceDefinition
+      services.AddApiServiceDefinition(new ApiServiceDefinition
       {
-         Enabled = settings.Enabled,
          Area = WebApiArea.AREA_DEV,
          Name = "Dev API",
          Description = "API useful for debug purpose.",
          Version = "v1",
-      };
-
-      forgeBuilder.AddApiService(definition);
-
-      return definition;
-   });
+      });
+   }
 });
 ```
 
@@ -86,11 +79,38 @@ In this example you can see that `Area` is set to `WebApiArea.AREA_DEV` that's s
 
 The process to create a custom area is the same as the one shown in the example above, the only difference is the `Area` value, that can be any string.
 
+If we want to create an area named "area51" and be available for controllers defined in our shards or a 3rd party shards, we can register such area by creating a new ApiServiceDefinition instance and register it using AddApiServiceDefinition:
+
+```c#
+forgeBuilder.AddShard<YourShard, YourShardSettings>((context, services) =>
+{
+   if (context.GetShardSettings<YourShardSettings>()!.Enabled)
+   {
+      services.AddApiServiceDefinition(new ApiServiceDefinition
+      {
+         Enabled = true,
+         Area = "area51",
+         Name = "Area 51 - trust no one!",
+         Description = "Nothing to see here...",
+         Version = "v1",
+      });
+   }
+});
+```
+
+The example above implies that YourShardSettings has a `Enabled` boolean property that describes if the shard has to generate or not an ApiServiceDefinition. You are free to skip that check if you want to have an area always defined and/or want to tweak the ApiServiceDefinition Enabled property at runtime based on some custom conditions.
+
+!!! note
+	An ApiServiceDefinition can be enabled or disabled at runtime by changing its `Enabled` property.  
+	Registering an area implicitly generates its OpenAPI document, but access to its API are controlled by its Enabled property.
+
+
+
 In order to have controllers assigned to such area, a controller has to be decorated with an Area attribute like in this example:
 
 ```c#
-[Area(WebApiArea.AREA_DEV)]
-public class PeerManagementController : MithrilControllerBase
+[Area("area51")]
+public class YourAreaController : MithrilControllerBase
 ```
 
 You can find more information on controller creation in the [Creating a Controller] section.

@@ -28,38 +28,6 @@ namespace MithrilShards.Core.Forge
       private const string SWAGGER_ROUTE_PREFIX = "docs";
 
       /// <summary>
-      /// Extension used by other shards to create custom <see cref="ApiServiceDefinition" />.
-      /// </summary>
-      /// <param name="forgeBuilder">The forge builder.</param>
-      /// <param name="apiServiceDefinition">The API service definition.</param>
-      /// <returns></returns>
-      public static IForgeBuilder AddApiService(this IForgeBuilder forgeBuilder, ApiServiceDefinition apiServiceDefinition)
-      {
-         if (forgeBuilder is null) ThrowHelper.ThrowArgumentException(nameof(forgeBuilder));
-
-         forgeBuilder.ConfigureContext(context =>
-         {
-            string key = nameof(ApiServiceDefinition);
-
-            List<ApiServiceDefinition> apiServiceDefinitions;
-
-            if (context.Properties.TryGetValue(key, out object? item))
-            {
-               apiServiceDefinitions = item as List<ApiServiceDefinition> ?? new List<ApiServiceDefinition>();
-            }
-            else
-            {
-               apiServiceDefinitions = new List<ApiServiceDefinition>();
-            }
-
-            apiServiceDefinitions.Add(apiServiceDefinition);
-            context.Properties[key] = apiServiceDefinitions;
-         });
-
-         return forgeBuilder;
-      }
-
-      /// <summary>
       /// Uses the bitcoin chain.
       /// </summary>
       /// <param name="forgeBuilder">The forge builder.</param>
@@ -75,27 +43,114 @@ namespace MithrilShards.Core.Forge
          {
             if (optionsInstance.EnablePublicApi)
             {
-               services.AddSingleton<ApiServiceDefinition>(sp =>
+               services.AddApiServiceDefinition(new ApiServiceDefinition
                {
-                  var settings = sp.GetService<IOptions<WebApiSettings>>()!.Value;
-
-                  var definition = new ApiServiceDefinition
-                  {
-                     Enabled = settings.Enabled,
-                     Area = WebApiArea.AREA_API,
-                     Name = "API",
-                     Description = optionsInstance.PublicApiDescription,
-                     Version = "v1",
-                  };
-
-                  forgeBuilder.AddApiService(definition);
-
-                  return definition;
+                  Enabled = context.GetShardSettings<WebApiSettings>()!.Enabled,
+                  Area = WebApiArea.AREA_API,
+                  Name = "API",
+                  Description = optionsInstance.PublicApiDescription,
+                  Version = "v1",
                });
             }
-         }, preBuildAction: (iHostBuilder) =>
+         }, preBuildAction: (hostBuilder) =>
          {
-            iHostBuilder.ConfigureWebHost(configure =>
+
+            hostBuilder.ConfigureServices((context, services) =>
+            {
+               var tempServiceProvider = services.BuildServiceProvider();
+               var logger = tempServiceProvider.GetService<ILogger<WebApiShard>>();
+
+               if (!context.GetShardSettings<WebApiSettings>()!.Enabled)
+               {
+                  logger.LogDebug("Web API services disabled, skipping Initialization.");
+                  return;
+               }
+
+               IEnumerable<Assembly> assembliesToInspect = tempServiceProvider.GetService<IEnumerable<IMithrilShard>>()!
+               .Select(shard => shard.GetType().Assembly)
+               .Concat(optionsInstance.Seeker.GetAssemblies());
+
+               IEnumerable<ApiServiceDefinition> apiServiceDefinitions = tempServiceProvider.GetService<IEnumerable<ApiServiceDefinition>>()!;
+
+               services
+                  .AddRouting()
+                  .AddSwaggerGen(setup =>
+                  {
+                     logger.LogDebug("Configuring WEB API services.");
+
+                     setup.OperationFilter<AuthResponsesOperationFilter>();
+
+                     var documentFilterMethod = setup.GetType().GetMethod("DocumentFilter");
+                     foreach (var apiServiceDefinition in apiServiceDefinitions)
+                     {
+                        setup.SwaggerDoc(
+                           $"{apiServiceDefinition.Area}-{apiServiceDefinition.Version}",
+                           new OpenApiInfo
+                           {
+                              Title = apiServiceDefinition.Name,
+                              Version = $"{apiServiceDefinition.Area}-{apiServiceDefinition.Version}",
+                              Description = apiServiceDefinition.Description
+                           });
+
+                        setup.DocInclusionPredicate((x, api) =>
+                        {
+                           // actually version number isn't considered
+                           var parts = x.Split("-");
+                           return parts[0] == api.GroupName;
+                        });
+
+                        foreach (IDocumentFilter documentFilter in apiServiceDefinition.DocumentFilters)
+                        {
+                           documentFilterMethod!.MakeGenericMethod(documentFilter.GetType()).Invoke(setup, null);
+                           //apiServiceDefinition.SwaggerGenConfiguration?.Invoke(setup);
+                           logger.LogDebug("Added document filter type {DocumentFilterType}.", documentFilter.GetType());
+                        }
+                     }
+
+                     /// Adds XML documentation to swagger in order to produce a better documentation on swagger UI.
+                     /// Can work only if the assembly has been compiled with the option to generate the XML documentation file
+                     /// and the xml file name is the same as the assembly name (except the extension).
+                     foreach (Assembly assembly in assembliesToInspect)
+                     {
+                        var xmlFile = $"{assembly.GetName().Name}.xml";
+                        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                        if (File.Exists(xmlPath))
+                        {
+                           setup.IncludeXmlComments(xmlPath);
+                        }
+                        else
+                        {
+                           logger.LogTrace("Cannot find API documentation file {ApiDocumentationPath}", xmlPath);
+                        }
+                     }
+                  });
+
+               var mvcBuilder = services
+                  .AddControllers(configure =>
+                  {
+                     // adding filters to consume and produce json and to disable controllers that don't belong to an Area
+                     configure.Filters.Add(new ConsumesAttribute("application/json"));
+                     configure.Filters.Add(new ProducesAttribute("application/json"));
+                     configure.Filters.Add<DisableByEndPointActionFilterAttribute>();
+
+                     configure.Conventions.Add(new ApiExplorerGroupPerVersionConvention());
+                  })
+                  .AddJsonOptions(options =>
+                  {
+                     options.JsonSerializerOptions.WriteIndented = true;
+                     options.JsonSerializerOptions.IgnoreNullValues = true;
+                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                  });
+
+               // creates application part for each shard and assembly containing controllers.
+               foreach (Assembly assembly in assembliesToInspect)
+               {
+                  mvcBuilder.AddApplicationPart(assembly);
+               }
+
+            });
+
+            hostBuilder.ConfigureWebHost(configure =>
             {
                configure
                   .UseKestrel(serverOptions =>
@@ -131,101 +186,6 @@ namespace MithrilShards.Core.Forge
                         string rootUrl = webApiSettings.GetListeningUrl();
                         string apiUrl = $"{rootUrl}/{SWAGGER_ROUTE_PREFIX}";
                         logger.LogInformation("Configured WEB API listener to {ApiEndPoint}. Swagger documentation at URL {SwaggerEndPoint}", rootUrl, apiUrl);
-                     }
-                  })
-                  .ConfigureServices(services =>
-                  {
-                     var tempServiceProvider = services.BuildServiceProvider();
-                     var logger = tempServiceProvider.GetService<ILogger<WebApiShard>>();
-                     var webApiSettings = tempServiceProvider.GetService<IOptions<WebApiSettings>>()!.Value;
-
-
-                     if (!webApiSettings.Enabled)
-                     {
-                        logger.LogDebug("Web API services disabled, skipping Initialization.");
-                        return;
-                     }
-
-                     IEnumerable<Assembly> assembliesToInspect = tempServiceProvider.GetService<IEnumerable<IMithrilShard>>()!
-                     .Select(shard => shard.GetType().Assembly)
-                     .Concat(optionsInstance.Seeker.GetAssemblies());
-
-                     IEnumerable<ApiServiceDefinition> apiServiceDefinitions = tempServiceProvider.GetService<IEnumerable<ApiServiceDefinition>>()!;
-
-                     services
-                        .AddRouting()
-                        .AddSwaggerGen(setup =>
-                        {
-                           logger.LogDebug("Configuring WEB API services.");
-
-                           setup.OperationFilter<AuthResponsesOperationFilter>();
-
-                           var documentFilterMethod = setup.GetType().GetMethod("DocumentFilter");
-                           foreach (var apiServiceDefinition in apiServiceDefinitions)
-                           {
-                              setup.SwaggerDoc(
-                                 $"{apiServiceDefinition.Area}-{apiServiceDefinition.Version}",
-                                 new OpenApiInfo
-                                 {
-                                    Title = apiServiceDefinition.Name,
-                                    Version = $"{apiServiceDefinition.Area}-{apiServiceDefinition.Version}",
-                                    Description = apiServiceDefinition.Description
-                                 });
-
-                              setup.DocInclusionPredicate((x, api) =>
-                              {
-                                 // actually version number isn't considered
-                                 var parts = x.Split("-");
-                                 return parts[0] == api.GroupName;
-                              });
-
-                              foreach (IDocumentFilter documentFilter in apiServiceDefinition.DocumentFilters)
-                              {
-                                 documentFilterMethod!.MakeGenericMethod(documentFilter.GetType()).Invoke(setup, null);
-                                 //apiServiceDefinition.SwaggerGenConfiguration?.Invoke(setup);
-                                 logger.LogDebug("Added document filter type {DocumentFilterType}.", documentFilter.GetType());
-                              }
-                           }
-
-                           /// Adds XML documentation to swagger in order to produce a better documentation on swagger UI.
-                           /// Can work only if the assembly has been compiled with the option to generate the XML documentation file
-                           /// and the xml file name is the same as the assembly name (except the extension).
-                           foreach (Assembly assembly in assembliesToInspect)
-                           {
-                              var xmlFile = $"{assembly.GetName().Name}.xml";
-                              var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                              if (File.Exists(xmlPath))
-                              {
-                                 setup.IncludeXmlComments(xmlPath);
-                              }
-                              else
-                              {
-                                 logger.LogTrace("Cannot find API documentation file {ApiDocumentationPath}", xmlPath);
-                              }
-                           }
-                        });
-
-                     var mvcBuilder = services
-                        .AddControllers(configure =>
-                        {
-                           // adding filters to consume and produce json and to disable controllers that don't belong to an Area
-                           configure.Filters.Add(new ConsumesAttribute("application/json"));
-                           configure.Filters.Add(new ProducesAttribute("application/json"));
-                           configure.Filters.Add<DisableByEndPointActionFilterAttribute>();
-
-                           configure.Conventions.Add(new ApiExplorerGroupPerVersionConvention());
-                        })
-                        .AddJsonOptions(options =>
-                        {
-                           options.JsonSerializerOptions.WriteIndented = true;
-                           options.JsonSerializerOptions.IgnoreNullValues = true;
-                           options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                        });
-
-                     // creates application part for each shard and assembly containing controllers.
-                     foreach (Assembly assembly in assembliesToInspect)
-                     {
-                        mvcBuilder.AddApplicationPart(assembly);
                      }
                   })
                   .Configure(app => SwaggerConfiguration(app, optionsInstance));

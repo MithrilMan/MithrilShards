@@ -103,8 +103,8 @@ nav:
     - mithril-shards/forge-builder.md
     - mithril-shards/default-forge.md
   - Shards:
-     - BedrockForgeConnectivity:
-       - shards/bedrock-forge-connectivity/index.md
+     - BedrockNetwork:
+       - shards/bedrock-network/index.md
      - Serilog:
        -  shards/serilog/index.md
      - WebApi:

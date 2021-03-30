@@ -9,9 +9,10 @@
 [WebApiShard]: /shards/web-api
 [WebApiSettings]: /shards/web-api/using-webapishard#webapisettings
 [ApiServiceDefinition]: /shards/web-api/areas#apiservicedefinition
-[Creating a Controller]: /shards/web-api/areas#creating-a-controller
-[Using Swagger UI]: /shards/web-api/areas#using-swagger-ui
+[Web API Areas]: /shards/web-api/areas
+[Creating a Controller]: /shards/web-api/creating-a-controller
+[Using Swagger UI]: /shards/web-api/using-swagger-ui
 
 [DevControllerShard]: /shards/dev-controller/
 
-[BedrockForgeConnectivityShard]: /shards/bedrock-forge-connectivity/
+[BedrockNetworkShard]: /shards/bedrock-network/

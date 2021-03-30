@@ -1,8 +1,4 @@
-﻿using System.Net;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using MithrilShards.Core;
-using MithrilShards.Core.Forge;
+﻿using MithrilShards.Core.Forge;
 using MithrilShards.WebApi;
 
 namespace MithrilShards.Dev.Controller
@@ -17,27 +13,19 @@ namespace MithrilShards.Dev.Controller
       /// <returns></returns>
       public static IForgeBuilder UseDevController(this IForgeBuilder forgeBuilder)
       {
-         forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>(
-            (hostBuildContext, services) =>
+         forgeBuilder.AddShard<DevControllerShard, DevControllerSettings>((context, services) =>
+         {
+            if (context.GetShardSettings<DevControllerSettings>()!.Enabled)
             {
-               services.AddSingleton<ApiServiceDefinition>(sp =>
+               services.AddApiServiceDefinition(new ApiServiceDefinition
                {
-                  var settings = sp.GetService<IOptions<DevControllerSettings>>()!.Value;
-
-                  var definition = new ApiServiceDefinition
-                  {
-                     Enabled = settings.Enabled,
-                     Area = WebApiArea.AREA_DEV,
-                     Name = "Dev API",
-                     Description = "API useful for debug purpose.",
-                     Version = "v1",
-                  };
-
-                  forgeBuilder.AddApiService(definition);
-
-                  return definition;
+                  Area = WebApiArea.AREA_DEV,
+                  Name = "Dev API",
+                  Description = "API useful for debug purpose.",
+                  Version = "v1",
                });
-            });
+            }
+         });
 
          return forgeBuilder;
       }

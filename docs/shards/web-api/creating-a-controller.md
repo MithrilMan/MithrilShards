@@ -49,7 +49,8 @@ WebApiArea is an helper class that just contains a bounch of constant string of 
 
 There are some Controllers that are available out of the box when you use Mithril Shards features, an example is [SerilogShard] that includes SeriLogController that allows to control Log filters at runtime and it's exposed in the "api" area, while many more Controllers are exposed in "dev" area like the ones included by [DevControllerShard].
 
-
+!!! tip
+	You can create custom areas, for more information see [Web API Areas] documentation.
 
 ### Declare controller Type
 

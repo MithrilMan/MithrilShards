@@ -31,14 +31,14 @@ Without going too deeper into documenting the UI (there are a lot of resources o
 
 It's a combo box that allows you to select one of the [ApiServiceDefinition] defined area that are currently enabled.
 In this example we have selected API that corresponds to our `WebApiArea.API` (or simply "api") area defined by WebApiShard itself.  
-You can see another option, DEV Api, that corresponds to the `WebApiArea.DEV` (or simply "dev") area defined by [DevControllerShard].
+You can see another option, DEV API, that corresponds to the `WebApiArea.DEV` (or simply "dev") area defined by [DevControllerShard].
 
 !!! note
   	The displayed name corresponds to ApiServiceDefinition `Name` property.
 
 ### OpenAPI document URL
 
-It's the url of the selected OpenAPI document.  
+It's the URL of the selected OpenAPI document.  
 It can be used to generate RESTful clients with tools like [AutoRest](https://github.com/Azure/autorest){:target="_blank"}.
 
 ### Search Box
@@ -54,7 +54,7 @@ By clicking on an API entry, it's possible to execute it by clicking on `Try it 
 !!! note
 	It is possible to provide examples and more documentation by using C# XML comments, you can find more information in the section [Include Descriptions](https://github.com/domaindrivendev/Swashbuckle.AspNetCore#include-descriptions-from-xml-comments){:target="_blank"} from XML Comments on Swashbuckle.AspNetCore repository or by looking at the `ExampleController` source code in the MithrilShards.Example.Dev project.
 
-The screenshot above shows the AddQuote action in the [example project] and it has been fully documented:
+The screenshot above shows the `AddQuote` action in the [example project] and it has been fully documented:
 
 ```c#
 /// <summary>

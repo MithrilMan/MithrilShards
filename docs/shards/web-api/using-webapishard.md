@@ -69,7 +69,7 @@ It contains few properties to configure the endpoint used to listen to API reque
 
 
 
-Configuration properties can be set in the application configuartion file, within its root section, under the name of `WebApi`
+Configuration properties can be set in the application configuration file, within its root section, under the name of `WebApi`
 
 !!! note
 	every shard configuration section is mapped by default to the name of the configuration setting class, stripping out the `Settings` part
