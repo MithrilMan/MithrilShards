@@ -29,28 +29,29 @@ theme:
       #- navigation.tabs
       #- navigation.tabs.sticky # for insiders only
       - navigation.indexes # for insiders only
-      - navigation.top # for insiders only
+      - navigation.top
+      - navigation.expand
       #- header.autohide
       #- toc.integrate
 
     palette:
       # Light mode
       - media: "(prefers-color-scheme: light)"
-        scheme: slate
-        primary: deep orange
+        scheme: default
+        primary: blue grey
         accent: indigo
         toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
+          icon: material/toggle-switch-off-outline
+          name: Switch to dark mode
 
       # Dark mode
       - media: "(prefers-color-scheme: dark)"
         scheme: slate
-        primary: blue
-        accent: blue
+        primary: deep orange
+        accent: indigo
         toggle:
-        icon: material/weather-sunny
-        name: Switch to light mode
+          icon: material/toggle-switch
+          name: Switch to light mode
 
 
 markdown_extensions:
