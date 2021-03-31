@@ -30,7 +30,7 @@ theme:
       #- navigation.tabs.sticky # for insiders only
       - navigation.indexes # for insiders only
       - navigation.top
-      - navigation.expand
+      #- navigation.expand
       #- header.autohide
       #- toc.integrate
 
@@ -73,6 +73,8 @@ markdown_extensions:
       noclasses: false #set to true to enable pygments_style option
       pygments_style: 'vs'
   - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -101,23 +103,25 @@ nav:
   - index.md
   - Mithril Shards Core:
     - mithril-shards/index.md
+    - mithril-shards/shards.md
     - mithril-shards/forge-builder.md
     - mithril-shards/default-forge.md
   - Shards:
-     - BedrockNetwork:
-       -  shards/bedrock-network/index.md
-     - Serilog:
-       -  shards/serilog/index.md
-     - WebApi:
-       -  shards/web-api/index.md
-       -  shards/web-api/using-webapishard.md
-       -  shards/web-api/areas.md
-       -  shards/web-api/creating-a-controller.md
-       -  shards/web-api/swagger-ui.md
-     - DevController:
-       -  shards/dev-controller/index.md
-     - Bitcoin:
-       - shards/bitcoin/index.md
-       - shards/bitcoin/network.md
-       - shards/bitcoin/testing_node_communication.md
+    - BedrockNetwork:
+      -  shards/bedrock-network/index.md
+    - Serilog:
+      -  shards/serilog/index.md
+    - WebApi:
+      -  shards/web-api/index.md
+      -  shards/web-api/using-webapishard.md
+      -  shards/web-api/areas.md
+      -  shards/web-api/creating-a-controller.md
+      -  shards/web-api/swagger-ui.md
+    - DevController:
+      -  shards/dev-controller/index.md
+    - Bitcoin:
+      - shards/bitcoin/index.md
+      - shards/bitcoin/network.md
+      - shards/bitcoin/testing_node_communication.md
+  - Example Projects: example-projects/index.md
   - Issue Tracker: 'https://github.com/MithrilMan/MithrilShards/issues'

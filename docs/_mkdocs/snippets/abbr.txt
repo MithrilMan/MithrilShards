@@ -1,5 +1,4 @@
 *[API]: Application Program Interface
-*[API]: Application Program Interface
 *[DLT]: Distributed Ledger Technology
 *[FN]: Full Node
 *[MQ]: Message Queue
@@ -7,3 +6,4 @@
 *[UI]: User Interface
 *[JSON]: JavaScript Object Notation
 *[URL]: Uniform Resource Locator
+*[CLI]: Command Line Interface
