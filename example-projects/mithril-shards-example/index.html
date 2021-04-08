@@ -834,6 +834,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#handling-the-pingmessage" class="md-nav__link">
+    Handling the PingMessage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#handling-the-pongmessage" class="md-nav__link">
+    Handling the PongMessage
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1104,6 +1118,20 @@
           <li class="md-nav__item">
   <a href="#constructor" class="md-nav__link">
     Constructor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#handling-the-pingmessage" class="md-nav__link">
+    Handling the PingMessage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#handling-the-pongmessage" class="md-nav__link">
+    Handling the PongMessage
   </a>
   
 </li>
@@ -1717,6 +1745,82 @@ In our example we uses this information to start a periodic task that ensures th
 <span class="p">}</span>
 </code></pre></div>
 </td></tr></table>
+<p>The call to <code>DisconnectIfAsync</code> within PingAsync method, ensures that if the other peers doesn't reply to us with a proper pong messages, we disconnect from the remote peer.<br />
+The action passed to DisconnectIfAsync gets evaluated when the time specified by <code>TimeSpan.FromSeconds(TIMEOUT_INTERVAL)</code> elapses.<br />
+Current status of our processor is held in the inner Status class, when we call its PingSent we are resetting the PingResponseTime to 0.<br />
+When we receive a pong message PingResponseTime  is set to a value and thus when the timeout elapses we are expected to find a value if the peer replied, or 0 if it didn't (and thus disconnect the peer).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This logic to works requires that TIMEOUT_INTERVAL is lower than PING_INTERVAL.</p>
+</div>
+<h4 id="handling-the-pingmessage">Handling the PingMessage</h4>
+<p>As we saw earlier, we declared that the class was implementing INetworkMessageHandler<PingMessage>, this mean that we have to implement its ProcessMessageAsync where we can put our logic to handle the ping message:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="n">ValueTask</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">INetworkMessageHandler</span><span class="p">&lt;</span><span class="n">PingMessage</span><span class="p">&gt;.</span><span class="n">ProcessMessageAsync</span><span class="p">(</span><span class="n">PingMessage</span> <span class="n">message</span><span class="p">,</span> <span class="n">CancellationToken</span> <span class="n">cancellation</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="k">await</span> <span class="nf">SendMessageAsync</span><span class="p">(</span><span class="k">new</span> <span class="n">PongMessage</span>
+   <span class="p">{</span>
+      <span class="n">PongFancyResponse</span> <span class="p">=</span> <span class="k">new</span> <span class="n">PongFancyResponse</span>
+      <span class="p">{</span>
+         <span class="n">Nonce</span> <span class="p">=</span> <span class="n">message</span><span class="p">.</span><span class="n">Nonce</span><span class="p">,</span>
+         <span class="n">Quote</span> <span class="p">=</span> <span class="n">_quoteService</span><span class="p">.</span><span class="n">GetRandomQuote</span><span class="p">()</span>
+      <span class="p">}</span>
+   <span class="p">}).</span><span class="n">ConfigureAwait</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+
+   <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>This method is pretty simple, it just sends an async PongMessage, returning the original ping Nonce and a random quote picked from the IQuoteService implementation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In this example, ProcessMessageAsync has been implemented as an <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/interfaces/explicit-interface-implementation" target="_blank">explicit implementation of the interface</a>, this allows us to hide these methods from the publicly available methods of the type.</p>
+</div>
+<h4 id="handling-the-pongmessage">Handling the PongMessage</h4>
+<p>Similarly to the PingMessage handler, we implements PongMessage:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="n">ValueTask</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">INetworkMessageHandler</span><span class="p">&lt;</span><span class="n">PongMessage</span><span class="p">&gt;.</span><span class="n">ProcessMessageAsync</span><span class="p">(</span><span class="n">PongMessage</span> <span class="n">message</span><span class="p">,</span> <span class="n">CancellationToken</span> <span class="n">cancellation</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="k">if</span> <span class="p">(</span><span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span> <span class="p">!=</span> <span class="m">0</span> <span class="p">&amp;&amp;</span> <span class="n">message</span><span class="p">.</span><span class="n">PongFancyResponse</span><span class="p">?.</span><span class="n">Nonce</span> <span class="p">==</span> <span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="p">)</span>
+   <span class="p">{</span>
+      <span class="p">(</span><span class="kt">ulong</span> <span class="n">Nonce</span><span class="p">,</span> <span class="kt">long</span> <span class="n">RoundTrip</span><span class="p">)</span> <span class="p">=</span> <span class="n">_status</span><span class="p">.</span><span class="n">PongReceived</span><span class="p">(</span><span class="n">_dateTimeProvider</span><span class="p">.</span><span class="n">GetTimeMicros</span><span class="p">());</span>
+      <span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Received pong with nonce {PingNonce} in {PingRoundTrip} usec. {Quote}&quot;</span><span class="p">,</span> <span class="n">Nonce</span><span class="p">,</span> <span class="n">RoundTrip</span><span class="p">,</span> <span class="n">message</span><span class="p">.</span><span class="n">PongFancyResponse</span><span class="p">.</span><span class="n">Quote</span><span class="p">);</span>
+      <span class="n">_pingCancellationTokenSource</span><span class="p">.</span><span class="n">Cancel</span><span class="p">();</span>
+   <span class="p">}</span>
+   <span class="k">else</span>
+   <span class="p">{</span>
+      <span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Received pong with wrong nonce: {PingNonce}&quot;</span><span class="p">,</span> <span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="p">);</span>
+   <span class="p">}</span>
+
+   <span class="k">return</span> <span class="k">new</span> <span class="n">ValueTask</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;(</span><span class="k">true</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+</td></tr></table>
+<p>In this method we check that the returned Nonce is the same of our last ping request, if so we update our internal status to signal that we received the pong message.</p>
 <h2 id="add-the-shard-into-the-forge">Add the shard into the forge</h2>
 <p>To add the shard to the forge, the [IForgeBuilder] extension <code>UseExample</code> in ForgeBuilderExtensions class has to be used, here what it does:</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
