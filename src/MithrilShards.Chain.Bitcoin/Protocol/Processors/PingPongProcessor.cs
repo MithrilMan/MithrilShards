@@ -85,6 +85,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       async ValueTask<bool> INetworkMessageHandler<PingMessage>.ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
       {
+         logger.LogDebug("Received ping with nonce {PingNonce} in {PingRoundTrip} usec.", message.Nonce);
          await SendMessageAsync(new PongMessage { Nonce = message.Nonce }).ConfigureAwait(false);
 
          return true;

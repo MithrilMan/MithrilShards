@@ -17,7 +17,7 @@ Most of the custom application code is implemented here:
   * `INetworkMessage` implementations of custom messages (payloads) and complex types used within their implementation.
   * `INetworkMessage` and type serializators that serialize classes into a byte representation that can be sent through the network.
   * `INetworkMessage` processors that contain the logic to parse incoming messages and send messages to other peers
-  * plumbing classes like shard class and its setting class
+  * classes like shard class and its setting class that forms the plumbing of our application.
   * custom services used by processors or other internal components like `QuoteService`.
 
 
@@ -169,7 +169,7 @@ QuoteService implementation simply initialize a list of quotes (from [The Lord o
 ### ServerPeerConnectionGuardBase
 
 This class implements the interface [IServerPeerConnectionGuard] whose purpose is to validate an incoming connection before we attempt to handshake and exchange information with it.  
-It's an abstract class and its purpose is to implement plumbing code in order to have a base class to use as a peer guard and focus just on the guarding rule in the guard implementation.
+It's an abstract class and its purpose is to implement generic useful code to be used by concrete peer guard implementations in such a way that guard implementation has just to focus on the guarding rule.
 Currently the example implements two guards: 
 
 `MaxConnectionThresholdGuard` 
@@ -276,6 +276,10 @@ Like for messages, their serializer has to implement an interface, in this case 
 
 Usually you have one message serializer for each message you have, so in this case we have four message serializers: VersionMessageSerializer, VerackMessageSerializer, PingMessageSerializer and PongMessageSerializer.
 
+
+
+### PongMessageSerializer
+
 Since we have already described the PongMessage in details, makes sense to explain its serializer:
 
 ```c#
@@ -307,6 +311,159 @@ public class PongMessageSerializer : ExampleNetworkMessageSerializerBase<PongMes
          PongFancyResponse = reader.ReadWithSerializer(protocolVersion, _pongFancyResponseSerializator)
       };
    }
+}
+```
+
+What to highlight in this code is: 
+
+- [ ] PongMessageSerializer declares it's a serializer for the PongMessage by extending `ExampleNetworkMessageSerializerBase<PongMessage>` (note that the generic type argument is PongMessage)
+- [ ] It's constructor accepts a `IProtocolTypeSerializer<PongFancyResponse> pongFancyResponseSerializator`, this will be injected automatically by the DI container when the serializer is resolved and it will be used to serialize the complex type PongFancyResponse.  
+  Later we'll see the PongFancyResponseSerializer that will be used, note how actually we ask for a IProtocolTypeSerializer<PongFancyResponse> and at runtime our serializer PongFancyResponseSerializer will be used, no need to worry about knowing the real implementation of our serializer, we can even change it at runtime or using a custom feature that changes serializers, that's the power of **abstraction**!
+- [ ] We have to implement Serialize and Deserialize methods and in this example we are just relying on the extension `WriteWithSerializer` and `ReadWithSerializer`, nothing easier than that.  
+  If we had other primitive types to serialize, like an integer property, we had just to use the proper `IBufferWriter<byte>` primitive extension WriteInt (to serialize) and `SequenceReader<byte>` ReadInt primitive extension (to read).
+
+
+
+!!! info
+	You are encouraged to check source code: IBufferWriterExtensions.cs and SequenceReaderExtensions.cs classes contains all the primitive extensions to serialize primitive types and helper to leverage the use of IProtocolTypeSerializer used to serialize complex types.
+
+
+
+### Protocol Types Serializers
+
+When a message contains a complex type like our PongFancyResponse type, we can make use of `IProtocolTypeSerializer` implementations.
+
+In our example we have the PongFancryResponseSerializer class that we can study
+
+```c#
+public class PongFancyResponseSerializer : IProtocolTypeSerializer<PongFancyResponse>
+{
+   public int Serialize(PongFancyResponse typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
+   {
+
+      int size = 0;
+      size += writer.WriteULong(typeInstance.Nonce);
+      size += writer.WriteVarString(typeInstance.Quote);
+
+      return size;
+   }
+
+   public PongFancyResponse Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
+   {
+      return new PongFancyResponse
+      {
+         Nonce = reader.ReadULong(),
+         Quote = reader.ReadVarString()
+      };
+   }
+}
+```
+
+The logic is similar to message serializer, we have to implement the interface `IProtocolTypeSerializer<TComplextype>` that requires us to implement the Serialize and Deserialize method.
+
+In this specific example we can see how an unsigned long and a nullable string are serialized in our protocol implementaiton.
+
+!!! tip
+	IProtocolTypeSerializer implementations can inject other IProtocolTypeSerializer implementations if they include other complex types.
+
+
+
+## Processors
+
+Processors are fundamental classes that allow us to react to incoming messages.
+Mithril Shards has a clever way to handle messages: whenever a stream of data arrives, it gets read to see if it represents a known messages and if it's the case, all the processors that are registered as interested in that particular message are activated.
+
+Technically it's like a publish-subscribe pattern but it's transparent for the developer, everything it's handled by following conventions and implementing specific classes.
+
+Processors are attached to a peer context by the Mithril Shards core class NetworkMessageProcessorFactory, their lifetime scope is defined as Transient, this mean that each peer context has its own processor instance attached (processors aren't mean to natively share data between peers but you can anyway create a singleton service that inject in the processor to do so).
+
+In our example, an abstract `BaseProcessor` class implements the code to deal with common needs, it has a lot of helper methods that allow you to subscribe and unsubscribe to event bus messages, react to peer handshake, send messages, execute conditional statement asynchronously and much more (check out the BaseProcess.cs file).
+
+Processors can be quite complex, in this example PingPongProcessor is quite simple but still contains useful snippets that you can learn and use.
+
+
+
+### PingPongProcessor
+
+To shed some light on this, let's inspect the PingPongProcessor, whose goal is to process incoming ping requests and reply with pong messages, or generate ping messages after a certain period of time that has elapsed (it's not meant to be an optimized protocol, in such case you'd want to ping only if you don't receive data from the peer for a certain time, but the goal is to keep the example simple in logic but exhaustive as implementation).
+
+#### Declaration
+
+This time I'm not including the full class source code but just meaningful snippets, let's start from the declaration:
+
+```c#
+public partial class PingPongProcessor : BaseProcessor,
+   INetworkMessageHandler<PingMessage>,
+   INetworkMessageHandler<PongMessage>
+```
+
+PingPongProcessor inherits from BaseProcessor and is declared as a partial class, because its internal status is declared as an inner class and defined into a nested file PingProcessor.Status.cs.  
+This allow us to restrict Status scope while keeping our source more compact.
+
+![image-20210408173551787](../img/image-20210408173551787.png)  
+<sup>In visual studio the inner file is shown as a child of the PingProngProcessor.cs as you can see.</sup>
+
+It also implements two interfaces: `INetworkMessageHandler<PingMessage>` and `INetworkMessageHandler<PongMessage>`.
+Implementing INetworkMessageHandler generic interface is a way to instruct the Mithril Shards framework that this processor is interested in handling incoming PingMessage and PongMessage.
+
+Declarative syntax like this allow us to maintain better our code when we have several processors and allow us to have a better control over which process elaborates which messages without much effort.
+
+#### Constructor
+
+```c#
+public PingPongProcessor(ILogger<PingPongProcessor> logger,
+                           IEventBus eventBus,
+                           IPeerBehaviorManager peerBehaviorManager,
+                           IRandomNumberGenerator randomNumberGenerator,
+                           IDateTimeProvider dateTimeProvider,
+                           IPeriodicWork periodicPing,
+                           IQuoteService quoteService)
+   : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
+{
+   _randomNumberGenerator = randomNumberGenerator;
+   _dateTimeProvider = dateTimeProvider;
+   _periodicPing = periodicPing;
+   _quoteService = quoteService;
+}
+```
+
+The constructor declares which services we need and calls the base constructor passing its needed services.
+I'd emphasize the last 2 base constructor parameter that I've specified by using named arguments to better show their meaning: `isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true`
+
+Specifying true to isHandshakeAware means that the processor is handshake aware and when our peer handshake correctly with a remote peer, `OnPeerHandshakedAsync` method is invoked.  
+In our example we uses this information to start a periodic task that ensures that we send a ping request every PING_INTERVAL amount of time
+
+```c#
+protected override ValueTask OnPeerHandshakedAsync()
+{
+   _ = _periodicPing.StartAsync(
+         label: $"{nameof(_periodicPing)}-{PeerContext.PeerId}",
+         work: PingAsync,
+         interval: TimeSpan.FromSeconds(PING_INTERVAL),
+         cancellation: PeerContext.ConnectionCancellationTokenSource.Token
+      );
+
+   return default;
+}
+
+private async Task PingAsync(CancellationToken cancellationToken)
+{
+   var ping = new PingMessage();
+   ping.Nonce = _randomNumberGenerator.GetUint64();
+
+   await SendMessageAsync(ping).ConfigureAwait(false);
+
+   _status.PingSent(_dateTimeProvider.GetTimeMicros(), ping);
+   logger.LogDebug("Sent ping request with nonce {PingNonce}", _status.PingRequestNonce);
+
+   //in case of memory leak, investigate this.
+   _pingCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+   // ensures the handshake is performed timely
+   await DisconnectIfAsync(() =>
+   {
+      return new ValueTask<bool>(_status.PingResponseTime == 0);
+   }, TimeSpan.FromSeconds(TIMEOUT_INTERVAL), "Pong not received in time", _pingCancellationTokenSource.Token).ConfigureAwait(false);
 }
 ```
 

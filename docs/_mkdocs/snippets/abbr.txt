@@ -8,3 +8,4 @@
 *[URL]: Uniform Resource Locator
 *[CLI]: Command Line Interface
 *[POCO]: Plain Old CLR Object
+*[DI]: Dependency Injection
