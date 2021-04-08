@@ -467,6 +467,67 @@ private async Task PingAsync(CancellationToken cancellationToken)
 }
 ```
 
+The call to `DisconnectIfAsync` within PingAsync method, ensures that if the other peers doesn't reply to us with a proper pong messages, we disconnect from the remote peer.  
+The action passed to DisconnectIfAsync gets evaluated when the time specified by `TimeSpan.FromSeconds(TIMEOUT_INTERVAL)` elapses.  
+Current status of our processor is held in the inner Status class, when we call its PingSent we are resetting the PingResponseTime to 0.  
+When we receive a pong message PingResponseTime  is set to a value and thus when the timeout elapses we are expected to find a value if the peer replied, or 0 if it didn't (and thus disconnect the peer).
+
+!!! warning
+	This logic to works requires that TIMEOUT_INTERVAL is lower than PING_INTERVAL.
+
+
+
+#### Handling the PingMessage
+
+As we saw earlier, we declared that the class was implementing INetworkMessageHandler<PingMessage>, this mean that we have to implement its ProcessMessageAsync where we can put our logic to handle the ping message:
+
+```c#
+async ValueTask<bool> INetworkMessageHandler<PingMessage>.ProcessMessageAsync(PingMessage message, CancellationToken cancellation)
+{
+   await SendMessageAsync(new PongMessage
+   {
+      PongFancyResponse = new PongFancyResponse
+      {
+         Nonce = message.Nonce,
+         Quote = _quoteService.GetRandomQuote()
+      }
+   }).ConfigureAwait(false);
+
+   return true;
+}
+```
+
+This method is pretty simple, it just sends an async PongMessage, returning the original ping Nonce and a random quote picked from the IQuoteService implementation.
+
+!!! note
+	In this example, ProcessMessageAsync has been implemented as an [explicit implementation of the interface](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/interfaces/explicit-interface-implementation){:target="_blank"}, this allows us to hide these methods from the publicly available methods of the type.
+
+
+
+#### Handling the PongMessage
+
+Similarly to the PingMessage handler, we implements PongMessage:
+
+```c#
+ValueTask<bool> INetworkMessageHandler<PongMessage>.ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
+{
+   if (_status.PingRequestNonce != 0 && message.PongFancyResponse?.Nonce == _status.PingRequestNonce)
+   {
+      (ulong Nonce, long RoundTrip) = _status.PongReceived(_dateTimeProvider.GetTimeMicros());
+      logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec. {Quote}", Nonce, RoundTrip, message.PongFancyResponse.Quote);
+      _pingCancellationTokenSource.Cancel();
+   }
+   else
+   {
+      logger.LogDebug("Received pong with wrong nonce: {PingNonce}", _status.PingRequestNonce);
+   }
+
+   return new ValueTask<bool>(true);
+}
+```
+
+In this method we check that the returned Nonce is the same of our last ping request, if so we update our internal status to signal that we received the pong message.
+
 
 
 ## Add the shard into the forge

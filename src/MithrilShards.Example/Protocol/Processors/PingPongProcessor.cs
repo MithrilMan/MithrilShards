@@ -24,8 +24,9 @@ namespace MithrilShards.Example.Protocol.Processors
 
       /// <summary>
       /// Time after which to disconnect, after waiting for a ping response (in seconds).
+      /// It has to be lower than PING_INTERVAL
       /// </summary>
-      const int TIMEOUT_INTERVAL = 20 * 60;
+      const int TIMEOUT_INTERVAL = 5;
 
       readonly IRandomNumberGenerator _randomNumberGenerator;
       readonly IDateTimeProvider _dateTimeProvider;
