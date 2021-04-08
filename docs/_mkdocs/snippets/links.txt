@@ -4,7 +4,8 @@
 [mithrilshards]: https://github.com/MithrilMan/MithrilShards/
 [ForgeBuilder]: /mithril-shards/forge-builder
 [DefaultForge]: /mithril-shards/default-forge
-[example project]: /mithril-shards/example-project/
+[shards]: /mithril-shards/shards
+
 [SerilogShard]: /shards/serilog
 
 [WebApiShard]: /shards/web-api
@@ -17,3 +18,9 @@
 [DevControllerShard]: /shards/dev-controller/
 
 [BedrockNetworkShard]: /shards/bedrock-network/
+
+[example project]: /example-projects/
+[MithrilShards.Example]: /example-projects/mithril-shards-example
+[MithrilShards.Example.Network.Bedrock]: /example-projects/mithril-shards-example-network-bedrock
+[MithrilShards.Example.Dev]: /example-projects/mithril-shards-example-dev
+[MithrilShards.Example.Node]: /example-projects/mithril-shards-example-node

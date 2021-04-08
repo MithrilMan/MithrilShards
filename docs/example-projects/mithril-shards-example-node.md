@@ -1,40 +1,21 @@
 ---
-title: Example Project
-description: Mithril Shards implementation, Example Project
+title: MithrilShards.Example.Node
+description: Mithril Shards Example Projects, MithrilShards.Example.Node
 ---
 
 --8<-- "refs.txt"
 
-The best way to see it in action is by inspecting the Example project I've created.
-
-## Example Projects
-
-The example is composed by several projects, each one with their own scope, to mimic a (simple) typical modular application:
-
-* MithrilShards.Example
-* MithrilShards.Example.Network.Bedrock
-* MithrilShards.Example.Dev
-* MithrilShards.Example.Node
-
-### MithrilShards.Example
-
-It contains the core classes and services needed to run the example application.
-Here we can find:
-
-* network classes like
-  * a custom IPeerContext implementation and its factory class
-  * some custom `IServerPeerConnectionGuard` implementation to filter incoming connections and a custom ConnectorBase implementation that contains the logic to connect to other peers
-* protocol classes like
-  * `INetworkMessage` implementations of custom messages (payloads) and complex types used within their implementation.
-  * `INetworkMessage` and type serializators that serialize classes into a byte representation that can be sent through the network.
-  * `INetworkMessage` processors that contain the logic to parse incoming messages and send messages to other peers
-* plumbing classes like shard setting class and services used by processors or other internal components.
-
-
+### MithrilShards.Example.Node
 
 It makes use of [System.CommandLine](https://github.com/dotnet/command-line-api){:target="_blank"} to have implement the application as a CLI.
 
-```
+While all other projects were C# Class Library projects, this one produces an executable that's the actual, assembled application.
+
+It contains the Program.cs file that melt the shards into the forge and run it, plus a couple of configuration files that you can inspect to see different configuration combinations.
+
+Program.cs file is quote short and easy to read:
+
+```c#
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
