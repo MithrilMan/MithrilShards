@@ -108,7 +108,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          }
 
          /// Turn the lowest '1' bit in the binary representation of a number into a '0'.
-         int invertLowestOne(int n)
+         static int invertLowestOne(int n)
          {
             return n & (n - 1);
          }
@@ -253,8 +253,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
       public override bool Equals(object? obj)
       {
-         var item = obj as HeaderNode;
-         if (item is null)
+         if (obj is not HeaderNode item)
             return false;
 
          return Hash.Equals(item.Hash);

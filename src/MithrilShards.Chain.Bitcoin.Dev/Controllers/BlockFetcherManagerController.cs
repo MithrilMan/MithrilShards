@@ -14,7 +14,7 @@ namespace MithrilShards.Chain.Bitcoin.Dev
       private readonly ILogger<ConsensusController> _logger;
       readonly IBlockFetcherManager _blockFetcherManager;
 
-      public BlockFetcherManagerController(ILogger<ConsensusController> logger, IEventBus eventBus, IBlockFetcherManager blockFetcherManager)
+      public BlockFetcherManagerController(ILogger<ConsensusController> logger, IBlockFetcherManager blockFetcherManager)
       {
          _logger = logger;
          _blockFetcherManager = blockFetcherManager;

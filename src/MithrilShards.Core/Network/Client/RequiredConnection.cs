@@ -25,7 +25,7 @@ namespace MithrilShards.Core.Network.Client
 
       private readonly ForgeConnectivitySettings _settings;
 
-      public List<OutgoingConnectionEndPoint> connectionsToAttempt = new List<OutgoingConnectionEndPoint>();
+      public List<OutgoingConnectionEndPoint> connectionsToAttempt = new();
 
       public RequiredConnection(ILogger<RequiredConnection> logger,
                                 IEventBus eventBus,

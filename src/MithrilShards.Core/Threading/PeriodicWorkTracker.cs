@@ -13,7 +13,7 @@ namespace MithrilShards.Core.Threading
 
       readonly ILogger<PeriodicWorkTracker> _logger;
       readonly IStatisticFeedsCollector _statisticFeedsCollector;
-      readonly ConcurrentDictionary<Guid, IPeriodicWork> _works = new ConcurrentDictionary<Guid, IPeriodicWork>();
+      readonly ConcurrentDictionary<Guid, IPeriodicWork> _works = new();
 
       public PeriodicWorkTracker(ILogger<PeriodicWorkTracker> logger, IStatisticFeedsCollector statisticFeedsCollector)
       {

@@ -11,8 +11,8 @@ namespace MithrilShards.Core.EventBus
    /// <seealso cref="System.IDisposable" />
    public class EventSubscriptionManager : IDisposable
    {
-      private readonly object _subscriptionsLock = new object();
-      private readonly List<SubscriptionToken> _subscriptionTokens = new List<SubscriptionToken>();
+      private readonly object _subscriptionsLock = new();
+      private readonly List<SubscriptionToken> _subscriptionTokens = new();
 
       /// <summary>
       /// Registers the provided subscriptions.

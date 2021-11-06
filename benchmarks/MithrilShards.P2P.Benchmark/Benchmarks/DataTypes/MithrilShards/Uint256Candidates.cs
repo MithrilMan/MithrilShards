@@ -6,7 +6,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
    public class UnsafeUInt256
    {
       private const int EXPECTED_SIZE = 32;
-      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new NBitcoin.DataEncoders.HexEncoder();
+      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new();
 
       private readonly byte[] _bytes;
 
@@ -36,7 +36,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
    public class UInt256As4Long
    {
       private const int EXPECTED_SIZE = 32;
-      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new NBitcoin.DataEncoders.HexEncoder();
+      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new();
 
       private readonly long[] _data;
 
@@ -67,7 +67,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
    public class UInt256As4Jhon
    {
       private const int EXPECTED_SIZE = 32;
-      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new NBitcoin.DataEncoders.HexEncoder();
+      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new();
 
       private readonly ulong _part1;
       private readonly ulong _part2;
@@ -97,7 +97,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.MithrilShards
    public class UnsafeUInt256As4Long
    {
       private const int EXPECTED_SIZE = 32;
-      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new NBitcoin.DataEncoders.HexEncoder();
+      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new();
 
       private readonly ulong _data1;
       private readonly ulong _data2;

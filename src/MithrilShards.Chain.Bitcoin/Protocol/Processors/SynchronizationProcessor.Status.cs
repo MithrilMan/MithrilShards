@@ -5,7 +5,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
    public partial class SynchronizationProcessor
    {
-      private readonly BlockHeaderProcessorStatus _status = new BlockHeaderProcessorStatus();
+      private readonly BlockHeaderProcessorStatus _status = new();
 
       public class BlockHeaderProcessorStatus
       {

@@ -53,10 +53,13 @@ namespace MithrilShards.Network.Bedrock
          ProtocolReader reader = connection.CreateReader();
          INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
-         using IPeerContext peerContext = _peerContextFactory.CreateIncomingPeerContext(connection.ConnectionId,
+         IPeerContext peerContext = _peerContextFactory.CreateIncomingPeerContext(connection.ConnectionId,
                                                                                             connection.LocalEndPoint!.AsIPEndPoint().EnsureIPv6(),
                                                                                             connection.RemoteEndPoint!.AsIPEndPoint().EnsureIPv6(),
                                                                                             new NetworkMessageWriter(protocol, connection.CreateWriter()));
+
+         // will dispose peerContext when out of scope, see https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync#using-async-disposable
+         await using var peerContextLifeCycle = peerContext.ConfigureAwait(false);
 
          using CancellationTokenRegistration cancellationRegistration = peerContext.ConnectionCancellationTokenSource.Token.Register(() =>
          {
@@ -66,10 +69,10 @@ namespace MithrilShards.Network.Bedrock
          connection.Features.Set(peerContext);
          protocol.SetPeerContext(peerContext);
 
-         if (EnsurePeerCanConnect(connection, peerContext))
+         if (await EnsurePeerCanConnect(connection, peerContext).ConfigureAwait(false))
          {
 
-            _eventBus.Publish(new PeerConnected(peerContext));
+            await _eventBus.PublishAsync(new PeerConnected(peerContext)).ConfigureAwait(false);
 
             await _networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
 
@@ -105,7 +108,7 @@ namespace MithrilShards.Network.Bedrock
       /// Check if the client is allowed to connect based on certain criteria.
       /// </summary>
       /// <returns>When criteria is met returns <c>true</c>, to allow connection.</returns>
-      private bool EnsurePeerCanConnect(ConnectionContext connection, IPeerContext peerContext)
+      private async ValueTask<bool> EnsurePeerCanConnect(ConnectionContext connection, IPeerContext peerContext)
       {
          if (_serverPeerConnectionGuards == null)
          {
@@ -127,7 +130,7 @@ namespace MithrilShards.Network.Bedrock
          {
             _logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected because of {ClientDisconnectedReason} and will be closed.", connection.RemoteEndPoint, result.DenyReason);
             connection.Abort(new ConnectionAbortedException(result.DenyReason));
-            _eventBus.Publish(new PeerConnectionRejected(peerContext, result.DenyReason));
+            await _eventBus.PublishAsync(new PeerConnectionRejected(peerContext, result.DenyReason)).ConfigureAwait(false);
             return false;
          }
 
@@ -141,7 +144,7 @@ namespace MithrilShards.Network.Bedrock
          if (!(message is UnknownMessage))
          {
             await _networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
-            _eventBus.Publish(new PeerMessageReceived(peerContext, message));
+            await _eventBus.PublishAsync(new PeerMessageReceived(peerContext, message), cancellation).ConfigureAwait(false);
          }
       }
    }

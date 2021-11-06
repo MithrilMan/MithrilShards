@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MithrilShards.Core.EventBus
 {
@@ -12,15 +14,15 @@ namespace MithrilShards.Core.EventBus
       /// <summary>
       /// The action to invoke when a subscripted event type is published.
       /// </summary>
-      private readonly Action<TEventBase> _action;
+      private readonly Func<TEventBase, CancellationToken, ValueTask> _action;
 
-      public Subscription(Action<TEventBase> action, SubscriptionToken token)
+      public Subscription(Func<TEventBase, CancellationToken, ValueTask> action, SubscriptionToken token)
       {
          _action = action ?? throw new ArgumentNullException(nameof(action));
          SubscriptionToken = token ?? throw new ArgumentNullException(nameof(token));
       }
 
-      public void Publish(EventBase eventItem)
+      public ValueTask ProcessEventAsync(EventBase eventItem, CancellationToken cancellationToken)
       {
          if (eventItem is null) throw new ArgumentNullException(nameof(eventItem));
 
@@ -29,7 +31,12 @@ namespace MithrilShards.Core.EventBus
             throw new ArgumentException("Event Item is not the correct type.");
          }
 
-         _action.Invoke((TEventBase)eventItem);
+         if (cancellationToken.IsCancellationRequested)
+         {
+            return ValueTask.CompletedTask;
+         }
+
+         return _action.Invoke((TEventBase)eventItem, cancellationToken);
       }
    }
 }

@@ -2,7 +2,7 @@
 {
    public partial class DataFeederProcessor
    {
-      private readonly DataFeederProcessorStatus _status = new DataFeederProcessorStatus();
+      private readonly DataFeederProcessorStatus _status = new();
 
       public class DataFeederProcessorStatus
       {

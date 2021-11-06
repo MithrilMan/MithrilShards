@@ -22,7 +22,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    {
       private const int INITIAL_ITEMS_ALLOCATED = 16 ^ 2; //this parameter may go into settings, better to be multiple of 2
 
-      private readonly ReaderWriterLockSlim _theLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+      private readonly ReaderWriterLockSlim _theLock = new(LockRecursionPolicy.SupportsRecursion);
 
       private readonly ILogger<HeadersTree> _logger;
       private readonly IConsensusParameters _consensusParameters;
@@ -31,13 +31,13 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// Known set of hashes, both on forks and on best chains.
       /// Those who are on the best chain, can be found in the <see cref="_bestChain"/> list.
       /// </summary>
-      private readonly Dictionary<UInt256, HeaderNode> _knownHeaders = new Dictionary<UInt256, HeaderNode>(INITIAL_ITEMS_ALLOCATED);
+      private readonly Dictionary<UInt256, HeaderNode> _knownHeaders = new(INITIAL_ITEMS_ALLOCATED);
 
       /// <summary>
       /// The best chain of hashes sorted by height.
       /// If a block hash is in this list, it means it's in the main chain and can be sent to other peers.
       /// </summary>
-      private readonly List<UInt256> _bestChain = new List<UInt256>(INITIAL_ITEMS_ALLOCATED);
+      private readonly List<UInt256> _bestChain = new(INITIAL_ITEMS_ALLOCATED);
 
       /// <summary>
       /// The genesis node.

@@ -10,7 +10,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
    public class UInt160 : UIntBase, IComparable<UInt160>, IEquatable<UInt160>
    {
       public const int LENGTH = 20;
-      public static readonly UInt160 Zero = new UInt160();
+      public static readonly UInt160 Zero = new();
 
       private ulong _value1;
       private ulong _value2;

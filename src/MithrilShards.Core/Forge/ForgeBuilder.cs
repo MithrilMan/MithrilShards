@@ -24,7 +24,7 @@ namespace MithrilShards.Core.Forge
       private readonly ILogger<ForgeBuilder> _logger;
       private bool _isForgeSet = false;
       private bool _createDefaultConfigurationFileNeeded = false;
-      private List<Action<IHostBuilder>> _preBuildActions = new List<Action<IHostBuilder>>();
+      private readonly List<Action<IHostBuilder>> _preBuildActions = new();
       private readonly HostBuilder _hostBuilder;
 
       public string ConfigurationFileName { get; private set; } = null!; //set to something meaningful during initialization

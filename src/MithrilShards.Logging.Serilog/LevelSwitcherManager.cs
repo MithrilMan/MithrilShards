@@ -9,7 +9,7 @@ namespace MithrilShards.Logging.Serilog
 {
    public class LevelSwitcherManager
    {
-      Dictionary<string, LoggingLevelSwitch> _logLevels = new Dictionary<string, LoggingLevelSwitch>(StringComparer.InvariantCultureIgnoreCase);
+      readonly Dictionary<string, LoggingLevelSwitch> _logLevels = new(StringComparer.InvariantCultureIgnoreCase);
 
       public LevelSwitcherManager() { }
 

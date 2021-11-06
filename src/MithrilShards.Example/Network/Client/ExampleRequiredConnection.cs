@@ -16,7 +16,7 @@ namespace MithrilShards.Example.Network.Client
 
       private readonly ExampleSettings _settings;
 
-      private readonly List<OutgoingConnectionEndPoint> _connectionsToAttempt = new List<OutgoingConnectionEndPoint>();
+      private readonly List<OutgoingConnectionEndPoint> _connectionsToAttempt = new();
 
       public ExampleRequiredConnection(ILogger<ExampleRequiredConnection> logger,
                                 IEventBus eventBus,

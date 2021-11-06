@@ -56,7 +56,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
          _blockValidationRules.SetupRules();
 
          // starts the consumer loop of header validation
-         _validationLoop.StartAsync(
+         _ = _validationLoop.StartAsync(
             label: nameof(BlockValidator),
             work: ValidationWorkAsync,
             interval: TimeSpan.Zero,
@@ -84,28 +84,26 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator
       {
          await foreach (BlockToValidate request in _blocksToValidate.Reader.ReadAllAsync(cancellation))
          {
-            using (IDisposable logScope = _logger.BeginScope("Validating block {BlockHash}", request.Block.Header!.Hash))
+            using IDisposable logScope = _logger.BeginScope("Validating block {BlockHash}", request.Block.Header!.Hash);
+
+            BlockValidationState? state = null;
+
+            bool isNew = false;
+            using (await GlobalLocks.WriteOnMainAsync())
             {
+               AcceptBlockLocked(request.Block, out state, out isNew);
+            }
 
-               BlockValidationState? state = null;
-
-               bool isNew = false;
-               using (await GlobalLocks.WriteOnMainAsync())
-               {
-                  AcceptBlockLocked(request.Block, out state, out isNew);
-               }
-
-               // publish events out of lock
-               if (state!.IsInvalid())
-               {
-                  // signal header validation failed
-                  _eventBus.Publish(new BlockValidationFailed(request.Block, state, request.Peer));
-               }
-               else
-               {
-                  // signal header validation succeeded
-                  _eventBus.Publish(new BlockValidationSucceeded(request.Block, isNew, request.Peer));
-               }
+            // publish events out of lock
+            if (state!.IsInvalid())
+            {
+               // signal header validation failed
+               await _eventBus.PublishAsync(new BlockValidationFailed(request.Block, state, request.Peer), cancellation).ConfigureAwait(false);
+            }
+            else
+            {
+               // signal header validation succeeded
+               await _eventBus.PublishAsync(new BlockValidationSucceeded(request.Block, isNew, request.Peer), cancellation).ConfigureAwait(false);
             }
          }
       }

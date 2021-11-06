@@ -31,7 +31,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks.Target
       uint _blockTime = 1262152739;
       uint _bits = 0x1d00ffff;
 
-      ProofOfWorkCalculator _powCalculator = new ProofOfWorkCalculator(
+      ProofOfWorkCalculator _powCalculator = new(
          new NullLogger<ProofOfWorkCalculator>(),
          new BitcoinMainDefinition(new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()))).ConfigureConsensus(),
          null

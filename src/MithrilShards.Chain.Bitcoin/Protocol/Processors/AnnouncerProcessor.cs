@@ -94,7 +94,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             }
 
             // ignore later version announces
-            if (_status.WantsCompactWitness = (message.Version == 2))
+            if (_status.WantsCompactWitness = message.Version == 2)
             {
                _status.AnnounceUsingCompactBlock = message.AnnounceUsingCompactBlock;
             }
@@ -103,11 +103,11 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             {
                if (_localServiceProvider.HasServices(NodeServices.Witness))
                {
-                  _status.SupportsDesiredCompactVersion = (message.Version == 2);
+                  _status.SupportsDesiredCompactVersion = message.Version == 2;
                }
                else
                {
-                  _status.SupportsDesiredCompactVersion = (message.Version == 1);
+                  _status.SupportsDesiredCompactVersion = message.Version == 1;
                }
             }
          }

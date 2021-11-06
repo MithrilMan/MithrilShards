@@ -51,17 +51,20 @@ namespace MithrilShards.Network.Bedrock
          ProtocolReader reader = connection.CreateReader();
          INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
-         using IPeerContext peerContext = _peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
+         IPeerContext peerContext = _peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
                                                                                             connection.LocalEndPoint!,
                                                                                             connection.Features.Get<OutgoingConnectionEndPoint>(),
                                                                                             new NetworkMessageWriter(protocol, connection.CreateWriter()));
+
+         // will dispose peerContext when out of scope, see https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync#using-async-disposable
+         await using var peerContextLifeCycle = peerContext.ConfigureAwait(false);
 
          connection.ConnectionClosed = peerContext.ConnectionCancellationTokenSource.Token;
          connection.Features.Set(peerContext);
 
          protocol.SetPeerContext(peerContext);
 
-         _eventBus.Publish(new PeerConnected(peerContext));
+         await _eventBus.PublishAsync(new PeerConnected(peerContext)).ConfigureAwait(false);
 
 
          await _networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
@@ -107,7 +110,7 @@ namespace MithrilShards.Network.Bedrock
          if (!(message is UnknownMessage))
          {
             await _networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
-            _eventBus.Publish(new PeerMessageReceived(peerContext, message));
+            await _eventBus.PublishAsync(new PeerMessageReceived(peerContext, message), cancellation).ConfigureAwait(false);
          }
       }
    }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Chain.Events;
@@ -17,8 +18,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
    /// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.IBlockHeaderRepository" />
    public class InMemoryBlockHeaderRepository : IBlockHeaderRepository
    {
-      private readonly Dictionary<UInt256, BlockHeader> _headers = new Dictionary<UInt256, BlockHeader>();
-      private readonly ReaderWriterLockSlim _theLock = new ReaderWriterLockSlim();
+      private readonly Dictionary<UInt256, BlockHeader> _headers = new();
+      private readonly ReaderWriterLockSlim _theLock = new();
       readonly ILogger<InMemoryBlockHeaderRepository> _logger;
       readonly IEventBus _eventBus;
 
@@ -37,7 +38,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </returns>
       /// <exception cref="ArgumentNullException">header</exception>
       /// <exception cref="NullReferenceException">Block Header hash cannot be null</exception>
-      public bool TryAdd(BlockHeader header)
+      public async ValueTask<bool> TryAddAsync(BlockHeader header)
       {
          if (header is null) throw new ArgumentNullException(nameof(header));
 
@@ -60,7 +61,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
 
          if (success)
          {
-            _eventBus.Publish(new BlockHeaderAddedToRepository(header));
+            await _eventBus.PublishAsync(new BlockHeaderAddedToRepository(header)).ConfigureAwait(false);
          }
 
          return success;

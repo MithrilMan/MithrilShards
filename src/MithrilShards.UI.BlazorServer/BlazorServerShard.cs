@@ -158,7 +158,7 @@ namespace MithrilShards.UI.BlazorServer
       {
          if (_webHost != null)
          {
-            _webHost.StopAsync(cancellationToken);
+            _ = _webHost.StopAsync(cancellationToken);
          }
 
          return default;

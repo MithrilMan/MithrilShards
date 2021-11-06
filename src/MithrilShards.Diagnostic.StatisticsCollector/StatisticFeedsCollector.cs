@@ -14,10 +14,10 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
 {
    public class StatisticFeedsCollector : IStatisticFeedsCollector
    {
-      private readonly List<ScheduledStatisticFeed> _scheduledFeeds = new List<ScheduledStatisticFeed>();
-      private readonly List<StatisticFeedDefinition> _registeredfeedDefinitions = new List<StatisticFeedDefinition>();
+      private readonly List<ScheduledStatisticFeed> _scheduledFeeds = new();
+      private readonly List<StatisticFeedDefinition> _registeredfeedDefinitions = new();
       private readonly ILogger<StatisticFeedsCollector> _logger;
-      private readonly object _statisticsFeedsLock = new object();
+      private readonly object _statisticsFeedsLock = new();
       private readonly StringBuilder _logStringBuilder;
       private readonly StatisticsCollectorSettings _settings;
 

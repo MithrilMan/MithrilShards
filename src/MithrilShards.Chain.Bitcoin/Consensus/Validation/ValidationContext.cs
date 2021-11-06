@@ -14,7 +14,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
       public bool IsForcedAsValid { get; private set; } = false;
 
-      protected Dictionary<string, object> items = new Dictionary<string, object>();
+      protected Dictionary<string, object> items = new();
 
       /// <summary>
       /// Initializes a new instance of the <see cref="ValidationContext" /> implementation.
@@ -43,7 +43,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
          if (!items.ContainsKey(key))
          {
             logger.LogDebug("context data not found: {DataKey}", key);
-            data = default(T);
+            data = default;
             return false;
          }
 

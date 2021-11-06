@@ -6,7 +6,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Message
 {
    public class SendHeadersMessageSerializer : BitcoinNetworkMessageSerializerBase<SendHeadersMessage>
    {
-      private static readonly SendHeadersMessage _instance = new SendHeadersMessage();
+      private static readonly SendHeadersMessage _instance = new();
 
       public override void Serialize(SendHeadersMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output) { }
 

@@ -40,7 +40,7 @@ namespace MithrilShards.Network.Bedrock
       public async ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation)
       {
          using IDisposable logScope = _logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
-         _eventBus.Publish(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()));
+         await _eventBus.PublishAsync(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()), cancellation).ConfigureAwait(false);
 
          bool connectionEstablished = false;
 
@@ -56,13 +56,13 @@ namespace MithrilShards.Network.Bedrock
          catch (OperationCanceledException)
          {
             _logger.LogDebug("Connection to {RemoteEndPoint} canceled", remoteEndPoint.EndPoint);
-            _eventBus.Publish(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), "Operation canceled."));
+            await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), "Operation canceled."), cancellation).ConfigureAwait(false);
          }
          catch (Exception ex)
          {
             if (!connectionEstablished)
             {
-               _eventBus.Publish(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), ex.Message));
+               await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), ex.Message), cancellation).ConfigureAwait(false);
             }
             else
             {

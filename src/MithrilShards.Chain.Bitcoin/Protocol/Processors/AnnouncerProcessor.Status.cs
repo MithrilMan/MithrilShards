@@ -6,7 +6,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 {
    public partial class AnnouncerProcessor
    {
-      private readonly AnnouncerProcessorStatus _status = new AnnouncerProcessorStatus();
+      private readonly AnnouncerProcessorStatus _status = new();
 
       public class AnnouncerProcessorStatus
       {

@@ -12,7 +12,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
    {
 
       public const int LENGTH = 32;
-      public static readonly NEO_UInt256 Zero = new NEO_UInt256();
+      public static readonly NEO_UInt256 Zero = new();
 
       private ulong _value1;
       private ulong _value2;
@@ -196,7 +196,7 @@ namespace MithrilShards.P2P.Benchmark.Benchmarks.DataTypes.Neo
 
 
 
-      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new NBitcoin.DataEncoders.HexEncoder();
+      private static readonly NBitcoin.DataEncoders.HexEncoder _encoder = new();
       public override string ToString()
       {
          ulong[] arr = new ulong[] { _value1, _value2, _value3, _value4 };

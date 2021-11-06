@@ -39,8 +39,8 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       private MethodInfo _method;
       private Delegate _computedDelegate;
       private Func<object, object[], object> _lambdaWrapper;
-      private readonly Message1 _messageInstance = new Message1();
-      private readonly Message2 _messageInstance2 = new Message2();
+      private readonly Message1 _messageInstance = new();
+      private readonly Message2 _messageInstance2 = new();
 
 
 

@@ -16,7 +16,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
       [Params(100, 1_000, 2_000)]
       public int N;
 
-      BlockHeaderHashCalculator _hashCalculator = new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()));
+      BlockHeaderHashCalculator _hashCalculator = new(new BlockHeaderSerializer(new UInt256Serializer()));
 
       BlockHeader[] _headers;
 

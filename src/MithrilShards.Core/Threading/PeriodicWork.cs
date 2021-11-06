@@ -116,7 +116,7 @@ namespace MithrilShards.Core.Threading
 
                      if (feedback.IsCritical)
                      {
-                        _eventBus.Publish(new PeriodicWorkCriticallyStopped(_label, Id, _lastException, feedback.Message));
+                        await _eventBus.PublishAsync(new PeriodicWorkCriticallyStopped(_label, Id, _lastException, feedback.Message), cancellation).ConfigureAwait(false);
                      }
 
                      return;
@@ -163,7 +163,7 @@ namespace MithrilShards.Core.Threading
       {
          if (_isRunning)
          {
-            StopAsync();
+            _ = StopAsync();
          }
 
          GC.SuppressFinalize(this);

@@ -48,6 +48,6 @@ namespace MithrilShards.Chain.Bitcoin.Network
       /// serving the last 288 (2 day) blocks
       /// See BIP159 for details on how this is implemented.
       /// </summary>
-      NetworkLimited = (1 << 10),
+      NetworkLimited = 1 << 10,
    }
 }

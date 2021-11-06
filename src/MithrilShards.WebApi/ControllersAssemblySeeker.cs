@@ -10,7 +10,7 @@ namespace MithrilShards.WebApi
    /// </summary>
    public class ControllersAssemblySeeker
    {
-      private readonly List<Assembly> _assembliesToInspect = new List<Assembly>();
+      private readonly List<Assembly> _assembliesToInspect = new();
       internal ControllersAssemblySeeker()
       {
       }

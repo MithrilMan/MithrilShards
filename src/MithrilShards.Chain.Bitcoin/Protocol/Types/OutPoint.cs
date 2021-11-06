@@ -25,7 +25,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Types
       /// </returns>
       public bool IsNull()
       {
-         return (Hash == UInt256.Zero && Index == uint.MaxValue);
+         return Hash == UInt256.Zero && Index == uint.MaxValue;
       }
    }
 }
