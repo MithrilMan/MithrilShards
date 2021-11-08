@@ -50,7 +50,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
       public static ReadOnlySpan<byte> DoubleSha512AsBytes(ReadOnlySpan<byte> data)
       {
-         using var sha = new SHA512Managed();
+         using var sha = SHA512.Create();
          Span<byte> result = new byte[64];
          sha.TryComputeHash(data, result, out _);
          sha.TryComputeHash(result, result, out _);
@@ -59,7 +59,7 @@ namespace MithrilShards.Network.Benchmark.Benchmarks
 
       public static Core.DataTypes.UInt256 DoubleSha512AsUInt256(ReadOnlySpan<byte> data)
       {
-         using var sha = new SHA512Managed();
+         using var sha = SHA512.Create();
          Span<byte> result = stackalloc byte[64];
          sha.TryComputeHash(data, result, out _);
          sha.TryComputeHash(result, result, out _);

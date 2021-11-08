@@ -46,7 +46,11 @@ namespace MithrilShards.Network.Bedrock
 
          try
          {
-            await using ConnectionContext connection = await _client.ConnectAsync(remoteEndPoint.EndPoint).ConfigureAwait(false);
+            ConnectionContext connection = await _client.ConnectAsync(remoteEndPoint.EndPoint, cancellation).ConfigureAwait(false);
+
+            // will dispose peerContext when out of scope, see https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync#using-async-disposable
+            await using var connectionScope = connection.ConfigureAwait(false);
+
             // we store the RemoteEndPoint class as a feature of the connection so we can then copy it into the PeerContext in the ClientConnectionHandler.OnConnectedAsync
             connection.Features.Set(remoteEndPoint);
             connectionEstablished = true;
