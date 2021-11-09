@@ -279,7 +279,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                return;
             }
 
-            int availableSlots = MAX_PARALLEL_DOWNLOADED_BLOCKS - _blocksInDownload.Count;
+            int availableSlots = MAX_PARALLEL_DOWNLOADED_BLOCKS - _blocksInDownload.Sum(fetcher => fetcher.Value.Count);
 
             for (int i = 0; i < availableSlots; i++)
             {
@@ -311,6 +311,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader
                where score > 0 // only peers that can fetch the block
                select fetcher
                ;
+
+            _logger.LogDebug("fetchersByScore :{fetchersByScore}", fetchersByScore.Count());
 
             IBlockFetcher? selectedFetcher = null;
             foreach (IBlockFetcher? fetcher in fetchersByScore)

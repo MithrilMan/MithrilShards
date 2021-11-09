@@ -59,7 +59,7 @@ namespace MithrilShards.Network.Bedrock
                                                                                             new NetworkMessageWriter(protocol, connection.CreateWriter()));
 
          // will dispose peerContext when out of scope, see https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync#using-async-disposable
-         await using var peerContextLifeCycle = peerContext.ConfigureAwait(false);
+         await using var asyncDisposablePeerContext = peerContext.ConfigureAwait(false);
 
          using CancellationTokenRegistration cancellationRegistration = peerContext.ConnectionCancellationTokenSource.Token.Register(() =>
          {

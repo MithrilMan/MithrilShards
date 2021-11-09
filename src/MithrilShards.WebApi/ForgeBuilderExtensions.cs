@@ -62,7 +62,7 @@ namespace MithrilShards.Core.Forge
 
                if (!context.GetShardSettings<WebApiSettings>()!.Enabled)
                {
-                  logger.LogDebug("Web API services disabled, skipping Initialization.");
+                  logger?.LogDebug("Web API services disabled, skipping Initialization.");
                   return;
                }
 
@@ -76,7 +76,7 @@ namespace MithrilShards.Core.Forge
                   .AddRouting()
                   .AddSwaggerGen(setup =>
                   {
-                     logger.LogDebug("Configuring WEB API services.");
+                     logger?.LogDebug("Configuring WEB API services.");
 
                      setup.OperationFilter<AuthResponsesOperationFilter>();
 
@@ -103,7 +103,7 @@ namespace MithrilShards.Core.Forge
                         {
                            documentFilterMethod!.MakeGenericMethod(documentFilter.GetType()).Invoke(setup, null);
                            //apiServiceDefinition.SwaggerGenConfiguration?.Invoke(setup);
-                           logger.LogDebug("Added document filter type {DocumentFilterType}.", documentFilter.GetType());
+                           logger?.LogDebug("Added document filter type {DocumentFilterType}.", documentFilter.GetType());
                         }
                      }
 
@@ -120,7 +120,7 @@ namespace MithrilShards.Core.Forge
                         }
                         else
                         {
-                           logger.LogTrace("Cannot find API documentation file {ApiDocumentationPath}", xmlPath);
+                           logger?.LogTrace("Cannot find API documentation file {ApiDocumentationPath}", xmlPath);
                         }
                      }
                   });
@@ -138,7 +138,7 @@ namespace MithrilShards.Core.Forge
                   .AddJsonOptions(options =>
                   {
                      options.JsonSerializerOptions.WriteIndented = true;
-                     options.JsonSerializerOptions.IgnoreNullValues = true;
+                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                      options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                   });
 
@@ -185,7 +185,7 @@ namespace MithrilShards.Core.Forge
 
                         string rootUrl = webApiSettings.GetListeningUrl();
                         string apiUrl = $"{rootUrl}/{SWAGGER_ROUTE_PREFIX}";
-                        logger.LogInformation("Configured WEB API listener to {ApiEndPoint}. Swagger documentation at URL {SwaggerEndPoint}", rootUrl, apiUrl);
+                        logger?.LogInformation("Configured WEB API listener to {ApiEndPoint}. Swagger documentation at URL {SwaggerEndPoint}", rootUrl, apiUrl);
                      }
                   })
                   .Configure(app => SwaggerConfiguration(app, optionsInstance));

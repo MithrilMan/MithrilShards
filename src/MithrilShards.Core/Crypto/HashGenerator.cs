@@ -8,7 +8,7 @@ namespace MithrilShards.Core.Crypto
    {
       public static ReadOnlySpan<byte> Sha256(ReadOnlySpan<byte> data)
       {
-         using var sha = new SHA256Managed();
+         using var sha = SHA256.Create();
          Span<byte> result = new byte[32];
 
          if (!sha.TryComputeHash(data, result, out _)) ThrowHashGeneratorException($"Failed to perform {nameof(Sha256)}");
@@ -18,7 +18,7 @@ namespace MithrilShards.Core.Crypto
 
       public static ReadOnlySpan<byte> DoubleSha256(ReadOnlySpan<byte> data)
       {
-         using var sha = new SHA256Managed();
+         using var sha = SHA256.Create();
          Span<byte> result = new byte[32];
 
          if (!sha.TryComputeHash(data, result, out _) || !sha.TryComputeHash(result, result, out _))
@@ -31,7 +31,7 @@ namespace MithrilShards.Core.Crypto
 
       public static ReadOnlySpan<byte> DoubleSha512(ReadOnlySpan<byte> data)
       {
-         using var sha = new SHA512Managed();
+         using var sha = SHA512.Create();
          Span<byte> result = new byte[64];
          sha.TryComputeHash(data, result, out _);
          sha.TryComputeHash(result, result, out _);
