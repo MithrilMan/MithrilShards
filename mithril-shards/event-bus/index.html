@@ -6,28 +6,28 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Mithril Shards bitcoin implementation, testing node">
+        <meta name="description" content="Mithril Shards implementation, Event Bus">
       
       
       
         <meta name="author" content="Mithril Man">
       
       
-        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/shards/bitcoin/testing_node_communication/">
+        <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/mithril-shards/event-bus/">
       
-      <link rel="icon" href="../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
     
     
       
-        <title>Testing node communication - Mithril Shards</title>
+        <title>Event Bus - Mithril Shards</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.a57b2b03.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a57b2b03.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.3f5d1f46.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
         
       
     
@@ -42,7 +42,7 @@
     
     
     
-      <link rel="stylesheet" href="../../../_mkdocs/extra_css/custom.css">
+      <link rel="stylesheet" href="../../_mkdocs/extra_css/custom.css">
     
     
       
@@ -63,7 +63,7 @@
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
-    <script>function __prefix(e){return new URL("../../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
       <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
@@ -71,11 +71,6 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
-      
-        
-        <a href="#testing-node-communication" class="md-skip">
-          Skip to content
-        </a>
       
     </div>
     <div data-md-component="announce">
@@ -86,7 +81,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href="../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -105,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Testing node communication
+              Event Bus
             
           </span>
         </div>
@@ -208,7 +203,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
+    <a href="../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -240,7 +235,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         Welcome!
       </a>
     </li>
@@ -253,12 +248,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
       
       
       
@@ -280,7 +277,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../../mithril-shards/">Mithril Shards Core</a>
+          <a href="../">Mithril Shards Core</a>
           
             <label for="__nav_2">
               <span class="md-nav__icon md-icon"></span>
@@ -304,7 +301,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../mithril-shards/shards/" class="md-nav__link">
+      <a href="../shards/" class="md-nav__link">
         Understanding Shards
       </a>
     </li>
@@ -318,7 +315,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../mithril-shards/forge-builder/" class="md-nav__link">
+      <a href="../forge-builder/" class="md-nav__link">
         ForgeBuilder
       </a>
     </li>
@@ -332,7 +329,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../mithril-shards/default-forge/" class="md-nav__link">
+      <a href="../default-forge/" class="md-nav__link">
         DefaultForge
       </a>
     </li>
@@ -344,11 +341,19 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../../mithril-shards/event-bus/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Event Bus
       </a>
+      
     </li>
   
 
@@ -366,14 +371,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
       
       
       
@@ -425,7 +428,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../bedrock-network/">BedrockNetwork</a>
+          <a href="../../shards/bedrock-network/">BedrockNetwork</a>
           
         </div>
       
@@ -469,7 +472,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../serilog/">Serilog</a>
+          <a href="../../shards/serilog/">Serilog</a>
           
         </div>
       
@@ -521,7 +524,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../web-api/">WebApi</a>
+          <a href="../../shards/web-api/">WebApi</a>
           
             <label for="__nav_3_3">
               <span class="md-nav__icon md-icon"></span>
@@ -545,7 +548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../web-api/using-webapishard/" class="md-nav__link">
+      <a href="../../shards/web-api/using-webapishard/" class="md-nav__link">
         Using WebApiShard
       </a>
     </li>
@@ -559,7 +562,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../web-api/areas/" class="md-nav__link">
+      <a href="../../shards/web-api/areas/" class="md-nav__link">
         Web API Areas
       </a>
     </li>
@@ -573,7 +576,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../web-api/creating-a-controller/" class="md-nav__link">
+      <a href="../../shards/web-api/creating-a-controller/" class="md-nav__link">
         Creating a Controller
       </a>
     </li>
@@ -587,7 +590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../web-api/swagger-ui/" class="md-nav__link">
+      <a href="../../shards/web-api/swagger-ui/" class="md-nav__link">
         Using Swagger UI
       </a>
     </li>
@@ -625,7 +628,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../dev-controller/">DevController</a>
+          <a href="../../shards/dev-controller/">DevController</a>
           
         </div>
       
@@ -650,14 +653,12 @@
               
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_5" type="checkbox" id="__nav_3_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_5" type="checkbox" id="__nav_3_5" >
       
       
       
@@ -675,7 +676,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../">Bitcoin</a>
+          <a href="../../shards/bitcoin/">Bitcoin</a>
           
             <label for="__nav_3_5">
               <span class="md-nav__icon md-icon"></span>
@@ -699,7 +700,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../network/" class="md-nav__link">
+      <a href="../../shards/bitcoin/network/" class="md-nav__link">
         Network implementation
       </a>
     </li>
@@ -711,66 +712,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Testing node communication
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../shards/bitcoin/testing_node_communication/" class="md-nav__link">
         Testing node communication
       </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    Troubleshooting
-  </a>
-  
-    <nav class="md-nav" aria-label="Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#systemnetsocketssocketexception-10013" class="md-nav__link">
-    System.Net.Sockets.SocketException (10013)
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -824,7 +770,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../../example-projects/">Example Projects</a>
+          <a href="../../example-projects/">Example Projects</a>
           
             <label for="__nav_4">
               <span class="md-nav__icon md-icon"></span>
@@ -848,7 +794,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../example-projects/mithril-shards-example/" class="md-nav__link">
+      <a href="../../example-projects/mithril-shards-example/" class="md-nav__link">
         MithrilShards.Example
       </a>
     </li>
@@ -862,7 +808,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../example-projects/mithril-shards-example-network-bedrock/" class="md-nav__link">
+      <a href="../../example-projects/mithril-shards-example-network-bedrock/" class="md-nav__link">
         MithrilShards.Example.Network.Bedrock
       </a>
     </li>
@@ -876,7 +822,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../example-projects/mithril-shards-example-dev/" class="md-nav__link">
+      <a href="../../example-projects/mithril-shards-example-dev/" class="md-nav__link">
         MithrilShards.Example.Dev
       </a>
     </li>
@@ -890,7 +836,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../example-projects/mithril-shards-example-node/" class="md-nav__link">
+      <a href="../../example-projects/mithril-shards-example-node/" class="md-nav__link">
         MithrilShards.Example.Node
       </a>
     </li>
@@ -904,7 +850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../example-projects/running-example/" class="md-nav__link">
+      <a href="../../example-projects/running-example/" class="md-nav__link">
         Running the example
       </a>
     </li>
@@ -940,84 +886,20 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    Troubleshooting
-  </a>
-  
-    <nav class="md-nav" aria-label="Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#systemnetsocketssocketexception-10013" class="md-nav__link">
-    System.Net.Sockets.SocketException (10013)
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/mithrilman/mithrilshards/edit/master/docs/shards/bitcoin/testing_node_communication.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/mithrilman/mithrilshards/edit/master/docs/mithril-shards/event-bus.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                <h1 id="testing-node-communication">Testing node communication</h1>
-<p>In order to test the Forge implementation, I used the handy <a href="https://github.com/freewil/bitcoin-testnet-box" target="_blank">bitcoin testnet in a box</a>    </p>
-<p>I used the docker implementation:</p>
-<p><code>docker pull freewil/bitcoin-testnet-box</code></p>
-<p>then I modified the suggested docker run arguments, in order to open the node port, this way, to run the image with an reachable testnet node, run the image as</p>
-<p><code>docker run -t -i -p 19000:19000 -p 19001:19001 -p 19011:19011 freewil/bitcoin-testnet-box</code></p>
-<p>after that, in the tty console, write <code>make start</code> to start the node and this way you can connect to the testnet box using the endpoint <code>127.0.0.1:19000</code></p>
-<p>If everything is going as expected and you ran the Forge within bitcoin-testnet network, you should see something similar to this</p>
-<p><img alt="img" src="https://cdn.discordapp.com/attachments/662122241190002699/662122563270475776/unknown.png" /></p>
-<p>At the time of the screenshot (2nd of January 2020) only the handshake implementation was ready, this is why of warnings following the successful handshake.</p>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<h5 id="systemnetsocketssocketexception-10013">System.Net.Sockets.SocketException (10013)</h5>
-<p>In case you receive this error while trying to open some port for listening, the reason may be your OS is excluding some port ranges for some reason.
-To check if the port is reserved, you can use the command</p>
-<p><code>netsh interface ipv4 show excludedportrange tcp</code></p>
-<p>you'll see a list of port ranges that may include the port you are trying to open.
-To fix that your best bet is to just change the port you want to use in your configuration file, otherwise you need to understand why a specific port range is being reserved and eventually change it.</p>
-<p>You can delete the excludedportrange if you want and you know what you are doing, using commands like</p>
-<p><code>netsh int ipv4 delete excludedportrange protocol=tcp startport=45000 numberofports=100</code></p>
-<p>and add new ones with 
-<code>netsh int ipv4 add excludedportrange protocol=tcp startport=45000 numberofports=100</code></p>
+                  <h1>Event Bus</h1>
+                
+                <p>Event Bus is a simple implementation of the <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern" target="_blank">publish/subscribe pattern</a> which is a messaging pattern that allows two or more actors to publish messages and handle these messages without having a direct relationship between them.</p>
+<p>Publishers don't know if the message they are publishing is handled and by whom, while subscribers do not know who was the publisher of a specific event: this means that components among Mithril Shards can be <a href="https://en.wikipedia.org/wiki/Loose_coupling" target="_blank">loosely coupled</a> </p>
                 
                   
                     
@@ -1026,7 +908,7 @@ To fix that your best bet is to just change the port you want to use in your con
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-03-23
+      Last update: 2021-11-06
     
   </small>
 </div>
@@ -1066,7 +948,7 @@ To fix that your best bet is to just change the port you want to use in your con
 
       <!-- Link to previous page -->
       
-      <a href="../network/"
+      <a href="../default-forge/"
          class="md-footer__link md-footer__link--prev"
          rel="prev">
          <div class="md-footer__button md-icon">
@@ -1077,7 +959,7 @@ To fix that your best bet is to just change the port you want to use in your con
                <span class="md-footer__direction">
                   Previous
                </span>
-               Network implementation
+               DefaultForge
             </div>
          </div>
       </a>
@@ -1085,7 +967,7 @@ To fix that your best bet is to just change the port you want to use in your con
 
       <!-- Link to next page -->
       
-      <a href="../../../example-projects/"
+      <a href="../../shards/bedrock-network/"
          class="md-footer__link md-footer__link--next"
          rel="next">
          <div class="md-footer__title">
@@ -1093,7 +975,7 @@ To fix that your best bet is to just change the port you want to use in your con
                <span class="md-footer__direction">
                   Next
                </span>
-               Example Projects Overview
+               Overview
             </div>
          </div>
          <div class="md-footer__button md-icon">
@@ -1141,14 +1023,14 @@ To fix that your best bet is to just change the port you want to use in your con
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.b1047164.min.js"></script>
+      <script src="../../assets/javascripts/bundle.b1047164.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js"></script>
       
-        <script src="../../../_mkdocs/extra_js/custom.js"></script>
+        <script src="../../_mkdocs/extra_js/custom.js"></script>
       
     
   </body>
