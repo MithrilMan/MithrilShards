@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Net;
+﻿using System.Net;
 using MithrilShards.Core.Shards;
 using MithrilShards.Core.Shards.Validation.ValidationAttributes;
 

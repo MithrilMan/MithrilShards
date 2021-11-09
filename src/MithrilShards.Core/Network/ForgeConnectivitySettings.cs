@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using MithrilShards.Core.Shards;
 using MithrilShards.Core.Network.Server;
+using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Core.Network;
 

@@ -62,17 +62,14 @@ public class BedrockForgeConnectivity : IForgeClientConnectivity
          _logger.LogDebug("Connection to {RemoteEndPoint} canceled", remoteEndPoint.EndPoint);
          await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), "Operation canceled."), cancellation).ConfigureAwait(false);
       }
+      catch (Exception ex) when (!connectionEstablished)
+      {
+         _logger.LogDebug("Connection to {RemoteEndPoint} failed: {Reason}", remoteEndPoint.EndPoint, ex.Message);
+         await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), ex.Message), cancellation).ConfigureAwait(false);
+      }
       catch (Exception ex)
       {
-         if (!connectionEstablished)
-         {
-            await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), ex.Message), cancellation).ConfigureAwait(false);
-         }
-         else
-         {
-            _logger.LogError(ex, "AttemptConnectionAsync failed");
-            //throw;
-         }
+         _logger.LogDebug(ex, "AttemptConnectionAsync failed");
       }
    }
 }

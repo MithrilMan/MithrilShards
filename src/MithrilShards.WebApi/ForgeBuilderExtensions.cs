@@ -1,25 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using MithrilShards.WebApi;
-using System.Text.Json.Serialization;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
-using MithrilShards.Core.Shards;
-using System.Linq;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.Extensions.Logging;
-using System.IO;
-using System;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
-using MithrilShards.WebApi.Filters.OperationFilters;
-using MithrilShards.Dev.Controller;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using MithrilShards.Core.Shards;
+using MithrilShards.Dev.Controller;
+using MithrilShards.WebApi;
 using MithrilShards.WebApi.Conventions;
+using MithrilShards.WebApi.Filters.OperationFilters;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace MithrilShards.Core.Forge;
 
@@ -94,23 +94,23 @@ public static class ForgeBuilderExtensions
 
                      setup.DocInclusionPredicate((x, api) =>
                      {
-                           // actually version number isn't considered
-                           var parts = x.Split("-");
+                        // actually version number isn't considered
+                        var parts = x.Split("-");
                         return parts[0] == api.GroupName;
                      });
 
                      foreach (IDocumentFilter documentFilter in apiServiceDefinition.DocumentFilters)
                      {
                         documentFilterMethod!.MakeGenericMethod(documentFilter.GetType()).Invoke(setup, null);
-                           //apiServiceDefinition.SwaggerGenConfiguration?.Invoke(setup);
-                           logger?.LogDebug("Added document filter type {DocumentFilterType}.", documentFilter.GetType());
+                        //apiServiceDefinition.SwaggerGenConfiguration?.Invoke(setup);
+                        logger?.LogDebug("Added document filter type {DocumentFilterType}.", documentFilter.GetType());
                      }
                   }
 
-                     /// Adds XML documentation to swagger in order to produce a better documentation on swagger UI.
-                     /// Can work only if the assembly has been compiled with the option to generate the XML documentation file
-                     /// and the xml file name is the same as the assembly name (except the extension).
-                     foreach (Assembly assembly in assembliesToInspect)
+                  /// Adds XML documentation to swagger in order to produce a better documentation on swagger UI.
+                  /// Can work only if the assembly has been compiled with the option to generate the XML documentation file
+                  /// and the xml file name is the same as the assembly name (except the extension).
+                  foreach (Assembly assembly in assembliesToInspect)
                   {
                      var xmlFile = $"{assembly.GetName().Name}.xml";
                      var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -128,8 +128,8 @@ public static class ForgeBuilderExtensions
             var mvcBuilder = services
                .AddControllers(configure =>
                {
-                     // adding filters to consume and produce json and to disable controllers that don't belong to an Area
-                     configure.Filters.Add(new ConsumesAttribute("application/json"));
+                  // adding filters to consume and produce json and to disable controllers that don't belong to an Area
+                  configure.Filters.Add(new ConsumesAttribute("application/json"));
                   configure.Filters.Add(new ProducesAttribute("application/json"));
                   configure.Filters.Add<DisableByEndPointActionFilterAttribute>();
 
@@ -142,8 +142,8 @@ public static class ForgeBuilderExtensions
                   options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                });
 
-               // creates application part for each shard and assembly containing controllers.
-               foreach (Assembly assembly in assembliesToInspect)
+            // creates application part for each shard and assembly containing controllers.
+            foreach (Assembly assembly in assembliesToInspect)
             {
                mvcBuilder.AddApplicationPart(assembly);
             }
@@ -160,14 +160,14 @@ public static class ForgeBuilderExtensions
                   IEnumerable<ApiServiceDefinition> apiServiceDefinitions = serverOptions.ApplicationServices.GetService<IEnumerable<ApiServiceDefinition>>()!;
                   var webApiSettings = serverOptions.ApplicationServices.GetService<IOptions<WebApiSettings>>()!.Value;
 
-                     // sanity check of registered ApiServiceDefinition
-                     foreach (var apiServiceDefinition in apiServiceDefinitions)
+                  // sanity check of registered ApiServiceDefinition
+                  foreach (var apiServiceDefinition in apiServiceDefinitions)
                   {
                      apiServiceDefinition.CheckValidity();
                   }
 
-                     //check for duplicated areas
-                     var duplicatedArea = apiServiceDefinitions.GroupBy(d => d.Area).FirstOrDefault(g => g.Count() > 1);
+                  //check for duplicated areas
+                  var duplicatedArea = apiServiceDefinitions.GroupBy(d => d.Area).FirstOrDefault(g => g.Count() > 1);
                   if (duplicatedArea != null)
                   {
                      ThrowHelper.ThrowArgumentException($"Multiple {nameof(ApiServiceDefinition)} defined with the same Area {duplicatedArea.Key}");

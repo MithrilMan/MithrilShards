@@ -38,14 +38,11 @@ public class MithrilForgeClientConnectionHandler : ConnectionHandler
 
    public override async Task OnConnectedAsync(ConnectionContext connection)
    {
-      // TODO: we could register processors as Scoped per connection and create a scope here
-      //using var serviceProviderScope = serviceProvider.CreateScope();
+      if (connection is null) throw new ArgumentNullException(nameof(connection));
 
-      if (connection is null)
-      {
-         throw new ArgumentNullException(nameof(connection));
-      }
+      OutgoingConnectionEndPoint outgoingConnectionEndPoint = connection.Features.Get<OutgoingConnectionEndPoint>() ?? throw new NullReferenceException($"Missing {nameof(OutgoingConnectionEndPoint)} feature.");
 
+      using var serviceProviderScope = _serviceProvider.CreateScope();
       using IDisposable logScope = _logger.BeginScope("Peer {PeerId} connected to outbound {PeerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
 
       ProtocolReader reader = connection.CreateReader();
@@ -53,7 +50,7 @@ public class MithrilForgeClientConnectionHandler : ConnectionHandler
 
       IPeerContext peerContext = _peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
                                                                                          connection.LocalEndPoint!,
-                                                                                         connection.Features.Get<OutgoingConnectionEndPoint>(),
+                                                                                         outgoingConnectionEndPoint,
                                                                                          new NetworkMessageWriter(protocol, connection.CreateWriter()));
 
       // will dispose peerContext when out of scope, see https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync#using-async-disposable

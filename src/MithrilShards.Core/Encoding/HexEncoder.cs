@@ -12,7 +12,7 @@ public static class HexEncoder
       return string.Create(2 * rawData.Length, rawData.ToArray(), (dst, src) =>
       {
          string hexDigits = HEX_VALUES; //JIT optimization
-            int i = src.Length - 1;
+         int i = src.Length - 1;
 
          if (reverse)
          {

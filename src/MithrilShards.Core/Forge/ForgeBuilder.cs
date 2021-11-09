@@ -139,8 +139,8 @@ public class ForgeBuilder : IForgeBuilder
 
          optionsBuilder.Services.AddSingleton<IValidateOptions<TMithrilShardSettings>>(new DataAnnotationValidateOptions<TMithrilShardSettings>(optionsBuilder.Name));
 
-            //register the shard configuration setting as IMithrilShardSettings in order to allow DefaultConfigurationWriter to write default its default values
-            services.AddSingleton<IMithrilShardSettings, TMithrilShardSettings>();
+         //register the shard configuration setting as IMithrilShardSettings in order to allow DefaultConfigurationWriter to write default its default values
+         services.AddSingleton<IMithrilShardSettings, TMithrilShardSettings>();
 
          context.SetShardSettings<TMithrilShardSettings>(services);
       });
@@ -228,8 +228,8 @@ public class ForgeBuilder : IForgeBuilder
 
       _ = _hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
       {
-            // do not change optional to true, because there is SetFileLoadExceptionHandler that will create a default file if missing.
-            config.AddJsonFile(configurationFileProvider, Path.GetFileName(ConfigurationFileName), optional: false, reloadOnChange: true);
+         // do not change optional to true, because there is SetFileLoadExceptionHandler that will create a default file if missing.
+         config.AddJsonFile(configurationFileProvider, Path.GetFileName(ConfigurationFileName), optional: false, reloadOnChange: true);
 
          config.AddEnvironmentVariables("FORGE_");
 

@@ -103,8 +103,8 @@ public abstract class BaseProcessor : INetworkMessageProcessor
    {
       _eventSubscriptionManager.RegisterSubscriptions(eventBus.Subscribe<TEventBase>(async (message, cancellationToken) =>
       {
-            // ensure we listen only to events we are interested into
-            if (clause != null && !clause(message)) return;
+         // ensure we listen only to events we are interested into
+         if (clause != null && !clause(message)) return;
 
          await handler(message).ConfigureAwait(false);
       }));
@@ -166,11 +166,11 @@ public abstract class BaseProcessor : INetworkMessageProcessor
          }
          catch (OperationCanceledException)
          {
-               // Task canceled, legit, ignoring exception.
-            }
+            // Task canceled, legit, ignoring exception.
+         }
 
-            // if cancellation was requested, return without doing anything
-            if (!cancellation.IsCancellationRequested && !PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
+         // if cancellation was requested, return without doing anything
+         if (!cancellation.IsCancellationRequested && !PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
          {
             PeerContext.Disconnect(reason);
          }
@@ -200,11 +200,11 @@ public abstract class BaseProcessor : INetworkMessageProcessor
          }
          catch (OperationCanceledException)
          {
-               // Task canceled, legit, ignoring exception.
-            }
+            // Task canceled, legit, ignoring exception.
+         }
 
-            // if cancellation was requested, return without doing anything
-            if (!cancellation.IsCancellationRequested && !PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
+         // if cancellation was requested, return without doing anything
+         if (!cancellation.IsCancellationRequested && !PeerContext.ConnectionCancellationTokenSource.Token.IsCancellationRequested && await condition().ConfigureAwait(false))
          {
             logger.LogDebug("Condition met, trigger action.");
             await action().ConfigureAwait(false);
