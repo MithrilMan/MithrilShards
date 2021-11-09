@@ -666,11 +666,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
 
       public override void Dispose()
       {
-         // if this peer is able to serve blocks, register it
-         if (!_status.IsClient)
-         {
-            _blockFetcherManager.UnregisterFetcher(this);
-         }
+         // unregister the peer from fetcher list if it was registered.
+         _blockFetcherManager.UnregisterFetcher(this);
 
          base.Dispose();
       }
