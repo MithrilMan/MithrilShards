@@ -4,110 +4,104 @@ using System.Threading.Tasks;
 
 namespace MithrilShards.Core.Extensions;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD003:Avoid awaiting foreign Tasks", Justification = "<Pending>")]
 public static class TaskExtensions
 {
-   //   /// <summary>
-   //   /// Throws OperationCanceledException if token cancels before the real task completes.
-   //   /// Doesn't abort the inner task, but allows the calling code to get "unblocked" and react to stuck tasks.
-   //   /// </summary>
-   //   public static Task<T> WithCancellationAsync<T>(this Task<T> task, CancellationToken token, bool useSynchronizationContext = false, bool continueOnCapturedContext = false) {
-   //      if (!token.CanBeCanceled || task.IsCompleted) {
-   //         return task;
-   //      }
-   //      else if (token.IsCancellationRequested) {
-   //         return Task.FromCanceled<T>(token);
-   //      }
-
-   //      return Inner(task, token, useSynchronizationContext, continueOnCapturedContext);
-
-   //      static async Task<T> Inner(Task<T> task, CancellationToken token, bool useSynchronizationContext, bool continueOnCapturedContext) {
-   //         var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-   //         using (token.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs, useSynchronizationContext)) {
-   //            if (task != await Task.WhenAny(task, tcs.Task)) {
-   //               token.ThrowIfCancellationRequested();
-   //            }
-   //         }
-
-   //         // This is needed to re-throw eventual task exception that would be grouped instead.
-   //         return await task.ConfigureAwait(continueOnCapturedContext);
-   //      }
-   //   }
-
-   //   /// <summary>
-   //   /// Throws OperationCanceledException if token cancels before the real task completes.
-   //   /// Doesn't abort the inner task, but allows the calling code to get "unblocked" and react to stuck tasks.
-   //   /// </summary>
-   //   public static Task WithCancellationAsync(this Task task, CancellationToken token, bool useSynchronizationContext = false, bool continueOnCapturedContext = false) {
-   //      if (!token.CanBeCanceled || task.IsCompleted) {
-   //         return task;
-   //      }
-   //      else if (token.IsCancellationRequested) {
-   //         return Task.FromCanceled(token);
-   //      }
-
-   //      return Inner(task, token, useSynchronizationContext, continueOnCapturedContext);
-
-   //      static async Task Inner(Task task, CancellationToken token, bool useSynchronizationContext, bool continueOnCapturedContext) {
-   //         var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-   //         using (token.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs, useSynchronizationContext)) {
-   //            if (task != await Task.WhenAny(task, tcs.Task)) {
-   //               token.ThrowIfCancellationRequested();
-   //            }
-   //         }
-
-   //         // This is needed to re-throw eventual task exception that would be grouped instead.
-   //         await task.ConfigureAwait(continueOnCapturedContext);
-   //      }
-   //   }
-
    /// <summary>
-   /// Allows to cancel awaitable operations with a cancellationToken.
-   /// https://devblogs.microsoft.com/pfxteam/how-do-i-cancel-non-cancelable-async-operations/
+   /// Wraps a task with one that will complete as cancelled based on a cancellation token,
+   /// allowing someone to await a task but be able to break out early by cancelling the token.
    /// </summary>
-   /// <typeparam name="T">Task return type</typeparam>
-   /// <param name="task">The task.</param>
-   /// <param name="cancellationToken">The cancellation token.</param>
-   /// <returns></returns>
-   /// <exception cref="OperationCanceledException">Task has been canceled.</exception>
-   public static async Task<T> WithCancellationAsync<T>(this Task<T> task, CancellationToken cancellationToken)
+   /// <typeparam name="T">The type of value returned by the task.</typeparam>
+   /// <param name="task">The task to wrap.</param>
+   /// <param name="cancellationToken">The token that can be canceled to break out of the await.</param>
+   /// <returns>The wrapping task.</returns>
+   public static Task<T> WithCancellationAsync<T>(this Task<T> task, CancellationToken cancellationToken)
    {
-      var tcs = new TaskCompletionSource<bool>();
+      if (task is null) throw new ArgumentNullException(nameof(task));
 
-      using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s!).TrySetResult(true), tcs))
+      if (!cancellationToken.CanBeCanceled || task.IsCompleted)
       {
-         if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
-         {
-            throw new OperationCanceledException(cancellationToken);
-         }
+         return task;
       }
 
-#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-      return await task.ConfigureAwait(false);
-#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
+      if (cancellationToken.IsCancellationRequested)
+      {
+         return Task.FromCanceled<T>(cancellationToken);
+      }
+
+      return WithCancellationSlow(task, cancellationToken);
+   }
+
+
+   /// <summary>
+   /// Wraps a task with one that will complete as cancelled based on a cancellation token,
+   /// allowing someone to await a task but be able to break out early by cancelling the token.
+   /// </summary>
+   /// <param name="task">The task to wrap.</param>
+   /// <param name="cancellationToken">The token that can be canceled to break out of the await.</param>
+   /// <returns>The wrapping task.</returns>
+   public static Task WithCancellationAsync(this Task task, CancellationToken cancellationToken)
+   {
+      if (task is null) ThrowHelper.ThrowArgumentNullException(nameof(task));
+
+      if (!cancellationToken.CanBeCanceled || task.IsCompleted)
+      {
+         return task;
+      }
+
+      if (cancellationToken.IsCancellationRequested)
+      {
+         return Task.FromCanceled(cancellationToken);
+      }
+
+      return WithCancellationSlow(task, continueOnCapturedContext: false, cancellationToken: cancellationToken);
    }
 
    /// <summary>
-   /// Allows to cancel awaitable operations with a cancellationToken.
-   /// https://devblogs.microsoft.com/pfxteam/how-do-i-cancel-non-cancelable-async-operations/
+   /// Wraps a task with one that will complete as cancelled based on a cancellation token,
+   /// allowing someone to await a task but be able to break out early by cancelling the token.
    /// </summary>
-   /// <param name="task">The task.</param>
-   /// <param name="cancellationToken">The cancellation token.</param>
-   /// <returns></returns>
-   /// <exception cref="OperationCanceledException">Task has been canceled.</exception>
-   public static async Task WithCancellationAsync(this Task task, CancellationToken cancellationToken)
+   /// <typeparam name="T">The type of value returned by the task.</typeparam>
+   /// <param name="task">The task to wrap.</param>
+   /// <param name="continueOnCapturedContext">A value indicating whether *internal* continuations required to respond to cancellation should run on the current <see cref="SynchronizationContext"/>.</param>
+   /// <param name="cancellationToken">The token that can be canceled to break out of the await.</param>
+   /// <returns>The wrapping task.</returns>
+   private static async Task<T> WithCancellationSlow<T>(Task<T> task, CancellationToken cancellationToken, bool continueOnCapturedContext = false)
    {
       var tcs = new TaskCompletionSource<bool>();
-
       using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s!).TrySetResult(true), tcs))
       {
-         if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
+         if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(continueOnCapturedContext))
          {
-            throw new OperationCanceledException(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
          }
       }
 
-#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-      await task.ConfigureAwait(false); // This is needed to re-throw eventual task exception.
-#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
+      // Rethrow any fault/cancellation exception, even if we awaited above.
+      // But if we skipped the above if branch, this will actually yield
+      // on an incompleted task.
+      return await task.ConfigureAwait(continueOnCapturedContext);
+   }
+
+   /// <summary>
+   /// Wraps a task with one that will complete as cancelled based on a cancellation token,
+   /// allowing someone to await a task but be able to break out early by cancelling the token.
+   /// </summary>
+   /// <param name="task">The task to wrap.</param>
+   /// <param name="continueOnCapturedContext">A value indicating whether *internal* continuations required to respond to cancellation should run on the current <see cref="SynchronizationContext"/>.</param>
+   /// <param name="cancellationToken">The token that can be canceled to break out of the await.</param>
+   /// <returns>The wrapping task.</returns>
+   private static async Task WithCancellationSlow(this Task task, CancellationToken cancellationToken, bool continueOnCapturedContext = false)
+   {
+      var tcs = new TaskCompletionSource<bool>();
+      using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s!).TrySetResult(true), tcs))
+      {
+         if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(continueOnCapturedContext))
+         {
+            cancellationToken.ThrowIfCancellationRequested();
+         }
+      }
+
+      await task.ConfigureAwait(continueOnCapturedContext);
    }
 }
