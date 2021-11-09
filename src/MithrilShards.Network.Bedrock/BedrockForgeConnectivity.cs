@@ -11,68 +11,67 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Events;
 
-namespace MithrilShards.Network.Bedrock
+namespace MithrilShards.Network.Bedrock;
+
+public class BedrockForgeConnectivity : IForgeClientConnectivity
 {
-   public class BedrockForgeConnectivity : IForgeClientConnectivity
+   private readonly ILogger<BedrockNetworkShard> _logger;
+   private readonly IEventBus _eventBus;
+   private readonly MithrilForgeClientConnectionHandler _clientConnectionHandler;
+   private readonly ForgeConnectivitySettings _settings;
+   private readonly Client _client = null!;
+
+   public BedrockForgeConnectivity(ILogger<BedrockNetworkShard> logger,
+                             IEventBus eventBus,
+                             IOptions<ForgeConnectivitySettings> settings,
+                             MithrilForgeClientConnectionHandler clientConnectionHandler,
+                             ClientBuilder clientBuilder)
    {
-      private readonly ILogger<BedrockNetworkShard> _logger;
-      private readonly IEventBus _eventBus;
-      private readonly MithrilForgeClientConnectionHandler _clientConnectionHandler;
-      private readonly ForgeConnectivitySettings _settings;
-      private readonly Client _client = null!;
+      _logger = logger;
+      _eventBus = eventBus;
+      _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
+      _clientConnectionHandler = clientConnectionHandler;
+      _client = clientBuilder
+         .UseSockets()
+         .UseConnectionLogging()
+         .Build();
+   }
 
-      public BedrockForgeConnectivity(ILogger<BedrockNetworkShard> logger,
-                                IEventBus eventBus,
-                                IOptions<ForgeConnectivitySettings> settings,
-                                MithrilForgeClientConnectionHandler clientConnectionHandler,
-                                ClientBuilder clientBuilder)
+   public async ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation)
+   {
+      using IDisposable logScope = _logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
+      await _eventBus.PublishAsync(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()), cancellation).ConfigureAwait(false);
+
+      bool connectionEstablished = false;
+
+      try
       {
-         _logger = logger;
-         _eventBus = eventBus;
-         _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
-         _clientConnectionHandler = clientConnectionHandler;
-         _client = clientBuilder
-            .UseSockets()
-            .UseConnectionLogging()
-            .Build();
+         ConnectionContext connection = await _client.ConnectAsync(remoteEndPoint.EndPoint, cancellation).ConfigureAwait(false);
+
+         // will dispose peerContext when out of scope, see https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync#using-async-disposable
+         await using var connectionScope = connection.ConfigureAwait(false);
+
+         // we store the RemoteEndPoint class as a feature of the connection so we can then copy it into the PeerContext in the ClientConnectionHandler.OnConnectedAsync
+         connection.Features.Set(remoteEndPoint);
+         connectionEstablished = true;
+
+         await _clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
       }
-
-      public async ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation)
+      catch (OperationCanceledException)
       {
-         using IDisposable logScope = _logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
-         await _eventBus.PublishAsync(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()), cancellation).ConfigureAwait(false);
-
-         bool connectionEstablished = false;
-
-         try
+         _logger.LogDebug("Connection to {RemoteEndPoint} canceled", remoteEndPoint.EndPoint);
+         await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), "Operation canceled."), cancellation).ConfigureAwait(false);
+      }
+      catch (Exception ex)
+      {
+         if (!connectionEstablished)
          {
-            ConnectionContext connection = await _client.ConnectAsync(remoteEndPoint.EndPoint, cancellation).ConfigureAwait(false);
-
-            // will dispose peerContext when out of scope, see https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync#using-async-disposable
-            await using var connectionScope = connection.ConfigureAwait(false);
-
-            // we store the RemoteEndPoint class as a feature of the connection so we can then copy it into the PeerContext in the ClientConnectionHandler.OnConnectedAsync
-            connection.Features.Set(remoteEndPoint);
-            connectionEstablished = true;
-
-            await _clientConnectionHandler.OnConnectedAsync(connection).ConfigureAwait(false);
+            await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), ex.Message), cancellation).ConfigureAwait(false);
          }
-         catch (OperationCanceledException)
+         else
          {
-            _logger.LogDebug("Connection to {RemoteEndPoint} canceled", remoteEndPoint.EndPoint);
-            await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), "Operation canceled."), cancellation).ConfigureAwait(false);
-         }
-         catch (Exception ex)
-         {
-            if (!connectionEstablished)
-            {
-               await _eventBus.PublishAsync(new PeerConnectionAttemptFailed(remoteEndPoint.EndPoint.AsIPEndPoint(), ex.Message), cancellation).ConfigureAwait(false);
-            }
-            else
-            {
-               _logger.LogError(ex, "AttemptConnectionAsync failed");
-               //throw;
-            }
+            _logger.LogError(ex, "AttemptConnectionAsync failed");
+            //throw;
          }
       }
    }

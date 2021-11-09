@@ -6,49 +6,48 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace MithrilShards.Core.Shards.Validation
+namespace MithrilShards.Core.Shards.Validation;
+
+internal class ValidationHostedService : IHostedService
 {
-   internal class ValidationHostedService : IHostedService
+   private readonly IDictionary<Type, Action> _validators;
+
+   public ValidationHostedService(IOptions<ValidatorOptions> validatorOptions)
    {
-      private readonly IDictionary<Type, Action> _validators;
-
-      public ValidationHostedService(IOptions<ValidatorOptions> validatorOptions)
-      {
-         _validators = validatorOptions?.Value?.Validators ?? throw new ArgumentNullException(nameof(validatorOptions));
-      }
-
-      public Task StartAsync(CancellationToken cancellationToken)
-      {
-         var exceptions = new List<Exception>();
-
-         foreach (var validate in _validators.Values)
-         {
-            try
-            {
-               // Execute the validation method and catch the validation error
-               validate();
-            }
-            catch (OptionsValidationException ex)
-            {
-               exceptions.Add(ex);
-            }
-         }
-
-         if (exceptions.Count == 1)
-         {
-            // Rethrow if it's a single error
-            ExceptionDispatchInfo.Capture(exceptions[0]).Throw();
-         }
-
-         if (exceptions.Count > 1)
-         {
-            // Aggregate if we have many errors
-            throw new AggregateException(exceptions);
-         }
-
-         return Task.CompletedTask;
-      }
-
-      public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+      _validators = validatorOptions?.Value?.Validators ?? throw new ArgumentNullException(nameof(validatorOptions));
    }
+
+   public Task StartAsync(CancellationToken cancellationToken)
+   {
+      var exceptions = new List<Exception>();
+
+      foreach (var validate in _validators.Values)
+      {
+         try
+         {
+            // Execute the validation method and catch the validation error
+            validate();
+         }
+         catch (OptionsValidationException ex)
+         {
+            exceptions.Add(ex);
+         }
+      }
+
+      if (exceptions.Count == 1)
+      {
+         // Rethrow if it's a single error
+         ExceptionDispatchInfo.Capture(exceptions[0]).Throw();
+      }
+
+      if (exceptions.Count > 1)
+      {
+         // Aggregate if we have many errors
+         throw new AggregateException(exceptions);
+      }
+
+      return Task.CompletedTask;
+   }
+
+   public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

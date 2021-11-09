@@ -3,29 +3,29 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MithrilShards.Core.Threading
+namespace MithrilShards.Core.Threading;
+
+public class BackgroundTaskQueue : IBackgroundTaskQueue
 {
-   public class BackgroundTaskQueue : IBackgroundTaskQueue
+   private readonly ConcurrentQueue<Func<CancellationToken, Task>> _workItems = new();
+   private readonly SemaphoreSlim _signal = new(0);
+
+   public void QueueBackgroundWorkItem(Func<CancellationToken, Task> workItem)
    {
-      private readonly ConcurrentQueue<Func<CancellationToken, Task>> _workItems = new();
-      private readonly SemaphoreSlim _signal = new(0);
-
-      public void QueueBackgroundWorkItem(Func<CancellationToken, Task> workItem)
+      if (workItem == null)
       {
-         if (workItem == null)
-         {
-            throw new ArgumentNullException(nameof(workItem));
-         }
-
-         _workItems.Enqueue(workItem);
-         _signal.Release();
+         throw new ArgumentNullException(nameof(workItem));
       }
 
-      public async Task<Func<CancellationToken, Task>?> DequeueAsync(CancellationToken cancellationToken){
-         await _signal.WaitAsync(cancellationToken).ConfigureAwait(false);
-         _workItems.TryDequeue(out Func<CancellationToken, Task>? workItem);
+      _workItems.Enqueue(workItem);
+      _signal.Release();
+   }
 
-         return workItem;
-      }
+   public async Task<Func<CancellationToken, Task>?> DequeueAsync(CancellationToken cancellationToken)
+   {
+      await _signal.WaitAsync(cancellationToken).ConfigureAwait(false);
+      _workItems.TryDequeue(out Func<CancellationToken, Task>? workItem);
+
+      return workItem;
    }
 }

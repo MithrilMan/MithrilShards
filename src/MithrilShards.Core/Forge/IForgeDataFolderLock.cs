@@ -1,8 +1,7 @@
-﻿namespace MithrilShards.Core.Forge
+﻿namespace MithrilShards.Core.Forge;
+
+public interface IForgeDataFolderLock
 {
-   public interface IForgeDataFolderLock
-   {
-      bool TryLockDataFolder();
-      void UnlockDataFolder();
-   }
+   bool TryLockDataFolder();
+   void UnlockDataFolder();
 }

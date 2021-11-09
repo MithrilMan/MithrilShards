@@ -1,25 +1,24 @@
 ﻿using System;
 
-namespace MithrilShards.Core.Utils
+namespace MithrilShards.Core.Utils;
+
+public class ByteSizeFormatter
 {
-   public class ByteSizeFormatter
+   private const string SI_UNITS = "kMGTPE";
+   private const string UNITS = "KMGTPE";
+
+   public static string HumanReadable(long bytes, bool si = true)
    {
-      private const string SI_UNITS = "kMGTPE";
-      private const string UNITS = "KMGTPE";
+      int unit = si ? 1000 : 1024;
 
-      public static string HumanReadable(long bytes, bool si = true)
+      if (bytes < unit)
       {
-         int unit = si ? 1000 : 1024;
-
-         if (bytes < unit)
-         {
-            return $"{bytes} B";
-         }
-
-         int exp = (int)(Math.Log(bytes) / Math.Log(unit));
-         double value = bytes / Math.Pow(unit, exp);
-
-         return si ? $"{value:F2} {SI_UNITS[exp - 1]}B" : $"{value:F2} {UNITS[exp - 1]}iB";
+         return $"{bytes} B";
       }
+
+      int exp = (int)(Math.Log(bytes) / Math.Log(unit));
+      double value = bytes / Math.Pow(unit, exp);
+
+      return si ? $"{value:F2} {SI_UNITS[exp - 1]}B" : $"{value:F2} {UNITS[exp - 1]}iB";
    }
 }

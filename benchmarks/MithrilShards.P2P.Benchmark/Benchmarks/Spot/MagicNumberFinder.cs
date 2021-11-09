@@ -3,129 +3,128 @@ using System.Buffers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
-namespace MithrilShards.Network.Benchmark.Benchmarks
+namespace MithrilShards.Network.Benchmark.Benchmarks;
+
+[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+[RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
+public class MagicNumberFinder
 {
-   [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-   [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
-   public class MagicNumberFinder
+   readonly byte[] _magicNumberBytes = BitConverter.GetBytes(0x0709110B);
+   readonly int _magicNumber = 0x0709110B;
+
+   private ReadOnlySequence<byte> _input;
+
+   [Params(100, 10000)]
+   //[Params(1_000_000)]
+   public int PacketSize;
+
+   //0 = at the beginning, 1 = at the end
+   [Params(0f, 0.2f, 0.5f, 1f)]
+   //[Params(1f)]
+   public float MagicPacketRelativePosition;
+
+   [GlobalSetup]
+   public void Setup()
    {
-      readonly byte[] _magicNumberBytes = BitConverter.GetBytes(0x0709110B);
-      readonly int _magicNumber = 0x0709110B;
+      byte[] data = new byte[PacketSize];
+      new Random().NextBytes(data);
 
-      private ReadOnlySequence<byte> _input;
-
-      [Params(100, 10000)]
-      //[Params(1_000_000)]
-      public int PacketSize;
-
-      //0 = at the beginning, 1 = at the end
-      [Params(0f, 0.2f, 0.5f, 1f)]
-      //[Params(1f)]
-      public float MagicPacketRelativePosition;
-
-      [GlobalSetup]
-      public void Setup()
+      //ensure magic packet is at the right position, replace every occurrence of the first magic packet in the string with something else
+      for (int i = 0; i < data.Length; i++)
       {
-         byte[] data = new byte[PacketSize];
-         new Random().NextBytes(data);
-
-         //ensure magic packet is at the right position, replace every occurrence of the first magic packet in the string with something else
-         for (int i = 0; i < data.Length; i++)
+         byte b = data[i];
+         if (b == _magicNumberBytes[0])
          {
-            byte b = data[i];
-            if (b == _magicNumberBytes[0])
-            {
-               data[i] = (byte)'\0';
-            }
+            data[i] = (byte)'\0';
          }
+      }
 
-         // insert magic packet at the right position
-         int position = (int)(data.Length * MagicPacketRelativePosition);
-         position = Math.Min(position, data.Length - (_magicNumberBytes.Length + 1));
-         for (int i = 0; i < _magicNumberBytes.Length; i++)
+      // insert magic packet at the right position
+      int position = (int)(data.Length * MagicPacketRelativePosition);
+      position = Math.Min(position, data.Length - (_magicNumberBytes.Length + 1));
+      for (int i = 0; i < _magicNumberBytes.Length; i++)
+      {
+         data[position + i] = _magicNumberBytes[i];
+      }
+
+      _input = new ReadOnlySequence<byte>(data);
+   }
+
+
+   [Benchmark]
+   public bool FindWithTryAdvanceTo()
+   {
+      var reader = new SequenceReader<byte>(_input);
+      return FindWithTryAdvanceTo(ref reader);
+   }
+
+   [Benchmark]
+   public bool FindWithForLoop()
+   {
+      var reader = new SequenceReader<byte>(_input);
+      return FindWithForLoop(ref reader);
+   }
+
+
+
+
+   private bool FindWithTryAdvanceTo(ref SequenceReader<byte> reader)
+   {
+      // advance to the first byte of the magic number.
+      while (reader.TryAdvanceTo(_magicNumberBytes[0], advancePastDelimiter: false))
+      {
+         if (reader.TryReadLittleEndian(out int magicRead))
          {
-            data[position + i] = _magicNumberBytes[i];
-         }
-
-         _input = new ReadOnlySequence<byte>(data);
-      }
-
-
-      [Benchmark]
-      public bool FindWithTryAdvanceTo()
-      {
-         var reader = new SequenceReader<byte>(_input);
-         return FindWithTryAdvanceTo(ref reader);
-      }
-
-      [Benchmark]
-      public bool FindWithForLoop()
-      {
-         var reader = new SequenceReader<byte>(_input);
-         return FindWithForLoop(ref reader);
-      }
-
-
-
-
-      private bool FindWithTryAdvanceTo(ref SequenceReader<byte> reader)
-      {
-         // advance to the first byte of the magic number.
-         while (reader.TryAdvanceTo(_magicNumberBytes[0], advancePastDelimiter: false))
-         {
-            if (reader.TryReadLittleEndian(out int magicRead))
+            if (magicRead == _magicNumber)
             {
-               if (magicRead == _magicNumber)
-               {
-                  return true;
-               }
-               else
-               {
-                  reader.Rewind(3);
-               }
+               return true;
             }
             else
             {
-               return false;
+               reader.Rewind(3);
             }
          }
-
-         // didn't found the first magic byte so can advance up to the end
-         reader.Advance(reader.Remaining);
-         return false;
-      }
-
-      private bool FindWithForLoop(ref SequenceReader<byte> reader)
-      {
-         for (int i = 0; i < _magicNumberBytes.Length; i++)
+         else
          {
-            byte expectedByte = _magicNumberBytes[i];
+            return false;
+         }
+      }
 
-            if (reader.TryRead(out byte receivedByte))
-            {
-               if (expectedByte != receivedByte)
-               {
-                  // If we did not receive the next byte we expected
-                  // we either received the first byte of the magic value
-                  // or not. If yes, we set index to 0 here, which is then
-                  // incremented in for loop to 1 and we thus continue
-                  // with the second byte. Otherwise, we set index to -1
-                  // here, which means that after the loop incrementation,
-                  // we will start from first byte of magic.
-                  i = receivedByte == _magicNumberBytes[0] ? 0 : -1;
-               }
-            }
-            else
-            {
-               //nothing left to read
-               // in case there are partial matches for the magic packet, don't consider them as consumed
-               // so they will be examined again next iteration when hopefully the full magic number will be present
-               reader.Rewind(i);
+      // didn't found the first magic byte so can advance up to the end
+      reader.Advance(reader.Remaining);
+      return false;
+   }
 
-               return false;
+   private bool FindWithForLoop(ref SequenceReader<byte> reader)
+   {
+      for (int i = 0; i < _magicNumberBytes.Length; i++)
+      {
+         byte expectedByte = _magicNumberBytes[i];
+
+         if (reader.TryRead(out byte receivedByte))
+         {
+            if (expectedByte != receivedByte)
+            {
+               // If we did not receive the next byte we expected
+               // we either received the first byte of the magic value
+               // or not. If yes, we set index to 0 here, which is then
+               // incremented in for loop to 1 and we thus continue
+               // with the second byte. Otherwise, we set index to -1
+               // here, which means that after the loop incrementation,
+               // we will start from first byte of magic.
+               i = receivedByte == _magicNumberBytes[0] ? 0 : -1;
             }
          }
-         return true;
+         else
+         {
+            //nothing left to read
+            // in case there are partial matches for the magic packet, don't consider them as consumed
+            // so they will be examined again next iteration when hopefully the full magic number will be present
+            reader.Rewind(i);
+
+            return false;
+         }
       }
+      return true;
    }
 }

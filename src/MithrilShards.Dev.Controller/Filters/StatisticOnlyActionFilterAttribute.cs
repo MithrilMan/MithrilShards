@@ -2,26 +2,25 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using MithrilShards.Core.Statistics;
 
-namespace MithrilShards.Dev.Controller
+namespace MithrilShards.Dev.Controller;
+
+public class StatisticOnlyActionFilterAttribute : ActionFilterAttribute
 {
-   public class StatisticOnlyActionFilterAttribute : ActionFilterAttribute
+   readonly IStatisticFeedsCollector? _statisticFeedsCollector;
+
+   public StatisticOnlyActionFilterAttribute(IStatisticFeedsCollector? statisticFeedsCollector = null)
    {
-      readonly IStatisticFeedsCollector? _statisticFeedsCollector;
+      _statisticFeedsCollector = statisticFeedsCollector;
+   }
 
-      public StatisticOnlyActionFilterAttribute(IStatisticFeedsCollector? statisticFeedsCollector = null)
+   public override void OnActionExecuting(ActionExecutingContext context)
+   {
+      if (_statisticFeedsCollector == null || _statisticFeedsCollector is StatisticFeedsCollectorNullImplementation)
       {
-         _statisticFeedsCollector = statisticFeedsCollector;
+         context.Result = new NotFoundObjectResult($"Cannot produce output because {nameof(IStatisticFeedsCollector)} is not available");
+         return;
       }
 
-      public override void OnActionExecuting(ActionExecutingContext context)
-      {
-         if (_statisticFeedsCollector == null || _statisticFeedsCollector is StatisticFeedsCollectorNullImplementation)
-         {
-            context.Result = new NotFoundObjectResult($"Cannot produce output because {nameof(IStatisticFeedsCollector)} is not available");
-            return;
-         }
-
-         base.OnActionExecuting(context);
-      }
+      base.OnActionExecuting(context);
    }
 }

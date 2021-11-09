@@ -2,23 +2,23 @@
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core;
 
-namespace MithrilShards.Example
+namespace MithrilShards.Example;
+
+/// <summary>
+/// Very minimal service implementation that expose a list of quotes used by <see cref="Protocol.Processors.PingPongProcessor"/>.
+/// </summary>
+public class QuoteService : IQuoteService
 {
-   /// <summary>
-   /// Very minimal service implementation that expose a list of quotes used by <see cref="Protocol.Processors.PingPongProcessor"/>.
-   /// </summary>
-   public class QuoteService : IQuoteService
+   readonly ILogger<QuoteService> _logger;
+   readonly IRandomNumberGenerator _randomNumberGenerator;
+
+   public QuoteService(ILogger<QuoteService> logger, IRandomNumberGenerator randomNumberGenerator)
    {
-      readonly ILogger<QuoteService> _logger;
-      readonly IRandomNumberGenerator _randomNumberGenerator;
+      _logger = logger;
+      _randomNumberGenerator = randomNumberGenerator;
+   }
 
-      public QuoteService(ILogger<QuoteService> logger, IRandomNumberGenerator randomNumberGenerator)
-      {
-         _logger = logger;
-         _randomNumberGenerator = randomNumberGenerator;
-      }
-
-      public List<string> Quotes { get; } = new List<string>
+   public List<string> Quotes { get; } = new List<string>
       {
          "There is only one Lord of the Ring, only one who can bend it to his will. And he does not share power.",
          "That there’s some good in this world, Mr. Frodo… and it’s worth fighting for.",
@@ -42,9 +42,8 @@ namespace MithrilShards.Example
          "I’m glad to be with you, Samwise Gamgee…here at the end of all things.",
       };
 
-      public string GetRandomQuote()
-      {
-         return Quotes.Count > 0 ? Quotes[(int)(_randomNumberGenerator.GetUint32() % Quotes.Count)] : string.Empty;
-      }
+   public string GetRandomQuote()
+   {
+      return Quotes.Count > 0 ? Quotes[(int)(_randomNumberGenerator.GetUint32() % Quotes.Count)] : string.Empty;
    }
 }

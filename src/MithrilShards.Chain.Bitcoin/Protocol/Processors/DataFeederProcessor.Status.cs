@@ -1,12 +1,11 @@
-﻿namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
+﻿namespace MithrilShards.Chain.Bitcoin.Protocol.Processors;
+
+public partial class DataFeederProcessor
 {
-   public partial class DataFeederProcessor
+   private readonly DataFeederProcessorStatus _status = new();
+
+   public class DataFeederProcessorStatus
    {
-      private readonly DataFeederProcessorStatus _status = new();
 
-      public class DataFeederProcessorStatus
-      {
-
-      }
    }
 }

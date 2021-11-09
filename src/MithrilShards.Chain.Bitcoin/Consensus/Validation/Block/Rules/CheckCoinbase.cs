@@ -1,39 +1,38 @@
 ﻿using Microsoft.Extensions.Logging;
 
 
-namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
-{
-   public class CheckCoinbase : IBlockValidationRule
-   {
-      readonly ILogger<CheckCoinbase> _logger;
+namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules;
 
-      public CheckCoinbase(ILogger<CheckCoinbase> logger)
+public class CheckCoinbase : IBlockValidationRule
+{
+   readonly ILogger<CheckCoinbase> _logger;
+
+   public CheckCoinbase(ILogger<CheckCoinbase> logger)
+   {
+      _logger = logger;
+   }
+
+
+   public bool Check(IBlockValidationContext context, ref BlockValidationState validationState)
+   {
+      Protocol.Types.Transaction[] transactions = context.Block.Transactions!;
+
+      // First transaction must be coinbase, the rest must not be
+      if ((transactions.Length == 0) || !transactions[0].IsCoinBase())
       {
-         _logger = logger;
+         validationState.Invalid(BlockValidationStateResults.Consensus, "bad-cb-missing", "first tx is not coinbase");
+         return false;
       }
 
-
-      public bool Check(IBlockValidationContext context, ref BlockValidationState validationState)
+      for (int i = 1; i < transactions.Length; i++)
       {
-         Protocol.Types.Transaction[] transactions = context.Block.Transactions!;
-
-         // First transaction must be coinbase, the rest must not be
-         if ((transactions.Length == 0) || !transactions[0].IsCoinBase())
+         if (transactions[i].IsCoinBase())
          {
-            validationState.Invalid(BlockValidationStateResults.Consensus, "bad-cb-missing", "first tx is not coinbase");
+            validationState.Invalid(BlockValidationStateResults.Consensus, "bad-cb-multiple", "more than one coinbase");
             return false;
          }
-
-         for (int i = 1; i < transactions.Length; i++)
-         {
-            if (transactions[i].IsCoinBase())
-            {
-               validationState.Invalid(BlockValidationStateResults.Consensus, "bad-cb-multiple", "more than one coinbase");
-               return false;
-            }
-         }
-
-         return true;
       }
+
+      return true;
    }
 }

@@ -4,53 +4,52 @@ using System.Linq;
 using System.Threading;
 using MithrilShards.Core.Threading;
 
-namespace MithrilShards.Core.DataTypes
+namespace MithrilShards.Core.DataTypes;
+
+public class MedianFilter<T> where T : struct
 {
-   public class MedianFilter<T> where T : struct
+   readonly ReaderWriterLockSlim _lockSlim = new();
+   private readonly Queue<T> _items;
+   private readonly Func<(T lowerItem, T higherItem), T> _medianComputationOnEvenElements;
+   private readonly uint _size;
+
+   public int Count => _items.Count;
+
+   public MedianFilter(uint size, T initialValue, Func<(T lowerItem, T higherItem), T> medianComputationOnEvenElements)
    {
-      readonly ReaderWriterLockSlim _lockSlim = new();
-      private readonly Queue<T> _items;
-      private readonly Func<(T lowerItem, T higherItem), T> _medianComputationOnEvenElements;
-      private readonly uint _size;
+      _size = size;
+      _medianComputationOnEvenElements = medianComputationOnEvenElements;
+      _items = new Queue<T>((int)size);
+      _items.Enqueue(initialValue);
+   }
 
-      public int Count => _items.Count;
-
-      public MedianFilter(uint size, T initialValue, Func<(T lowerItem, T higherItem), T> medianComputationOnEvenElements)
+   public T GetMedian()
+   {
+      using var readLock = new ReadLock(_lockSlim);
+      if (_items.Count <= 0)
       {
-         _size = size;
-         _medianComputationOnEvenElements = medianComputationOnEvenElements;
-         _items = new Queue<T>((int)size);
-         _items.Enqueue(initialValue);
+         ThrowHelper.ThrowArgumentException($"{nameof(_size)} <= 0");
       }
 
-      public T GetMedian()
+      T[] sortedItems = _items.OrderBy(o => o).ToArray();
+
+      if (_size % 2 == 1)
       {
-         using var readLock = new ReadLock(_lockSlim);
-         if (_items.Count <= 0)
-         {
-            ThrowHelper.ThrowArgumentException($"{nameof(_size)} <= 0");
-         }
-
-         T[] sortedItems = _items.OrderBy(o => o).ToArray();
-
-         if (_size % 2 == 1)
-         {
-            return sortedItems[_size / 2];
-         }
-         else
-         {
-            return _medianComputationOnEvenElements((sortedItems[_size / 2 - 1], sortedItems[_size / 2]));
-         }
+         return sortedItems[_size / 2];
       }
-
-      public void AddSample(T value)
+      else
       {
-         using var writeLock = new WriteLock(_lockSlim);
-         if (_items.Count == _size)
-         {
-            _items.Dequeue();
-         }
-         _items.Enqueue(value);
+         return _medianComputationOnEvenElements((sortedItems[_size / 2 - 1], sortedItems[_size / 2]));
       }
+   }
+
+   public void AddSample(T value)
+   {
+      using var writeLock = new WriteLock(_lockSlim);
+      if (_items.Count == _size)
+      {
+         _items.Dequeue();
+      }
+      _items.Enqueue(value);
    }
 }

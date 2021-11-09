@@ -1,12 +1,11 @@
 ﻿using System.Net;
 
-namespace MithrilShards.Core.Extensions
+namespace MithrilShards.Core.Extensions;
+
+public static class EndPointExtensions
 {
-   public static class EndPointExtensions
+   public static IPEndPoint AsIPEndPoint(this EndPoint endpoint)
    {
-      public static IPEndPoint AsIPEndPoint(this EndPoint endpoint)
-      {
-         return (IPEndPoint)endpoint;
-      }
+      return (IPEndPoint)endpoint;
    }
 }

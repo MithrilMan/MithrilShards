@@ -3,25 +3,24 @@ using Microsoft.Extensions.Options;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.PeerAddressBook;
 
-namespace MithrilShards.Example.Network.Server.Guards
+namespace MithrilShards.Example.Network.Server.Guards;
+
+public class BannedPeerGuard : ServerPeerConnectionGuardBase
 {
-   public class BannedPeerGuard : ServerPeerConnectionGuardBase
+   readonly IPeerAddressBook _peerAddressBook;
+
+   public BannedPeerGuard(ILogger<BannedPeerGuard> logger, IOptions<ForgeConnectivitySettings> settings, IPeerAddressBook peerAddressBook) : base(logger, settings)
    {
-      readonly IPeerAddressBook _peerAddressBook;
+      _peerAddressBook = peerAddressBook;
+   }
 
-      public BannedPeerGuard(ILogger<BannedPeerGuard> logger, IOptions<ForgeConnectivitySettings> settings, IPeerAddressBook peerAddressBook) : base(logger, settings)
+   internal override string? TryGetDenyReason(IPeerContext peerContext)
+   {
+      if (_peerAddressBook.IsBanned(peerContext))
       {
-         _peerAddressBook = peerAddressBook;
+         return "Inbound connection refused: peer is banned.";
       }
 
-      internal override string? TryGetDenyReason(IPeerContext peerContext)
-      {
-         if (_peerAddressBook.IsBanned(peerContext))
-         {
-            return "Inbound connection refused: peer is banned.";
-         }
-
-         return null;
-      }
+      return null;
    }
 }

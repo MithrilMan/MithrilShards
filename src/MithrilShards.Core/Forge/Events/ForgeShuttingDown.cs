@@ -1,8 +1,7 @@
 ﻿using MithrilShards.Core.EventBus;
 
-namespace MithrilShards.Core.Forge.Events
+namespace MithrilShards.Core.Forge.Events;
+
+public class ForgeShuttingDown : EventBase
 {
-   public class ForgeShuttingDown : EventBase
-   {
-   }
 }

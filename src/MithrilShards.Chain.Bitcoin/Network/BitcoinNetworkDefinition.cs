@@ -1,15 +1,14 @@
 ﻿using MithrilShards.Core.Network.Protocol;
 
-namespace MithrilShards.Chain.Bitcoin.Network
+namespace MithrilShards.Chain.Bitcoin.Network;
+
+public class BitcoinNetworkDefinition : INetworkDefinition
 {
-   public class BitcoinNetworkDefinition : INetworkDefinition
-   {
-      public string Name { get; set; } = null!;
+   public string Name { get; set; } = null!;
 
-      public uint Magic { get; set; }
+   public uint Magic { get; set; }
 
-      public byte[] MagicBytes { get; set; } = null!;
+   public byte[] MagicBytes { get; set; } = null!;
 
-      public int DefaultMaxPayloadSize { get; set; }
-   }
+   public int DefaultMaxPayloadSize { get; set; }
 }

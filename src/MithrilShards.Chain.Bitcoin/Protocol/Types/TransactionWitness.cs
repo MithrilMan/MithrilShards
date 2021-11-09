@@ -1,13 +1,12 @@
-﻿namespace MithrilShards.Chain.Bitcoin.Protocol.Types
+﻿namespace MithrilShards.Chain.Bitcoin.Protocol.Types;
+
+/// <summary>
+/// transaction output (tx_out).
+/// </summary>
+public class TransactionWitness
 {
    /// <summary>
-   /// transaction output (tx_out).
+   /// The witness raw data
    /// </summary>
-   public class TransactionWitness
-   {
-      /// <summary>
-      /// The witness raw data
-      /// </summary>
-      public TransactionWitnessComponent[]? Components { get; set; }
-   }
+   public TransactionWitnessComponent[]? Components { get; set; }
 }

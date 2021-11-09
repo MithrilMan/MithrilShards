@@ -1,6 +1,5 @@
-﻿namespace MithrilShards.Example.Dev
+﻿namespace MithrilShards.Example.Dev;
+
+public class ExampleDev
 {
-   public class ExampleDev
-    {
-    }
 }

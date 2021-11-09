@@ -8,185 +8,184 @@ using System.Runtime.InteropServices;
 using MithrilShards.Chain.Bitcoin.Converters;
 using MithrilShards.Core.DataTypes;
 
-namespace MithrilShards.Chain.Bitcoin.DataTypes
+namespace MithrilShards.Chain.Bitcoin.DataTypes;
+
+[TypeConverter(typeof(TargetConverter))]
+public partial class Target : UInt256
 {
-   [TypeConverter(typeof(TargetConverter))]
-   public partial class Target : UInt256
+   private static readonly BigInteger _pow256 = BigInteger.Pow(new BigInteger(2), 256);
+
+   public static new Target Zero { get; } = new Target("0".PadRight(EXPECTED_SIZE * 2, '0'));
+
+   /// <summary>
+   /// Returns a Target representing the passed raw value.
+   /// </summary>
+   /// <param name="value">The value.</param>
+   /// <returns></returns>
+   public static Target FromRawValue(ulong value)
    {
-      private static readonly BigInteger _pow256 = BigInteger.Pow(new BigInteger(2), 256);
+      return new Target { part1 = value };
+   }
 
-      public static new Target Zero { get; } = new Target("0".PadRight(EXPECTED_SIZE * 2, '0'));
+   private Target() { }
 
-      /// <summary>
-      /// Returns a Target representing the passed raw value.
-      /// </summary>
-      /// <param name="value">The value.</param>
-      /// <returns></returns>
-      public static Target FromRawValue(ulong value)
+   public Target(string hexString) : base(hexString) { }
+
+   /// <summary>
+   /// Initializes a new instance of the <see cref="Target"/> class from a raw byte array.
+   /// </summary>
+   /// <param name="input"></param>
+   public Target(ReadOnlySpan<byte> input) : base(input) { }
+
+   /// <summary>
+   /// Initializes a new instance of the <see cref="Target"/> class from a compact value (big-endian representation).
+   /// </summary>
+   /// <param name="compactValue">The compact value.</param>
+   public Target(uint compactValue)
+   {
+      Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
+
+      byte exponent = (byte)(compactValue >> 24); // number of bytes of N
+      uint mantissa = compactValue & 0x007fffff;
+
+      if (exponent <= 3)
       {
-         return new Target { part1 = value };
+         mantissa >>= 8 * (3 - exponent);
+         //this.part1 = mantissa;
+         BinaryPrimitives.WriteUInt32LittleEndian(data, mantissa);
+      }
+      else
+      {
+         part1 = mantissa;
+         ShiftLeft(8 * (exponent - 3));
+      }
+   }
+
+   /// <summary>
+   /// Initializes a new instance of the <see cref="Target"/> class from a compact value (big-endian representation).
+   /// </summary>
+   /// <param name="compactValue">The compact value.</param>
+   /// <param name="isNegative"></param>
+   /// <param name="isOverflow"></param>
+   public Target(uint compactValue, out bool isNegative, out bool isOverflow)
+   {
+      Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
+
+      byte exponent = (byte)(compactValue >> 24); // number of bytes of N
+      uint mantissa = compactValue & 0x007fffff;
+
+      if (exponent <= 3)
+      {
+         mantissa >>= 8 * (3 - exponent);
+         BinaryPrimitives.WriteUInt32LittleEndian(data, mantissa);
+      }
+      else
+      {
+         part1 = mantissa;
+         ShiftLeft(8 * (exponent - 3));
       }
 
-      private Target() { }
+      // 0x00800000 is the mask to use to obtain the sign.
+      isNegative = mantissa != 0 && (compactValue & 0x00800000) != 0;
 
-      public Target(string hexString) : base(hexString) { }
+      isOverflow = mantissa != 0 && ((exponent > 34) ||
+                                    (mantissa > 0xff && exponent > 33) ||
+                                    (mantissa > 0xffff && exponent > 32));
+   }
 
-      /// <summary>
-      /// Initializes a new instance of the <see cref="Target"/> class from a raw byte array.
-      /// </summary>
-      /// <param name="input"></param>
-      public Target(ReadOnlySpan<byte> input) : base(input) { }
+   public int Bits()
+   {
+      const int bitsPerPart = sizeof(ulong) * 8;
 
-      /// <summary>
-      /// Initializes a new instance of the <see cref="Target"/> class from a compact value (big-endian representation).
-      /// </summary>
-      /// <param name="compactValue">The compact value.</param>
-      public Target(uint compactValue)
+      if (part4 != 0)
       {
-         Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
-
-         byte exponent = (byte)(compactValue >> 24); // number of bytes of N
-         uint mantissa = compactValue & 0x007fffff;
-
-         if (exponent <= 3)
-         {
-            mantissa >>= 8 * (3 - exponent);
-            //this.part1 = mantissa;
-            BinaryPrimitives.WriteUInt32LittleEndian(data, mantissa);
-         }
-         else
-         {
-            part1 = mantissa;
-            ShiftLeft(8 * (exponent - 3));
-         }
+         int zeroes = BitOperations.LeadingZeroCount(part4);
+         if (zeroes > 0) return (bitsPerPart * 4) - zeroes;
       }
 
-      /// <summary>
-      /// Initializes a new instance of the <see cref="Target"/> class from a compact value (big-endian representation).
-      /// </summary>
-      /// <param name="compactValue">The compact value.</param>
-      /// <param name="isNegative"></param>
-      /// <param name="isOverflow"></param>
-      public Target(uint compactValue, out bool isNegative, out bool isOverflow)
+      if (part3 != 0)
       {
-         Span<byte> data = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref part1, EXPECTED_SIZE / sizeof(ulong)));
-
-         byte exponent = (byte)(compactValue >> 24); // number of bytes of N
-         uint mantissa = compactValue & 0x007fffff;
-
-         if (exponent <= 3)
-         {
-            mantissa >>= 8 * (3 - exponent);
-            BinaryPrimitives.WriteUInt32LittleEndian(data, mantissa);
-         }
-         else
-         {
-            part1 = mantissa;
-            ShiftLeft(8 * (exponent - 3));
-         }
-
-         // 0x00800000 is the mask to use to obtain the sign.
-         isNegative = mantissa != 0 && (compactValue & 0x00800000) != 0;
-
-         isOverflow = mantissa != 0 && ((exponent > 34) ||
-                                       (mantissa > 0xff && exponent > 33) ||
-                                       (mantissa > 0xffff && exponent > 32));
+         int zeroes = BitOperations.LeadingZeroCount(part3);
+         if (zeroes > 0) return (bitsPerPart * 3) - zeroes;
       }
 
-      public int Bits()
+      if (part2 != 0)
       {
-         const int bitsPerPart = sizeof(ulong) * 8;
-
-         if (part4 != 0)
-         {
-            int zeroes = BitOperations.LeadingZeroCount(part4);
-            if (zeroes > 0) return (bitsPerPart * 4) - zeroes;
-         }
-
-         if (part3 != 0)
-         {
-            int zeroes = BitOperations.LeadingZeroCount(part3);
-            if (zeroes > 0) return (bitsPerPart * 3) - zeroes;
-         }
-
-         if (part2 != 0)
-         {
-            int zeroes = BitOperations.LeadingZeroCount(part2);
-            if (zeroes > 0) return (bitsPerPart * 2) - zeroes;
-         }
-
-         if (part1 != 0)
-         {
-            int zeroes = BitOperations.LeadingZeroCount(part1);
-            if (zeroes > 0) return bitsPerPart - zeroes;
-         }
-
-         return 0;
+         int zeroes = BitOperations.LeadingZeroCount(part2);
+         if (zeroes > 0) return (bitsPerPart * 2) - zeroes;
       }
 
-      public uint ToCompact(bool isNegative = false)
+      if (part1 != 0)
       {
-         uint compact;
-
-         int size = (Bits() + 7) / 8;
-         if (size <= 3)
-         {
-            compact = (uint)(part1 << 8 * (3 - size));
-         }
-         else
-         {
-            compact = GetCompactMantissa(8 * (size - 3));
-         }
-
-         // The 0x00800000 bit denotes the sign.
-         // Thus, if it is already set, divide the mantissa by 256 and increase the exponent.
-         if ((compact & 0x00800000) != 0)
-         {
-            compact >>= 8;
-            size++;
-         }
-
-         Debug.Assert((compact & ~0x007fffff) == 0);
-         Debug.Assert(size < 256);
-         compact |= (uint)(size << 24);
-         compact |= (uint)(isNegative && ((compact & 0x007fffff) != 0) ? 0x00800000 : 0);
-         return compact;
+         int zeroes = BitOperations.LeadingZeroCount(part1);
+         if (zeroes > 0) return bitsPerPart - zeroes;
       }
 
-      public BigInteger ToBigInteger()
+      return 0;
+   }
+
+   public uint ToCompact(bool isNegative = false)
+   {
+      uint compact;
+
+      int size = (Bits() + 7) / 8;
+      if (size <= 3)
       {
-         uint compact = ToCompact();
-         uint exp = compact >> 24;
-         uint value = compact & 0x00FFFFFF;
-         return new BigInteger(value) << (8 * ((int)exp - 3));
+         compact = (uint)(part1 << 8 * (3 - size));
+      }
+      else
+      {
+         compact = GetCompactMantissa(8 * (size - 3));
       }
 
-      /// <summary>
-      /// Calculates the amount of work that this target, representing the difficulty of a block, contributes to the total chain work.
-      /// </summary>
-      /// <returns>
-      /// Amount of work.
-      /// </returns>
-      public Target GetBlockProof()
+      // The 0x00800000 bit denotes the sign.
+      // Thus, if it is already set, divide the mantissa by 256 and increase the exponent.
+      if ((compact & 0x00800000) != 0)
       {
-         // bitcoin core says: we need to compute 2**256 / (bnTarget+1), but we can't represent 2**256
-         // as it's too large for an arith_uint256. However, as 2**256 is at least as large
-         // as bnTarget+1, it is equal to ((2**256 - bnTarget - 1) / (bnTarget+1)) + 1,
-         // or ~bnTarget / (bnTarget+1) + 1.
-
-         //but we can using BigInteger (less performant, could be improved)
-
-         var asBigInt = new BigInteger(GetBytes());
-         if (this <= Zero || asBigInt >= _pow256)
-            return Zero;
-
-
-         var proof = new Target();
-         Span<byte> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref proof.part1), EXPECTED_SIZE);
-         data.Clear();
-         (_pow256 / (asBigInt + 1)).TryWriteBytes(data, out _);
-
-         return proof;
+         compact >>= 8;
+         size++;
       }
+
+      Debug.Assert((compact & ~0x007fffff) == 0);
+      Debug.Assert(size < 256);
+      compact |= (uint)(size << 24);
+      compact |= (uint)(isNegative && ((compact & 0x007fffff) != 0) ? 0x00800000 : 0);
+      return compact;
+   }
+
+   public BigInteger ToBigInteger()
+   {
+      uint compact = ToCompact();
+      uint exp = compact >> 24;
+      uint value = compact & 0x00FFFFFF;
+      return new BigInteger(value) << (8 * ((int)exp - 3));
+   }
+
+   /// <summary>
+   /// Calculates the amount of work that this target, representing the difficulty of a block, contributes to the total chain work.
+   /// </summary>
+   /// <returns>
+   /// Amount of work.
+   /// </returns>
+   public Target GetBlockProof()
+   {
+      // bitcoin core says: we need to compute 2**256 / (bnTarget+1), but we can't represent 2**256
+      // as it's too large for an arith_uint256. However, as 2**256 is at least as large
+      // as bnTarget+1, it is equal to ((2**256 - bnTarget - 1) / (bnTarget+1)) + 1,
+      // or ~bnTarget / (bnTarget+1) + 1.
+
+      //but we can using BigInteger (less performant, could be improved)
+
+      var asBigInt = new BigInteger(GetBytes());
+      if (this <= Zero || asBigInt >= _pow256)
+         return Zero;
+
+
+      var proof = new Target();
+      Span<byte> data = MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, byte>(ref proof.part1), EXPECTED_SIZE);
+      data.Clear();
+      (_pow256 / (asBigInt + 1)).TryWriteBytes(data, out _);
+
+      return proof;
    }
 }

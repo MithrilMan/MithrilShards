@@ -1,8 +1,7 @@
-﻿namespace MithrilShards.Core.Network
+﻿namespace MithrilShards.Core.Network;
+
+public enum PeerConnectionDirection
 {
-   public enum PeerConnectionDirection
-   {
-      Inbound,
-      Outbound
-   }
+   Inbound,
+   Outbound
 }

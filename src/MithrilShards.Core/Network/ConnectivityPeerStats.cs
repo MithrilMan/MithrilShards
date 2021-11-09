@@ -1,9 +1,8 @@
-﻿namespace MithrilShards.Core.Network
-{
-   public class ConnectivityPeerStats : IConnectivityPeerStats
-   {
-      public int ConnectedInboundPeersCount { get; }
+﻿namespace MithrilShards.Core.Network;
 
-      public int ConnectedOutboundPeersCount { get; }
-   }
+public class ConnectivityPeerStats : IConnectivityPeerStats
+{
+   public int ConnectedInboundPeersCount { get; }
+
+   public int ConnectedOutboundPeersCount { get; }
 }

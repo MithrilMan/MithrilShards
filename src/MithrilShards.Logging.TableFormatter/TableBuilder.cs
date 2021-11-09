@@ -4,244 +4,243 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace MithrilShards.Logging.TableFormatter
+namespace MithrilShards.Logging.TableFormatter;
+
+public class TableBuilder
 {
-   public class TableBuilder
+   private readonly StringBuilder _stringBuilder;
+   private bool _prepared;
+
+   public List<ColumnDefinition> ColumnDefinitions { get; }
+   public TableStyle TableStyle { get; private set; } = null!;
+   public int Width { get; private set; }
+
+   public TableBuilder(StringBuilder builder)
    {
-      private readonly StringBuilder _stringBuilder;
-      private bool _prepared;
+      _stringBuilder = builder ?? new StringBuilder();
 
-      public List<ColumnDefinition> ColumnDefinitions { get; }
-      public TableStyle TableStyle { get; private set; } = null!;
-      public int Width { get; private set; }
+      ColumnDefinitions = new List<ColumnDefinition>();
+   }
 
-      public TableBuilder(StringBuilder builder)
+   public TableBuilder AddColumns(params ColumnDefinition[] columns)
+   {
+      if (_prepared)
       {
-         _stringBuilder = builder ?? new StringBuilder();
-
-         ColumnDefinitions = new List<ColumnDefinition>();
+         throw new TableAlreadyDefinedException();
       }
 
-      public TableBuilder AddColumns(params ColumnDefinition[] columns)
-      {
-         if (_prepared)
-         {
-            throw new TableAlreadyDefinedException();
-         }
+      ColumnDefinitions.AddRange(columns);
+      return this;
+   }
 
-         ColumnDefinitions.AddRange(columns);
-         return this;
+   public TableBuilder AddColumn(ColumnDefinition column)
+   {
+      if (_prepared)
+      {
+         throw new TableAlreadyDefinedException();
       }
 
-      public TableBuilder AddColumn(ColumnDefinition column)
-      {
-         if (_prepared)
-         {
-            throw new TableAlreadyDefinedException();
-         }
+      ColumnDefinitions.Add(column);
+      return this;
+   }
 
-         ColumnDefinitions.Add(column);
-         return this;
+   public TableBuilder SetStyle(TableStyle style)
+   {
+      if (_prepared)
+      {
+         throw new TableAlreadyDefinedException();
       }
 
-      public TableBuilder SetStyle(TableStyle style)
-      {
-         if (_prepared)
-         {
-            throw new TableAlreadyDefinedException();
-         }
+      TableStyle = style;
+      return this;
+   }
 
-         TableStyle = style;
-         return this;
+   /// <summary>
+   /// Prepares this instance.
+   /// After having called this method, no alteration could be made on the table definition and only rows can be added.
+   /// </summary>
+   /// <returns></returns>
+   public TableBuilder Prepare()
+   {
+      if (_prepared)
+      {
+         throw new TableAlreadyDefinedException();
       }
 
-      /// <summary>
-      /// Prepares this instance.
-      /// After having called this method, no alteration could be made on the table definition and only rows can be added.
-      /// </summary>
-      /// <returns></returns>
-      public TableBuilder Prepare()
+      _prepared = true;
+      if (TableStyle == null)
       {
-         if (_prepared)
-         {
-            throw new TableAlreadyDefinedException();
-         }
-
-         _prepared = true;
-         if (TableStyle == null)
-         {
-            TableStyle = new TableStyle();
-         }
-
-         ComputeTableWidth();
-         return this;
+         TableStyle = new TableStyle();
       }
 
-      public TableBuilder Start(string? title = null)
+      ComputeTableWidth();
+      return this;
+   }
+
+   public TableBuilder Start(string? title = null)
+   {
+      if (!_prepared)
       {
-         if (!_prepared)
-         {
-            Prepare();
-         }
+         Prepare();
+      }
 
-         if (title != null)
-         {
-            DrawTitle(title);
-         }
+      if (title != null)
+      {
+         DrawTitle(title);
+      }
 
+      DrawTopBorder();
+
+      DrawLeftBorder();
+      for (int i = 0; i < ColumnDefinitions.Count; i++)
+      {
+         DrawColumn(i, ColumnDefinitions[i].Label.Center(ColumnDefinitions[i].Width));
+      }
+      DrawRightBorder();
+
+      DrawTopBorder();
+
+      return this;
+   }
+
+   private void DrawTitle(string title)
+   {
+      string alignTitle(ColumnAlignment alignment, int availableSpace) => alignment switch
+      {
+         ColumnAlignment.Left => title.AlignLeft(availableSpace),
+         ColumnAlignment.Right => title.AlignRight(availableSpace),
+         ColumnAlignment.Center => title.Center(availableSpace),
+         _ => string.Empty
+      };
+
+      if (TableStyle.TitleBorder)
+      {
          DrawTopBorder();
-
          DrawLeftBorder();
-         for (int i = 0; i < ColumnDefinitions.Count; i++)
-         {
-            DrawColumn(i, ColumnDefinitions[i].Label.Center(ColumnDefinitions[i].Width));
-         }
+         int availableSpace = Width - (TableStyle.Left == char.MinValue ? 0 : 1) - (TableStyle.Right == char.MinValue ? 0 : 1);
+         _stringBuilder.AppendLine(alignTitle(TableStyle.TitleAlignment, availableSpace));
          DrawRightBorder();
+      }
+      else
+      {
+         _stringBuilder.AppendLine(alignTitle(TableStyle.TitleAlignment, Width));
+      }
+   }
 
-         DrawTopBorder();
+   public TableBuilder DrawRow(string?[] values)
+   {
+      if (values is null) throw new ArgumentNullException(nameof(values));
 
-         return this;
+      if (values.Length > ColumnDefinitions.Count)
+      {
+         throw new ArgumentOutOfRangeException(nameof(values), "values length is greater than column lengths.");
       }
 
-      private void DrawTitle(string title)
+      DrawLeftBorder();
+      for (int i = 0; i < ColumnDefinitions.Count; i++)
       {
-         string alignTitle(ColumnAlignment alignment, int availableSpace) => alignment switch
+         if (i < values.Length)
          {
-            ColumnAlignment.Left => title.AlignLeft(availableSpace),
-            ColumnAlignment.Right => title.AlignRight(availableSpace),
-            ColumnAlignment.Center => title.Center(availableSpace),
-            _ => string.Empty
-         };
-
-         if (TableStyle.TitleBorder)
-         {
-            DrawTopBorder();
-            DrawLeftBorder();
-            int availableSpace = Width - (TableStyle.Left == char.MinValue ? 0 : 1) - (TableStyle.Right == char.MinValue ? 0 : 1);
-            _stringBuilder.AppendLine(alignTitle(TableStyle.TitleAlignment, availableSpace));
-            DrawRightBorder();
+            DrawColumn(i, values[i] ?? string.Empty);
          }
          else
          {
-            _stringBuilder.AppendLine(alignTitle(TableStyle.TitleAlignment, Width));
+            DrawColumn(i, string.Empty);
          }
       }
+      DrawRightBorder();
 
-      public TableBuilder DrawRow(string?[] values)
+      return this;
+   }
+
+   public TableBuilder End()
+   {
+      DrawBottomBorder();
+      return this;
+   }
+
+   private void ComputeTableWidth()
+   {
+      Width =
+          (TableStyle.Left == char.MinValue ? 0 : 1) // length of the left border
+          + ColumnDefinitions.Sum(cd => cd.Width) //sum of the column widths
+          + ((ColumnDefinitions.Count - 1) * TableStyle.Separator.Length) // sum of the space occupied by column separators;
+          + (TableStyle.Right == char.MinValue ? 0 : 1)// length of the right border
+          ;
+   }
+
+   private void DrawTopBorder()
+   {
+      if (TableStyle.Top != char.MinValue)
       {
-         if (values is null) throw new ArgumentNullException(nameof(values));
-
-         if (values.Length > ColumnDefinitions.Count)
-         {
-            throw new ArgumentOutOfRangeException(nameof(values), "values length is greater than column lengths.");
-         }
-
-         DrawLeftBorder();
-         for (int i = 0; i < ColumnDefinitions.Count; i++)
-         {
-            if (i < values.Length)
-            {
-               DrawColumn(i, values[i] ?? string.Empty);
-            }
-            else
-            {
-               DrawColumn(i, string.Empty);
-            }
-         }
-         DrawRightBorder();
-
-         return this;
+         DrawLine(TableStyle.Top, Width);
       }
+   }
 
-      public TableBuilder End()
+   private void DrawLeftBorder()
+   {
+      if (TableStyle.Left != char.MinValue)
       {
-         DrawBottomBorder();
-         return this;
+         _stringBuilder.Append(TableStyle.Left.ToString(CultureInfo.InvariantCulture));
       }
+   }
 
-      private void ComputeTableWidth()
+   private void DrawColumn(int columnIndex, string value)
+   {
+      ColumnDefinition columnDefinition = ColumnDefinitions[columnIndex];
+
+      switch (columnDefinition.Alignment)
       {
-         Width =
-             (TableStyle.Left == char.MinValue ? 0 : 1) // length of the left border
-             + ColumnDefinitions.Sum(cd => cd.Width) //sum of the column widths
-             + ((ColumnDefinitions.Count - 1) * TableStyle.Separator.Length) // sum of the space occupied by column separators;
-             + (TableStyle.Right == char.MinValue ? 0 : 1)// length of the right border
-             ;
+         case ColumnAlignment.Left:
+            _stringBuilder.Append(value.AlignLeft(columnDefinition.Width));
+            break;
+         case ColumnAlignment.Right:
+            _stringBuilder.Append(value.AlignRight(columnDefinition.Width));
+            break;
+         case ColumnAlignment.Center:
+            _stringBuilder.Append(value.Center(columnDefinition.Width));
+            break;
+         default:
+            throw new NotImplementedException(columnDefinition.Alignment.ToString());
       }
 
-      private void DrawTopBorder()
+      bool isLastColumn = columnIndex == ColumnDefinitions.Count - 1;
+      if (!isLastColumn)
       {
-         if (TableStyle.Top != char.MinValue)
-         {
-            DrawLine(TableStyle.Top, Width);
-         }
+         DrawColumnSeparator();
       }
+   }
 
-      private void DrawLeftBorder()
+   private void DrawColumnSeparator()
+   {
+      if (TableStyle.Separator.Length > 0)
       {
-         if (TableStyle.Left != char.MinValue)
-         {
-            _stringBuilder.Append(TableStyle.Left.ToString(CultureInfo.InvariantCulture));
-         }
+         _stringBuilder.Append(TableStyle.Separator);
       }
+   }
 
-      private void DrawColumn(int columnIndex, string value)
+   private void DrawRightBorder()
+   {
+      if (TableStyle.Right != char.MinValue)
       {
-         ColumnDefinition columnDefinition = ColumnDefinitions[columnIndex];
-
-         switch (columnDefinition.Alignment)
-         {
-            case ColumnAlignment.Left:
-               _stringBuilder.Append(value.AlignLeft(columnDefinition.Width));
-               break;
-            case ColumnAlignment.Right:
-               _stringBuilder.Append(value.AlignRight(columnDefinition.Width));
-               break;
-            case ColumnAlignment.Center:
-               _stringBuilder.Append(value.Center(columnDefinition.Width));
-               break;
-            default:
-               throw new NotImplementedException(columnDefinition.Alignment.ToString());
-         }
-
-         bool isLastColumn = columnIndex == ColumnDefinitions.Count - 1;
-         if (!isLastColumn)
-         {
-            DrawColumnSeparator();
-         }
+         _stringBuilder.AppendLine(TableStyle.Right.ToString(CultureInfo.InvariantCulture));
       }
-
-      private void DrawColumnSeparator()
+      else
       {
-         if (TableStyle.Separator.Length > 0)
-         {
-            _stringBuilder.Append(TableStyle.Separator);
-         }
+         _stringBuilder.AppendLine();
       }
+   }
 
-      private void DrawRightBorder()
+   private void DrawBottomBorder()
+   {
+      if (TableStyle.Bottom != char.MinValue)
       {
-         if (TableStyle.Right != char.MinValue)
-         {
-            _stringBuilder.AppendLine(TableStyle.Right.ToString(CultureInfo.InvariantCulture));
-         }
-         else
-         {
-            _stringBuilder.AppendLine();
-         }
+         DrawLine(TableStyle.Bottom, Width);
       }
+   }
 
-      private void DrawBottomBorder()
-      {
-         if (TableStyle.Bottom != char.MinValue)
-         {
-            DrawLine(TableStyle.Bottom, Width);
-         }
-      }
-
-      public void DrawLine(char character, int width)
-      {
-         _stringBuilder.AppendLine(string.Empty.PadRight(width, character));
-      }
+   public void DrawLine(char character, int width)
+   {
+      _stringBuilder.AppendLine(string.Empty.PadRight(width, character));
    }
 }

@@ -5,32 +5,31 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.Shards;
 
-namespace MithrilShards.Chain.Bitcoin
+namespace MithrilShards.Chain.Bitcoin;
+
+public class BitcoinShard : IMithrilShard
 {
-   public class BitcoinShard : IMithrilShard
+   private readonly ILogger<BitcoinShard> _logger;
+   private readonly BitcoinSettings _settings;
+
+   public BitcoinShard(ILogger<BitcoinShard> logger, IOptions<BitcoinSettings> settings)
    {
-      private readonly ILogger<BitcoinShard> _logger;
-      private readonly BitcoinSettings _settings;
+      _logger = logger;
+      _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
+   }
 
-      public BitcoinShard(ILogger<BitcoinShard> logger, IOptions<BitcoinSettings> settings)
-      {
-         _logger = logger;
-         _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
-      }
+   public ValueTask InitializeAsync(CancellationToken cancellationToken)
+   {
+      return default;
+   }
 
-      public ValueTask InitializeAsync(CancellationToken cancellationToken)
-      {
-         return default;
-      }
+   public ValueTask StartAsync(CancellationToken cancellationToken)
+   {
+      return default;
+   }
 
-      public ValueTask StartAsync(CancellationToken cancellationToken)
-      {
-         return default;
-      }
-
-      public ValueTask StopAsync(CancellationToken cancellationToken)
-      {
-         return default;
-      }
+   public ValueTask StopAsync(CancellationToken cancellationToken)
+   {
+      return default;
    }
 }

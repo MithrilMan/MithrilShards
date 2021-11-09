@@ -1,9 +1,8 @@
-﻿namespace MithrilShards.Logging.TableFormatter
+﻿namespace MithrilShards.Logging.TableFormatter;
+
+public enum ColumnAlignment
 {
-   public enum ColumnAlignment
-   {
-      Left,
-      Right,
-      Center
-   }
+   Left,
+   Right,
+   Center
 }
