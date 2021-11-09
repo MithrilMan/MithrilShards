@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using MithrilShards.Core.Forge;
 using MithrilShards.Core.Statistics;

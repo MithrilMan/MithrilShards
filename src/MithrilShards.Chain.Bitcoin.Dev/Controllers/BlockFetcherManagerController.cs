@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
 using MithrilShards.Core.DevTools;
-using MithrilShards.Core.EventBus;
 using MithrilShards.WebApi;
 
 namespace MithrilShards.Chain.Bitcoin.Dev;

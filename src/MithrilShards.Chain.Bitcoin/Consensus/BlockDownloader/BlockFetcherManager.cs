@@ -306,10 +306,10 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
          //try to see if performance wise has too much impact
          IEnumerable<IBlockFetcher> fetchersByScore =
             from fetcher in _fetchers.ToList() //get a copy
-               let score = fetcher.GetFetchBlockScore(blockToDownload)
+            let score = fetcher.GetFetchBlockScore(blockToDownload)
             orderby score descending
             where score > 0 // only peers that can fetch the block
-               select fetcher
+            select fetcher
             ;
 
          _logger.LogDebug("fetchersByScore :{fetchersByScore}", fetchersByScore.Count());

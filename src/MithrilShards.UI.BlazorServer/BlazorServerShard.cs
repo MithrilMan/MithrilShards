@@ -1,24 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using MithrilShards.Core;
 using MithrilShards.Core.Shards;
-using Blazorise.Bootstrap;
-using Blazorise.Icons.FontAwesome;
-using Blazorise;
 
 namespace MithrilShards.UI.BlazorServer;
 
@@ -61,8 +56,8 @@ internal class BlazorServerShard : IMithrilShard
             else
             {
                app.UseExceptionHandler("/Error");
-                  // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                  app.UseHsts();
+               // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+               app.UseHsts();
             }
 
             app.UseHttpsRedirection();
@@ -78,17 +73,17 @@ internal class BlazorServerShard : IMithrilShard
          })
          .ConfigureServices(services =>
          {
-               // copies all the services registered in the forge, maintaining eventual singleton instances
-               // also copies over singleton instances already defined
-               foreach (ServiceDescriptor service in _registeredServices)
+            // copies all the services registered in the forge, maintaining eventual singleton instances
+            // also copies over singleton instances already defined
+            foreach (ServiceDescriptor service in _registeredServices)
             {
                if (service.ServiceType == typeof(IHostedService))
                {
-                     //prevent to start again an hosted service that's already running
-                     continue;
+                  //prevent to start again an hosted service that's already running
+                  continue;
                }
-                  // open types can't be singletons
-                  else if (service.ServiceType.IsGenericType || service.Lifetime == ServiceLifetime.Scoped)
+               // open types can't be singletons
+               else if (service.ServiceType.IsGenericType || service.Lifetime == ServiceLifetime.Scoped)
                {
                   services.Add(service);
                }
@@ -96,8 +91,8 @@ internal class BlazorServerShard : IMithrilShard
                {
                   services.AddSingleton(service.ServiceType, sp =>
                   {
-                        //resolve singletons from the main provider
-                        var instance = _serviceProvider.GetServices(service.ServiceType).First(s => service.ImplementationType == null || s?.GetType() == service.ImplementationType);
+                     //resolve singletons from the main provider
+                     var instance = _serviceProvider.GetServices(service.ServiceType).First(s => service.ImplementationType == null || s?.GetType() == service.ImplementationType);
                      if (instance == null) ThrowHelper.ThrowNullReferenceException($"Service type {service.ServiceType.Name} not found.");
 
                      return instance;
@@ -139,14 +134,14 @@ internal class BlazorServerShard : IMithrilShard
               }
               catch (OperationCanceledException)
               {
-                    // Task canceled, legit, ignoring exception.
-                 }
+                 // Task canceled, legit, ignoring exception.
+              }
               catch (Exception ex)
               {
                  _logger.LogCritical(ex, "BlazorServer exception, {BlazorServerException}. The node will still run without BlazorServer functionality.", ex.Message);
-                    // if we want to stop the application in case of exception, uncomment line below
-                    // hostApplicationLifetime.StopApplication();
-                 }
+                 // if we want to stop the application in case of exception, uncomment line below
+                 // hostApplicationLifetime.StopApplication();
+              }
            });
       }
 
