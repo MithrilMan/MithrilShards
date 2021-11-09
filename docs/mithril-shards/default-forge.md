@@ -17,4 +17,4 @@ After all shards are initialized, they are started by invoking their `StartAsync
 
 From this moment, the forge is running.
 
-When the application lifetime runs out (in the default scenario by pressing CTRL+C when running in console) `StopAsync` method is called and it calls `StopAsync` on all running shards allowing them to close properly.
+When the application lifetime ends (in the default scenario by pressing CTRL+C when running in console) `StopAsync` method is called, which calls `StopAsync` on all running shards allowing them to close properly.

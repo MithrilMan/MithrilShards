@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -58,14 +59,14 @@ namespace MithrilShards.Dev.Controller.Controllers
       [HttpPost]
       [ProducesResponseType(StatusCodes.Status200OK)]
       [ProducesResponseType(StatusCodes.Status400BadRequest)]
-      public IActionResult Disconnect(PeerManagementDisconnectRequest request)
+      public async Task<IActionResult> Disconnect(PeerManagementDisconnectRequest request)
       {
          if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
          {
             return ValidationProblem("Incorrect endpoint");
          }
 
-         _eventBus.Publish(new PeerDisconnectionRequired(ipEndPoint, request.Reason));
+         await _eventBus.PublishAsync(new PeerDisconnectionRequired(ipEndPoint, request.Reason)).ConfigureAwait(false);
          return Ok();
       }
    }

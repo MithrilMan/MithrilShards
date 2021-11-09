@@ -8,7 +8,7 @@ namespace MithrilShards.Core.DataTypes
 {
    public class MedianFilter<T> where T : struct
    {
-      readonly ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim();
+      readonly ReaderWriterLockSlim _lockSlim = new();
       private readonly Queue<T> _items;
       private readonly Func<(T lowerItem, T higherItem), T> _medianComputationOnEvenElements;
       private readonly uint _size;

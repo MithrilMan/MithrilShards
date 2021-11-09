@@ -8,7 +8,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
    {
       readonly ILogger<SelfConnectionTracker> _logger;
       readonly IRandomNumberGenerator _randomNumberGenerator;
-      private readonly List<ulong> _localNonces = new List<ulong>();
+      private readonly List<ulong> _localNonces = new();
 
       public SelfConnectionTracker(ILogger<SelfConnectionTracker> logger, IRandomNumberGenerator randomNumberGenerator)
       {

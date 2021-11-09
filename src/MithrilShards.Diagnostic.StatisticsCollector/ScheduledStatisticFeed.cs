@@ -21,7 +21,7 @@ namespace MithrilShards.Diagnostic.StatisticsCollector
       /// <summary>
       /// The string builder that will hold human readable output;
       /// </summary>
-      private readonly StringBuilder _stringBuilder = new StringBuilder();
+      private readonly StringBuilder _stringBuilder = new();
 
       /// <summary>
       /// Gets the source of the feed.

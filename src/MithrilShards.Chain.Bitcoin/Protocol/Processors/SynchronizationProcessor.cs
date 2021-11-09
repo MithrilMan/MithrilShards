@@ -423,7 +423,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
             transaction.WitnessHash = _transactionHashCalculator.ComputeWitnessHash(transaction, protocolVersion);
          });
 
-         eventBus.Publish(new BlockReceived(message.Block!, PeerContext, this));
+         await eventBus.PublishAsync(new BlockReceived(message.Block!, PeerContext, this), cancellation).ConfigureAwait(false);
 
          //enqueue headers for validation
          await _blockValidator.RequestValidationAsync(new BlockToValidate(message.Block!, PeerContext)).ConfigureAwait(false);

@@ -69,7 +69,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
          _headerValidationRules.SetupRules();
 
          // starts the consumer loop of header validation
-         _validationLoop.StartAsync(
+         _ = _validationLoop.StartAsync(
             label: nameof(HeaderValidator),
             work: ValidationWorkAsync,
             interval: TimeSpan.Zero,
@@ -143,16 +143,18 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header
             if (state!.IsInvalid())
             {
                // signal header validation failed
-               _eventBus.Publish(new BlockHeaderValidationFailed(invalidBlockHeader!, state, request.Peer));
+               var eventItem = new BlockHeaderValidationFailed(invalidBlockHeader!, state, request.Peer);
+               await _eventBus.PublishAsync(eventItem, cancellation).ConfigureAwait(false);
             }
             else
             {
                // signal header validation succeeded
-               _eventBus.Publish(new BlockHeaderValidationSucceeded(validatedHeaders,
-                                                                        lastValidatedBlockHeader!,
-                                                                        lastValidatedHeaderNode!,
-                                                                        newValidatedHeaderNodes.Count,
-                                                                        request.Peer));
+               var eventItem = new BlockHeaderValidationSucceeded(validatedHeaders,
+                                                                  lastValidatedBlockHeader!,
+                                                                  lastValidatedHeaderNode!,
+                                                                  newValidatedHeaderNodes.Count,
+                                                                  request.Peer);
+               await _eventBus.PublishAsync(eventItem, cancellation).ConfigureAwait(false);
             }
          }
       }

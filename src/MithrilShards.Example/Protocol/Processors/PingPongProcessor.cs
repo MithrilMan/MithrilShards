@@ -63,8 +63,10 @@ namespace MithrilShards.Example.Protocol.Processors
 
       private async Task PingAsync(CancellationToken cancellationToken)
       {
-         var ping = new PingMessage();
-         ping.Nonce = _randomNumberGenerator.GetUint64();
+         var ping = new PingMessage
+         {
+            Nonce = _randomNumberGenerator.GetUint64()
+         };
 
          await SendMessageAsync(ping).ConfigureAwait(false);
 

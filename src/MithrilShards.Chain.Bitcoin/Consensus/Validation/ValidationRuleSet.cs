@@ -15,7 +15,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
 
          public uint PreferredExecutionOrder { get; }
 
-         private readonly HashSet<TValidationRule> _executeAfter = new HashSet<TValidationRule>();
+         private readonly HashSet<TValidationRule> _executeAfter = new();
 
          public IEnumerable<TValidationRule> GetDependencies() => _executeAfter;
 
@@ -84,7 +84,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
       protected virtual List<RuleDefinition> VerifyValidationRules()
       {
          // ensures that registered rules dependencies are honored
-         List<Type> GetRequiredRules(Type ruleType)
+         static List<Type> GetRequiredRules(Type ruleType)
          {
             return ruleType.GetCustomAttributes(typeof(RequiresRuleAttribute), true)
                .Select(req => ((RequiresRuleAttribute)req).RequiredRuleType)

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.DataTypes;
 
@@ -11,7 +12,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// </summary>
       /// <param name="header">The header to add.</param>
       /// <returns><see langword="true"/> if the header has been added, <see langword="false"/> if it was already in the repository.</returns>
-      public bool TryAdd(BlockHeader header);
+      public ValueTask<bool> TryAddAsync(BlockHeader header);
 
       /// <summary>
       /// Gets the <see cref="BlockHeader" /> with specified hash.

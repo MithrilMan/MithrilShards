@@ -4,7 +4,7 @@ namespace MithrilShards.Example.Protocol.Processors
 {
    public partial class PingPongProcessor
    {
-      private readonly Status _status = new Status();
+      private readonly Status _status = new();
 
       public class Status
       {

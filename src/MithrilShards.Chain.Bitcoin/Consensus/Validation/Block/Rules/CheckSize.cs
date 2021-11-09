@@ -39,8 +39,6 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
 
       private int GetBlockSize(Protocol.Types.Block block)
       {
-         var buffer = new PooledByteBufferWriter(block.Transactions!.Length * 256);
-
          return _blockSerializer.Serialize(
             block,
             KnownVersion.CurrentVersion,

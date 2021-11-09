@@ -71,7 +71,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Rules
          bool transactionCountIsOdd = (transactionsCount & 1) == 1;
 
          uint higherBitPosition = (uint)(transactionCountBitLength - (BitOperations.LeadingZeroCount(transactionsCount - 1) + 1));
-         uint safePoint = ((uint)Math.Pow(2, higherBitPosition));
+         uint safePoint = (uint)Math.Pow(2, higherBitPosition);
          uint itemsToConsider = transactionsCount - safePoint;
 
          Transaction lastElement = transactions[transactionsCount - 1];

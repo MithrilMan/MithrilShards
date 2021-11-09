@@ -7,7 +7,7 @@ using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Core.Network
 {
-   public interface IPeerContext : IDisposable
+   public interface IPeerContext : IAsyncDisposable
    {
       /// <summary>
       /// Gets the direction of the peer connection.

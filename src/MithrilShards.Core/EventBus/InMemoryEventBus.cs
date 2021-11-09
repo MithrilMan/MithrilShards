@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace MithrilShards.Core.EventBus
@@ -23,7 +25,7 @@ namespace MithrilShards.Core.EventBus
       /// <summary>
       /// The subscriptions lock to prevent race condition during publishing
       /// </summary>
-      private readonly object _subscriptionsLock = new object();
+      private readonly object _subscriptionsLock = new();
 
       /// <summary>
       /// Initializes a new instance of the <see cref="InMemoryEventBus" /> class.
@@ -37,8 +39,8 @@ namespace MithrilShards.Core.EventBus
          _subscriptions = new Dictionary<Type, List<ISubscription>>();
       }
 
-      /// <inheritdoc />
-      public SubscriptionToken Subscribe<TEvent>(Action<TEvent> handler) where TEvent : EventBase
+
+      public SubscriptionToken Subscribe<TEvent>(Func<TEvent, CancellationToken, ValueTask> handler) where TEvent : EventBase
       {
          if (handler == null)
          {
@@ -47,16 +49,14 @@ namespace MithrilShards.Core.EventBus
 
          lock (_subscriptionsLock)
          {
-            if (!_subscriptions.ContainsKey(typeof(TEvent)))
+            if (!_subscriptions.TryGetValue(typeof(TEvent), out List<ISubscription>? eventSubscriptions))
             {
-               _subscriptions.Add(typeof(TEvent), new List<ISubscription>());
+               eventSubscriptions = new();
+               _subscriptions.Add(typeof(TEvent), eventSubscriptions);
             }
 
-#pragma warning disable CA2000 // Dispose objects before losing scope
             var subscriptionToken = new SubscriptionToken(this, typeof(TEvent));
-#pragma warning restore CA2000 // Dispose objects before losing scope
-
-            _subscriptions[typeof(TEvent)].Add(new Subscription<TEvent>(handler, subscriptionToken));
+            eventSubscriptions.Add(new Subscription<TEvent>(handler, subscriptionToken));
 
             return subscriptionToken;
          }
@@ -76,9 +76,16 @@ namespace MithrilShards.Core.EventBus
          {
             if (_subscriptions.ContainsKey(subscriptionToken.EventType))
             {
-               List<ISubscription> allSubscriptions = _subscriptions[subscriptionToken.EventType];
+               var subscriptionToRemove = _subscriptions[subscriptionToken.EventType].FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
+               if (subscriptionToRemove != null)
+               {
+                  _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
+               }
+            }
 
-               ISubscription? subscriptionToRemove = allSubscriptions.FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
+            if (_subscriptions.ContainsKey(subscriptionToken.EventType))
+            {
+               var subscriptionToRemove = _subscriptions[subscriptionToken.EventType].FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
                if (subscriptionToRemove != null)
                {
                   _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
@@ -87,34 +94,38 @@ namespace MithrilShards.Core.EventBus
          }
       }
 
-      /// <inheritdoc />
-      public void Publish<TEvent>(TEvent @event) where TEvent : EventBase
+      public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : EventBase
       {
          if (@event == null)
          {
-            throw new ArgumentNullException(nameof(@event));
+            ThrowHelper.ThrowArgumentNullException(nameof(@event));
          }
 
-         var allSubscriptions = new List<ISubscription>();
+         Type eventType = typeof(TEvent);
+
+         List<ISubscription>? allSubscriptions = null;
          lock (_subscriptionsLock)
          {
-            Type eventType = typeof(TEvent);
             if (_subscriptions.ContainsKey(eventType))
             {
                allSubscriptions = _subscriptions[eventType].ToList();
             }
          }
 
-         for (int index = 0; index < allSubscriptions.Count; index++)
+         if (allSubscriptions is not null)
          {
-            ISubscription subscription = allSubscriptions[index];
-            try
+            foreach (ISubscription? subscription in allSubscriptions)
             {
-               subscription.Publish(@event);
-            }
-            catch (Exception ex)
-            {
-               _subscriptionErrorHandler?.Handle(@event, ex, subscription);
+               if (cancellationToken.IsCancellationRequested) return;
+
+               try
+               {
+                  await subscription.ProcessEventAsync(@event, cancellationToken).ConfigureAwait(false);
+               }
+               catch (Exception ex)
+               {
+                  _subscriptionErrorHandler?.Handle(@event, ex, subscription);
+               }
             }
          }
       }

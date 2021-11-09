@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
@@ -43,11 +44,11 @@ namespace MithrilShards.Example.Network
          base.AttachNetworkMessageProcessor(messageProcessor);
       }
 
-      public void OnHandshakeCompleted(Protocol.Messages.VersionMessage peerVersion)
+      public async ValueTask OnHandshakeCompleted(Protocol.Messages.VersionMessage peerVersion)
       {
          UserAgent = peerVersion.UserAgent;
          IsConnected = true;
-         eventBus.Publish(new PeerHandshaked(this));
+         await eventBus.PublishAsync(new PeerHandshaked(this)).ConfigureAwait(false);
       }
    }
 }

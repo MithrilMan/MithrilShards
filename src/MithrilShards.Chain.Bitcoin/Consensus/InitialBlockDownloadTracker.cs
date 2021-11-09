@@ -17,7 +17,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       readonly IDateTimeProvider _dateTimeProvider;
       private readonly Target? _minimumChainWork;
       private readonly long _maxTipAge;
-      readonly EventSubscriptionManager _subscriptionManager = new EventSubscriptionManager();
+      readonly EventSubscriptionManager _subscriptionManager = new();
 
       public InitialBlockDownloadTracker(ILogger<InitialBlockDownloadTracker> logger,
                                          IEventBus eventBus,

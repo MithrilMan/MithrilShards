@@ -1,4 +1,7 @@
-﻿namespace MithrilShards.Core.EventBus
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace MithrilShards.Core.EventBus
 {
    public interface ISubscription
    {
@@ -10,7 +13,9 @@
       /// <summary>
       /// Publish to the subscriber
       /// </summary>
-      /// <param name="eventBase"></param>
-      void Publish(EventBase eventBase);
+      /// <param name="eventBase">The event base.</param>
+      /// <param name="cancellationToken">The cancellation token.</param>
+      /// <returns></returns>
+      ValueTask ProcessEventAsync(EventBase eventBase, CancellationToken cancellationToken);
    }
 }

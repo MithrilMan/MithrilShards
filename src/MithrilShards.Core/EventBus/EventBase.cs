@@ -18,7 +18,7 @@ namespace MithrilShards.Core.EventBus
 
       public override string ToString()
       {
-         return $"{CorrelationId.ToString()} - {GetType().Name}";
+         return $"{CorrelationId} - {GetType().Name}";
       }
    }
 }

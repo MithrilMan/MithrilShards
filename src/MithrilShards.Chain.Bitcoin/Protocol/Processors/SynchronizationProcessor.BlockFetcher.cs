@@ -27,7 +27,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       private bool CanFetch(HeaderNode node)
       {
          bool isAvailable = _status.BestKnownHeader?.IsInSameChain(node) == true;
-         bool canServe = (!IsWitnessEnabled(node.Previous) || PeerContext.CanServeWitness);
+         bool canServe = !IsWitnessEnabled(node.Previous) || PeerContext.CanServeWitness;
          return isAvailable && canServe;
       }
 
@@ -125,7 +125,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
          }
       }
 
-      readonly BlockFetcherStatistics _fetcherStatus = new BlockFetcherStatistics();
+      readonly BlockFetcherStatistics _fetcherStatus = new();
 
       public class BlockFetcherStatistics
       {

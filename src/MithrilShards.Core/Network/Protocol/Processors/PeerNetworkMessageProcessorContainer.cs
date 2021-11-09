@@ -32,7 +32,7 @@ namespace MithrilShards.Core.Network.Protocol.Processors
       /// <summary>
       /// The mapping between MessageType and which processor instance is able to handle the request.
       /// </summary>
-      private readonly Dictionary<Type, List<ProcessorHandler>> _mapping = new Dictionary<Type, List<ProcessorHandler>>();
+      private readonly Dictionary<Type, List<ProcessorHandler>> _mapping = new();
       readonly ILogger<PeerNetworkMessageProcessorContainer> _logger;
 
       public PeerNetworkMessageProcessorContainer(ILogger<PeerNetworkMessageProcessorContainer> logger, IEnumerable<INetworkMessageProcessor> processors)

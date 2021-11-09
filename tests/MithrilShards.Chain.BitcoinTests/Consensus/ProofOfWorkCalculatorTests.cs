@@ -25,7 +25,7 @@ namespace MithrilShards.Chain.BitcoinTests
 
       [Theory]
       [JsonFileData("_data/ProofOfWorkCalculatorTests.json", "CalculateNextWorkRequired")]
-      public void CalculateNextWorkRequiredTest(uint lastRetargetTime, int height, uint blockTime, uint bits, uint expectedResult)
+      public void CalculateNextWorkRequiredTest(uint lastRetargetTime, uint blockTime, uint bits, uint expectedResult)
       {
          var powCalculator = new ProofOfWorkCalculator(
             _logger,
@@ -45,7 +45,7 @@ namespace MithrilShards.Chain.BitcoinTests
 
       [Theory]
       [JsonFileData("_data/ProofOfWorkCalculatorTests.json", "CalculateNextWorkRequired")]
-      public void NBitcoinCalculateNextWorkRequiredTest(uint lastRetargetTime, int height, uint blockTime, uint bits, uint expectedResult)
+      public void NBitcoinCalculateNextWorkRequiredTest(uint lastRetargetTime, uint blockTime, uint bits, uint expectedResult)
       {
          var header = new BlockHeader
          {
@@ -71,8 +71,8 @@ namespace MithrilShards.Chain.BitcoinTests
          // Retarget
          var bnNew = new NBitcoin.Target(header.Bits).ToBigInteger();
          uint cmp = new NBitcoin.Target(bnNew).ToCompact();
-         bnNew = bnNew * (new BigInteger((long)nActualTimespan.TotalSeconds));
-         bnNew = bnNew / (new BigInteger((long)consensus.PowTargetTimespan.TotalSeconds));
+         bnNew *= (new BigInteger((long)nActualTimespan.TotalSeconds));
+         bnNew /= (new BigInteger((long)consensus.PowTargetTimespan.TotalSeconds));
          var newTarget = new NBitcoin.Target(bnNew);
          if (newTarget > consensus.PowLimit)
             newTarget = consensus.PowLimit;

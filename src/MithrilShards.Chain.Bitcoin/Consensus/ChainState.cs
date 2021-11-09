@@ -28,7 +28,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
       /// <value>
       /// The coins view.
       /// </value>
-      protected private readonly ICoinsView coinsView;
+      private protected readonly ICoinsView coinsView;
 
       readonly IConsensusParameters _consensusParameters;
 
@@ -87,7 +87,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
          ChainTip = headersTree.Genesis;
          BestHeader = headersTree.Genesis;
 
-         _blockHeaderRepository.TryAdd(consensusParameters.GenesisHeader);
+         _blockHeaderRepository.TryAddAsync(consensusParameters.GenesisHeader);
       }
 
       /// <summary>
@@ -223,7 +223,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus
             }
 
             HeadersTree.Add(headerNode);
-            _blockHeaderRepository.TryAdd(header);
+            _blockHeaderRepository.TryAddAsync(header);
 
             return headerNode;
          }

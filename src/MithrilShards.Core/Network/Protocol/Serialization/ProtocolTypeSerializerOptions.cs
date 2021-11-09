@@ -5,7 +5,7 @@ namespace MithrilShards.Core.Network.Protocol.Serialization
 {
    public class ProtocolTypeSerializerOptions
    {
-      private readonly Dictionary<string, object> _options = new Dictionary<string, object>();
+      private readonly Dictionary<string, object> _options = new();
 
       public bool HasOption(string key)
       {

@@ -107,6 +107,7 @@ nav:
     - mithril-shards/shards.md
     - mithril-shards/forge-builder.md
     - mithril-shards/default-forge.md
+    - mithril-shards/event-bus.md
   - Shards:
     - BedrockNetwork:
       -  shards/bedrock-network/index.md

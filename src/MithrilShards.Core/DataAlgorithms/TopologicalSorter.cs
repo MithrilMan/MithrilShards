@@ -12,10 +12,10 @@ namespace MithrilShards.Core.DataAlgorithms
       private class Relations
       {
          public int Dependencies = 0;
-         public HashSet<TItem> Dependents = new HashSet<TItem>();
+         public HashSet<TItem> Dependents = new();
       }
 
-      private readonly Dictionary<TItem, Relations> _map = new Dictionary<TItem, Relations>();
+      private readonly Dictionary<TItem, Relations> _map = new();
 
 
       /// <summary>

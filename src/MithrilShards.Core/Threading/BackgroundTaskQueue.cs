@@ -7,8 +7,8 @@ namespace MithrilShards.Core.Threading
 {
    public class BackgroundTaskQueue : IBackgroundTaskQueue
    {
-      private readonly ConcurrentQueue<Func<CancellationToken, Task>> _workItems = new ConcurrentQueue<Func<CancellationToken, Task>>();
-      private readonly SemaphoreSlim _signal = new SemaphoreSlim(0);
+      private readonly ConcurrentQueue<Func<CancellationToken, Task>> _workItems = new();
+      private readonly SemaphoreSlim _signal = new(0);
 
       public void QueueBackgroundWorkItem(Func<CancellationToken, Task> workItem)
       {

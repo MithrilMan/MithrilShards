@@ -28,7 +28,7 @@
    },
    "WebApi": {
       "EndPoint": "127.0.0.1:45030",
-      "Enabled": false,
+      "Enabled": true,
       "Https": false
    }
 }

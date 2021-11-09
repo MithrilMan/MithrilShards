@@ -84,13 +84,13 @@ namespace MithrilShards.Chain.Bitcoin.Protocol
             hashesList.Add(hashes[hashes.Count - 1]);
          }
 
+         Span<byte> pairOfHashes = stackalloc byte[64];
          int elementsCount = hashesList.Count;
          while (elementsCount > 1)
          {
             int newHashPosition = 0;
             for (int pos = 0; pos + 1 < elementsCount; pos += 2)
             {
-               Span<byte> pairOfHashes = stackalloc byte[64];
                hashesList[pos].GetBytes().CopyTo(pairOfHashes);
                hashesList[pos + 1].GetBytes().CopyTo(pairOfHashes.Slice(32));
 

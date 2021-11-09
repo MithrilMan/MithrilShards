@@ -19,12 +19,12 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       private readonly ForgeConnectivitySettings _connectivitySettings;
       private readonly IPeerAddressBook _peerAddressBook;
 
-      private readonly Dictionary<string, PeerScore> _connectedPeers = new Dictionary<string, PeerScore>();
+      private readonly Dictionary<string, PeerScore> _connectedPeers = new();
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// </summary>
-      private readonly EventSubscriptionManager _eventSubscriptionManager = new EventSubscriptionManager();
+      private readonly EventSubscriptionManager _eventSubscriptionManager = new();
 
       public DefaultPeerBehaviorManager(ILogger<DefaultPeerBehaviorManager> logger,
                                         IEventBus eventBus,
@@ -43,8 +43,8 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       {
          RegisterStatisticFeeds();
          _eventSubscriptionManager.RegisterSubscriptions(
-            _eventBus.Subscribe<PeerConnected>(AddConnectedPeer),
-            _eventBus.Subscribe<PeerDisconnected>(RemoveConnectedPeer)
+            _eventBus.Subscribe<PeerConnected>(AddConnectedPeerAsync),
+            _eventBus.Subscribe<PeerDisconnected>(RemoveConnectedPeerAsync)
             );
 
          return Task.CompletedTask;
@@ -112,17 +112,20 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
       /// Adds the specified peer to the list of connected peer.
       /// </summary>
       /// <param name="event">The event.</param>
-      private void AddConnectedPeer(PeerConnected @event)
+      /// <param name="cancellationToken">The cancellation token.</param>
+      private ValueTask AddConnectedPeerAsync(PeerConnected @event, CancellationToken cancellationToken)
       {
          _connectedPeers[@event.PeerContext.PeerId] = new PeerScore(@event.PeerContext, INITIAL_SCORE);
          _logger.LogDebug("Added peer {PeerId} to the list of PeerBehaviorManager connected peers", @event.PeerContext.PeerId);
+         return ValueTask.CompletedTask;
       }
 
       /// <summary>
       /// Removes the specified peer from the list of connected peer.
       /// </summary>
       /// <param name="event">The event.</param>
-      private void RemoveConnectedPeer(PeerDisconnected @event)
+      /// <param name="cancellationToken">The cancellation token.</param>
+      private ValueTask RemoveConnectedPeerAsync(PeerDisconnected @event, CancellationToken cancellationToken)
       {
          if (!_connectedPeers.Remove(@event.PeerContext.PeerId))
          {
@@ -132,6 +135,8 @@ namespace MithrilShards.Core.Network.PeerBehaviorManager
          {
             _logger.LogDebug("Peer {PeerId} disconnected from PeerBehaviorManager.", @event.PeerContext.PeerId);
          }
+
+         return ValueTask.CompletedTask;
       }
 
       public void Dispose()

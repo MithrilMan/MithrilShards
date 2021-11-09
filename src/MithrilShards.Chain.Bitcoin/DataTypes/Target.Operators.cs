@@ -109,7 +109,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
                result[i - k - 1] |= leftBytes[i] << (SIZE - shiftAmount);
             }
 
-            result[i - k] |= (leftBytes[i] >> shiftAmount);
+            result[i - k] |= leftBytes[i] >> shiftAmount;
          }
 
          return result[0];
@@ -135,7 +135,7 @@ namespace MithrilShards.Chain.Bitcoin.DataTypes
                result[i - k - 1] |= leftBytes[i] << (SIZE - shiftAmount);
             }
 
-            result[i - k] |= (leftBytes[i] >> shiftAmount);
+            result[i - k] |= leftBytes[i] >> shiftAmount;
          }
 
          return new Target(MemoryMarshal.Cast<uint, byte>(result));

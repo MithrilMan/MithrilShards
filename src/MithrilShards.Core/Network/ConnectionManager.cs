@@ -20,22 +20,22 @@ namespace MithrilShards.Core.Network
       private const string FEED_CONNECTED_PEERS_SUMMARY = "ConnectedPeersSummary";
       private const string FEED_CONNECTED_PEERS = "ConnectedPeers";
 
-      protected readonly ConcurrentDictionary<string, IPeerContext> inboundPeers = new ConcurrentDictionary<string, IPeerContext>();
-      protected readonly ConcurrentDictionary<string, IPeerContext> outboundPeers = new ConcurrentDictionary<string, IPeerContext>();
-      protected readonly HashSet<EndPoint> attemptingConnections = new HashSet<EndPoint>();
+      protected readonly ConcurrentDictionary<string, IPeerContext> inboundPeers = new();
+      protected readonly ConcurrentDictionary<string, IPeerContext> outboundPeers = new();
+      protected readonly HashSet<EndPoint> attemptingConnections = new();
 
       private readonly ILogger<ConnectionManager> _logger;
       private readonly IEventBus _eventBus;
       readonly IStatisticFeedsCollector _statisticFeedsCollector;
       readonly IEnumerable<IConnector> _connectors;
 
-      private readonly object _connectionLock = new object();
+      private readonly object _connectionLock = new();
 
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// Must be disposed to unregister subscriptions.
       /// </summary>
-      private readonly EventSubscriptionManager _eventSubscriptionManager = new EventSubscriptionManager();
+      private readonly EventSubscriptionManager _eventSubscriptionManager = new();
 
       /// <summary>
       /// Gets the connected inbound peers count.
@@ -75,7 +75,9 @@ namespace MithrilShards.Core.Network
       /// Adds the specified peer to the list of connected peer.
       /// </summary>
       /// <param name="event">The event.</param>
-      private void AddConnectedPeer(PeerConnected @event)
+      /// <param name="cancellationToken">The cancellation token.</param>
+      /// <returns></returns>
+      private ValueTask AddConnectedPeerAsync(PeerConnected @event, CancellationToken cancellationToken)
       {
          IPEndPoint ipEndPoint = @event.PeerContext.RemoteEndPoint.EnsureIPv6();
          if (@event.PeerContext.Direction == PeerConnectionDirection.Outbound)
@@ -96,13 +98,16 @@ namespace MithrilShards.Core.Network
          ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? inboundPeers : outboundPeers;
          container[@event.PeerContext.PeerId] = @event.PeerContext;
          _logger.LogDebug("Connected to {RemoteEndPoint}, peer {PeerId} added to the list of connected peers.", ipEndPoint, @event.PeerContext.PeerId);
+
+         return ValueTask.CompletedTask;
       }
 
       /// <summary>
       /// Removes the specified peer from the list of connected peer.
       /// </summary>
       /// <param name="event">The event.</param>
-      private void OnPeerDisconnected(PeerDisconnected @event)
+      /// <param name="cancellationToken">The cancellation token.</param>
+      private ValueTask OnPeerDisconnectedAsync(PeerDisconnected @event, CancellationToken cancellationToken)
       {
          ConcurrentDictionary<string, IPeerContext> container = @event.PeerContext.Direction == PeerConnectionDirection.Inbound ? inboundPeers : outboundPeers;
          if (!container.TryRemove(@event.PeerContext.PeerId, out _))
@@ -113,17 +118,19 @@ namespace MithrilShards.Core.Network
          {
             _logger.LogDebug("Peer {PeerId} disconnected.", @event.PeerContext.PeerId);
          }
+
+         return ValueTask.CompletedTask;
       }
 
       public virtual Task StartAsync(CancellationToken cancellationToken)
       {
          RegisterStatisticFeeds();
          _eventSubscriptionManager.RegisterSubscriptions(
-               _eventBus.Subscribe<PeerConnected>(AddConnectedPeer),
-               _eventBus.Subscribe<PeerDisconnected>(OnPeerDisconnected),
-               _eventBus.Subscribe<PeerDisconnectionRequired>(OnPeerDisconnectionRequested),
-               _eventBus.Subscribe<PeerConnectionAttempt>(OnPeerConnectionAttempt),
-               _eventBus.Subscribe<PeerConnectionAttemptFailed>(OnPeerConnectionAttemptFailed)
+               _eventBus.Subscribe<PeerConnected>(AddConnectedPeerAsync),
+               _eventBus.Subscribe<PeerDisconnected>(OnPeerDisconnectedAsync),
+               _eventBus.Subscribe<PeerDisconnectionRequired>(OnPeerDisconnectionRequestedAsync),
+               _eventBus.Subscribe<PeerConnectionAttempt>(OnPeerConnectionAttemptAsync),
+               _eventBus.Subscribe<PeerConnectionAttemptFailed>(OnPeerConnectionAttemptFailedAsync)
          );
 
          // start the task that tries to connect to other peers
@@ -141,7 +148,7 @@ namespace MithrilShards.Core.Network
 
       public void RegisterStatisticFeeds()
       {
-         string byteFormatter((object? value, int widthHint) item) => ByteSizeFormatter.HumanReadable((long)item.value!);
+         static string byteFormatter((object? value, int widthHint) item) => ByteSizeFormatter.HumanReadable((long)item.value!);
 
          _statisticFeedsCollector.RegisterStatisticFeeds(this,
             new StatisticFeedDefinition(FEED_CONNECTED_PEERS_SUMMARY, "Connected Peers summary",
@@ -242,7 +249,7 @@ namespace MithrilShards.Core.Network
          return true;
       }
 
-      protected void OnPeerDisconnectionRequested(PeerDisconnectionRequired @event)
+      protected ValueTask OnPeerDisconnectionRequestedAsync(PeerDisconnectionRequired @event, CancellationToken cancellationToken)
       {
          IPEndPoint endPoint = @event.EndPoint.AsIPEndPoint().EnsureIPv6();
          IPeerContext? peerContext = inboundPeers.Values
@@ -258,9 +265,11 @@ namespace MithrilShards.Core.Network
          {
             _logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection failed, endpoint not matching with any connected peer.", endPoint);
          }
+
+         return ValueTask.CompletedTask;
       }
 
-      private void OnPeerConnectionAttempt(PeerConnectionAttempt @event)
+      private ValueTask OnPeerConnectionAttemptAsync(PeerConnectionAttempt @event, CancellationToken cancellationToken)
       {
          IPEndPoint ipEndPoint = @event.RemoteEndPoint;
          lock (_connectionLock)
@@ -269,9 +278,11 @@ namespace MithrilShards.Core.Network
          }
 
          _logger.LogDebug("Connection attempt to {RemoteEndPoint}. Added to attemptingConnections list.", ipEndPoint);
+
+         return ValueTask.CompletedTask;
       }
 
-      private void OnPeerConnectionAttemptFailed(PeerConnectionAttemptFailed @event)
+      private ValueTask OnPeerConnectionAttemptFailedAsync(PeerConnectionAttemptFailed @event, CancellationToken cancellationToken)
       {
          IPEndPoint ipEndPoint = @event.RemoteEndPoint.EnsureIPv6();
          lock (_connectionLock)
@@ -285,6 +296,8 @@ namespace MithrilShards.Core.Network
                _logger.LogWarning("EndPoint {RemoteEndPoint} not found in attemptingConnections list (shouldn't happen, need investigation). {FailureReason}", ipEndPoint, @event.Reason);
             }
          }
+
+         return ValueTask.CompletedTask;
       }
    }
 }

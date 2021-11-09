@@ -28,7 +28,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <summary>
       /// Holds registration of subscribed <see cref="IEventBus"/> event handlers.
       /// </summary>
-      private readonly EventSubscriptionManager _eventSubscriptionManager = new EventSubscriptionManager();
+      private readonly EventSubscriptionManager _eventSubscriptionManager = new();
 
       public BitcoinPeerContext PeerContext { get; private set; } = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
 
@@ -98,7 +98,7 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors
       /// <param name="clause">The clause.</param>
       protected void RegisterLifeTimeEventHandler<TEventBase>(Func<TEventBase, ValueTask> handler, Func<TEventBase, bool>? clause = null) where TEventBase : EventBase
       {
-         _eventSubscriptionManager.RegisterSubscriptions(eventBus.Subscribe<TEventBase>(async (message) =>
+         _eventSubscriptionManager.RegisterSubscriptions(eventBus.Subscribe<TEventBase>(async (message, cancellationToken) =>
          {
             // ensure we listen only to events we are interested into
             if (clause != null && !clause(message)) return;

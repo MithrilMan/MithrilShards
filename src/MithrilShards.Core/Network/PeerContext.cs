@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
@@ -14,7 +15,7 @@ namespace MithrilShards.Core.Network
 {
    public class PeerContext : IPeerContext
    {
-      private readonly List<INetworkMessageProcessor> _messageProcessors = new List<INetworkMessageProcessor>();
+      private readonly List<INetworkMessageProcessor> _messageProcessors = new();
       protected readonly ILogger logger;
       protected readonly IEventBus eventBus;
       protected readonly INetworkMessageWriter messageWriter;
@@ -101,17 +102,16 @@ namespace MithrilShards.Core.Network
       public void Disconnect(string reason)
       {
          IsConnected = false;
-         eventBus.Publish(new PeerDisconnectionRequired(RemoteEndPoint, reason));
+         _ = eventBus.PublishAsync(new PeerDisconnectionRequired(RemoteEndPoint, reason));
       }
 
-      public void Dispose()
+      public async ValueTask DisposeAsync()
       {
          logger.LogDebug("Disposing PeerContext of {PeerId}.", PeerId);
          foreach (INetworkMessageProcessor messageProcessor in _messageProcessors)
          {
             try
             {
-
                messageProcessor.Dispose();
             }
             catch (Exception ex)
@@ -122,7 +122,8 @@ namespace MithrilShards.Core.Network
 
          IsConnected = false;
          ConnectionCancellationTokenSource.Cancel();
-         eventBus.Publish(new PeerDisconnected(this, "Client disconnected", null));
+
+         await eventBus.PublishAsync(new PeerDisconnected(this, "Client disconnected", null)).ConfigureAwait(false);
       }
    }
 }
