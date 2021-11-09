@@ -104,7 +104,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '5.0.201'
+        dotnet-version: '6.0.x'
 
     - name: dotnet Restore
       run: dotnet restore -s "https://api.nuget.org/v3/index.json" -s "https://f.feedz.io/davidfowl/bedrockframework/nuget/index.json"
