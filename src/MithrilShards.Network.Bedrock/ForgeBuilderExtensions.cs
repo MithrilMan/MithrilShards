@@ -31,7 +31,7 @@ public static class ForgeBuilderExtensions
                .AddSingleton<IConnectivityPeerStats, ConnectivityPeerStats>()
                .AddSingleton<MithrilForgeClientConnectionHandler>()
                .AddSingleton<ClientBuilder>()
-               .AddTransient<INetworkProtocolMessageSerializer, TNetworkProtocolMessageSerializer>()
+               .AddScoped<INetworkProtocolMessageSerializer, TNetworkProtocolMessageSerializer>()
                ;
          });
 

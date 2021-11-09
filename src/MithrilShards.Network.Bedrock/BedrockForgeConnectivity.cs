@@ -70,7 +70,7 @@ public class BedrockForgeConnectivity : IForgeClientConnectivity
       }
       catch (Exception ex)
       {
-         _logger.LogError(ex, "AttemptConnectionAsync failed");
+         _logger.LogDebug(ex, "AttemptConnectionAsync failed");
       }
    }
 }
