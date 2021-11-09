@@ -1,19 +1,18 @@
 ﻿using System;
 
-namespace MithrilShards.Core
+namespace MithrilShards.Core;
+
+public interface IRandomNumberGenerator
 {
-   public interface IRandomNumberGenerator
-   {
-      void GetBytes(Span<byte> data);
+   void GetBytes(Span<byte> data);
 
-      void GetNonZeroBytes(Span<byte> data);
+   void GetNonZeroBytes(Span<byte> data);
 
-      int GetInt32();
+   int GetInt32();
 
-      uint GetUint32();
+   uint GetUint32();
 
-      long GetInt64();
+   long GetInt64();
 
-      ulong GetUint64();
-   }
+   ulong GetUint64();
 }

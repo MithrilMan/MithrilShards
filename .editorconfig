@@ -171,3 +171,4 @@ dotnet_diagnostic.CS1587.severity                                 = silent
 
 # IDE0090: Use 'new(...)'
 csharp_style_implicit_object_creation_when_type_is_apparent       = true: warning
+csharp_style_namespace_declarations=file_scoped:warning

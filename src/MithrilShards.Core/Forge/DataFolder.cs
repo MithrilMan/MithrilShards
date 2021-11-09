@@ -1,54 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MithrilShards.Core.Forge
+namespace MithrilShards.Core.Forge;
+
+public class DataFolders : IDataFolders
 {
-   public class DataFolders : IDataFolders
+   public const string ROOT_FEATURE = "root";
+   public string RootPath { get; }
+
+   readonly Dictionary<string, string> _paths;
+
+   public string this[string featureKey]
    {
-      public const string ROOT_FEATURE = "root";
-      public string RootPath { get; }
-
-      readonly Dictionary<string, string> _paths;
-
-      public string this[string featureKey]
+      get
       {
-         get
+         if (featureKey == null)
          {
-            if (featureKey == null)
-            {
-               throw new ArgumentNullException(nameof(featureKey));
-            }
-
-            if (_paths.TryGetValue(featureKey.ToLowerInvariant(), out string? path))
-            {
-               return path;
-            }
-            else
-            {
-               throw new KeyNotFoundException($"Cannot find data folder information for feature {featureKey}");
-            }
+            throw new ArgumentNullException(nameof(featureKey));
          }
-         set
+
+         if (_paths.TryGetValue(featureKey.ToLowerInvariant(), out string? path))
          {
-            if (featureKey == null)
-            {
-               throw new ArgumentNullException(nameof(featureKey));
-            }
-
-            if (value == null)
-            {
-               throw new ArgumentNullException(nameof(value));
-            }
-
-            _paths[featureKey.ToLowerInvariant()] = value;
+            return path;
+         }
+         else
+         {
+            throw new KeyNotFoundException($"Cannot find data folder information for feature {featureKey}");
          }
       }
-
-      public DataFolders(string rootPath)
+      set
       {
-         RootPath = rootPath;
-         _paths = new Dictionary<string, string>();
-         this[ROOT_FEATURE] = rootPath;
+         if (featureKey == null)
+         {
+            throw new ArgumentNullException(nameof(featureKey));
+         }
+
+         if (value == null)
+         {
+            throw new ArgumentNullException(nameof(value));
+         }
+
+         _paths[featureKey.ToLowerInvariant()] = value;
       }
+   }
+
+   public DataFolders(string rootPath)
+   {
+      RootPath = rootPath;
+      _paths = new Dictionary<string, string>();
+      this[ROOT_FEATURE] = rootPath;
    }
 }

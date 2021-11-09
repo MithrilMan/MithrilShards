@@ -1,6 +1,5 @@
-﻿namespace MithrilShards.Chain.Bitcoin.Consensus.Validation
+﻿namespace MithrilShards.Chain.Bitcoin.Consensus.Validation;
+
+public class TransactionValidationState : ValidationState<TransactionValidationStateResults>
 {
-   public class TransactionValidationState : ValidationState<TransactionValidationStateResults>
-   {
-   }
 }

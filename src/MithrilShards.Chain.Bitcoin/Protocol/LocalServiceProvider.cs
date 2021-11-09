@@ -1,45 +1,44 @@
 ﻿using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.Network;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol
+namespace MithrilShards.Chain.Bitcoin.Protocol;
+
+/// <summary>
+/// Allow to set and get available node services.
+/// </summary>
+/// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.ILocalServiceProvider" />
+public class LocalServiceProvider : ILocalServiceProvider
 {
-   /// <summary>
-   /// Allow to set and get available node services.
-   /// </summary>
-   /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.ILocalServiceProvider" />
-   public class LocalServiceProvider : ILocalServiceProvider
+   readonly ILogger<LocalServiceProvider> _logger;
+
+   private NodeServices _availableServices;
+
+   public LocalServiceProvider(ILogger<LocalServiceProvider> logger)
    {
-      readonly ILogger<LocalServiceProvider> _logger;
+      _logger = logger;
 
-      private NodeServices _availableServices;
+      AddServices(NodeServices.Network | NodeServices.NetworkLimited | NodeServices.Witness);
+   }
 
-      public LocalServiceProvider(ILogger<LocalServiceProvider> logger)
-      {
-         _logger = logger;
+   public void AddServices(NodeServices services)
+   {
+      _logger.LogDebug("Adding services {NodeServices}", services);
+      _availableServices |= services;
+   }
 
-         AddServices(NodeServices.Network | NodeServices.NetworkLimited | NodeServices.Witness);
-      }
+   public void RemoveServices(NodeServices services)
+   {
+      _logger.LogDebug("Removing services {NodeServices}", services);
+      _availableServices &= ~services;
+   }
 
-      public void AddServices(NodeServices services)
-      {
-         _logger.LogDebug("Adding services {NodeServices}", services);
-         _availableServices |= services;
-      }
+   public NodeServices GetServices()
+   {
+      return _availableServices;
+   }
 
-      public void RemoveServices(NodeServices services)
-      {
-         _logger.LogDebug("Removing services {NodeServices}", services);
-         _availableServices &= ~services;
-      }
-
-      public NodeServices GetServices()
-      {
-         return _availableServices;
-      }
-
-      public bool HasServices(NodeServices service)
-      {
-         return _availableServices.HasFlag(service);
-      }
+   public bool HasServices(NodeServices service)
+   {
+      return _availableServices.HasFlag(service);
    }
 }

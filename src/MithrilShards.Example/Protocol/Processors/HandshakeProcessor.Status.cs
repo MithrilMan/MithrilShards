@@ -3,70 +3,69 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Example.Protocol.Messages;
 
-namespace MithrilShards.Example.Protocol.Processors
+namespace MithrilShards.Example.Protocol.Processors;
+
+public partial class HandshakeProcessor
 {
-   public partial class HandshakeProcessor
+   internal class HandshakeProcessorStatus
    {
-      internal class HandshakeProcessorStatus
+      private readonly HandshakeProcessor _processor;
+
+      internal bool IsVersionSent { get; private set; } = false;
+
+      /// <summary>
+      /// Gets the version payload received from the peer.
+      /// </summary>
+      internal VersionMessage? PeerVersion { get; private set; } = null;
+
+      public bool IsHandShaked { get; private set; } = false;
+
+      internal bool VersionAckReceived { get; private set; } = false;
+
+      public HandshakeProcessorStatus(HandshakeProcessor processor)
       {
-         private readonly HandshakeProcessor _processor;
+         _processor = processor;
+      }
 
-         internal bool IsVersionSent { get; private set; } = false;
+      internal void VersionSent()
+      {
+         IsVersionSent = true;
+      }
 
-         /// <summary>
-         /// Gets the version payload received from the peer.
-         /// </summary>
-         internal VersionMessage? PeerVersion { get; private set; } = null;
+      internal async ValueTask VersionReceivedAsync(VersionMessage version)
+      {
+         PeerVersion = version;
+         _processor.PeerContext.NegotiatedProtocolVersion.Version
+            = Math.Min(PeerVersion.Version, _processor._nodeImplementation.ImplementationVersion);
 
-         public bool IsHandShaked { get; private set; } = false;
+         await OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
+      }
 
-         internal bool VersionAckReceived { get; private set; } = false;
+      internal async ValueTask VerAckReceivedAsync()
+      {
+         VersionAckReceived = true;
+         await OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
+      }
 
-         public HandshakeProcessorStatus(HandshakeProcessor processor)
+      private async ValueTask OnHandshakeStatusUpdatedAsync()
+      {
+         if (!VersionAckReceived)
          {
-            _processor = processor;
+            _processor.logger.LogDebug("Waiting verack...");
+            return;
          }
 
-         internal void VersionSent()
+         if (PeerVersion == null)
          {
-            IsVersionSent = true;
+            _processor.logger.LogDebug("Waiting version message...");
+            return;
          }
 
-         internal async ValueTask VersionReceivedAsync(VersionMessage version)
-         {
-            PeerVersion = version;
-            _processor.PeerContext.NegotiatedProtocolVersion.Version
-               = Math.Min(PeerVersion.Version, _processor._nodeImplementation.ImplementationVersion);
+         // if we reach this point, peer completed the handshake, yay!
+         IsHandShaked = true;
+         _processor.logger.LogDebug("Handshake successful");
 
-            await OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
-         }
-
-         internal async ValueTask VerAckReceivedAsync()
-         {
-            VersionAckReceived = true;
-            await OnHandshakeStatusUpdatedAsync().ConfigureAwait(false);
-         }
-
-         private async ValueTask OnHandshakeStatusUpdatedAsync()
-         {
-            if (!VersionAckReceived)
-            {
-               _processor.logger.LogDebug("Waiting verack...");
-               return;
-            }
-
-            if (PeerVersion == null)
-            {
-               _processor.logger.LogDebug("Waiting version message...");
-               return;
-            }
-
-            // if we reach this point, peer completed the handshake, yay!
-            IsHandShaked = true;
-            _processor.logger.LogDebug("Handshake successful");
-
-            await _processor.PeerContext.OnHandshakeCompleted(PeerVersion).ConfigureAwait(false);
-         }
+         await _processor.PeerContext.OnHandshakeCompleted(PeerVersion).ConfigureAwait(false);
       }
    }
 }

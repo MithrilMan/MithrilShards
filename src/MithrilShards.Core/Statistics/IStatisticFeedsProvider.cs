@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
 
-namespace MithrilShards.Core.Statistics
+namespace MithrilShards.Core.Statistics;
+
+/// <summary>
+/// Every component implementing this interface is exporting statistics relative to its job.
+/// </summary>
+public interface IStatisticFeedsProvider
 {
    /// <summary>
-   /// Every component implementing this interface is exporting statistics relative to its job.
+   /// Handy placeholder that feeds provider should use to Register a feed definition.
    /// </summary>
-   public interface IStatisticFeedsProvider
-   {
-      /// <summary>
-      /// Handy placeholder that feeds provider should use to Register a feed definition.
-      /// </summary>
-      void RegisterStatisticFeeds();
+   void RegisterStatisticFeeds();
 
-      /// <summary>
-      /// Gets the statistic feed values rows.
-      /// </summary>
-      /// <param name="feedId">The feed identifier.</param>
-      /// <returns>The feed values, ordered by column definition</returns>
-      List<object?[]>? GetStatisticFeedValues(string feedId);
-   }
+   /// <summary>
+   /// Gets the statistic feed values rows.
+   /// </summary>
+   /// <param name="feedId">The feed identifier.</param>
+   /// <returns>The feed values, ordered by column definition</returns>
+   List<object?[]>? GetStatisticFeedValues(string feedId);
 }

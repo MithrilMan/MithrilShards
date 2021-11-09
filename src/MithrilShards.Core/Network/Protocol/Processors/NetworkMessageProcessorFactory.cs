@@ -5,50 +5,49 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace MithrilShards.Core.Network.Protocol.Processors
+namespace MithrilShards.Core.Network.Protocol.Processors;
+
+/// <summary>
+/// Interfaces that define a generic network message
+/// </summary>
+public class NetworkMessageProcessorFactory : INetworkMessageProcessorFactory
 {
-   /// <summary>
-   /// Interfaces that define a generic network message
-   /// </summary>
-   public class NetworkMessageProcessorFactory : INetworkMessageProcessorFactory
+   readonly ILogger<INetworkMessageProcessorFactory> _logger;
+   readonly IServiceProvider _serviceProvider;
+
+   public NetworkMessageProcessorFactory(ILogger<INetworkMessageProcessorFactory> logger,
+                                         IServiceProvider serviceProvider)
    {
-      readonly ILogger<INetworkMessageProcessorFactory> _logger;
-      readonly IServiceProvider _serviceProvider;
+      _logger = logger;
+      _serviceProvider = serviceProvider;
+   }
 
-      public NetworkMessageProcessorFactory(ILogger<INetworkMessageProcessorFactory> logger,
-                                            IServiceProvider serviceProvider)
+   /// <summary>
+   /// Attaches known processors to specified peer.
+   /// </summary>
+   /// <param name="peerContext">The peer context.</param>
+   public async Task StartProcessorsAsync(IPeerContext peerContext)
+   {
+      if (peerContext is null)
       {
-         _logger = logger;
-         _serviceProvider = serviceProvider;
+         ThrowHelper.ThrowArgumentNullException(nameof(peerContext));
       }
 
-      /// <summary>
-      /// Attaches known processors to specified peer.
-      /// </summary>
-      /// <param name="peerContext">The peer context.</param>
-      public async Task StartProcessorsAsync(IPeerContext peerContext)
+      IEnumerable<INetworkMessageProcessor> processors = _serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>()!;
+      foreach (INetworkMessageProcessor processor in processors)
       {
-         if (peerContext is null)
-         {
-            ThrowHelper.ThrowArgumentNullException(nameof(peerContext));
-         }
+         // skip processors that aren't enabled
+         if (!processor.Enabled) continue;
 
-         IEnumerable<INetworkMessageProcessor> processors = _serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>()!;
-         foreach (INetworkMessageProcessor processor in processors)
-         {
-            // skip processors that aren't enabled
-            if (!processor.Enabled) continue;
-
-            peerContext.AttachNetworkMessageProcessor(processor);
-            await processor.AttachAsync(peerContext).ConfigureAwait(false);
-         }
-
-         peerContext.Features.Set(new PeerNetworkMessageProcessorContainer(_serviceProvider.GetRequiredService<ILogger<PeerNetworkMessageProcessorContainer>>(), processors));
+         peerContext.AttachNetworkMessageProcessor(processor);
+         await processor.AttachAsync(peerContext).ConfigureAwait(false);
       }
 
-      public async ValueTask ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
-      {
-         await peerContext.Features.Get<PeerNetworkMessageProcessorContainer>().ProcessMessageAsync(message, cancellation).ConfigureAwait(false);
-      }
+      peerContext.Features.Set(new PeerNetworkMessageProcessorContainer(_serviceProvider.GetRequiredService<ILogger<PeerNetworkMessageProcessorContainer>>(), processors));
+   }
+
+   public async ValueTask ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
+   {
+      await peerContext.Features.Get<PeerNetworkMessageProcessorContainer>().ProcessMessageAsync(message, cancellation).ConfigureAwait(false);
    }
 }

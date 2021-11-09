@@ -15,14 +15,14 @@ using MithrilShards.Logging.Serilog;
 using MithrilShards.Network.Bedrock;
 using Serilog;
 
-namespace ConnectionTest
+namespace ConnectionTest;
+
+static class Program
 {
-   static class Program
+   static async Task Main(string[] args)
    {
-      static async Task Main(string[] args)
-      {
-         // Create a root command with some options
-         var rootCommand = new RootCommand {
+      // Create a root command with some options
+      var rootCommand = new RootCommand {
             new Option<string>(
                "--settings",
                getDefaultValue: () => "forge-settings.json",
@@ -49,27 +49,26 @@ namespace ConnectionTest
                .FromAmong("bitcoin-main","bitcoin-regtest")
          };
 
-         rootCommand.Description = "Mithril Shards - Bitcoin Test";
-         rootCommand.TreatUnmatchedTokensAsErrors = false;
+      rootCommand.Description = "Mithril Shards - Bitcoin Test";
+      rootCommand.TreatUnmatchedTokensAsErrors = false;
 
-         // Note that the parameters of the handler method are matched according to the names of the options
-         rootCommand.Handler = CommandHandler.Create<string, string, int, string>(async (settings, logSettings, protocolVersion, network) =>
-         {
-            Console.WriteLine($"Building {network} forge...");
+      // Note that the parameters of the handler method are matched according to the names of the options
+      rootCommand.Handler = CommandHandler.Create<string, string, int, string>(async (settings, logSettings, protocolVersion, network) =>
+      {
+         Console.WriteLine($"Building {network} forge...");
 
-            await new ForgeBuilder().UseForge<DefaultForge>(args, settings)
-                                    .UseBitcoinChain(networkName: network, minimumSupportedVersion: Math.Min(KnownVersion.V70012, protocolVersion), currentVersion: protocolVersion)
-                                    .UseBitcoinDev()
-                                    .UseSerilog(logSettings)
-                                    .UseBedrockNetwork<BitcoinNetworkProtocolMessageSerializer>()
-                                    .UseStatisticsCollector(options => options.DumpOnConsoleOnKeyPress = true)
-                                    .UseApi()
-                                    .UseDevController()
-                                    .RunConsoleAsync()
-                                    .ConfigureAwait(false);
-         });
+         await new ForgeBuilder().UseForge<DefaultForge>(args, settings)
+                                 .UseBitcoinChain(networkName: network, minimumSupportedVersion: Math.Min(KnownVersion.V70012, protocolVersion), currentVersion: protocolVersion)
+                                 .UseBitcoinDev()
+                                 .UseSerilog(logSettings)
+                                 .UseBedrockNetwork<BitcoinNetworkProtocolMessageSerializer>()
+                                 .UseStatisticsCollector(options => options.DumpOnConsoleOnKeyPress = true)
+                                 .UseApi()
+                                 .UseDevController()
+                                 .RunConsoleAsync()
+                                 .ConfigureAwait(false);
+      });
 
-         await rootCommand.InvokeAsync(args).ConfigureAwait(false);
-      }
+      await rootCommand.InvokeAsync(args).ConfigureAwait(false);
    }
 }

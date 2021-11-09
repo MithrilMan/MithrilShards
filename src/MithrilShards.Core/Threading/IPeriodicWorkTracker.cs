@@ -1,12 +1,11 @@
-﻿namespace MithrilShards.Core.Threading
-{
-   /// <summary>
-   /// Tracks instantiated IPeriodicWork to check their health status and collect statistics
-   /// </summary>
-   public interface IPeriodicWorkTracker
-   {
-      void StartTracking(IPeriodicWork work);
+﻿namespace MithrilShards.Core.Threading;
 
-      void StopTracking(IPeriodicWork work);
-   }
+/// <summary>
+/// Tracks instantiated IPeriodicWork to check their health status and collect statistics
+/// </summary>
+public interface IPeriodicWorkTracker
+{
+   void StartTracking(IPeriodicWork work);
+
+   void StopTracking(IPeriodicWork work);
 }

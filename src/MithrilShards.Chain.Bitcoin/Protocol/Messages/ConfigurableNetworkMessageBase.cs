@@ -2,43 +2,42 @@
 using MithrilShards.Core.Network.Protocol;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Messages
+namespace MithrilShards.Chain.Bitcoin.Protocol.Messages;
+
+public abstract class ConfigurableNetworkMessageBase : INetworkMessage
 {
-   public abstract class ConfigurableNetworkMessageBase : INetworkMessage
+   private Dictionary<string, object>? _serializationOptions;
+
+   protected abstract string Command { get; }
+
+   string INetworkMessage.Command => Command;
+
+   protected void SetSerializationOptions(params (string Key, object Value)[] options)
    {
-      private Dictionary<string, object>? _serializationOptions;
-
-      protected abstract string Command { get; }
-
-      string INetworkMessage.Command => Command;
-
-      protected void SetSerializationOptions(params (string Key, object Value)[] options)
+      if (_serializationOptions != null)
       {
-         if (_serializationOptions != null)
-         {
-            _serializationOptions.Clear();
-         }
-
-         if ((options?.Length ?? 0) == 0) return;
-
-         _serializationOptions ??= new Dictionary<string, object>();
-
-         foreach ((string Key, object Value) option in options!)
-         {
-            _serializationOptions.Add(option.Key, option.Value);
-         }
+         _serializationOptions.Clear();
       }
 
-      public void PopulateSerializerOption(ref ProtocolTypeSerializerOptions? options)
+      if ((options?.Length ?? 0) == 0) return;
+
+      _serializationOptions ??= new Dictionary<string, object>();
+
+      foreach ((string Key, object Value) option in options!)
       {
-         if (_serializationOptions == null) return;
+         _serializationOptions.Add(option.Key, option.Value);
+      }
+   }
 
-         options ??= new ProtocolTypeSerializerOptions();
+   public void PopulateSerializerOption(ref ProtocolTypeSerializerOptions? options)
+   {
+      if (_serializationOptions == null) return;
 
-         foreach (KeyValuePair<string, object> option in _serializationOptions)
-         {
-            options.Set(option.Key, option.Value);
-         }
+      options ??= new ProtocolTypeSerializerOptions();
+
+      foreach (KeyValuePair<string, object> option in _serializationOptions)
+      {
+         options.Set(option.Key, option.Value);
       }
    }
 }

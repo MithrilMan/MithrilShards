@@ -1,6 +1,5 @@
-﻿namespace MithrilShards.Chain.Bitcoin.Protocol
+﻿namespace MithrilShards.Chain.Bitcoin.Protocol;
+
+class ForgeVersion
 {
-   class ForgeVersion
-   {
-   }
 }

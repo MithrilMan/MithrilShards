@@ -1,10 +1,9 @@
-﻿namespace MithrilShards.Core.Network.Protocol
+﻿namespace MithrilShards.Core.Network.Protocol;
+
+/// <summary>
+/// Interfaces that define a generic network message
+/// </summary>
+public interface INetworkMessage
 {
-   /// <summary>
-   /// Interfaces that define a generic network message
-   /// </summary>
-   public interface INetworkMessage
-   {
-      string Command { get; }
-   }
+   string Command { get; }
 }

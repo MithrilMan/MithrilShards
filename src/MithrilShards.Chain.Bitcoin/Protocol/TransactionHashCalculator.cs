@@ -6,39 +6,38 @@ using MithrilShards.Core.Crypto;
 using MithrilShards.Core.DataTypes;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol
+namespace MithrilShards.Chain.Bitcoin.Protocol;
+
+public class TransactionHashCalculator : ITransactionHashCalculator
 {
-   public class TransactionHashCalculator : ITransactionHashCalculator
+   private readonly IProtocolTypeSerializer<Transaction> _transactionSerializer;
+
+   public TransactionHashCalculator(IProtocolTypeSerializer<Transaction> transactionSerializer)
    {
-      private readonly IProtocolTypeSerializer<Transaction> _transactionSerializer;
+      _transactionSerializer = transactionSerializer;
+   }
 
-      public TransactionHashCalculator(IProtocolTypeSerializer<Transaction> transactionSerializer)
-      {
-         _transactionSerializer = transactionSerializer;
-      }
+   public UInt256 ComputeHash(Transaction transaction, int protocolVersion)
+   {
+      var buffer = new ArrayBufferWriter<byte>();
+      _transactionSerializer.Serialize(transaction,
+                                           protocolVersion,
+                                           buffer,
+                                           new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
 
-      public UInt256 ComputeHash(Transaction transaction, int protocolVersion)
-      {
-         var buffer = new ArrayBufferWriter<byte>();
-         _transactionSerializer.Serialize(transaction,
-                                              protocolVersion,
-                                              buffer,
-                                              new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
+      return HashGenerator.DoubleSha256AsUInt256(buffer.WrittenSpan);
+   }
 
-         return HashGenerator.DoubleSha256AsUInt256(buffer.WrittenSpan);
-      }
+   public UInt256 ComputeWitnessHash(Transaction transaction, int protocolVersion)
+   {
+      var buffer = new ArrayBufferWriter<byte>();
+      _transactionSerializer.Serialize(transaction,
+                                           protocolVersion,
+                                           buffer,
+                                           new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, transaction.HasWitness())));
 
-      public UInt256 ComputeWitnessHash(Transaction transaction, int protocolVersion)
-      {
-         var buffer = new ArrayBufferWriter<byte>();
-         _transactionSerializer.Serialize(transaction,
-                                              protocolVersion,
-                                              buffer,
-                                              new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, transaction.HasWitness())));
+      return HashGenerator.DoubleSha256AsUInt256(buffer.WrittenSpan);
 
-         return HashGenerator.DoubleSha256AsUInt256(buffer.WrittenSpan);
-
-         throw new NotImplementedException();
-      }
+      throw new NotImplementedException();
    }
 }

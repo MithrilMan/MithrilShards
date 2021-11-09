@@ -5,127 +5,126 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace MithrilShards.Core.EventBus
+namespace MithrilShards.Core.EventBus;
+
+public class InMemoryEventBus : IEventBus
 {
-   public class InMemoryEventBus : IEventBus
+   /// <summary>Instance logger.</summary>
+   private readonly ILogger _logger;
+
+   /// <summary>
+   /// The subscriber error handler
+   /// </summary>
+   private readonly ISubscriptionErrorHandler _subscriptionErrorHandler;
+
+   /// <summary>
+   /// The subscriptions stored by EventType
+   /// </summary>
+   private readonly Dictionary<Type, List<ISubscription>> _subscriptions;
+
+   /// <summary>
+   /// The subscriptions lock to prevent race condition during publishing
+   /// </summary>
+   private readonly object _subscriptionsLock = new();
+
+   /// <summary>
+   /// Initializes a new instance of the <see cref="InMemoryEventBus" /> class.
+   /// </summary>
+   /// <param name="logger">The logger.</param>
+   /// <param name="subscriptionErrorHandler">The subscription error handler. If null the default one will be used</param>
+   public InMemoryEventBus(ILogger<InMemoryEventBus> logger, ISubscriptionErrorHandler subscriptionErrorHandler)
    {
-      /// <summary>Instance logger.</summary>
-      private readonly ILogger _logger;
+      _logger = logger;
+      _subscriptionErrorHandler = subscriptionErrorHandler;
+      _subscriptions = new Dictionary<Type, List<ISubscription>>();
+   }
 
-      /// <summary>
-      /// The subscriber error handler
-      /// </summary>
-      private readonly ISubscriptionErrorHandler _subscriptionErrorHandler;
 
-      /// <summary>
-      /// The subscriptions stored by EventType
-      /// </summary>
-      private readonly Dictionary<Type, List<ISubscription>> _subscriptions;
-
-      /// <summary>
-      /// The subscriptions lock to prevent race condition during publishing
-      /// </summary>
-      private readonly object _subscriptionsLock = new();
-
-      /// <summary>
-      /// Initializes a new instance of the <see cref="InMemoryEventBus" /> class.
-      /// </summary>
-      /// <param name="logger">The logger.</param>
-      /// <param name="subscriptionErrorHandler">The subscription error handler. If null the default one will be used</param>
-      public InMemoryEventBus(ILogger<InMemoryEventBus> logger, ISubscriptionErrorHandler subscriptionErrorHandler)
+   public SubscriptionToken Subscribe<TEvent>(Func<TEvent, CancellationToken, ValueTask> handler) where TEvent : EventBase
+   {
+      if (handler == null)
       {
-         _logger = logger;
-         _subscriptionErrorHandler = subscriptionErrorHandler;
-         _subscriptions = new Dictionary<Type, List<ISubscription>>();
+         throw new ArgumentNullException(nameof(handler));
       }
 
-
-      public SubscriptionToken Subscribe<TEvent>(Func<TEvent, CancellationToken, ValueTask> handler) where TEvent : EventBase
+      lock (_subscriptionsLock)
       {
-         if (handler == null)
+         if (!_subscriptions.TryGetValue(typeof(TEvent), out List<ISubscription>? eventSubscriptions))
          {
-            throw new ArgumentNullException(nameof(handler));
+            eventSubscriptions = new();
+            _subscriptions.Add(typeof(TEvent), eventSubscriptions);
          }
 
-         lock (_subscriptionsLock)
-         {
-            if (!_subscriptions.TryGetValue(typeof(TEvent), out List<ISubscription>? eventSubscriptions))
-            {
-               eventSubscriptions = new();
-               _subscriptions.Add(typeof(TEvent), eventSubscriptions);
-            }
+         var subscriptionToken = new SubscriptionToken(this, typeof(TEvent));
+         eventSubscriptions.Add(new Subscription<TEvent>(handler, subscriptionToken));
 
-            var subscriptionToken = new SubscriptionToken(this, typeof(TEvent));
-            eventSubscriptions.Add(new Subscription<TEvent>(handler, subscriptionToken));
+         return subscriptionToken;
+      }
+   }
 
-            return subscriptionToken;
-         }
+   /// <inheritdoc />
+   public void Unsubscribe(SubscriptionToken subscriptionToken)
+   {
+      // Ignore null token
+      if (subscriptionToken == null)
+      {
+         _logger.LogDebug("Unsubscribe called with a null token, ignored.");
+         return;
       }
 
-      /// <inheritdoc />
-      public void Unsubscribe(SubscriptionToken subscriptionToken)
+      lock (_subscriptionsLock)
       {
-         // Ignore null token
-         if (subscriptionToken == null)
+         if (_subscriptions.ContainsKey(subscriptionToken.EventType))
          {
-            _logger.LogDebug("Unsubscribe called with a null token, ignored.");
-            return;
+            var subscriptionToRemove = _subscriptions[subscriptionToken.EventType].FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
+            if (subscriptionToRemove != null)
+            {
+               _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
+            }
          }
 
-         lock (_subscriptionsLock)
+         if (_subscriptions.ContainsKey(subscriptionToken.EventType))
          {
-            if (_subscriptions.ContainsKey(subscriptionToken.EventType))
+            var subscriptionToRemove = _subscriptions[subscriptionToken.EventType].FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
+            if (subscriptionToRemove != null)
             {
-               var subscriptionToRemove = _subscriptions[subscriptionToken.EventType].FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
-               if (subscriptionToRemove != null)
-               {
-                  _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
-               }
-            }
-
-            if (_subscriptions.ContainsKey(subscriptionToken.EventType))
-            {
-               var subscriptionToRemove = _subscriptions[subscriptionToken.EventType].FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
-               if (subscriptionToRemove != null)
-               {
-                  _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
-               }
+               _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
             }
          }
       }
+   }
 
-      public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : EventBase
+   public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : EventBase
+   {
+      if (@event == null)
       {
-         if (@event == null)
+         ThrowHelper.ThrowArgumentNullException(nameof(@event));
+      }
+
+      Type eventType = typeof(TEvent);
+
+      List<ISubscription>? allSubscriptions = null;
+      lock (_subscriptionsLock)
+      {
+         if (_subscriptions.ContainsKey(eventType))
          {
-            ThrowHelper.ThrowArgumentNullException(nameof(@event));
+            allSubscriptions = _subscriptions[eventType].ToList();
          }
+      }
 
-         Type eventType = typeof(TEvent);
-
-         List<ISubscription>? allSubscriptions = null;
-         lock (_subscriptionsLock)
+      if (allSubscriptions is not null)
+      {
+         foreach (ISubscription? subscription in allSubscriptions)
          {
-            if (_subscriptions.ContainsKey(eventType))
+            if (cancellationToken.IsCancellationRequested) return;
+
+            try
             {
-               allSubscriptions = _subscriptions[eventType].ToList();
+               await subscription.ProcessEventAsync(@event, cancellationToken).ConfigureAwait(false);
             }
-         }
-
-         if (allSubscriptions is not null)
-         {
-            foreach (ISubscription? subscription in allSubscriptions)
+            catch (Exception ex)
             {
-               if (cancellationToken.IsCancellationRequested) return;
-
-               try
-               {
-                  await subscription.ProcessEventAsync(@event, cancellationToken).ConfigureAwait(false);
-               }
-               catch (Exception ex)
-               {
-                  _subscriptionErrorHandler?.Handle(@event, ex, subscription);
-               }
+               _subscriptionErrorHandler?.Handle(@event, ex, subscription);
             }
          }
       }

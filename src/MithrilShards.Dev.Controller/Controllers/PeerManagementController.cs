@@ -11,63 +11,62 @@ using MithrilShards.Core.Network.Events;
 using MithrilShards.Dev.Controller.Models.Requests;
 using MithrilShards.WebApi;
 
-namespace MithrilShards.Dev.Controller.Controllers
+namespace MithrilShards.Dev.Controller.Controllers;
+
+[Area(WebApiArea.AREA_DEV)]
+public class PeerManagementController : MithrilControllerBase
 {
-   [Area(WebApiArea.AREA_DEV)]
-   public class PeerManagementController : MithrilControllerBase
+   private readonly ILogger<PeerManagementController> _logger;
+   readonly IEventBus _eventBus;
+   readonly RequiredConnection? _requiredConnection;
+
+   public PeerManagementController(ILogger<PeerManagementController> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
    {
-      private readonly ILogger<PeerManagementController> _logger;
-      readonly IEventBus _eventBus;
-      readonly RequiredConnection? _requiredConnection;
+      _logger = logger;
+      _eventBus = eventBus;
+      _requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
+   }
 
-      public PeerManagementController(ILogger<PeerManagementController> logger, IEventBus eventBus, IEnumerable<IConnector>? connectors)
+   /// <summary>
+   /// Adds a connection request, trying to connect to the specified endpoint.
+   /// </summary>
+   /// <param name="request">The request.</param>
+   /// <returns></returns>
+   [HttpPost]
+   [ProducesResponseType(StatusCodes.Status200OK)]
+   [ProducesResponseType(StatusCodes.Status400BadRequest)]
+   public IActionResult Connect(PeerManagementConnectRequest request)
+   {
+      if (_requiredConnection == null)
       {
-         _logger = logger;
-         _eventBus = eventBus;
-         _requiredConnection = connectors?.OfType<RequiredConnection>().FirstOrDefault();
+         return ValidationProblem($"Cannot produce output because {nameof(RequiredConnection)} is not available");
       }
 
-      /// <summary>
-      /// Adds a connection request, trying to connect to the specified endpoint.
-      /// </summary>
-      /// <param name="request">The request.</param>
-      /// <returns></returns>
-      [HttpPost]
-      [ProducesResponseType(StatusCodes.Status200OK)]
-      [ProducesResponseType(StatusCodes.Status400BadRequest)]
-      public IActionResult Connect(PeerManagementConnectRequest request)
+      if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
       {
-         if (_requiredConnection == null)
-         {
-            return ValidationProblem($"Cannot produce output because {nameof(RequiredConnection)} is not available");
-         }
-
-         if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
-         {
-            return ValidationProblem("Incorrect endpoint");
-         }
-
-         _requiredConnection.TryAddEndPoint(ipEndPoint);
-         return Ok();
+         return ValidationProblem("Incorrect endpoint");
       }
 
-      /// <summary>
-      /// Tries to disconnects from the specified endpoint.
-      /// </summary>
-      /// <param name="request">The request.</param>
-      /// <returns></returns>
-      [HttpPost]
-      [ProducesResponseType(StatusCodes.Status200OK)]
-      [ProducesResponseType(StatusCodes.Status400BadRequest)]
-      public async Task<IActionResult> Disconnect(PeerManagementDisconnectRequest request)
-      {
-         if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
-         {
-            return ValidationProblem("Incorrect endpoint");
-         }
+      _requiredConnection.TryAddEndPoint(ipEndPoint);
+      return Ok();
+   }
 
-         await _eventBus.PublishAsync(new PeerDisconnectionRequired(ipEndPoint, request.Reason)).ConfigureAwait(false);
-         return Ok();
+   /// <summary>
+   /// Tries to disconnects from the specified endpoint.
+   /// </summary>
+   /// <param name="request">The request.</param>
+   /// <returns></returns>
+   [HttpPost]
+   [ProducesResponseType(StatusCodes.Status200OK)]
+   [ProducesResponseType(StatusCodes.Status400BadRequest)]
+   public async Task<IActionResult> Disconnect(PeerManagementDisconnectRequest request)
+   {
+      if (!IPEndPoint.TryParse(request.EndPoint, out IPEndPoint? ipEndPoint))
+      {
+         return ValidationProblem("Incorrect endpoint");
       }
+
+      await _eventBus.PublishAsync(new PeerDisconnectionRequired(ipEndPoint, request.Reason)).ConfigureAwait(false);
+      return Ok();
    }
 }

@@ -1,14 +1,13 @@
 ﻿using MithrilShards.Core.Statistics;
 
-namespace MithrilShards.Diagnostic.StatisticsCollector.Models
-{
-   public class TabularStatisticFeedResult : StatisticFeedResult<TabularStatisticFeedResult>
-   {
-      public string Content { get; set; }
+namespace MithrilShards.Diagnostic.StatisticsCollector.Models;
 
-      internal TabularStatisticFeedResult(ScheduledStatisticFeed feed) : base(feed.StatisticFeedDefinition.FeedId, feed.LastResultsDate)
-      {
-         Content = feed.GetTabularFeed();
-      }
+public class TabularStatisticFeedResult : StatisticFeedResult<TabularStatisticFeedResult>
+{
+   public string Content { get; set; }
+
+   internal TabularStatisticFeedResult(ScheduledStatisticFeed feed) : base(feed.StatisticFeedDefinition.FeedId, feed.LastResultsDate)
+   {
+      Content = feed.GetTabularFeed();
    }
 }

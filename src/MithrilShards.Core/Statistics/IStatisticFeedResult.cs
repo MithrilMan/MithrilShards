@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace MithrilShards.Core.Statistics
-{
-   public interface IStatisticFeedResult
-   {
-      string FeedId { get; }
+namespace MithrilShards.Core.Statistics;
 
-      DateTimeOffset Time { get; }
-   }
+public interface IStatisticFeedResult
+{
+   string FeedId { get; }
+
+   DateTimeOffset Time { get; }
 }

@@ -1,6 +1,5 @@
-﻿namespace MithrilShards.Chain.Bitcoin.Consensus
+﻿namespace MithrilShards.Chain.Bitcoin.Consensus;
+
+public class CoinsView : ICoinsView
 {
-   public class CoinsView : ICoinsView
-   {
-   }
 }

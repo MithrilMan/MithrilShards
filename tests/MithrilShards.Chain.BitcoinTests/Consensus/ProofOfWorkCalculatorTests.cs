@@ -8,76 +8,75 @@ using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace MithrilShards.Chain.BitcoinTests
+namespace MithrilShards.Chain.BitcoinTests;
+
+public class ProofOfWorkCalculatorTests
 {
-   public class ProofOfWorkCalculatorTests
+   private readonly XunitLogger<ProofOfWorkCalculator> _logger;
+   private readonly IConsensusParameters _consensusParameters;
+
+   public ProofOfWorkCalculatorTests(ITestOutputHelper output)
    {
-      private readonly XunitLogger<ProofOfWorkCalculator> _logger;
-      private readonly IConsensusParameters _consensusParameters;
+      _logger = new XunitLogger<ProofOfWorkCalculator>(output); // or new NullLogger<ProofOfWorkCalculator>
 
-      public ProofOfWorkCalculatorTests(ITestOutputHelper output)
+      var headerHashCalculator = new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()));
+      _consensusParameters = new BitcoinMainDefinition(headerHashCalculator).ConfigureConsensus();
+   }
+
+   [Theory]
+   [JsonFileData("_data/ProofOfWorkCalculatorTests.json", "CalculateNextWorkRequired")]
+   public void CalculateNextWorkRequiredTest(uint lastRetargetTime, uint blockTime, uint bits, uint expectedResult)
+   {
+      var powCalculator = new ProofOfWorkCalculator(
+         _logger,
+         _consensusParameters,
+         null
+         );
+
+      var header = new BlockHeader
       {
-         _logger = new XunitLogger<ProofOfWorkCalculator>(output); // or new NullLogger<ProofOfWorkCalculator>
+         TimeStamp = blockTime,
+         Bits = bits
+      };
 
-         var headerHashCalculator = new BlockHeaderHashCalculator(new BlockHeaderSerializer(new UInt256Serializer()));
-         _consensusParameters = new BitcoinMainDefinition(headerHashCalculator).ConfigureConsensus();
-      }
+      uint result = powCalculator.CalculateNextWorkRequired(header, lastRetargetTime);
+      Assert.Equal(expectedResult, result);
+   }
 
-      [Theory]
-      [JsonFileData("_data/ProofOfWorkCalculatorTests.json", "CalculateNextWorkRequired")]
-      public void CalculateNextWorkRequiredTest(uint lastRetargetTime, uint blockTime, uint bits, uint expectedResult)
+   [Theory]
+   [JsonFileData("_data/ProofOfWorkCalculatorTests.json", "CalculateNextWorkRequired")]
+   public void NBitcoinCalculateNextWorkRequiredTest(uint lastRetargetTime, uint blockTime, uint bits, uint expectedResult)
+   {
+      var header = new BlockHeader
       {
-         var powCalculator = new ProofOfWorkCalculator(
-            _logger,
-            _consensusParameters,
-            null
-            );
+         TimeStamp = blockTime,
+         Bits = bits
+      };
 
-         var header = new BlockHeader
-         {
-            TimeStamp = blockTime,
-            Bits = bits
-         };
+      NBitcoin.Target result = NBitcoinCalculateNextWorkRequired(header, lastRetargetTime);
+      Assert.Equal(expectedResult, result.ToCompact());
+   }
 
-         uint result = powCalculator.CalculateNextWorkRequired(header, lastRetargetTime);
-         Assert.Equal(expectedResult, result);
-      }
+   public NBitcoin.Target NBitcoinCalculateNextWorkRequired(BlockHeader header, uint lastRetargetTime)
+   {
+      NBitcoin.Consensus consensus = NBitcoin.Network.Main.Consensus;
 
-      [Theory]
-      [JsonFileData("_data/ProofOfWorkCalculatorTests.json", "CalculateNextWorkRequired")]
-      public void NBitcoinCalculateNextWorkRequiredTest(uint lastRetargetTime, uint blockTime, uint bits, uint expectedResult)
-      {
-         var header = new BlockHeader
-         {
-            TimeStamp = blockTime,
-            Bits = bits
-         };
+      // Limit adjustment step
+      var nActualTimespan = TimeSpan.FromSeconds(header.TimeStamp - lastRetargetTime);
+      if (nActualTimespan < TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks / 4))
+         nActualTimespan = TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks / 4);
+      if (nActualTimespan > TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks * 4))
+         nActualTimespan = TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks * 4);
 
-         NBitcoin.Target result = NBitcoinCalculateNextWorkRequired(header, lastRetargetTime);
-         Assert.Equal(expectedResult, result.ToCompact());
-      }
+      // Retarget
+      var bnNew = new NBitcoin.Target(header.Bits).ToBigInteger();
+      uint cmp = new NBitcoin.Target(bnNew).ToCompact();
+      bnNew *= (new BigInteger((long)nActualTimespan.TotalSeconds));
+      bnNew /= (new BigInteger((long)consensus.PowTargetTimespan.TotalSeconds));
+      var newTarget = new NBitcoin.Target(bnNew);
+      if (newTarget > consensus.PowLimit)
+         newTarget = consensus.PowLimit;
 
-      public NBitcoin.Target NBitcoinCalculateNextWorkRequired(BlockHeader header, uint lastRetargetTime)
-      {
-         NBitcoin.Consensus consensus = NBitcoin.Network.Main.Consensus;
-
-         // Limit adjustment step
-         var nActualTimespan = TimeSpan.FromSeconds(header.TimeStamp - lastRetargetTime);
-         if (nActualTimespan < TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks / 4))
-            nActualTimespan = TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks / 4);
-         if (nActualTimespan > TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks * 4))
-            nActualTimespan = TimeSpan.FromTicks(consensus.PowTargetTimespan.Ticks * 4);
-
-         // Retarget
-         var bnNew = new NBitcoin.Target(header.Bits).ToBigInteger();
-         uint cmp = new NBitcoin.Target(bnNew).ToCompact();
-         bnNew *= (new BigInteger((long)nActualTimespan.TotalSeconds));
-         bnNew /= (new BigInteger((long)consensus.PowTargetTimespan.TotalSeconds));
-         var newTarget = new NBitcoin.Target(bnNew);
-         if (newTarget > consensus.PowLimit)
-            newTarget = consensus.PowLimit;
-
-         return newTarget;
-      }
+      return newTarget;
    }
 }

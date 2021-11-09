@@ -2,27 +2,26 @@
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.Network;
 
-namespace MithrilShards.Example.Network.Server.Guards
+namespace MithrilShards.Example.Network.Server.Guards;
+
+public class MaxConnectionThresholdGuard : ServerPeerConnectionGuardBase
 {
-   public class MaxConnectionThresholdGuard : ServerPeerConnectionGuardBase
+   readonly IConnectivityPeerStats _peerStats;
+
+   public MaxConnectionThresholdGuard(ILogger<MaxConnectionThresholdGuard> logger,
+                                      IOptions<ForgeConnectivitySettings> settings,
+                                      IConnectivityPeerStats serverPeerStats) : base(logger, settings)
    {
-      readonly IConnectivityPeerStats _peerStats;
+      _peerStats = serverPeerStats;
+   }
 
-      public MaxConnectionThresholdGuard(ILogger<MaxConnectionThresholdGuard> logger,
-                                         IOptions<ForgeConnectivitySettings> settings,
-                                         IConnectivityPeerStats serverPeerStats) : base(logger, settings)
+   internal override string? TryGetDenyReason(IPeerContext peerContext)
+   {
+      if (_peerStats.ConnectedInboundPeersCount >= settings.MaxInboundConnections)
       {
-         _peerStats = serverPeerStats;
+         return "Inbound connection refused: max connection threshold reached.";
       }
 
-      internal override string? TryGetDenyReason(IPeerContext peerContext)
-      {
-         if (_peerStats.ConnectedInboundPeersCount >= settings.MaxInboundConnections)
-         {
-            return "Inbound connection refused: max connection threshold reached.";
-         }
-
-         return null;
-      }
+      return null;
    }
 }

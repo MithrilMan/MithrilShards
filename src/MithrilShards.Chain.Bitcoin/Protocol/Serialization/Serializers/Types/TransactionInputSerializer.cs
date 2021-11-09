@@ -2,34 +2,33 @@
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
 using MithrilShards.Core.Network.Protocol.Serialization;
 
-namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types
+namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Types;
+
+public class TransactionInputSerializer : IProtocolTypeSerializer<TransactionInput>
 {
-   public class TransactionInputSerializer : IProtocolTypeSerializer<TransactionInput>
+   readonly IProtocolTypeSerializer<OutPoint> _outPointSerializator;
+
+   public TransactionInputSerializer(IProtocolTypeSerializer<OutPoint> outPointSerializator)
    {
-      readonly IProtocolTypeSerializer<OutPoint> _outPointSerializator;
+      _outPointSerializator = outPointSerializator;
+   }
 
-      public TransactionInputSerializer(IProtocolTypeSerializer<OutPoint> outPointSerializator)
+   public TransactionInput Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
+   {
+      return new TransactionInput
       {
-         _outPointSerializator = outPointSerializator;
-      }
+         PreviousOutput = reader.ReadWithSerializer(protocolVersion, _outPointSerializator),
+         SignatureScript = reader.ReadByteArray(),
+         Sequence = reader.ReadUInt()
+      };
+   }
 
-      public TransactionInput Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
-      {
-         return new TransactionInput
-         {
-            PreviousOutput = reader.ReadWithSerializer(protocolVersion, _outPointSerializator),
-            SignatureScript = reader.ReadByteArray(),
-            Sequence = reader.ReadUInt()
-         };
-      }
+   public int Serialize(TransactionInput typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
+   {
+      int size = writer.WriteWithSerializer(typeInstance.PreviousOutput!, protocolVersion, _outPointSerializator);
+      size += writer.WriteByteArray(typeInstance.SignatureScript);
+      size += writer.WriteUInt(typeInstance.Sequence);
 
-      public int Serialize(TransactionInput typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
-      {
-         int size = writer.WriteWithSerializer(typeInstance.PreviousOutput!, protocolVersion, _outPointSerializator);
-         size += writer.WriteByteArray(typeInstance.SignatureScript);
-         size += writer.WriteUInt(typeInstance.Sequence);
-
-         return size;
-      }
+      return size;
    }
 }

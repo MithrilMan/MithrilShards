@@ -1,7 +1,6 @@
-﻿namespace MithrilShards.Core.Network.Server.Guards
+﻿namespace MithrilShards.Core.Network.Server.Guards;
+
+public interface IServerPeerConnectionGuard
 {
-   public interface IServerPeerConnectionGuard
-   {
-      ServerPeerConnectionGuardResult Check(IPeerContext peerEndPoint);
-   }
+   ServerPeerConnectionGuardResult Check(IPeerContext peerEndPoint);
 }

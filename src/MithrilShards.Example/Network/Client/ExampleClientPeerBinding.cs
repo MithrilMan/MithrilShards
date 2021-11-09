@@ -3,36 +3,35 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using MithrilShards.Core.Shards.Validation.ValidationAttributes;
 
-namespace MithrilShards.Example.Network.Client
+namespace MithrilShards.Example.Network.Client;
+
+/// <summary>
+/// Client Peer endpoint the node would like to be connected to.
+/// </summary>
+public class ExampleClientPeerBinding
 {
-   /// <summary>
-   /// Client Peer endpoint the node would like to be connected to.
-   /// </summary>
-   public class ExampleClientPeerBinding
+   /// <summary>IP address and port number of the peer we wants to connect to.</summary>
+   [IPEndPointValidator]
+   [Required]
+   public string? EndPoint { get; set; }
+
+   public string? AdditionalInformation { get; set; }
+
+   public bool TryGetExampleEndPoint([MaybeNullWhen(false)] out ExampleEndPoint endPoint)
    {
-      /// <summary>IP address and port number of the peer we wants to connect to.</summary>
-      [IPEndPointValidator]
-      [Required]
-      public string? EndPoint { get; set; }
+      endPoint = null;
 
-      public string? AdditionalInformation { get; set; }
-
-      public bool TryGetExampleEndPoint([MaybeNullWhen(false)] out ExampleEndPoint endPoint)
+      if (!IPEndPoint.TryParse(EndPoint ?? string.Empty, out IPEndPoint? ipEndPoint))
       {
-         endPoint = null;
-
-         if (!IPEndPoint.TryParse(EndPoint ?? string.Empty, out IPEndPoint? ipEndPoint))
-         {
-            return false;
-         }
-
-         if (AdditionalInformation == null)
-         {
-            return false;
-         }
-
-         endPoint = new ExampleEndPoint(ipEndPoint.Address, ipEndPoint.Port, AdditionalInformation);
-         return true;
+         return false;
       }
+
+      if (AdditionalInformation == null)
+      {
+         return false;
+      }
+
+      endPoint = new ExampleEndPoint(ipEndPoint.Address, ipEndPoint.Port, AdditionalInformation);
+      return true;
    }
 }

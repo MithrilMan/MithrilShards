@@ -8,53 +8,52 @@ using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Threading;
 
-namespace MithrilShards.Example.Network.Client
+namespace MithrilShards.Example.Network.Client;
+
+public class ExampleRequiredConnection : ConnectorBase
 {
-   public class ExampleRequiredConnection : ConnectorBase
+   private const int INNER_DELAY = 500;
+
+   private readonly ExampleSettings _settings;
+
+   private readonly List<OutgoingConnectionEndPoint> _connectionsToAttempt = new();
+
+   public ExampleRequiredConnection(ILogger<ExampleRequiredConnection> logger,
+                             IEventBus eventBus,
+                             IOptions<ExampleSettings> options,
+                             IConnectivityPeerStats serverPeerStats,
+                             IForgeClientConnectivity forgeConnectivity,
+                             IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
    {
-      private const int INNER_DELAY = 500;
+      _settings = options.Value!;
 
-      private readonly ExampleSettings _settings;
-
-      private readonly List<OutgoingConnectionEndPoint> _connectionsToAttempt = new();
-
-      public ExampleRequiredConnection(ILogger<ExampleRequiredConnection> logger,
-                                IEventBus eventBus,
-                                IOptions<ExampleSettings> options,
-                                IConnectivityPeerStats serverPeerStats,
-                                IForgeClientConnectivity forgeConnectivity,
-                                IPeriodicWork connectionLoop) : base(logger, eventBus, serverPeerStats, forgeConnectivity, connectionLoop)
+      foreach (ExampleClientPeerBinding peerBinding in _settings.Connections)
       {
-         _settings = options.Value!;
-
-         foreach (ExampleClientPeerBinding peerBinding in _settings.Connections)
+         if (!peerBinding.TryGetExampleEndPoint(out ExampleEndPoint? endPoint))
          {
-            if (!peerBinding.TryGetExampleEndPoint(out ExampleEndPoint? endPoint))
-            {
-               logger.LogWarning("Required connection skipped because of wrong format, check settings file. {Endpoint}", peerBinding.EndPoint);
-               continue;
-            }
-
-            var remoteEndPoint = new OutgoingConnectionEndPoint(endPoint);
-            remoteEndPoint.Items[nameof(endPoint.MyExtraInformation)] = endPoint.MyExtraInformation;
-            _connectionsToAttempt.Add(remoteEndPoint);
+            logger.LogWarning("Required connection skipped because of wrong format, check settings file. {Endpoint}", peerBinding.EndPoint);
+            continue;
          }
+
+         var remoteEndPoint = new OutgoingConnectionEndPoint(endPoint);
+         remoteEndPoint.Items[nameof(endPoint.MyExtraInformation)] = endPoint.MyExtraInformation;
+         _connectionsToAttempt.Add(remoteEndPoint);
       }
+   }
 
-      protected override async ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation)
+   protected override async ValueTask AttemptConnectionsAsync(IConnectionManager connectionManager, CancellationToken cancellation)
+   {
+      foreach (OutgoingConnectionEndPoint endPoint in _connectionsToAttempt)
       {
-         foreach (OutgoingConnectionEndPoint endPoint in _connectionsToAttempt)
+         if (cancellation.IsCancellationRequested) break;
+
+         if (connectionManager.CanConnectTo(endPoint.EndPoint))
          {
-            if (cancellation.IsCancellationRequested) break;
+            // note that AttemptConnection is not blocking because it returns when the peer fails to connect or when one of the parties disconnect
+            _ = forgeConnectivity.AttemptConnectionAsync(endPoint, cancellation).ConfigureAwait(false);
 
-            if (connectionManager.CanConnectTo(endPoint.EndPoint))
-            {
-               // note that AttemptConnection is not blocking because it returns when the peer fails to connect or when one of the parties disconnect
-               _ = forgeConnectivity.AttemptConnectionAsync(endPoint, cancellation).ConfigureAwait(false);
-
-               // apply a delay between attempts to prevent too many connection attempt in a row
-               await Task.Delay(INNER_DELAY).ConfigureAwait(false);
-            }
+            // apply a delay between attempts to prevent too many connection attempt in a row
+            await Task.Delay(INNER_DELAY).ConfigureAwait(false);
          }
       }
    }
