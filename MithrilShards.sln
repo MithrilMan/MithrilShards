@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29609.76
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeStyle", "CodeStyle", "{4745214D-E97C-41B1-A1A3-5C8237C59B72}"
 	ProjectSection(SolutionItems) = preProject
@@ -104,6 +104,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B5529C29-3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "docs-placeholder", "docs\docs-placeholder.csproj", "{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.EventDispatcher.SignalR", "src\MithrilShards.EventDispatcher.SignalR\MithrilShards.EventDispatcher.SignalR.csproj", "{EAF0E440-3F91-474F-B92C-FFE77C039249}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +188,10 @@ Global
 		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAF0E440-3F91-474F-B92C-FFE77C039249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAF0E440-3F91-474F-B92C-FFE77C039249}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAF0E440-3F91-474F-B92C-FFE77C039249}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAF0E440-3F91-474F-B92C-FFE77C039249}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -215,6 +221,7 @@ Global
 		{6E6CAED8-41AA-43B0-85D0-CA8A3C84629A} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
 		{B137F4E3-ACE7-498F-81CE-22A174C72C91} = {AEDA167A-43CB-40E7-935B-BF12DCBE339A}
 		{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D} = {B5529C29-3CC7-41C6-AC76-B10B8FDD429C}
+		{EAF0E440-3F91-474F-B92C-FFE77C039249} = {45D8469B-1E71-4366-89F7-B58FC6C789F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5624037D-68BC-4AD5-8802-500F2ADE8DED}
