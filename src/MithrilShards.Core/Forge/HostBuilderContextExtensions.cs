@@ -28,7 +28,7 @@ public static class HostBuilderContextExtensions
       if (!context.Properties.TryGetValue(key, out object? value))
       {
          var tempSP = services.BuildServiceProvider();
-         settings = tempSP.GetRequiredService<IOptions<TMithrilShardSettings>>().Value;
+         settings = tempSP.GetRequiredService<IOptions<TMithrilShardSettings>>().Value; //causes validation
          context.Properties[key] = settings;
       }
       else

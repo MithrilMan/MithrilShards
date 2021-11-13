@@ -82,7 +82,7 @@ public class ForgeBuilder : IForgeBuilder
             services.AddSingleton<DefaultConfigurationWriter>(services =>
             {
                return new DefaultConfigurationWriter(
-                  services.GetService<ILoggerFactory>().CreateLogger<DefaultConfigurationWriter>(),
+                  services.GetRequiredService<ILoggerFactory>().CreateLogger<DefaultConfigurationWriter>(),
                   services.GetServices<IMithrilShardSettings>(),
                   ConfigurationFileName
                   );
@@ -91,7 +91,6 @@ public class ForgeBuilder : IForgeBuilder
 
          services
             .AddOptions()
-            .AddHostedService<ValidationHostedService>() // used to validate IOptions at startup, when they use ValidateOnStart (shards are automatically configured to validate asap)
             .AddSingleton<IServiceCollection>(services) // register forge service collection in order to create other sandboxed serviceProviders in other Hosts (e.g. for API purpose)
             .AddSingleton<IForge, TForgeImplementation>()
             .AddHostedService<TForgeImplementation>(serviceProvider => (TForgeImplementation)serviceProvider.GetRequiredService<IForge>())
@@ -135,11 +134,13 @@ public class ForgeBuilder : IForgeBuilder
          var optionsBuilder = services
              .AddOptions<TMithrilShardSettings>()
              .Bind(MithrilShardSettingsManager.GetSection<TMithrilShardSettings>(context.Configuration))
-             .ValidateOnStart();
+             //.ValidateDataAnnotations()
+             //.ValidateOnStart()
+             ;
 
          optionsBuilder.Services.AddSingleton<IValidateOptions<TMithrilShardSettings>>(new DataAnnotationValidateOptions<TMithrilShardSettings>(optionsBuilder.Name));
 
-         //register the shard configuration setting as IMithrilShardSettings in order to allow DefaultConfigurationWriter to write default its default values
+         //register the shard configuration setting as IMithrilShardSettings in order to allow DefaultConfigurationWriter to write its default values.
          services.AddSingleton<IMithrilShardSettings, TMithrilShardSettings>();
 
          context.SetShardSettings<TMithrilShardSettings>(services);
