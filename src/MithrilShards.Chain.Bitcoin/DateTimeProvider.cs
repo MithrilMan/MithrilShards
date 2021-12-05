@@ -8,16 +8,10 @@ using MithrilShards.Core.Extensions;
 
 namespace MithrilShards.Chain.Bitcoin;
 
-public class DateTimeProvider : IDateTimeProvider
+public partial class DateTimeProvider : IDateTimeProvider
 {
    const int MAX_SAMPLES = 200;
-   const string WARNING_MESSAGE = @"
-**************************************************************
-Please check that your computer's date and time are correct!
-If your clock is wrong, the node will not work properly.
-To recover from this state fix your time and restart the node.
-**************************************************************
-";
+
    /// <summary>
    /// Represents the number of ticks that are in 1 microsecond.
    /// </summary>
@@ -25,9 +19,7 @@ To recover from this state fix your time and restart the node.
    const long UNIX_EPOCH_TICKS = 719_162 * TimeSpan.TicksPerDay;
    const long UNIX_EPOCH_MICROSECONDS = UNIX_EPOCH_TICKS / TimeSpan.TicksPerMillisecond;
 
-   readonly ILogger<DateTimeProvider> _logger;
    private readonly BitcoinSettings _settings;
-
 
    private readonly MedianFilter<long> _medianFilter;
    private readonly HashSet<IPAddress> _knownPeers;
@@ -105,10 +97,10 @@ To recover from this state fix your time and restart the node.
    {
       if (!_autoAdjustingTimeEnabled)
       {
-         _logger.LogDebug("Automatic time adjustment is disabled.");
+         DebugAutomaticTimeAdjustmentIsDisabled();
          if (_showWarning)
          {
-            _logger.LogCritical(WARNING_MESSAGE);
+            CriticalWarning();
          }
          return;
       }
@@ -118,13 +110,13 @@ To recover from this state fix your time and restart the node.
 
       if (_knownPeers.Count == MAX_SAMPLES)
       {
-         _logger.LogDebug("Ignored AddTimeData: max peer tracked.");
+         DebugIgnoreAddTimeData("Max peer tracked.");
          return;
       }
 
       if (_knownPeers.Contains(remoteEndPoint.Address))
       {
-         _logger.LogDebug("Ignored AddTimeData: peer already contributed.");
+         DebugIgnoreAddTimeData("Peer already contributed.");
          return;
       }
 
@@ -165,4 +157,24 @@ To recover from this state fix your time and restart the node.
          }
       }
    }
+}
+
+public partial class DateTimeProvider
+{
+   readonly ILogger<DateTimeProvider> _logger;
+
+   [LoggerMessage(0, LogLevel.Debug, "Automatic time adjustment is disabled.")]
+   partial void DebugAutomaticTimeAdjustmentIsDisabled();
+
+   [LoggerMessage(0, LogLevel.Debug, "Ignored AddTimeData: {Reason}.")]
+   partial void DebugIgnoreAddTimeData(string reason);
+
+   [LoggerMessage(0, LogLevel.Critical, @"
+**************************************************************
+Please check that your computer's date and time are correct!
+If your clock is wrong, the node will not work properly.
+To recover from this state fix your time and restart the node.
+**************************************************************
+")]
+   partial void CriticalWarning();
 }

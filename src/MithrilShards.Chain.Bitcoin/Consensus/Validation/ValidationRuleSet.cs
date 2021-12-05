@@ -7,7 +7,7 @@ using MithrilShards.Core.DataAlgorithms;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation;
 
-public class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidationRule> where TValidationRule : class
+public partial class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidationRule> where TValidationRule : class
 {
    protected class RuleDefinition
    {
@@ -31,7 +31,6 @@ public class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidation
       }
    }
 
-   protected readonly ILogger<ValidationRuleSet<TValidationRule>> logger;
    protected List<TValidationRule> rules;
 
    public IEnumerable<TValidationRule> Rules => rules;
@@ -74,7 +73,7 @@ public class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidation
          .ThenBy(definition => definition.item.PreferredExecutionOrder)
          .Select(definition => definition.item.Rule).ToList();
 
-      logger.LogDebug("Final sorted rules: {SortedRules}", string.Join(", ", rules.Select(rule => rule.GetType().Name)));
+      DebugFinalSortedRules(string.Join(", ", rules.Select(rule => rule.GetType().Name)));
    }
 
    /// <summary>
@@ -130,4 +129,13 @@ public class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidation
 
       return definitions;
    }
+}
+
+
+partial class ValidationRuleSet<TValidationRule>
+{
+   protected readonly ILogger<ValidationRuleSet<TValidationRule>> logger;
+
+   [LoggerMessage(0, LogLevel.Debug, "Final sorted rules: {SortedRules}.")]
+   partial void DebugFinalSortedRules(string sortedRules);
 }

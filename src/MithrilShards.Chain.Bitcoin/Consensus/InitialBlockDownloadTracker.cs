@@ -8,9 +8,8 @@ namespace MithrilShards.Chain.Bitcoin.Consensus;
 /// <summary>
 /// temporary Mock, to be moved and implemented properly
 /// </summary>
-public class InitialBlockDownloadTracker : IInitialBlockDownloadTracker
+public partial class InitialBlockDownloadTracker : IInitialBlockDownloadTracker
 {
-   readonly ILogger<InitialBlockDownloadTracker> _logger;
    readonly IEventBus _eventBus;
    readonly IChainState _chainState;
    readonly IConsensusParameters _consensusParameters;
@@ -38,7 +37,7 @@ public class InitialBlockDownloadTracker : IInitialBlockDownloadTracker
       _minimumChainWork = options.Value.MinimumChainWork ?? _consensusParameters.MinimumChainWork;
       if (_minimumChainWork < _consensusParameters.MinimumChainWork)
       {
-         _logger.LogWarning($"{nameof(_minimumChainWork)} set below default value of {_consensusParameters.MinimumChainWork}");
+         WarningChainworkSetLowerThanConsensusChainwork(_minimumChainWork, _consensusParameters.MinimumChainWork);
       }
 
       _maxTipAge = options.Value.MaxTipAge;
@@ -49,4 +48,12 @@ public class InitialBlockDownloadTracker : IInitialBlockDownloadTracker
       return _chainState.ChainTip.ChainWork < _minimumChainWork
          || (_chainState.GetTipHeader().TimeStamp < (_dateTimeProvider.GetTime() - _maxTipAge));
    }
+}
+
+public partial class InitialBlockDownloadTracker
+{
+   readonly ILogger<InitialBlockDownloadTracker> _logger;
+
+   [LoggerMessage(0, LogLevel.Warning, "{CustomMinimumChainWork} set below default value of {ConsensusMinimumChainWork}.")]
+   partial void WarningChainworkSetLowerThanConsensusChainwork(Target customMinimumChainWork, Target ConsensusMinimumChainWork);
 }

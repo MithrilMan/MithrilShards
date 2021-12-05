@@ -5,14 +5,13 @@ using MithrilShards.Core.Network.Server.Guards;
 
 namespace MithrilShards.Chain.Bitcoin.Network.Server.Guards;
 
-public abstract class ServerPeerConnectionGuardBase : IServerPeerConnectionGuard
+public abstract partial class ServerPeerConnectionGuardBase : IServerPeerConnectionGuard
 {
-   protected readonly ILogger logger;
    protected readonly ForgeConnectivitySettings settings;
 
    public ServerPeerConnectionGuardBase(ILogger logger, IOptions<ForgeConnectivitySettings> options)
    {
-      this.logger = logger;
+      _logger = logger;
       settings = options.Value;
    }
 
@@ -21,7 +20,7 @@ public abstract class ServerPeerConnectionGuardBase : IServerPeerConnectionGuard
       string? denyReason = TryGetDenyReason(peerContext);
       if (!string.IsNullOrEmpty(denyReason))
       {
-         logger.LogDebug("Peer connection guard not passed: {denyReason}", denyReason);
+         DebugGuardNotPassed(denyReason);
          return ServerPeerConnectionGuardResult.Deny(denyReason);
       }
 
@@ -29,4 +28,12 @@ public abstract class ServerPeerConnectionGuardBase : IServerPeerConnectionGuard
    }
 
    internal abstract string? TryGetDenyReason(IPeerContext peerContext);
+}
+
+partial class ServerPeerConnectionGuardBase
+{
+   private readonly ILogger _logger;
+
+   [LoggerMessage(0, LogLevel.Debug, "Peer connection guard not passed: {DenyReason}.")]
+   partial void DebugGuardNotPassed(string denyReason);
 }

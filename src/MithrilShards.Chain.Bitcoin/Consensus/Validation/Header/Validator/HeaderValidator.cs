@@ -23,10 +23,9 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Header;
 /// these headers are pushed in high order relative to their own branches.
 /// Having a simple place where header validation is performed, simplify how concurrency complexity design can be managed.
 /// </summary>
-public class HeaderValidator : IHostedService, IPeriodicWorkExceptionHandler, IHeaderValidator
+public partial class HeaderValidator : IHostedService, IPeriodicWorkExceptionHandler, IHeaderValidator
 {
    private readonly Channel<HeadersToValidate> _headersToValidate;
-   readonly ILogger<HeaderValidator> _logger;
    readonly IPeriodicWork _validationLoop;
    readonly IChainState _chainState;
    readonly IValidationRuleSet<IHeaderValidationRule> _headerValidationRules;
@@ -58,7 +57,7 @@ public class HeaderValidator : IHostedService, IPeriodicWorkExceptionHandler, IH
 
    public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
    {
-      _logger.LogCritical("An unhandled exception has been raised in the header validation loop.");
+      CriticalPeriodicWorkFailure(failedWork.Label);
       feedback.IsCritical = true;
       feedback.ContinueExecution = false;
       feedback.Message = "Without validation loop, it's impossible to advance in consensus. A node restart is required to fix the problem.";
@@ -99,7 +98,7 @@ public class HeaderValidator : IHostedService, IPeriodicWorkExceptionHandler, IH
       {
          if (request.Headers.Count == 0) continue; //if there aren't headers to validate, ignore the request
 
-         _logger.LogDebug("Validating {HeadersCount} headers", request.Headers.Count);
+         DebugValidatingHeaders(request.Headers.Count);
 
          var newValidatedHeaderNodes = new List<HeaderNode>();
 
@@ -184,7 +183,7 @@ public class HeaderValidator : IHostedService, IPeriodicWorkExceptionHandler, IH
          {
             if (!rule.Check(context, ref validationState))
             {
-               _logger.LogDebug("Header validation failed: {HeaderValidationState}", validationState.ToString());
+               DebugBlockValidationFailed(validationState.ToString());
                isNew = false;
                processedHeader = null;
                return false;
@@ -210,4 +209,19 @@ public class HeaderValidator : IHostedService, IPeriodicWorkExceptionHandler, IH
 
       return true;
    }
+}
+
+
+public partial class HeaderValidator
+{
+   readonly ILogger<HeaderValidator> _logger;
+
+   [LoggerMessage(0, LogLevel.Critical, "An unhandled exception has been raised in the {PeriodicWork} work.")]
+   partial void CriticalPeriodicWorkFailure(string periodicWork);
+
+   [LoggerMessage(0, LogLevel.Debug, "Validating {HeadersCount} headers")]
+   partial void DebugValidatingHeaders(int headersCount);
+
+   [LoggerMessage(0, LogLevel.Debug, "Header validation failed: {HeaderValidationState}")]
+   partial void DebugBlockValidationFailed(string headerValidationState);
 }

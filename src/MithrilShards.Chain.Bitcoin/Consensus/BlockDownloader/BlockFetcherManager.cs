@@ -20,7 +20,7 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.BlockDownloader;
 /// <summary>
 /// Manage the download blocking
 /// </summary>
-public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionHandler, IHostedService, IDebugInsight
+public partial class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionHandler, IHostedService, IDebugInsight
 {
    /// <summary>
    /// The <see cref="_checkStaleBlockFetchersLoop"/> interval, in seconds.
@@ -40,7 +40,6 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
    private static readonly object _channelLock = new();
    private readonly ReaderWriterLockSlim _fetcherSlimLock = new();
 
-   readonly ILogger<BlockFetcherManager> _logger;
    readonly IEventBus _eventBus;
    readonly IDateTimeProvider _dateTimeProvider;
    readonly IChainState _chainState;
@@ -150,7 +149,7 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
 
    public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
    {
-      _logger.LogCritical("An unhandled exception has been raised in the {0} work.", failedWork.Label);
+      CriticalPeriodicWorkFailure(failedWork.Label);
       feedback.ContinueExecution = false;
       feedback.IsCritical = true;
       feedback.Message = "Node may be unstable, restart the node to fix the problem";
@@ -174,7 +173,7 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
          //check if the block was requested and remove it from the queued blocks
          if (!_blocksInDownload.TryGetValue(arg.Fetcher, out ConcurrentDictionary<UInt256, PendingDownload>? pendingDownloads))
          {
-            _logger.LogDebug("Received block {UnrequestedBlock} from an unexpected source, do nothing.", blockHash);
+            DebugUnrequestedBlockReceived(blockHash);
             return ValueTask.CompletedTask;
          }
 
@@ -217,7 +216,7 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
             ///TODO: ensure we are not stuck in case our best known header refers to something not validated fully
             ///(e.g. headers validate but blocks are never sent to us)
             ///Technically this branch may be left without blocks and so should be removed and rolled back to be moved then to a better fork
-            _logger.LogDebug("Ignoring validated headers because they are on a lower fork at this time");
+            DebugIgnoringValidatedHeaders();
             return;
          }
 
@@ -259,7 +258,7 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
       {
          if (_fetchers.Remove(blockFetcher))
          {
-            _logger.LogDebug("fetcher removed");
+            DebugFetcherRemoved();
          }
       }
    }
@@ -274,7 +273,7 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
       {
          if (_blocksToDownload.IsEmpty)
          {
-            _logger.LogTrace("No blocks to download");
+            DebugNoBlocksToDownload();
             // no more blocks to download
             return;
          }
@@ -285,7 +284,7 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
          {
             if (!_blocksToDownload.TryDequeue(out HeaderNode? blockToDownload))
             {
-               _logger.LogTrace("No blocks to download");
+               DebugNoBlocksToDownload();
                // no more blocks to download
                return;
             }
@@ -312,8 +311,6 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
             select fetcher
             ;
 
-         _logger.LogDebug("fetchersByScore :{fetchersByScore}", fetchersByScore.Count());
-
          IBlockFetcher? selectedFetcher = null;
          foreach (IBlockFetcher? fetcher in fetchersByScore)
          {
@@ -331,7 +328,7 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
 
                   if (!selectedFetcherPendingDownloads.TryAdd(blockToDownload.Hash, new PendingDownload(blockToDownload, selectedFetcher, _dateTimeProvider.GetTimeMicros())))
                   {
-                     _logger.LogDebug("Failed to add block to current fetcher, try with next");
+                     DebugCannotAddBlockToFetcher();
                      continue;
                   }
 
@@ -341,14 +338,14 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
             }
             catch (Exception ex)
             {
-               _logger.LogDebug("Failed to fetch block because of: {ErrorMessage}", ex.Message);
+               DebugFailedToFetchBlock(ex.Message);
                continue;
             }
          }
 
          if (selectedFetcher == null)
          {
-            _logger.LogDebug("None of the block fetcher is able to get block {BlockHash}, mark this block as failed", blockToDownload.Hash);
+            DebugBlockNotAvailable(blockToDownload.Hash);
             _failedBlockFetch.TryAdd(blockToDownload.Hash, blockToDownload);
             return;
          }
@@ -427,4 +424,34 @@ public class BlockFetcherManager : IBlockFetcherManager, IPeriodicWorkExceptionH
          FetchersScore = _fetchersScore,
       };
    }
+}
+
+
+public partial class BlockFetcherManager
+{
+   readonly ILogger<BlockFetcherManager> _logger;
+
+   [LoggerMessage(0, LogLevel.Critical, "An unhandled exception has been raised in the {PeriodicWork} work.")]
+   partial void CriticalPeriodicWorkFailure(string periodicWork);
+
+   [LoggerMessage(0, LogLevel.Debug, "Received block {UnrequestedBlock} from an unexpected source, do nothing.")]
+   partial void DebugUnrequestedBlockReceived(UInt256 unrequestedBlock);
+
+   [LoggerMessage(0, LogLevel.Debug, "Fetcher removed")]
+   partial void DebugFetcherRemoved();
+
+   [LoggerMessage(0, LogLevel.Debug, "No blocks to download")]
+   partial void DebugNoBlocksToDownload();
+
+   [LoggerMessage(0, LogLevel.Debug, "Failed to add block to current fetcher, try with next.")]
+   partial void DebugCannotAddBlockToFetcher();
+
+   [LoggerMessage(0, LogLevel.Debug, "Failed to fetch block because of: {FailureReason}.")]
+   partial void DebugFailedToFetchBlock(string failureReason);
+
+   [LoggerMessage(0, LogLevel.Debug, "None of the block fetcher is able to get block {BlockHash}, mark this block as failed.")]
+   partial void DebugBlockNotAvailable(UInt256 blockHash);
+
+   [LoggerMessage(0, LogLevel.Debug, "Ignoring validated headers because they are on a lower fork at this time.")]
+   partial void DebugIgnoringValidatedHeaders();
 }

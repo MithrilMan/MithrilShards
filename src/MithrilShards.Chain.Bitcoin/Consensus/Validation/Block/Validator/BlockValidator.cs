@@ -11,10 +11,9 @@ using MithrilShards.Core.Threading;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Block.Validator;
 
-public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBlockValidator
+public partial class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBlockValidator
 {
    private readonly Channel<BlockToValidate> _blocksToValidate;
-   readonly ILogger<BlockValidator> _logger;
    readonly IPeriodicWork _validationLoop;
    readonly IChainState _chainState;
    readonly IValidationRuleSet<IBlockValidationRule> _blockValidationRules;
@@ -45,7 +44,7 @@ public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBl
 
    public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
    {
-      _logger.LogCritical("An unhandled exception has been raised in the block validation loop.");
+      CriticalPeriodicWorkFailure(failedWork.Label);
       feedback.IsCritical = true;
       feedback.ContinueExecution = false;
       feedback.Message = "Without block validation loop, it's impossible to advance in consensus. A node restart is required to fix the problem.";
@@ -119,7 +118,7 @@ public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBl
       {
          if (!rule.Check(context, ref validationState))
          {
-            _logger.LogDebug("Block validation failed: {BlockValidationState}", validationState.ToString());
+            DebugBlockValidationFailed(validationState.ToString());
             isNew = false;
             return false;
          }
@@ -135,4 +134,16 @@ public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBl
 
       return true;
    }
+}
+
+
+public partial class BlockValidator
+{
+   readonly ILogger<BlockValidator> _logger;
+
+   [LoggerMessage(0, LogLevel.Critical, "An unhandled exception has been raised in the {PeriodicWork} work.")]
+   partial void CriticalPeriodicWorkFailure(string periodicWork);
+
+   [LoggerMessage(0, LogLevel.Debug, "Block validation failed: {BlockValidationState}")]
+   partial void DebugBlockValidationFailed(string blockValidationState);
 }

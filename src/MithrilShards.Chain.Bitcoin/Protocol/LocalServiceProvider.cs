@@ -7,10 +7,8 @@ namespace MithrilShards.Chain.Bitcoin.Protocol;
 /// Allow to set and get available node services.
 /// </summary>
 /// <seealso cref="MithrilShards.Chain.Bitcoin.Protocol.ILocalServiceProvider" />
-public class LocalServiceProvider : ILocalServiceProvider
+public partial class LocalServiceProvider : ILocalServiceProvider
 {
-   readonly ILogger<LocalServiceProvider> _logger;
-
    private NodeServices _availableServices;
 
    public LocalServiceProvider(ILogger<LocalServiceProvider> logger)
@@ -22,14 +20,14 @@ public class LocalServiceProvider : ILocalServiceProvider
 
    public void AddServices(NodeServices services)
    {
-      _logger.LogDebug("Adding services {NodeServices}", services);
       _availableServices |= services;
+      DebugServicesAdded(services);
    }
 
    public void RemoveServices(NodeServices services)
    {
-      _logger.LogDebug("Removing services {NodeServices}", services);
       _availableServices &= ~services;
+      DebugServicesRemoved(services);
    }
 
    public NodeServices GetServices()
@@ -41,4 +39,15 @@ public class LocalServiceProvider : ILocalServiceProvider
    {
       return _availableServices.HasFlag(service);
    }
+}
+
+partial class LocalServiceProvider
+{
+   readonly ILogger<LocalServiceProvider> _logger;
+
+   [LoggerMessage(0, LogLevel.Debug, "Services added: {NodeServices}.")]
+   partial void DebugServicesAdded(NodeServices nodeServices);
+
+   [LoggerMessage(0, LogLevel.Debug, "Services removed: {NodeServices}.")]
+   partial void DebugServicesRemoved(NodeServices nodeServices);
 }

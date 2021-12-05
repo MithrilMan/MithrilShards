@@ -10,7 +10,7 @@ using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors;
 
-public class AddressProcessor : BaseProcessor,
+public partial class AddressProcessor : BaseProcessor,
    INetworkMessageHandler<GetAddrMessage>,
    INetworkMessageHandler<AddrMessage>
 {
@@ -18,6 +18,7 @@ public class AddressProcessor : BaseProcessor,
    public AddressProcessor(ILogger<AddressProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager)
       : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
    {
+      _logger = logger;
    }
 
    protected override async ValueTask OnPeerHandshakedAsync()
@@ -32,7 +33,7 @@ public class AddressProcessor : BaseProcessor,
 
    public async ValueTask<bool> ProcessMessageAsync(GetAddrMessage message, CancellationToken cancellation)
    {
-      logger.LogDebug("Peer requiring addresses from us.");
+      DebugAddressesRequested();
       NetworkAddress[] fetchedAddresses = Array.Empty<NetworkAddress>(); //TODO fetch addresses from addressmananager
       await SendMessageAsync(new AddrMessage { Addresses = fetchedAddresses }).ConfigureAwait(false);
       return true;
@@ -40,8 +41,19 @@ public class AddressProcessor : BaseProcessor,
 
    ValueTask<bool> INetworkMessageHandler<AddrMessage>.ProcessMessageAsync(AddrMessage message, CancellationToken cancellation)
    {
-      logger.LogDebug("Peer sent us a list of addresses.");
+      DebugAddressesSent();
       //TODO
       return new ValueTask<bool>(true);
    }
+}
+
+partial class AddressProcessor
+{
+   readonly ILogger<AddressProcessor> _logger;
+
+   [LoggerMessage(0, LogLevel.Debug, "Peer requiring addresses from us.")]
+   partial void DebugAddressesRequested();
+
+   [LoggerMessage(0, LogLevel.Debug, "Peer sent us a list of addresses.")]
+   partial void DebugAddressesSent();
 }

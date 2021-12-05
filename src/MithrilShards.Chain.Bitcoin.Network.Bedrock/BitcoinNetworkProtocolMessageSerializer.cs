@@ -21,9 +21,8 @@ namespace MithrilShards.Chain.Bitcoin.Network.Bedrock;
 /// 4    | command   |uint32_t   | First 4 bytes of sha256(sha256(payload))
 /// ?    | command   |uchar[]    | The actual data
 /// </summary>
-public class BitcoinNetworkProtocolMessageSerializer : INetworkProtocolMessageSerializer
+public partial class BitcoinNetworkProtocolMessageSerializer : INetworkProtocolMessageSerializer
 {
-   readonly ILogger<BitcoinNetworkProtocolMessageSerializer> _logger;
    private readonly INetworkDefinition _chainDefinition;
    readonly INetworkMessageSerializerManager _networkMessageSerializerManager;
    /// <summary>
@@ -74,13 +73,13 @@ public class BitcoinNetworkProtocolMessageSerializer : INetworkProtocolMessageSe
                .TryDeserialize(commandName, ref payload, _peerContext.NegotiatedProtocolVersion.Version, _peerContext, out message!))
             {
                int payloadSize = _deserializationContext.GetTotalMessageLength();
-               _logger.LogTrace("Received message '{Command}' with payload size {PayloadSize}.", commandName, payloadSize);
+               TraceCommandReceived(commandName, payloadSize);
                _peerContext.Metrics.Received(payloadSize);
                return true;
             }
             else
             {
-               _logger.LogDebug("Serializer for message '{Command}' not found.", commandName);
+               DebugCommandSerializerNotFound(commandName);
                message = new UnknownMessage(commandName, payload.ToArray());
                _peerContext.Metrics.Wasted(_deserializationContext.GetTotalMessageLength());
                return true;
@@ -275,12 +274,26 @@ public class BitcoinNetworkProtocolMessageSerializer : INetworkProtocolMessageSe
             output.Write(payloadOutput.WrittenSpan);
 
             _peerContext.Metrics.Sent(ProtocolDefinition.HEADER_LENGTH + payloadSize);
-            _logger.LogTrace("Sent message '{Command}' with payload size {PayloadSize}.", command, payloadSize);
+            TraceCommandSent(command, payloadSize);
          }
          else
          {
-            _logger.LogDebug("Serializer for message '{Command}' not found.", command);
+            DebugCommandSerializerNotFound(command);
          }
       }
    }
+}
+
+public partial class BitcoinNetworkProtocolMessageSerializer
+{
+   readonly ILogger<BitcoinNetworkProtocolMessageSerializer> _logger;
+
+   [LoggerMessage(0, LogLevel.Trace, "Received message '{Command}' with payload size {PayloadSize}.")]
+   partial void TraceCommandReceived(string command, int payloadSize);
+
+   [LoggerMessage(0, LogLevel.Trace, "Sent message '{Command}' with payload size {PayloadSize}.")]
+   partial void TraceCommandSent(string command, int payloadSize);
+
+   [LoggerMessage(0, LogLevel.Debug, "Serializer for message '{Command}' not found.")]
+   partial void DebugCommandSerializerNotFound(string command);
 }

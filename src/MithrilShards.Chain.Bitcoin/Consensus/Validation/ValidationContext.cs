@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation;
 
-public abstract class ValidationContext : IValidationContext
+public abstract partial class ValidationContext : IValidationContext
 {
    protected readonly ILogger logger;
 
@@ -33,7 +34,7 @@ public abstract class ValidationContext : IValidationContext
    {
       if (items.ContainsKey(key))
       {
-         logger.LogDebug("Overwriting context data {DataKey}", key);
+         DebugOverwritingContextData(key);
       }
       items[key] = data;
    }
@@ -42,7 +43,7 @@ public abstract class ValidationContext : IValidationContext
    {
       if (!items.ContainsKey(key))
       {
-         logger.LogDebug("context data not found: {DataKey}", key);
+         DebugContextDataFound(key);
          data = default;
          return false;
       }
@@ -55,7 +56,17 @@ public abstract class ValidationContext : IValidationContext
 
    public void ForceAsValid(string reason)
    {
-      logger.LogDebug("Forced as valid because {ForceAsValidReason}", reason);
+      DebugForcedAsValid(reason);
       IsForcedAsValid = true;
    }
+
+
+   [LoggerMessage(0, LogLevel.Debug, "Overwriting context data {DataKey}.")]
+   partial void DebugOverwritingContextData(string dataKey);
+
+   [LoggerMessage(0, LogLevel.Debug, "Context data not found: {DataKey}.")]
+   partial void DebugContextDataFound(string dataKey);
+
+   [LoggerMessage(0, LogLevel.Debug, "Forced as valid because {Reason}.")]
+   partial void DebugForcedAsValid(string reason);
 }
