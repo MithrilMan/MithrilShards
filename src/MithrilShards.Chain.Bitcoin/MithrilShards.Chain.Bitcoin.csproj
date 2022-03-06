@@ -12,7 +12,7 @@
    </ItemGroup>
 
    <ItemGroup>
-      <ProjectCapability Include="DynamicDependentFile" />
-      <ProjectCapability Include="DynamicFileNesting" />
+      <ProjectCapability Include="ConfigurableFileNesting" />
+      <ProjectCapability Include="ConfigurableFileNestingFeatureEnabled" />
    </ItemGroup>
 </Project>

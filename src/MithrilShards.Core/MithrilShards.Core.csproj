@@ -5,26 +5,26 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Remove="Chain\**" />
-     <EmbeddedResource Remove="Chain\**" />
-     <None Remove="Chain\**" />
+      <Compile Remove="Chain\**" />
+      <EmbeddedResource Remove="Chain\**" />
+      <None Remove="Chain\**" />
    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.12" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="6.0.0" />
-  </ItemGroup>
+   <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.12" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="6.0.0" />
+   </ItemGroup>
 
    <ItemGroup>
-      <ProjectCapability Include="DynamicDependentFile" />
-      <ProjectCapability Include="DynamicFileNesting" />
+      <ProjectCapability Include="ConfigurableFileNesting" />
+      <ProjectCapability Include="ConfigurableFileNestingFeatureEnabled" />
    </ItemGroup>
 
 </Project>

@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <Compile Remove="Encoders\**" />
-    <EmbeddedResource Remove="Encoders\**" />
-    <None Remove="Encoders\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
-  </ItemGroup>
+   <ItemGroup>
+      <Compile Remove="Encoders\**" />
+      <EmbeddedResource Remove="Encoders\**" />
+      <None Remove="Encoders\**" />
+   </ItemGroup>
 
    <ItemGroup>
-      <ProjectCapability Include="DynamicDependentFile" />
-      <ProjectCapability Include="DynamicFileNesting" />
+      <ProjectReference Include="..\MithrilShards.Core\MithrilShards.Core.csproj" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <ProjectCapability Include="ConfigurableFileNesting" />
+      <ProjectCapability Include="ConfigurableFileNestingFeatureEnabled" />
    </ItemGroup>
 </Project>
