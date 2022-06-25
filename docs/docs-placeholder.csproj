@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
    <PropertyGroup>
-      <TargetFramework>TargetFramework</TargetFramework>
+      <TargetFramework>netstandard2.0</TargetFramework>
       <IsPackable>false</IsPackable>
       <GenerateDocumentationFile>false</GenerateDocumentationFile>
    </PropertyGroup>
