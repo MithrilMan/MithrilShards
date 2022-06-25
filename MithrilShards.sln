@@ -69,7 +69,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.WebApi", "src
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solution", ".solution", "{BDB5B467-A0FD-4054-9950-C708F61E499D}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
 	EndProjectSection
 EndProject
@@ -104,7 +103,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B5529C29-3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "docs-placeholder", "docs\docs-placeholder.csproj", "{E1D1C6C4-7DDB-4F46-A3B1-B6D009F0107D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MithrilShards.EventDispatcher.SignalR", "src\MithrilShards.EventDispatcher.SignalR\MithrilShards.EventDispatcher.SignalR.csproj", "{EAF0E440-3F91-474F-B92C-FFE77C039249}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MithrilShards.EventDispatcher.SignalR", "src\MithrilShards.EventDispatcher.SignalR\MithrilShards.EventDispatcher.SignalR.csproj", "{EAF0E440-3F91-474F-B92C-FFE77C039249}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
