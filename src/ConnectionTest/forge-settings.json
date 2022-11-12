@@ -22,7 +22,12 @@
       "ContinuousConsoleDisplay": false,
       "ContinuousConsoleDisplayRate": 30
    },
+   "WebApi": {
+      "EndPoint": "127.0.0.1:45018",
+      "Enabled": true,
+      "Https": false
+   },
    "DevController": {
-      "EndPoint": "127.0.0.1:45018"
+      "Enabled": true
    }
 }

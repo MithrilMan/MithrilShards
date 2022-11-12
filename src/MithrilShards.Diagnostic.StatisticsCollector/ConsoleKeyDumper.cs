@@ -27,10 +27,15 @@ public class ConsoleKeyDumper
       }
 
       _isRunning = true;
+      bool consoleInputAvailable = !Console.IsInputRedirected;
+      if (consoleInputAvailable)
+      {
+         Console.WriteLine("No console input available, DumpKeyPressed disabled.");
+      }
 
       while (!_hostApplicationLifetime.ApplicationStopping.IsCancellationRequested)
       {
-         if (DumpKeyPressed())
+         if (consoleInputAvailable && DumpKeyPressed())
          {
             IEnumerable<StatisticFeedDefinition> feeds = _statisticFeedsCollector.GetRegisteredFeedsDefinitions();
 

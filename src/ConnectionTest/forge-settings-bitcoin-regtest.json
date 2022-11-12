@@ -6,7 +6,7 @@
       "Listeners": [
          {
             "IsWhitelistingEndpoint": true,
-            "Endpoint": "0.0.0.0:45017"
+            "Endpoint": "0.0.0.0:45010"
          },
          {
             "IsWhitelistingEndpoint": true,
@@ -26,9 +26,9 @@
       "ContinuousConsoleDisplayRate": 5
    },
    "WebApi": {
-      "EndPoint": "127.0.0.1:45020",
+      "EndPoint": "127.0.0.1:45018",
       "Enabled": true,
-      "Https": true
+      "Https": false
    },
    "DevController": {
       "Enabled": true

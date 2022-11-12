@@ -112,7 +112,7 @@ internal class BlazorServerShard : IMithrilShard
 
             });
 
-            services.AddBlazorise(options => { options.ChangeTextOnKeyPress = true; })
+            services.AddBlazorise(options => { options.Immediate = true; })
                 .AddBootstrapProviders()
                 .AddFontAwesomeIcons();
          }).Build();

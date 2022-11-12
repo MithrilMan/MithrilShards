@@ -18,7 +18,6 @@ public partial class AddressProcessor : BaseProcessor,
    public AddressProcessor(ILogger<AddressProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager)
       : base(logger, eventBus, peerBehaviorManager, isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true)
    {
-      _logger = logger;
    }
 
    protected override async ValueTask OnPeerHandshakedAsync()
@@ -45,15 +44,4 @@ public partial class AddressProcessor : BaseProcessor,
       //TODO
       return new ValueTask<bool>(true);
    }
-}
-
-partial class AddressProcessor
-{
-   readonly ILogger<AddressProcessor> _logger;
-
-   [LoggerMessage(0, LogLevel.Debug, "Peer requiring addresses from us.")]
-   partial void DebugAddressesRequested();
-
-   [LoggerMessage(0, LogLevel.Debug, "Peer sent us a list of addresses.")]
-   partial void DebugAddressesSent();
 }

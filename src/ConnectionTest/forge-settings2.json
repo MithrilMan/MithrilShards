@@ -1,0 +1,29 @@
+{
+  "Bitcoin": {
+    "MaxTimeAdjustment": 4200,
+    "MinimumChainWork": null,
+    "MaxTipAge": 86400
+  },
+  "ForgeConnectivity": {
+    "MaxInboundConnections": 20,
+    "MaxOutboundConnections": 20,
+    "AllowLoopbackConnection": true,
+    "ForceShutdownAfter": 300,
+    "BanScore": -100,
+    "MisbehavingBanTime": 86400,
+    "Listeners": [],
+    "Connections": []
+  },
+  "StatisticsCollector": {
+    "ContinuousConsoleDisplay": true,
+    "ContinuousConsoleDisplayRate": 30
+  },
+  "WebApi": {
+    "EndPoint": "127.0.0.1:45020",
+    "Enabled": true,
+    "Https": false
+  },
+  "DevController": {
+    "Enabled": true
+  }
+}
