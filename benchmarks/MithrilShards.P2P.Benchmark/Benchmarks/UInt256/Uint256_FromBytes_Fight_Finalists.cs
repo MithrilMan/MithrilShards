@@ -5,7 +5,7 @@ using NBitcoin;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256;
 
-[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+[SimpleJob(RuntimeMoniker.Net70)]
 [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
 public class Uint256_FromBytes_Fight_Finalists
 {

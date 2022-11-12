@@ -7,7 +7,7 @@ using BenchmarkDotNet.Jobs;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.UInt256
 {
-   [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+   [SimpleJob(RuntimeMoniker.Net70)]
    [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser, PlainExporter]
    public class Uint256_Study
    {

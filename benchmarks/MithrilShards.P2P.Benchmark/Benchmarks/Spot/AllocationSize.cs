@@ -4,7 +4,7 @@ using NBitcoin;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks;
 
-[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+[SimpleJob(RuntimeMoniker.Net70)]
 [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
 public class AllocationSize
 {

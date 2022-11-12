@@ -4,7 +4,7 @@ using BenchmarkDotNet.Jobs;
 
 namespace MithrilShards.P2P.Benchmark.Benchmarks;
 
-[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+[SimpleJob(RuntimeMoniker.Net70)]
 [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser]
 public class ParseNibble
 {

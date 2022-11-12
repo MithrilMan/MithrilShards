@@ -12,7 +12,7 @@ using NBitcoin_Target = NBitcoin.Target;
 
 namespace MithrilShards.Network.Benchmark.Benchmarks.Target;
 
-[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+[SimpleJob(RuntimeMoniker.Net70)]
 [RankColumn, MarkdownExporterAttribute.GitHub, MemoryDiagnoser, PlainExporter]
 public class Target_Study
 {
