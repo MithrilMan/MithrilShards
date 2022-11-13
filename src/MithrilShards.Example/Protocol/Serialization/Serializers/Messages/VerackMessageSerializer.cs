@@ -4,7 +4,7 @@ using MithrilShards.Example.Protocol.Messages;
 
 namespace MithrilShards.Example.Protocol.Serialization.Serializers.Messages;
 
-public class VerackMessageSerializer : ExampleNetworkMessageSerializerBase<VerackMessage>
+public sealed class VerackMessageSerializer : ExampleNetworkMessageSerializerBase<VerackMessage>
 {
    private static readonly VerackMessage _instance = new();
    public override VerackMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ExamplePeerContext peerContext)

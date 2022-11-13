@@ -5,7 +5,7 @@ using MithrilShards.Example.Protocol.Messages;
 
 namespace MithrilShards.Example.Protocol.Serialization.Serializers.Messages;
 
-public class VersionMessageSerializer : ExampleNetworkMessageSerializerBase<VersionMessage>
+public sealed class VersionMessageSerializer : ExampleNetworkMessageSerializerBase<VersionMessage>
 {
    public override void Serialize(VersionMessage message, int protocolVersion, ExamplePeerContext peerContext, IBufferWriter<byte> output)
    {

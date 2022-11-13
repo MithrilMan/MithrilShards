@@ -4,7 +4,7 @@ using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class GetAddrMessageSerializer : BitcoinNetworkMessageSerializerBase<GetAddrMessage>
+public sealed class GetAddrMessageSerializer : BitcoinNetworkMessageSerializerBase<GetAddrMessage>
 {
    private static readonly GetAddrMessage _instance = new();
 

@@ -7,7 +7,7 @@ using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class VersionMessageSerializer : BitcoinNetworkMessageSerializerBase<VersionMessage>
+public sealed class VersionMessageSerializer : BitcoinNetworkMessageSerializerBase<VersionMessage>
 {
    private readonly IProtocolTypeSerializer<NetworkAddressNoTime> _networkAddressNoTimeSerializer;
 

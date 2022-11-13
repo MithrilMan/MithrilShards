@@ -10,7 +10,8 @@ namespace MithrilShards.Example.Network;
 /// </summary>
 /// <typeparam name="TMessageType">The type of the message type.</typeparam>
 /// <seealso cref="MithrilShards.Core.Network.Protocol.Serialization.NetworkMessageSerializerBase{TMessageType, TPeerContext}" />
-public abstract class ExampleNetworkMessageSerializerBase<TMessageType> : NetworkMessageSerializerBase<TMessageType, ExamplePeerContext> where TMessageType : INetworkMessage, new()
+public abstract class ExampleNetworkMessageSerializerBase<TMessageType> : NetworkMessageSerializerBase<TMessageType, ExamplePeerContext>
+   where TMessageType : INetworkMessage, new()
 {
 
    protected void MethodOurSerializersMayNeed()

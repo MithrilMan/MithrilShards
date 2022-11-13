@@ -4,7 +4,7 @@ using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class SendCmpctMessageSerializer : BitcoinNetworkMessageSerializerBase<SendCmpctMessage>
+public sealed class SendCmpctMessageSerializer : BitcoinNetworkMessageSerializerBase<SendCmpctMessage>
 {
    public override void Serialize(SendCmpctMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
    {

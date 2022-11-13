@@ -4,7 +4,7 @@ using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class PingMessageSerializer : BitcoinNetworkMessageSerializerBase<PingMessage>
+public sealed class PingMessageSerializer : BitcoinNetworkMessageSerializerBase<PingMessage>
 {
    public override void Serialize(PingMessage message, int protocolVersion, BitcoinPeerContext peerContext, IBufferWriter<byte> output)
    {

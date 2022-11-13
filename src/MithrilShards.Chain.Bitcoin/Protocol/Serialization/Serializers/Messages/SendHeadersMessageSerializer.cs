@@ -4,7 +4,7 @@ using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class SendHeadersMessageSerializer : BitcoinNetworkMessageSerializerBase<SendHeadersMessage>
+public sealed class SendHeadersMessageSerializer : BitcoinNetworkMessageSerializerBase<SendHeadersMessage>
 {
    private static readonly SendHeadersMessage _instance = new();
 

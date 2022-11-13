@@ -10,7 +10,7 @@ namespace MithrilShards.Example.Protocol.Serialization.Serializers.Messages;
 /// PongMessage serializer, used to serialize and send through the network a <see cref="PongMessage"/>
 /// </summary>
 /// <seealso cref="ExampleNetworkMessageSerializerBase{PongMessage}" />
-public class PongMessageSerializer : ExampleNetworkMessageSerializerBase<PongMessage>
+public sealed class PongMessageSerializer : ExampleNetworkMessageSerializerBase<PongMessage>
 {
    readonly IProtocolTypeSerializer<PongFancyResponse> _pongFancyResponseSerializator;
 

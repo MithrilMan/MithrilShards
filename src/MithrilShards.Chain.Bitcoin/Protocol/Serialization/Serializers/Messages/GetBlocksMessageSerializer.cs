@@ -7,7 +7,7 @@ using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class GetBlocksMessageSerializer : BitcoinNetworkMessageSerializerBase<GetBlocksMessage>
+public sealed class GetBlocksMessageSerializer : BitcoinNetworkMessageSerializerBase<GetBlocksMessage>
 {
    private readonly IProtocolTypeSerializer<BlockLocator> _blockLocatorSerializer;
    private readonly IProtocolTypeSerializer<UInt256> _uint256Serializer;

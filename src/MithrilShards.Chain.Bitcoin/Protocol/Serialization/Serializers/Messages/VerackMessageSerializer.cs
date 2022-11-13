@@ -4,7 +4,7 @@ using MithrilShards.Chain.Bitcoin.Protocol.Messages;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class VerackMessageSerializer : BitcoinNetworkMessageSerializerBase<VerackMessage>
+public sealed class VerackMessageSerializer : BitcoinNetworkMessageSerializerBase<VerackMessage>
 {
    private static readonly VerackMessage _instance = new();
    public override VerackMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)

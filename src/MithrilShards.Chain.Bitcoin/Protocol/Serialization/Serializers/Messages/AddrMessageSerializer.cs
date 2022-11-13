@@ -6,7 +6,7 @@ using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class AddrMessageSerializer : BitcoinNetworkMessageSerializerBase<AddrMessage>
+public sealed class AddrMessageSerializer : BitcoinNetworkMessageSerializerBase<AddrMessage>
 {
    private readonly IProtocolTypeSerializer<NetworkAddress> _networkAddressSerializer;
 

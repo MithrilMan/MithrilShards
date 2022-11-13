@@ -8,7 +8,7 @@ namespace MithrilShards.Example.Protocol.Serialization.Serializers.Messages;
 /// PingMessage serializer, used to serialize and send through the network a <see cref="PingMessage"/>
 /// </summary>
 /// <seealso cref="ExampleNetworkMessageSerializerBase{PingMessage}" />
-public class PingMessageSerializer : ExampleNetworkMessageSerializerBase<PingMessage>
+public sealed class PingMessageSerializer : ExampleNetworkMessageSerializerBase<PingMessage>
 {
    public override void Serialize(PingMessage message, int protocolVersion, ExamplePeerContext peerContext, IBufferWriter<byte> output)
    {

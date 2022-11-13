@@ -6,7 +6,7 @@ using MithrilShards.Core.Network.Protocol.Serialization;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Serialization.Serializers.Messages;
 
-public class GetDataMessageSerializer : BitcoinNetworkMessageSerializerBase<GetDataMessage>
+public sealed class GetDataMessageSerializer : BitcoinNetworkMessageSerializerBase<GetDataMessage>
 {
    readonly IProtocolTypeSerializer<InventoryVector> _inventoryVectorSerializer;
 
