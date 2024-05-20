@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
       <IsPackable>true</IsPackable>
    </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bedrock.Framework" Version="0.1.62-alpha.g8a965bbcba" />
+    <PackageReference Include="Bedrock.Framework" Version="0.1.63-alpha.gf69fa1b135" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Bedrock.Framework;
@@ -46,7 +47,14 @@ public class BedrockNetworkShard(
    {
       var tasks = _serverPeers.Select(serverPeer => serverPeer.StopAsync(cancellationToken)).ToArray();
 
-      await Task.WhenAll(tasks).ConfigureAwait(false);
+      try
+      {
+         await Task.WhenAll(tasks).ConfigureAwait(false);
+      }
+      catch (Exception e)
+      {
+         logger.LogError(e, "Error while stopping server peers.");
+      }
    }
 
    private void CreateServerInstances()
@@ -74,7 +82,7 @@ public class BedrockNetworkShard(
          ServerBuilder builder = new ServerBuilder(serviceProvider)
             .UseSockets(sockets =>
             {
-               sockets.Options.NoDelay = true;
+               //sockets.Options.NoDelay = true;
 
                foreach (ServerPeerBinding binding in _settings.Listeners)
                {
@@ -96,6 +104,11 @@ public class BedrockNetworkShard(
                         .UseConnectionLogging()
                         .UseConnectionHandler<MithrilForgeServerConnectionHandler>()
                      );
+
+                  //var tcpListener = new TcpListener(localEndPoint.Address, localEndPoint.Port);
+                  //tcpListener.Start();
+                  //logger.LogInformation("Listening on {ListenerLocalEndpoint} for incoming connections.", tcpListener.LocalEndpoint);
+
                }
             }
          );

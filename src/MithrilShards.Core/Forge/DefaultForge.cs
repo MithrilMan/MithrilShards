@@ -34,8 +34,6 @@ public class DefaultForge(ILogger<DefaultForge> logger,
          logger.LogDebug("Starting Shard {ShardType}", shard.GetType().Name);
          _ = shard.StartAsync(stoppingToken);
       }
-
-      var tasks = mithrilShards.Select(shard => shard.StartAsync(stoppingToken)).ToArray();
    }
 
    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
