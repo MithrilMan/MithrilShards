@@ -19,7 +19,7 @@ public class TableBuilder
    {
       _stringBuilder = builder ?? new StringBuilder();
 
-      ColumnDefinitions = new List<ColumnDefinition>();
+      ColumnDefinitions = [];
    }
 
    public TableBuilder AddColumns(params ColumnDefinition[] columns)
@@ -68,10 +68,7 @@ public class TableBuilder
       }
 
       _prepared = true;
-      if (TableStyle == null)
-      {
-         TableStyle = new TableStyle();
-      }
+      TableStyle ??= new TableStyle();
 
       ComputeTableWidth();
       return this;
@@ -129,7 +126,7 @@ public class TableBuilder
 
    public TableBuilder DrawRow(string?[] values)
    {
-      if (values is null) throw new ArgumentNullException(nameof(values));
+      ArgumentNullException.ThrowIfNull(values);
 
       if (values.Length > ColumnDefinitions.Count)
       {

@@ -14,8 +14,8 @@ namespace MithrilShards.Diagnostic.StatisticsCollector;
 
 public class StatisticFeedsCollector : IStatisticFeedsCollector
 {
-   private readonly List<ScheduledStatisticFeed> _scheduledFeeds = new();
-   private readonly List<StatisticFeedDefinition> _registeredfeedDefinitions = new();
+   private readonly List<ScheduledStatisticFeed> _scheduledFeeds = [];
+   private readonly List<StatisticFeedDefinition> _registeredfeedDefinitions = [];
    private readonly ILogger<StatisticFeedsCollector> _logger;
    private readonly object _statisticsFeedsLock = new();
    private readonly StringBuilder _logStringBuilder;
@@ -90,7 +90,7 @@ public class StatisticFeedsCollector : IStatisticFeedsCollector
                _logStringBuilder.Clear();
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(_settings.ContinuousConsoleDisplayRate)).WithCancellationAsync(cancellationToken).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromSeconds(_settings.ContinuousConsoleDisplayRate), cancellationToken).ConfigureAwait(false);
          }
       }
       catch (OperationCanceledException)
@@ -190,11 +190,8 @@ public class StatisticFeedsCollector : IStatisticFeedsCollector
    /// <returns></returns>
    public IStatisticFeedResult GetFeedDump(string feedId, bool humanReadable)
    {
-      ScheduledStatisticFeed? feed = _scheduledFeeds.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault();
-      if (feed == null)
-      {
-         throw new ArgumentException("feedId not found");
-      }
+      ScheduledStatisticFeed? feed = _scheduledFeeds.Where(feed => feed.StatisticFeedDefinition.FeedId == feedId).FirstOrDefault()
+         ?? throw new ArgumentException("feedId not found");
 
       lock (_statisticsFeedsLock)
       {

@@ -7,23 +7,17 @@ using MithrilShards.Core.DataAlgorithms;
 
 namespace MithrilShards.Chain.Bitcoin.Consensus.Validation;
 
-public class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidationRule> where TValidationRule : class
+public class ValidationRuleSet<TValidationRule>(ILogger<ValidationRuleSet<TValidationRule>> logger, IEnumerable<TValidationRule> rules) : IValidationRuleSet<TValidationRule> where TValidationRule : class
 {
-   protected class RuleDefinition
+   protected class RuleDefinition(TValidationRule rule, uint preferredExecutionOrder)
    {
-      public TValidationRule Rule { get; }
+      public TValidationRule Rule { get; } = rule;
 
-      public uint PreferredExecutionOrder { get; }
+      public uint PreferredExecutionOrder { get; } = preferredExecutionOrder;
 
-      private readonly HashSet<TValidationRule> _executeAfter = new();
+      private readonly HashSet<TValidationRule> _executeAfter = [];
 
       public IEnumerable<TValidationRule> GetDependencies() => _executeAfter;
-
-      public RuleDefinition(TValidationRule rule, uint preferredExecutionOrder)
-      {
-         Rule = rule;
-         PreferredExecutionOrder = preferredExecutionOrder;
-      }
 
       public void ExecuteAfter(TValidationRule rule)
       {
@@ -31,20 +25,14 @@ public class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidation
       }
    }
 
-   protected readonly ILogger<ValidationRuleSet<TValidationRule>> logger;
-   protected List<TValidationRule> rules;
+   protected readonly ILogger<ValidationRuleSet<TValidationRule>> logger = logger;
+   protected List<TValidationRule> rules = rules.ToList();
 
    public IEnumerable<TValidationRule> Rules => rules;
 
-   public ValidationRuleSet(ILogger<ValidationRuleSet<TValidationRule>> logger, IEnumerable<TValidationRule> rules)
-   {
-      this.logger = logger;
-      this.rules = rules.ToList();
-   }
-
    public void SetupRules()
    {
-      using IDisposable logScope = logger.BeginScope("Setting up validation rules for {ValidationRuleType}", typeof(TValidationRule));
+      using var _ = logger.BeginScope("Setting up validation rules for {ValidationRuleType}", typeof(TValidationRule));
 
       List<RuleDefinition> definitions = VerifyValidationRules();
 
@@ -63,7 +51,7 @@ public class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidation
       }
 
       (IEnumerable<(ValidationRuleSet<TValidationRule>.RuleDefinition item, int level)> sorted, IEnumerable<ValidationRuleSet<TValidationRule>.RuleDefinition> cycled) = resolver.Sort();
-      if (cycled.Count() > 0)
+      if (cycled.Any())
       {
          string circularDependency = string.Join(", ", cycled.Select(definition => definition.Rule.GetType().Name));
          ThrowHelper.ThrowNotSupportedException($"Error configuring {typeof(TValidationRule).Name} rules, circular dependency detected: {circularDependency}");
@@ -95,7 +83,7 @@ public class ValidationRuleSet<TValidationRule> : IValidationRuleSet<TValidation
 
       Type validationRulesType = typeof(TValidationRule);
 
-      using IDisposable logScope = logger.BeginScope("Verifying validation rules for {ValidationRuleType}", validationRulesType.Name);
+      using var _ = logger.BeginScope("Verifying validation rules for {ValidationRuleType}", validationRulesType.Name);
       foreach (TValidationRule rule in rules)
       {
          RulePrecedenceAttribute? precedenceAttribute = rule.GetType().GetCustomAttribute<RulePrecedenceAttribute>();

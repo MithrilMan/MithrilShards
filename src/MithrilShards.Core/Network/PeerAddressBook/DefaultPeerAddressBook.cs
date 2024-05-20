@@ -57,6 +57,6 @@ public class DefaultPeerAddressBook : IPeerAddressBook
 
    private void LogNotImplementedWarning([CallerMemberName] string methodName = null!)
    {
-      _logger.LogWarning($"{methodName} not implemented ");
+      _logger.LogWarning("{MethodName} is not implemented", methodName);
    }
 }

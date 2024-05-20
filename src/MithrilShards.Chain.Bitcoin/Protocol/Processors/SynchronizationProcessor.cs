@@ -77,7 +77,7 @@ public partial class SynchronizationProcessor : BaseProcessor, IPeriodicWorkExce
       _minimumChainWork = _options.MinimumChainWork ?? _consensusParameters.MinimumChainWork;
       if (_minimumChainWork < _consensusParameters.MinimumChainWork)
       {
-         this.logger.LogWarning($"{nameof(_minimumChainWork)} set below default value of {_consensusParameters.MinimumChainWork}");
+         this.logger.LogWarning("_minimumChainWork set below default value of {DefaultMinimumChainWork}", _consensusParameters.MinimumChainWork);
       }
 
       headerSyncLoop.Configure(stopOnException: false, this);

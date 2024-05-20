@@ -9,78 +9,70 @@ using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Core.Forge;
 
-public class DefaultForge : BackgroundService, IForge
+public class DefaultForge(ILogger<DefaultForge> logger,
+             IForgeDataFolderLock forgeDataFolderLock,
+             IEnumerable<IMithrilShard> mithrilShards,
+             DefaultConfigurationWriter? defaultConfigurationManager = null) : BackgroundService, IForge
 {
-   private readonly IForgeDataFolderLock _forgeDataFolderLock;
-   readonly IEnumerable<IMithrilShard> _mithrilShards;
-   readonly DefaultConfigurationWriter? _defaultConfigurationManager;
-   private readonly ILogger _logger;
-
-   public DefaultForge(ILogger<DefaultForge> logger,
-                IForgeDataFolderLock forgeDataFolderLock,
-                IEnumerable<IMithrilShard> mithrilShards,
-                DefaultConfigurationWriter? defaultConfigurationManager = null)
-   {
-      _forgeDataFolderLock = forgeDataFolderLock;
-      _mithrilShards = mithrilShards;
-      _defaultConfigurationManager = defaultConfigurationManager;
-      _logger = logger;
-   }
 
    private async Task InitializeShardsAsync(CancellationToken stoppingToken)
    {
       //if no default configuration file is present, create one
-      _defaultConfigurationManager?.GenerateDefaultFile();
+      defaultConfigurationManager?.GenerateDefaultFile();
 
-      using (_logger.BeginScope("Initializing Shards"))
+      using (logger.BeginScope("Initializing Shards"))
       {
-         foreach (IMithrilShard shard in _mithrilShards)
+         foreach (IMithrilShard shard in mithrilShards)
          {
-            _logger.LogDebug("Initializing Shard {ShardType}", shard.GetType().Name);
+            logger.LogDebug("Initializing Shard {ShardType}", shard.GetType().Name);
             await shard.InitializeAsync(stoppingToken).ConfigureAwait(false);
          }
       }
 
-      foreach (IMithrilShard shard in _mithrilShards)
+      foreach (IMithrilShard shard in mithrilShards)
       {
-         _logger.LogDebug("Starting Shard {ShardType}", shard.GetType().Name);
+         logger.LogDebug("Starting Shard {ShardType}", shard.GetType().Name);
          _ = shard.StartAsync(stoppingToken);
       }
    }
 
    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
    {
-      if (!_forgeDataFolderLock.TryLockDataFolder())
+      if (!forgeDataFolderLock.TryLockDataFolder())
       {
-         _logger.LogCritical("Node folder is being used by another instance of the application!");
+         logger.LogCritical("Node folder is being used by another instance of the application!");
          throw new Exception("Node folder is being used!");
       }
 
       await InitializeShardsAsync(stoppingToken).ConfigureAwait(false);
 
-      _forgeDataFolderLock.UnlockDataFolder();
+      forgeDataFolderLock.UnlockDataFolder();
    }
 
    public override async Task StopAsync(CancellationToken cancellationToken)
    {
-      using IDisposable logScope = _logger.BeginScope("Shutting down the Forge.");
+      using var logScope = logger.BeginScope("Shutting down the Forge.");
 
-      _logger.LogDebug("Stopping Shards");
-      foreach (IMithrilShard shard in _mithrilShards)
+      logger.LogDebug("Stopping Shards");
+
+      // use wait all to wait for all shards to stop
+      var tasks = mithrilShards.Select(shard =>
       {
-         _logger.LogDebug("Stopping Shard {ShardType}", shard.GetType().Name);
-         _ = shard.StopAsync(cancellationToken);
-      }
+         logger.LogDebug("Stopping Shard {ShardType}", shard.GetType().Name);
+         return shard.StopAsync(cancellationToken);
+      }).ToArray();
 
-      _logger.LogDebug("Stopping Forge instance.");
+      await Task.WhenAll(tasks).ConfigureAwait(false);
+
+      logger.LogDebug("Stopping Forge instance.");
       await base.StopAsync(cancellationToken).ConfigureAwait(false);
    }
 
    public List<(string name, string version)> GetMeltedShardsNames()
    {
-      if (_mithrilShards.Count() == 0) return new List<(string name, string version)>();
+      if (!mithrilShards.Any()) return [];
 
-      return _mithrilShards.Select(shard => (
+      return mithrilShards.Select(shard => (
          name: shard.GetType().Name,
          version: shard.GetType().Assembly.GetName().Version?.ToString(3) ?? "-"
          )).ToList();

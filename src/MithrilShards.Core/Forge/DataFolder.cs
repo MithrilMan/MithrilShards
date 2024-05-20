@@ -14,10 +14,7 @@ public class DataFolders : IDataFolders
    {
       get
       {
-         if (featureKey == null)
-         {
-            throw new ArgumentNullException(nameof(featureKey));
-         }
+         ArgumentNullException.ThrowIfNull(featureKey);
 
          if (_paths.TryGetValue(featureKey.ToLowerInvariant(), out string? path))
          {
@@ -30,15 +27,8 @@ public class DataFolders : IDataFolders
       }
       set
       {
-         if (featureKey == null)
-         {
-            throw new ArgumentNullException(nameof(featureKey));
-         }
-
-         if (value == null)
-         {
-            throw new ArgumentNullException(nameof(value));
-         }
+         ArgumentNullException.ThrowIfNull(featureKey);
+         ArgumentNullException.ThrowIfNull(value);
 
          _paths[featureKey.ToLowerInvariant()] = value;
       }
@@ -47,7 +37,7 @@ public class DataFolders : IDataFolders
    public DataFolders(string rootPath)
    {
       RootPath = rootPath;
-      _paths = new Dictionary<string, string>();
+      _paths = [];
       this[ROOT_FEATURE] = rootPath;
    }
 }

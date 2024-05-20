@@ -13,38 +13,45 @@ using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Core.Network;
 
-public class PeerContext : IPeerContext
+public class PeerContext(
+   ILogger logger,
+   IEventBus eventBus,
+   PeerConnectionDirection direction,
+   string peerId,
+   EndPoint localEndPoint,
+   EndPoint publicEndPoint,
+   EndPoint remoteEndPoint,
+   INetworkMessageWriter messageWriter
+   ) : IPeerContext
 {
-   private readonly List<INetworkMessageProcessor> _messageProcessors = new();
-   protected readonly ILogger logger;
-   protected readonly IEventBus eventBus;
-   protected readonly INetworkMessageWriter messageWriter;
+   private readonly List<INetworkMessageProcessor> _messageProcessors = [];
+   protected readonly ILogger logger = logger;
+   protected readonly IEventBus eventBus = eventBus;
+   protected readonly INetworkMessageWriter messageWriter = messageWriter;
 
    /// <summary>
    /// Gets the direction of the peer connection.
    /// </summary>
-   public PeerConnectionDirection Direction { get; }
+   public PeerConnectionDirection Direction { get; } = direction;
 
    /// <summary>
    /// Gets the peer identifier.
    /// </summary>
-   public string PeerId { get; }
-
+   public string PeerId { get; } = peerId;
 
    /// <summary>
    /// Gets the local peer end point.
    /// </summary>
-   public IPEndPoint LocalEndPoint { get; }
-
+   public IPEndPoint LocalEndPoint { get; } = localEndPoint.AsIPEndPoint();
 
    /// <summary>External IP address and port number used to access the node from external network.</summary>
    /// <remarks>Used to announce to external peers the address they connect to in order to reach our Forge server.</remarks>
-   public IPEndPoint PublicEndPoint { get; }
+   public IPEndPoint PublicEndPoint { get; } = publicEndPoint.AsIPEndPoint();
 
    /// <summary>
    /// Gets the remote peer end point.
    /// </summary>
-   public IPEndPoint RemoteEndPoint { get; }
+   public IPEndPoint RemoteEndPoint { get; } = remoteEndPoint.AsIPEndPoint();
 
    public string? UserAgent { get; set; }
 
@@ -64,25 +71,6 @@ public class PeerContext : IPeerContext
    public CancellationTokenSource ConnectionCancellationTokenSource { get; } = new CancellationTokenSource();
 
    public bool IsConnected { get; protected set; } = false;
-
-   public PeerContext(ILogger logger,
-                      IEventBus eventBus,
-                      PeerConnectionDirection direction,
-                      string peerId,
-                      EndPoint localEndPoint,
-                      EndPoint publicEndPoint,
-                      EndPoint remoteEndPoint,
-                      INetworkMessageWriter messageWriter)
-   {
-      this.logger = logger;
-      this.eventBus = eventBus;
-      Direction = direction;
-      PeerId = peerId;
-      this.messageWriter = messageWriter;
-      LocalEndPoint = localEndPoint.AsIPEndPoint();
-      PublicEndPoint = publicEndPoint.AsIPEndPoint();
-      RemoteEndPoint = remoteEndPoint.AsIPEndPoint();
-   }
 
    public INetworkMessageWriter GetMessageWriter()
    {
@@ -121,7 +109,7 @@ public class PeerContext : IPeerContext
       }
 
       IsConnected = false;
-      ConnectionCancellationTokenSource.Cancel();
+      await ConnectionCancellationTokenSource.CancelAsync().ConfigureAwait(false);
 
       await eventBus.PublishAsync(new PeerDisconnected(this, "Client disconnected", null)).ConfigureAwait(false);
    }

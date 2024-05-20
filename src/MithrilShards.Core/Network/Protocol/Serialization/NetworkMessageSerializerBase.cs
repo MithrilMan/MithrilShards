@@ -30,10 +30,7 @@ public abstract class NetworkMessageSerializerBase<TMessageType, TPeerContext> :
 
    public void Serialize(INetworkMessage message, int protocolVersion, IPeerContext peerContext, IBufferWriter<byte> output)
    {
-      if (message is null)
-      {
-         throw new ArgumentNullException(nameof(message));
-      }
+      ArgumentNullException.ThrowIfNull(message);
 
       Serialize((TMessageType)message, protocolVersion, (TPeerContext)peerContext, output);
    }

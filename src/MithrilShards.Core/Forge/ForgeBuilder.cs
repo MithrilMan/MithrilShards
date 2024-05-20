@@ -24,7 +24,7 @@ public class ForgeBuilder : IForgeBuilder
    private readonly ILogger<ForgeBuilder> _logger;
    private bool _isForgeSet = false;
    private bool _createDefaultConfigurationFileNeeded = false;
-   private readonly List<Action<IHostBuilder>> _preBuildActions = new();
+   private readonly List<Action<IHostBuilder>> _preBuildActions = [];
    private readonly HostBuilder _hostBuilder;
 
    public string ConfigurationFileName { get; private set; } = null!; //set to something meaningful during initialization
@@ -57,7 +57,7 @@ public class ForgeBuilder : IForgeBuilder
       {
          _createDefaultConfigurationFileNeeded = true;
 
-         _logger.LogWarning($"Missing configuration file {ConfigurationFileName}, creating one with default values.");
+         _logger.LogWarning("Missing configuration file {ConfigurationFileName}. Creating a default one.", ConfigurationFileName);
 
          //default file created, no need to throw error
          fileContext.Ignore = true;
@@ -82,7 +82,7 @@ public class ForgeBuilder : IForgeBuilder
             services.AddSingleton<DefaultConfigurationWriter>(services =>
             {
                return new DefaultConfigurationWriter(
-                  services.GetService<ILoggerFactory>().CreateLogger<DefaultConfigurationWriter>(),
+                  services.GetRequiredService<ILoggerFactory>().CreateLogger<DefaultConfigurationWriter>(),
                   services.GetServices<IMithrilShardSettings>(),
                   ConfigurationFileName
                   );
@@ -91,11 +91,10 @@ public class ForgeBuilder : IForgeBuilder
 
          services
             .AddOptions()
-            .AddHostedService<ValidationHostedService>() // used to validate IOptions at startup, when they use ValidateOnStart (shards are automatically configured to validate asap)
             .AddSingleton<IServiceCollection>(services) // register forge service collection in order to create other sandboxed serviceProviders in other Hosts (e.g. for API purpose)
             .AddSingleton<IForge, TForgeImplementation>()
             .AddHostedService<TForgeImplementation>(serviceProvider => (TForgeImplementation)serviceProvider.GetRequiredService<IForge>())
-            .ConfigureForge(context);
+            .ConfigureForge();
       });
 
       _isForgeSet = true;
@@ -132,7 +131,7 @@ public class ForgeBuilder : IForgeBuilder
       //register shard configuration settings
       _hostBuilder.ConfigureServices((context, services) =>
       {
-         var optionsBuilder = services
+         OptionsBuilder<TMithrilShardSettings> optionsBuilder = services
              .AddOptions<TMithrilShardSettings>()
              .Bind(MithrilShardSettingsManager.GetSection<TMithrilShardSettings>(context.Configuration))
              .ValidateOnStart();
@@ -215,13 +214,13 @@ public class ForgeBuilder : IForgeBuilder
       }
    }
 
-   private IForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE)
+   private ForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE)
    {
       ConfigurationFileName = Path.GetFullPath(configurationFile ?? CONFIGURATION_FILE);
       string absoluteDirectoryPath = Path.GetDirectoryName(ConfigurationFileName)!;
       if (!Directory.Exists(absoluteDirectoryPath))
       {
-         _logger.LogWarning($"Creating directory structure to store configuration file {ConfigurationFileName}.");
+         _logger.LogWarning("Creating directory structure to store configuration file {ConfigurationFileName}", ConfigurationFileName);
          Directory.CreateDirectory(absoluteDirectoryPath);
       }
       var configurationFileProvider = new PhysicalFileProvider(absoluteDirectoryPath);

@@ -6,7 +6,7 @@ namespace MithrilShards.WebApi;
 
 public class WebApiShard : IMithrilShard
 {
-   public ValueTask InitializeAsync(CancellationToken cancellationToken) => default;
-   public ValueTask StartAsync(CancellationToken cancellationToken) => default;
-   public ValueTask StopAsync(CancellationToken cancellationToken) => default;
+   public Task InitializeAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+   public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+   public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

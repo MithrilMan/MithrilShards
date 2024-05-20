@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Chain.Bitcoin.DataTypes;
 using MithrilShards.Chain.Bitcoin.Protocol.Types;
@@ -29,8 +30,6 @@ public class ChainState : IChainState
    /// The coins view.
    /// </value>
    private protected readonly ICoinsView coinsView;
-
-   readonly IConsensusParameters _consensusParameters;
 
    /// <summary>
    /// Gets or sets the block sequence identifier.
@@ -79,15 +78,18 @@ public class ChainState : IChainState
                      IBlockHeaderRepository blockHeaderRepository,
                      IConsensusParameters consensusParameters)
    {
+      ArgumentNullException.ThrowIfNull(consensusParameters);
+      ArgumentNullException.ThrowIfNull(headersTree);
+
       this.logger = logger;
       HeadersTree = headersTree;
       this.coinsView = coinsView;
       _blockHeaderRepository = blockHeaderRepository;
-      _consensusParameters = consensusParameters;
+
       ChainTip = headersTree.Genesis;
       BestHeader = headersTree.Genesis;
 
-      _blockHeaderRepository.TryAddAsync(consensusParameters.GenesisHeader);
+      _ = _blockHeaderRepository.TryAddAsync(consensusParameters.GenesisHeader);
    }
 
    /// <summary>
@@ -147,6 +149,8 @@ public class ChainState : IChainState
 
    public HeaderNode FindForkInGlobalIndex(BlockLocator locator)
    {
+      ArgumentNullException.ThrowIfNull(locator);
+
       using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
       {
 
@@ -174,6 +178,8 @@ public class ChainState : IChainState
 
    public bool TryGetNext(HeaderNode headerNode, [MaybeNullWhen(false)] out HeaderNode nextHeaderNode)
    {
+      ArgumentNullException.ThrowIfNull(headerNode);
+
       using (GlobalLocks.ReadOnMainAsync().GetAwaiter().GetResult())
       {
          if (IsInBestChain(headerNode) && HeadersTree.TryGetNodeOnBestChain(headerNode.Height + 1, out nextHeaderNode))
@@ -188,6 +194,7 @@ public class ChainState : IChainState
 
    public bool TryGetBlockHeader(HeaderNode headerNode, [MaybeNullWhen(false)] out BlockHeader blockHeader)
    {
+      ArgumentNullException.ThrowIfNull(headerNode);
       return _blockHeaderRepository.TryGet(headerNode.Hash, out blockHeader);
    }
 
@@ -201,31 +208,31 @@ public class ChainState : IChainState
 
    public HeaderNode AddToBlockIndex(BlockHeader header)
    {
-      using (GlobalLocks.WriteOnMainAsync().GetAwaiter().GetResult())
+      ArgumentNullException.ThrowIfNull(header);
+
+      using var theLock = GlobalLocks.WriteOnMainAsync().GetAwaiter().GetResult();
+
+      // Check for duplicate
+      if (TryGetKnownHeaderNode(header.Hash, out HeaderNode? headerNode))
       {
-
-         // Check for duplicate
-         if (TryGetKnownHeaderNode(header.Hash, out HeaderNode? headerNode))
-         {
-            return headerNode;
-         }
-
-         if (!TryGetKnownHeaderNode(header.PreviousBlockHash, out HeaderNode? previousHeader))
-         {
-            ThrowHelper.ThrowNotSupportedException("Previous hash not found (shouldn't happen).");
-         }
-
-         headerNode = new HeaderNode(header, previousHeader);
-
-         if (BestHeader == null || BestHeader.ChainWork < headerNode.ChainWork)
-         {
-            BestHeader = headerNode;
-         }
-
-         HeadersTree.Add(headerNode);
-         _blockHeaderRepository.TryAddAsync(header);
-
          return headerNode;
       }
+
+      if (!TryGetKnownHeaderNode(header.PreviousBlockHash, out HeaderNode? previousHeader))
+      {
+         ThrowHelper.ThrowNotSupportedException("Previous hash not found (shouldn't happen).");
+      }
+
+      headerNode = new HeaderNode(header, previousHeader);
+
+      if (BestHeader == null || BestHeader.ChainWork < headerNode.ChainWork)
+      {
+         BestHeader = headerNode;
+      }
+
+      HeadersTree.Add(headerNode);
+      _ = _blockHeaderRepository.TryAddAsync(header);
+
+      return headerNode;
    }
 }

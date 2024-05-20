@@ -1,30 +1,16 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Dev.Controller;
 
 internal class DevControllerShard : IMithrilShard
 {
-   readonly ILogger<DevControllerShard> _logger;
-   readonly DevControllerSettings _settings;
-
-   public DevControllerShard(ILogger<DevControllerShard> logger, IOptions<DevControllerSettings> options)
-   {
-      _logger = logger;
-      _settings = options.Value;
-   }
-
-   public ValueTask InitializeAsync(CancellationToken cancellationToken)
-   {
-      return default;
-   }
+   public Task InitializeAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
    /// <inheritdoc/>
-   public ValueTask StartAsync(CancellationToken cancellationToken) => default;
+   public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
    /// <inheritdoc/>
-   public ValueTask StopAsync(CancellationToken cancellationToken) => default;
+   public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

@@ -36,5 +36,5 @@ public abstract class MithrilShardSettingsBase : IMithrilShardSettings
    /// <returns>
    /// A collection that holds failed-validation information.
    /// </returns>
-   public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext) => Enumerable.Empty<ValidationResult>();
+   public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext) => [];
 }

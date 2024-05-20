@@ -243,10 +243,7 @@ public class ExampleNetworkProtocolMessageSerializer : INetworkProtocolMessageSe
 
    public void WriteMessage(INetworkMessage message, IBufferWriter<byte> output)
    {
-      if (message is null)
-      {
-         throw new ArgumentNullException(nameof(message));
-      }
+      ArgumentNullException.ThrowIfNull(message);
 
       string command = message.Command;
       using (_logger.BeginScope("Serializing and sending '{Command}'", command))

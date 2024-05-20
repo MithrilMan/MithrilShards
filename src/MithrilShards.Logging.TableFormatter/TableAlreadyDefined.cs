@@ -9,7 +9,4 @@ public class TableAlreadyDefinedException : Exception
    public TableAlreadyDefinedException() : base(DEFAULT_ERROR_MESSAGE) { }
    public TableAlreadyDefinedException(string message) : base(message) { }
    public TableAlreadyDefinedException(string message, Exception inner) : base(message, inner) { }
-   protected TableAlreadyDefinedException(
-    System.Runtime.Serialization.SerializationInfo info,
-    System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 }

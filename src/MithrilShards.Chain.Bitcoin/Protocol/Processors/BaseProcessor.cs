@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Threading;
 using MithrilShards.Chain.Bitcoin.Network;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Extensions;
@@ -13,15 +14,22 @@ using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Chain.Bitcoin.Protocol.Processors;
 
-public abstract class BaseProcessor : INetworkMessageProcessor
+/// <summary>Initializes a new instance of the <see cref="BaseProcessor"/> class.</summary>
+/// <param name="logger">The logger.</param>
+/// <param name="eventBus">The event bus.</param>
+/// <param name="peerBehaviorManager">The peer behavior manager.</param>
+/// <param name="isHandshakeAware">If set to <c>true</c> register the instance to be handshake aware: when the peer is handshaked, OnPeerHandshaked method will be invoked.</param>
+/// <param name="receiveMessagesOnlyIfHandshaked">if set to <c>true</c> receives messages only if handshaked.</param>
+public abstract class BaseProcessor(
+   ILogger<BaseProcessor> logger,
+   IEventBus eventBus,
+   IPeerBehaviorManager peerBehaviorManager,
+   bool isHandshakeAware,
+   bool receiveMessagesOnlyIfHandshaked
+   ) : INetworkMessageProcessor
 {
-   const int INIT_PROTO_VERSION = KnownVersion.V209;
-
-   protected readonly ILogger<BaseProcessor> logger;
-   protected readonly IEventBus eventBus;
-   private readonly IPeerBehaviorManager _peerBehaviorManager;
-   private readonly bool _isHandshakeAware;
-   private readonly bool _receiveMessagesOnlyIfHandshaked;
+   protected readonly ILogger<BaseProcessor> logger = logger;
+   protected readonly IEventBus eventBus = eventBus;
    private bool _isHandshaked = false;
    private INetworkMessageWriter _messageWriter = null!; //hack to not rising null warnings, these are initialized when calling AttachAsync
 
@@ -35,22 +43,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
    public virtual bool Enabled { get; private set; } = true;
 
    /// <inheritdoc/>
-   public virtual bool CanReceiveMessages => _isHandshaked || _receiveMessagesOnlyIfHandshaked == false;
-
-   /// <summary>Initializes a new instance of the <see cref="BaseProcessor"/> class.</summary>
-   /// <param name="logger">The logger.</param>
-   /// <param name="eventBus">The event bus.</param>
-   /// <param name="peerBehaviorManager">The peer behavior manager.</param>
-   /// <param name="isHandshakeAware">If set to <c>true</c> register the instance to be handshake aware: when the peer is handshaked, OnPeerHandshaked method will be invoked.</param>
-   /// <param name="receiveMessagesOnlyIfHandshaked">if set to <c>true</c> receives messages only if handshaked.</param>
-   public BaseProcessor(ILogger<BaseProcessor> logger, IEventBus eventBus, IPeerBehaviorManager peerBehaviorManager, bool isHandshakeAware, bool receiveMessagesOnlyIfHandshaked)
-   {
-      this.logger = logger;
-      this.eventBus = eventBus;
-      _peerBehaviorManager = peerBehaviorManager;
-      _isHandshakeAware = isHandshakeAware;
-      _receiveMessagesOnlyIfHandshaked = receiveMessagesOnlyIfHandshaked;
-   }
+   public virtual bool CanReceiveMessages => _isHandshaked || receiveMessagesOnlyIfHandshaked == false;
 
    public async ValueTask AttachAsync(IPeerContext peerContext)
    {
@@ -70,7 +63,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
       {
          _isHandshaked = true;
 
-         if (_isHandshakeAware)
+         if (isHandshakeAware)
          {
             await OnPeerHandshakedAsync().ConfigureAwait(false);
          }
@@ -81,7 +74,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
    }
 
    /// <summary>
-   /// Method invoked when the peer handshakes and <see cref="_isHandshakeAware" /> is set to <see langword="true" />.
+   /// Method invoked when the peer handshakes and isHandshakeAware is set to <see langword="true" />.
    /// </summary>
    /// <returns></returns>
    protected virtual ValueTask OnPeerHandshakedAsync()
@@ -166,7 +159,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
       {
          try
          {
-            await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
+            await Task.Delay(timeout, cancellation).ConfigureAwait(false);
          }
          catch (OperationCanceledException)
          {
@@ -178,7 +171,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
          {
             PeerContext.Disconnect(reason);
          }
-      });
+      }, cancellation);
    }
 
    /// <summary>
@@ -200,7 +193,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
       {
          try
          {
-            await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
+            await Task.Delay(timeout, cancellation).ConfigureAwait(false);
          }
          catch (OperationCanceledException)
          {
@@ -213,7 +206,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
             logger.LogDebug("Condition met, trigger action.");
             await action().ConfigureAwait(false);
          }
-      });
+      }, cancellation);
    }
 
    /// <summary>
@@ -224,7 +217,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
    /// <param name="disconnect">if set to <c>true</c> [disconnect].</param>
    protected void Misbehave(uint penalty, string reason, bool disconnect = false)
    {
-      _peerBehaviorManager.Misbehave(PeerContext, penalty, reason);
+      peerBehaviorManager.Misbehave(PeerContext, penalty, reason);
       if (disconnect)
       {
          PeerContext.Disconnect(reason);

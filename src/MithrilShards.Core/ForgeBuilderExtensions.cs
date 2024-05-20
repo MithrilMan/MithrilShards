@@ -16,7 +16,7 @@ namespace MithrilShards.Core;
 internal static class ForgeBuilderExtensions
 {
 
-   public static IServiceCollection ConfigureForge(this IServiceCollection services, HostBuilderContext context)
+   public static IServiceCollection ConfigureForge(this IServiceCollection services)
    {
       services
             // data folder

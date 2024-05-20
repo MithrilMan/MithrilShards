@@ -24,9 +24,9 @@ internal class Subscription<TEventBase> : ISubscription where TEventBase : Event
 
    public ValueTask ProcessEventAsync(EventBase eventItem, CancellationToken cancellationToken)
    {
-      if (eventItem is null) throw new ArgumentNullException(nameof(eventItem));
+      ArgumentNullException.ThrowIfNull(eventItem);
 
-      if (!(eventItem is TEventBase))
+      if (eventItem is not TEventBase)
       {
          throw new ArgumentException("Event Item is not the correct type.");
       }

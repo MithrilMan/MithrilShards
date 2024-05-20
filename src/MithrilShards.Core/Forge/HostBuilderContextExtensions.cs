@@ -22,9 +22,9 @@ public static class HostBuilderContextExtensions
 
    internal static TMithrilShardSettings SetShardSettings<TMithrilShardSettings>(this HostBuilderContext context, IServiceCollection services) where TMithrilShardSettings : class, IMithrilShardSettings
    {
-      TMithrilShardSettings? settings = null;
       var key = typeof(TMithrilShardSettings);
 
+      TMithrilShardSettings? settings;
       if (!context.Properties.TryGetValue(key, out object? value))
       {
          var tempSP = services.BuildServiceProvider();

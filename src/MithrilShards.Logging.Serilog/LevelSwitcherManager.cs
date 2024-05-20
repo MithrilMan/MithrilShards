@@ -20,7 +20,11 @@ public class LevelSwitcherManager
       //Set default log level
       if (configuration.GetSection("Serilog:MinimumLevel:Default").Exists())
       {
-         _logLevels.Add("Default", new LoggingLevelSwitch((LogEventLevel)Enum.Parse(typeof(LogEventLevel), configuration.GetValue<string>("Serilog:MinimumLevel:Default"))));
+         var defaultLogLevel = configuration.GetValue<string>("Serilog:MinimumLevel:Default");
+         _logLevels.Add("Default", new LoggingLevelSwitch(defaultLogLevel == null 
+            ? LogEventLevel.Information 
+            : (LogEventLevel)Enum.Parse(typeof(LogEventLevel), defaultLogLevel)
+            ));
       }
 
       //Set log level(s) overrides
@@ -28,6 +32,7 @@ public class LevelSwitcherManager
       {
          foreach (IConfigurationSection levelOverride in configuration.GetSection("Serilog:MinimumLevel:Override").GetChildren())
          {
+            if (levelOverride.Value == null) continue;
             _logLevels.Add(levelOverride.Key, new LoggingLevelSwitch((LogEventLevel)Enum.Parse(typeof(LogEventLevel), levelOverride.Value)));
          }
       }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace MithrilShards.Core.Forge;
 
@@ -6,7 +7,7 @@ namespace MithrilShards.Core.Forge;
 /// Class that prevents another instance of the node to run in the same data folder
 /// and allows external applications to see if the node is running.
 /// </summary>
-public class ForgeDataFolderLock : IForgeDataFolderLock
+public class ForgeDataFolderLock : IForgeDataFolderLock, IDisposable
 {
    private const string LOCK_FILE_NAME = "lockfile";
    private readonly string _lockFileName;
@@ -39,5 +40,10 @@ public class ForgeDataFolderLock : IForgeDataFolderLock
          File.Delete(_lockFileName);
       }
       catch { }
+   }
+
+   public void Dispose()
+   {
+      _fileStream?.Dispose();
    }
 }

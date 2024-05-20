@@ -12,7 +12,7 @@ namespace MithrilShards.Core.EventBus;
 public class EventSubscriptionManager : IDisposable
 {
    private readonly object _subscriptionsLock = new();
-   private readonly List<SubscriptionToken> _subscriptionTokens = new();
+   private readonly List<SubscriptionToken> _subscriptionTokens = [];
 
    /// <summary>
    /// Registers the provided subscriptions.
@@ -21,7 +21,7 @@ public class EventSubscriptionManager : IDisposable
    /// <param name="subscriptions">The subscription action.</param>
    public EventSubscriptionManager RegisterSubscriptions(params SubscriptionToken[] subscriptions)
    {
-      if (_disposedValue) throw new ObjectDisposedException(nameof(EventSubscriptionManager));
+      ObjectDisposedException.ThrowIf(_disposedValue, this);
 
       lock (_subscriptionsLock)
       {
