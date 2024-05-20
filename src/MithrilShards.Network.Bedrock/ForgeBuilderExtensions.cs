@@ -18,10 +18,7 @@ public static class ForgeBuilderExtensions
    /// <exception cref="System.ArgumentNullException">forgeBuilder</exception>
    public static IForgeBuilder UseBedrockNetwork<TNetworkProtocolMessageSerializer>(this IForgeBuilder forgeBuilder) where TNetworkProtocolMessageSerializer : class, INetworkProtocolMessageSerializer
    {
-      if (forgeBuilder is null)
-      {
-         throw new System.ArgumentNullException(nameof(forgeBuilder));
-      }
+      System.ArgumentNullException.ThrowIfNull(forgeBuilder);
 
       forgeBuilder.AddShard<BedrockNetworkShard, ForgeConnectivitySettings>(
          (hostBuildContext, services) =>

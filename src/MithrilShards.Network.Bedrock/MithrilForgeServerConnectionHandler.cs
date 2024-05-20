@@ -43,12 +43,9 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
 
    public override async Task OnConnectedAsync(ConnectionContext connection)
    {
-      if (connection is null)
-      {
-         throw new ArgumentNullException(nameof(connection));
-      }
+      ArgumentNullException.ThrowIfNull(connection);
 
-      using IDisposable loggerScope = _logger.BeginScope("Peer {PeerId} connected to server {ServerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
+      using var _ = _logger.BeginScope("Peer {PeerId} connected to server {ServerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
 
       ProtocolReader reader = connection.CreateReader();
       INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
@@ -69,7 +66,7 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
       connection.Features.Set(peerContext);
       protocol.SetPeerContext(peerContext);
 
-      if (await EnsurePeerCanConnect(connection, peerContext).ConfigureAwait(false))
+      if (await EnsurePeerCanConnectAsync(connection, peerContext).ConfigureAwait(false))
       {
 
          await _eventBus.PublishAsync(new PeerConnected(peerContext)).ConfigureAwait(false);
@@ -108,12 +105,9 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
    /// Check if the client is allowed to connect based on certain criteria.
    /// </summary>
    /// <returns>When criteria is met returns <c>true</c>, to allow connection.</returns>
-   private async ValueTask<bool> EnsurePeerCanConnect(ConnectionContext connection, IPeerContext peerContext)
+   private async ValueTask<bool> EnsurePeerCanConnectAsync(ConnectionContext connection, IPeerContext peerContext)
    {
-      if (_serverPeerConnectionGuards == null)
-      {
-         return false;
-      }
+      if (_serverPeerConnectionGuards == null) return false;
 
       ServerPeerConnectionGuardResult? result = (
          from guard in _serverPeerConnectionGuards
@@ -139,9 +133,9 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
 
    private async Task ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
    {
-      using IDisposable logScope = _logger.BeginScope("Processing message '{Command}'", message.Command);
+      using var _ = _logger.BeginScope("Processing message '{Command}'", message.Command);
 
-      if (!(message is UnknownMessage))
+      if (message is not UnknownMessage)
       {
          await _networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
          await _eventBus.PublishAsync(new PeerMessageReceived(peerContext, message), cancellation).ConfigureAwait(false);

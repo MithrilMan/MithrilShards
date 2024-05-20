@@ -12,10 +12,10 @@ public class TopologicalSorter<TItem> where TItem : notnull
    private class Relations
    {
       public int Dependencies = 0;
-      public HashSet<TItem> Dependents = new();
+      public HashSet<TItem> Dependents = [];
    }
 
-   private readonly Dictionary<TItem, Relations> _map = new();
+   private readonly Dictionary<TItem, Relations> _map = [];
 
 
    /// <summary>
@@ -35,7 +35,7 @@ public class TopologicalSorter<TItem> where TItem : notnull
    /// <param name="dependencies">The dependencies.</param>
    public void Add(TItem item, IEnumerable<TItem> dependencies)
    {
-      if (dependencies.Count() == 0 && !_map.ContainsKey(item))
+      if (!dependencies.Any() && !_map.ContainsKey(item))
       {
          _map.Add(item, new Relations());
          return;
@@ -46,21 +46,23 @@ public class TopologicalSorter<TItem> where TItem : notnull
          // do not add eventual dependency to itself
          if (dependency.Equals(item)) continue;
 
-         if (!_map.ContainsKey(dependency))
+         if (!_map.TryGetValue(dependency, out TopologicalSorter<TItem>.Relations? dependencyDependecies))
          {
-            _map.Add(dependency, new Relations());
+            dependencyDependecies = new Relations();
+            _map.Add(dependency, dependencyDependecies);
          }
 
-         HashSet<TItem>? dependents = _map[dependency].Dependents;
+         HashSet<TItem>? dependents = dependencyDependecies.Dependents;
 
-         if (!_map.ContainsKey(item))
+         if (!_map.TryGetValue(item, out TopologicalSorter<TItem>.Relations? itemDependencies))
          {
-            _map.Add(item, new Relations());
+            itemDependencies = new Relations();
+            _map.Add(item, itemDependencies);
          }
 
          if (dependents.Add(item))
          {
-            _map[item].Dependencies++;
+            itemDependencies.Dependencies++;
          }
       }
    }

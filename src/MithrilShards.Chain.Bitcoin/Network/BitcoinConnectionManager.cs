@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MithrilShards.Core;
 using MithrilShards.Core.EventBus;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Client;
@@ -14,17 +13,13 @@ namespace MithrilShards.Chain.Bitcoin.Network;
 
 public class BitcoinConnectionManager : ConnectionManager
 {
-   private readonly TimeSpan _inactivityThreshold = TimeSpan.FromSeconds(2 * 60);
-   readonly IRandomNumberGenerator _randomNumberGenerator;
    readonly IPeriodicWork _periodicPeerHealthCheck;
 
    public BitcoinConnectionManager(ILogger<ConnectionManager> logger, IEventBus eventBus,
                                    IStatisticFeedsCollector statisticFeedsCollector,
                                    IEnumerable<IConnector> connectors,
-                                   IRandomNumberGenerator randomNumberGenerator,
                                    IPeriodicWork periodicPeerHealthCheck) : base(logger, eventBus, statisticFeedsCollector, connectors)
    {
-      _randomNumberGenerator = randomNumberGenerator;
       _periodicPeerHealthCheck = periodicPeerHealthCheck;
    }
 

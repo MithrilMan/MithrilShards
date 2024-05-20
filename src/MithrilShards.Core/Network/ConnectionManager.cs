@@ -15,14 +15,14 @@ using MithrilShards.Core.Utils;
 
 namespace MithrilShards.Core.Network;
 
-public class ConnectionManager : IConnectionManager, IStatisticFeedsProvider
+public class ConnectionManager : IConnectionManager, IStatisticFeedsProvider, IDisposable
 {
    private const string FEED_CONNECTED_PEERS_SUMMARY = "ConnectedPeersSummary";
    private const string FEED_CONNECTED_PEERS = "ConnectedPeers";
 
    protected readonly ConcurrentDictionary<string, IPeerContext> inboundPeers = new();
    protected readonly ConcurrentDictionary<string, IPeerContext> outboundPeers = new();
-   protected readonly HashSet<EndPoint> attemptingConnections = new();
+   protected readonly HashSet<EndPoint> attemptingConnections = [];
 
    private readonly ILogger<ConnectionManager> _logger;
    private readonly IEventBus _eventBus;
@@ -152,22 +152,22 @@ public class ConnectionManager : IConnectionManager, IStatisticFeedsProvider
 
       _statisticFeedsCollector.RegisterStatisticFeeds(this,
          new StatisticFeedDefinition(FEED_CONNECTED_PEERS_SUMMARY, "Connected Peers summary",
-            new List<FieldDefinition>{
-                  new FieldDefinition("Inbound","Number of inbound peers currently connected to one of the Forge listener",15),
-                  new FieldDefinition("Outbound","Number of outbound peers our forge is currently connected to",15)
-            },
+            [
+               new FieldDefinition("Inbound","Number of inbound peers currently connected to one of the Forge listener",15),
+               new FieldDefinition("Outbound","Number of outbound peers our forge is currently connected to",15)
+            ],
             TimeSpan.FromSeconds(15)
          ),
          new StatisticFeedDefinition(FEED_CONNECTED_PEERS, "Connected Peers",
-            new List<FieldDefinition>{
-                  new FieldDefinition("Endpoint", "Peer remote endpoint", 25),
-                  new FieldDefinition("Type", "Type of connection (inbound, outbound, etc..)", 10),
-                  new FieldDefinition("Version", "Negotiated protocol version", 8),
-                  new FieldDefinition("User Agent", "Peer User Agent", 20),
-                  new FieldDefinition("Received", "Bytes received from this peer", 10, null, byteFormatter),
-                  new FieldDefinition("Sent", "Bytes sent to this peer", 10, null, byteFormatter),
-                  new FieldDefinition( "Wasted","Bytes that we received but wasn't understood from our node", 10, null, byteFormatter),
-            },
+            [
+               new FieldDefinition("Endpoint", "Peer remote endpoint", 25),
+               new FieldDefinition("Type", "Type of connection (inbound, outbound, etc..)", 10),
+               new FieldDefinition("Version", "Negotiated protocol version", 8),
+               new FieldDefinition("User Agent", "Peer User Agent", 20),
+               new FieldDefinition("Received", "Bytes received from this peer", 10, null, byteFormatter),
+               new FieldDefinition("Sent", "Bytes sent to this peer", 10, null, byteFormatter),
+               new FieldDefinition( "Wasted","Bytes that we received but wasn't understood from our node", 10, null, byteFormatter),
+            ],
             TimeSpan.FromSeconds(15)
          )
       );
@@ -177,12 +177,7 @@ public class ConnectionManager : IConnectionManager, IStatisticFeedsProvider
    {
       return feedId switch
       {
-         FEED_CONNECTED_PEERS_SUMMARY => new List<object?[]> {
-                  new object?[] {
-                     inboundPeers.Count,
-                     outboundPeers.Count
-                  }
-               },
+         FEED_CONNECTED_PEERS_SUMMARY => [[inboundPeers.Count, outboundPeers.Count]],
          FEED_CONNECTED_PEERS => inboundPeers.Values.Concat(outboundPeers.Values)
             .Select(peer =>
                new object?[] {
@@ -249,24 +244,22 @@ public class ConnectionManager : IConnectionManager, IStatisticFeedsProvider
       return true;
    }
 
-   protected ValueTask OnPeerDisconnectionRequestedAsync(PeerDisconnectionRequired @event, CancellationToken cancellationToken)
+   protected async ValueTask OnPeerDisconnectionRequestedAsync(PeerDisconnectionRequired @event, CancellationToken cancellationToken)
    {
       IPEndPoint endPoint = @event.EndPoint.AsIPEndPoint().EnsureIPv6();
       IPeerContext? peerContext = inboundPeers.Values
-         .Concat(outboundPeers.Values.ToList())
+         .Concat([.. outboundPeers.Values])
          .FirstOrDefault(peer => peer.RemoteEndPoint.Equals(endPoint));
 
       if (peerContext != null)
       {
          _logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection because: {DisconnectionReason}", endPoint, @event.Reason);
-         peerContext.ConnectionCancellationTokenSource.Cancel();
+         await peerContext.ConnectionCancellationTokenSource.CancelAsync().ConfigureAwait(false);
       }
       else
       {
          _logger.LogDebug("Requesting peer {RemoteEndPoint} disconnection failed, endpoint not matching with any connected peer.", endPoint);
       }
-
-      return ValueTask.CompletedTask;
    }
 
    private ValueTask OnPeerConnectionAttemptAsync(PeerConnectionAttempt @event, CancellationToken cancellationToken)
@@ -298,5 +291,10 @@ public class ConnectionManager : IConnectionManager, IStatisticFeedsProvider
       }
 
       return ValueTask.CompletedTask;
+   }
+
+   public void Dispose()
+   {
+      _eventSubscriptionManager.Dispose();
    }
 }

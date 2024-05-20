@@ -15,40 +15,28 @@ using MithrilShards.Core.Network.Protocol.Processors;
 
 namespace MithrilShards.Network.Bedrock;
 
-public class MithrilForgeClientConnectionHandler : ConnectionHandler
+public class MithrilForgeClientConnectionHandler(
+   ILogger<MithrilForgeClientConnectionHandler> logger,
+   IServiceProvider serviceProvider,
+   IEventBus eventBus,
+   INetworkMessageProcessorFactory networkMessageProcessorFactory,
+   IPeerContextFactory peerContextFactory
+   ) : ConnectionHandler
 {
-   private readonly ILogger _logger;
-   private readonly IServiceProvider _serviceProvider;
-   private readonly IEventBus _eventBus;
-   private readonly INetworkMessageProcessorFactory _networkMessageProcessorFactory;
-   private readonly IPeerContextFactory _peerContextFactory;
-
-   public MithrilForgeClientConnectionHandler(ILogger<MithrilForgeClientConnectionHandler> logger,
-                                              IServiceProvider serviceProvider,
-                                              IEventBus eventBus,
-                                              INetworkMessageProcessorFactory networkMessageProcessorFactory,
-                                              IPeerContextFactory peerContextFactory)
-   {
-      _logger = logger;
-      _serviceProvider = serviceProvider;
-      _eventBus = eventBus;
-      _networkMessageProcessorFactory = networkMessageProcessorFactory;
-      _peerContextFactory = peerContextFactory;
-   }
 
    public override async Task OnConnectedAsync(ConnectionContext connection)
    {
-      if (connection is null) throw new ArgumentNullException(nameof(connection));
+      ArgumentNullException.ThrowIfNull(connection);
 
       OutgoingConnectionEndPoint outgoingConnectionEndPoint = connection.Features.Get<OutgoingConnectionEndPoint>() ?? throw new NullReferenceException($"Missing {nameof(OutgoingConnectionEndPoint)} feature.");
 
-      using var serviceProviderScope = _serviceProvider.CreateScope();
-      using IDisposable logScope = _logger.BeginScope("Peer {PeerId} connected to outbound {PeerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
+      using var serviceProviderScope = serviceProvider.CreateScope();
+      using var _ = logger.BeginScope("Peer {PeerId} connected to outbound {PeerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
 
       ProtocolReader reader = connection.CreateReader();
-      INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
+      INetworkProtocolMessageSerializer protocol = serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
-      IPeerContext peerContext = _peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
+      IPeerContext peerContext = peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
                                                                                          connection.LocalEndPoint!,
                                                                                          outgoingConnectionEndPoint,
                                                                                          new NetworkMessageWriter(protocol, connection.CreateWriter()));
@@ -61,10 +49,10 @@ public class MithrilForgeClientConnectionHandler : ConnectionHandler
 
       protocol.SetPeerContext(peerContext);
 
-      await _eventBus.PublishAsync(new PeerConnected(peerContext)).ConfigureAwait(false);
+      await eventBus.PublishAsync(new PeerConnected(peerContext)).ConfigureAwait(false);
 
 
-      await _networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
+      await networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
 
 
       while (true)
@@ -84,7 +72,7 @@ public class MithrilForgeClientConnectionHandler : ConnectionHandler
             }
 
             await ProcessMessageAsync(result.Message, peerContext, connection.ConnectionClosed)
-               .WithCancellationAsync(connection.ConnectionClosed)
+               .WaitAsync(connection.ConnectionClosed)
                .ConfigureAwait(false);
          }
          catch (OperationCanceledException)
@@ -102,12 +90,12 @@ public class MithrilForgeClientConnectionHandler : ConnectionHandler
 
    private async Task ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
    {
-      using IDisposable logScope = _logger.BeginScope("Processing message '{Command}'", message.Command);
+      using var _ = logger.BeginScope("Processing message '{Command}'", message.Command);
 
-      if (!(message is UnknownMessage))
+      if (message is not UnknownMessage)
       {
-         await _networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
-         await _eventBus.PublishAsync(new PeerMessageReceived(peerContext, message), cancellation).ConfigureAwait(false);
+         await networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
+         await eventBus.PublishAsync(new PeerMessageReceived(peerContext, message), cancellation).ConfigureAwait(false);
       }
    }
 }

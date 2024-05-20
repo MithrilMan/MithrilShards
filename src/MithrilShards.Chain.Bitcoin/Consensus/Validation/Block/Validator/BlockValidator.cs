@@ -84,7 +84,7 @@ public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBl
    {
       await foreach (BlockToValidate request in _blocksToValidate.Reader.ReadAllAsync(cancellation))
       {
-         using IDisposable logScope = _logger.BeginScope("Validating block {BlockHash}", request.Block.Header!.Hash);
+         using var _ = _logger.BeginScope("Validating block {BlockHash}", request.Block.Header!.Hash);
 
          BlockValidationState? state = null;
 

@@ -5,4 +5,17 @@
       <ProjectReference Include="..\MithrilShards.Dev.Controller\MithrilShards.Dev.Controller.csproj" />
    </ItemGroup>
 
+   <ItemGroup>
+     <PackageReference Update="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
+       <PrivateAssets>all</PrivateAssets>
+       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+     </PackageReference>
+     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
+       <PrivateAssets>all</PrivateAssets>
+       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+     </PackageReference>
+     <PackageReference Update="Nerdbank.GitVersioning" Version="3.6.133" />
+   </ItemGroup>
+
 </Project>

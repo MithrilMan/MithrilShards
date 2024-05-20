@@ -48,7 +48,7 @@ public class JsonFileDataAttribute : DataAttribute
    /// <inheritDoc />
    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
    {
-      if (testMethod == null) { throw new ArgumentNullException(nameof(testMethod)); }
+      ArgumentNullException.ThrowIfNull(testMethod);
 
       // Get the absolute path to the JSON file
       string path = Path.IsPathRooted(_filePath)

@@ -38,7 +38,7 @@ public static class ForgeBuilderExtensions
                                                int minimumSupportedVersion,
                                                int currentVersion)
    {
-      if (forgeBuilder is null) throw new ArgumentNullException(nameof(forgeBuilder));
+      ArgumentNullException.ThrowIfNull(forgeBuilder);
 
       Type? chainDefinitionType = networkName.ToLowerInvariant() switch
       {

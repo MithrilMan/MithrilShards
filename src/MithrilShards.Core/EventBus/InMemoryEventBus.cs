@@ -36,22 +36,19 @@ public class InMemoryEventBus : IEventBus
    {
       _logger = logger;
       _subscriptionErrorHandler = subscriptionErrorHandler;
-      _subscriptions = new Dictionary<Type, List<ISubscription>>();
+      _subscriptions = [];
    }
 
 
    public SubscriptionToken Subscribe<TEvent>(Func<TEvent, CancellationToken, ValueTask> handler) where TEvent : EventBase
    {
-      if (handler == null)
-      {
-         throw new ArgumentNullException(nameof(handler));
-      }
+      ArgumentNullException.ThrowIfNull(handler);
 
       lock (_subscriptionsLock)
       {
          if (!_subscriptions.TryGetValue(typeof(TEvent), out List<ISubscription>? eventSubscriptions))
          {
-            eventSubscriptions = new();
+            eventSubscriptions = [];
             _subscriptions.Add(typeof(TEvent), eventSubscriptions);
          }
 
@@ -74,21 +71,12 @@ public class InMemoryEventBus : IEventBus
 
       lock (_subscriptionsLock)
       {
-         if (_subscriptions.ContainsKey(subscriptionToken.EventType))
+         if (_subscriptions.TryGetValue(subscriptionToken.EventType, out List<ISubscription>? value))
          {
-            var subscriptionToRemove = _subscriptions[subscriptionToken.EventType].FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
+            var subscriptionToRemove = value.FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
             if (subscriptionToRemove != null)
             {
-               _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
-            }
-         }
-
-         if (_subscriptions.ContainsKey(subscriptionToken.EventType))
-         {
-            var subscriptionToRemove = _subscriptions[subscriptionToken.EventType].FirstOrDefault(sub => sub.SubscriptionToken.Token == subscriptionToken.Token);
-            if (subscriptionToRemove != null)
-            {
-               _subscriptions[subscriptionToken.EventType].Remove(subscriptionToRemove);
+               value.Remove(subscriptionToRemove);
             }
          }
       }
@@ -106,9 +94,9 @@ public class InMemoryEventBus : IEventBus
       List<ISubscription>? allSubscriptions = null;
       lock (_subscriptionsLock)
       {
-         if (_subscriptions.ContainsKey(eventType))
+         if (_subscriptions.TryGetValue(eventType, out List<ISubscription>? value))
          {
-            allSubscriptions = _subscriptions[eventType].ToList();
+            allSubscriptions = [.. value];
          }
       }
 

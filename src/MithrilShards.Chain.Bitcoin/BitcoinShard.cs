@@ -1,35 +1,14 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Chain.Bitcoin;
 
 public class BitcoinShard : IMithrilShard
 {
-   private readonly ILogger<BitcoinShard> _logger;
-   private readonly BitcoinSettings _settings;
+   public Task InitializeAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-   public BitcoinShard(ILogger<BitcoinShard> logger, IOptions<BitcoinSettings> settings)
-   {
-      _logger = logger;
-      _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
-   }
+   public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-   public ValueTask InitializeAsync(CancellationToken cancellationToken)
-   {
-      return default;
-   }
-
-   public ValueTask StartAsync(CancellationToken cancellationToken)
-   {
-      return default;
-   }
-
-   public ValueTask StopAsync(CancellationToken cancellationToken)
-   {
-      return default;
-   }
+   public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

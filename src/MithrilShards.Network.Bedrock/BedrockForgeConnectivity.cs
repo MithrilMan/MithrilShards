@@ -18,18 +18,15 @@ public class BedrockForgeConnectivity : IForgeClientConnectivity
    private readonly ILogger<BedrockNetworkShard> _logger;
    private readonly IEventBus _eventBus;
    private readonly MithrilForgeClientConnectionHandler _clientConnectionHandler;
-   private readonly ForgeConnectivitySettings _settings;
    private readonly Client _client = null!;
 
    public BedrockForgeConnectivity(ILogger<BedrockNetworkShard> logger,
                              IEventBus eventBus,
-                             IOptions<ForgeConnectivitySettings> settings,
                              MithrilForgeClientConnectionHandler clientConnectionHandler,
                              ClientBuilder clientBuilder)
    {
       _logger = logger;
       _eventBus = eventBus;
-      _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
       _clientConnectionHandler = clientConnectionHandler;
       _client = clientBuilder
          .UseSockets()
@@ -39,7 +36,7 @@ public class BedrockForgeConnectivity : IForgeClientConnectivity
 
    public async ValueTask AttemptConnectionAsync(OutgoingConnectionEndPoint remoteEndPoint, CancellationToken cancellation)
    {
-      using IDisposable logScope = _logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
+      using var _ = _logger.BeginScope("Outbound connection to {RemoteEndPoint}", remoteEndPoint);
       await _eventBus.PublishAsync(new PeerConnectionAttempt(remoteEndPoint.EndPoint.AsIPEndPoint()), cancellation).ConfigureAwait(false);
 
       bool connectionEstablished = false;

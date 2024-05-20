@@ -42,8 +42,8 @@ public partial class UInt256 : IEquatable<UInt256>
 
    public static int Compare(UInt256? a, UInt256? b)
    {
-      if (a is null) throw new ArgumentNullException(nameof(a));
-      if (b is null) throw new ArgumentNullException(nameof(b));
+      ArgumentNullException.ThrowIfNull(a);
+      ArgumentNullException.ThrowIfNull(b);
 
       if (a.part4 < b.part4)
          return -1;

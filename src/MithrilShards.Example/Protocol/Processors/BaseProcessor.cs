@@ -162,7 +162,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
       {
          try
          {
-            await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
+            await Task.Delay(timeout, cancellation).ConfigureAwait(false);
          }
          catch (OperationCanceledException)
          {
@@ -174,7 +174,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
          {
             PeerContext.Disconnect(reason);
          }
-      });
+      }, cancellation);
    }
 
    /// <summary>
@@ -196,7 +196,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
       {
          try
          {
-            await Task.Delay(timeout).WithCancellationAsync(cancellation).ConfigureAwait(false);
+            await Task.Delay(timeout, cancellation).ConfigureAwait(false);
          }
          catch (OperationCanceledException)
          {
@@ -209,7 +209,7 @@ public abstract class BaseProcessor : INetworkMessageProcessor
             logger.LogDebug("Condition met, trigger action.");
             await action().ConfigureAwait(false);
          }
-      });
+      }, cancellation);
    }
 
    /// <summary>

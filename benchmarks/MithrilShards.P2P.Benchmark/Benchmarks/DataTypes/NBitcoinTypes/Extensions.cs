@@ -6,8 +6,7 @@ public static class Extensions
 {
    internal static byte[] SafeSubarray(this byte[] array, int offset, int count)
    {
-      if (array == null)
-         throw new ArgumentNullException(nameof(array));
+      ArgumentNullException.ThrowIfNull(array);
       if (offset < 0 || offset > array.Length)
          throw new ArgumentOutOfRangeException("offset");
       if (count < 0 || offset + count > array.Length)

@@ -15,19 +15,14 @@ namespace MithrilShards.Chain.Bitcoin.Consensus;
 /// <summary>
 /// In-Memory implementation of <see cref="IBlockHeaderRepository" />, not suitable for production.
 /// </summary>
-/// <seealso cref="MithrilShards.Chain.Bitcoin.Consensus.IBlockHeaderRepository" />
-public class InMemoryBlockHeaderRepository : IBlockHeaderRepository
+/// <seealso cref="IBlockHeaderRepository" />
+public class InMemoryBlockHeaderRepository(
+   ILogger<InMemoryBlockHeaderRepository> logger,
+   IEventBus eventBus
+   ) : IBlockHeaderRepository, IDisposable
 {
-   private readonly Dictionary<UInt256, BlockHeader> _headers = new();
+   private readonly Dictionary<UInt256, BlockHeader> _headers = [];
    private readonly ReaderWriterLockSlim _theLock = new();
-   readonly ILogger<InMemoryBlockHeaderRepository> _logger;
-   readonly IEventBus _eventBus;
-
-   public InMemoryBlockHeaderRepository(ILogger<InMemoryBlockHeaderRepository> logger, IEventBus eventBus)
-   {
-      _logger = logger;
-      _eventBus = eventBus;
-   }
 
    /// <summary>
    /// Tries to add a header to the repository.
@@ -40,11 +35,11 @@ public class InMemoryBlockHeaderRepository : IBlockHeaderRepository
    /// <exception cref="NullReferenceException">Block Header hash cannot be null</exception>
    public async ValueTask<bool> TryAddAsync(BlockHeader header)
    {
-      if (header is null) throw new ArgumentNullException(nameof(header));
+      ArgumentNullException.ThrowIfNull(header);
 
-      UInt256? hash = header.Hash;
-      if (hash == null) throw new NullReferenceException("Block Header hash cannot be null");
+      logger.LogDebug("Adding block header {BlockHash} to repository", header.Hash);
 
+      UInt256? hash = header.Hash ?? throw new NullReferenceException("Block Header hash cannot be null");
       bool success;
       using (new WriteLock(_theLock))
       {
@@ -61,7 +56,7 @@ public class InMemoryBlockHeaderRepository : IBlockHeaderRepository
 
       if (success)
       {
-         await _eventBus.PublishAsync(new BlockHeaderAddedToRepository(header)).ConfigureAwait(false);
+         await eventBus.PublishAsync(new BlockHeaderAddedToRepository(header)).ConfigureAwait(false);
       }
 
       return success;
@@ -77,11 +72,15 @@ public class InMemoryBlockHeaderRepository : IBlockHeaderRepository
    /// </returns>
    public bool TryGet(UInt256 hash, [MaybeNullWhen(false)] out BlockHeader header)
    {
-      if (hash is null) throw new ArgumentNullException(nameof(hash));
+      ArgumentNullException.ThrowIfNull(hash);
 
       using (new ReadLock(_theLock))
       {
          return _headers.TryGetValue(hash, out header!);
       }
+   }
+
+   public void Dispose() {
+      _theLock.Dispose();
    }
 }

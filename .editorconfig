@@ -2,6 +2,13 @@
 [*]
 end_of_line = crlf
 indent_size = 3
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+tab_width = 3
+dotnet_style_coalesce_expression = true:error
+dotnet_style_null_propagation = true:warning
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_object_initializer = true:warning
 
 [*.xml]
 indent_style = space
@@ -11,14 +18,14 @@ indent_style = space
 ########## Naming Styles
 ##### Naming Rules
 # name all constant fields using UPPERCASE
-dotnet_naming_rule.constant_fields_should_be_upper_case.severity  = error
+dotnet_naming_rule.constant_fields_should_be_upper_case.severity = error
 dotnet_naming_rule.constant_fields_should_be_upper_case.symbols   = constant_fields
-dotnet_naming_rule.constant_fields_should_be_upper_case.style     = upper_case_style
+dotnet_naming_rule.constant_fields_should_be_upper_case.style = upper_case_style
 
 # name all private fields using camelCase and underscore prefix
 dotnet_naming_rule.private_members_with_underscore.symbols        = private_fields
-dotnet_naming_rule.private_members_with_underscore.style          = prefix_underscore
-dotnet_naming_rule.private_members_with_underscore.severity       = error
+dotnet_naming_rule.private_members_with_underscore.style = prefix_underscore
+dotnet_naming_rule.private_members_with_underscore.severity = error
 ##### End Naming Rules
 
 ##### End Symbol Specifications
@@ -74,7 +81,7 @@ csharp_new_line_before_members_in_object_initializers             = true
 csharp_new_line_before_open_brace                                 = all
 csharp_new_line_between_query_expression_clauses                  = true
 csharp_preferred_modifier_order                                   = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async : error
-csharp_prefer_braces                                              = when_multiline : error
+csharp_prefer_braces                                              = when_multiline:error
 csharp_prefer_simple_default_expression                           = true : suggestion
 csharp_preserve_single_line_blocks                                = true
 csharp_preserve_single_line_statements                            = true
@@ -90,20 +97,20 @@ csharp_space_between_parentheses                                  = false
 
 csharp_style_deconstructed_variable_declaration                   = true : suggestion
 csharp_style_conditional_delegate_call                            = true : suggestion
-csharp_style_expression_bodied_accessors                          = true : silent
-csharp_style_expression_bodied_constructors                       = true : silent
-csharp_style_expression_bodied_indexers                           = true : silent
-csharp_style_expression_bodied_methods                            = true : silent
-csharp_style_expression_bodied_operators                          = true : silent
-csharp_style_expression_bodied_properties                         = true : silent
+csharp_style_expression_bodied_accessors                          = true:silent
+csharp_style_expression_bodied_constructors                       = true:silent
+csharp_style_expression_bodied_indexers                           = true:silent
+csharp_style_expression_bodied_methods                            = true:silent
+csharp_style_expression_bodied_operators                          = true:silent
+csharp_style_expression_bodied_properties                         = true:silent
 csharp_style_inlined_variable_declaration                         = true : error
 csharp_style_pattern_local_over_anonymous_function                = true : suggestion
 csharp_style_pattern_matching_over_as_with_null_check             = true : error
 csharp_style_pattern_matching_over_is_with_cast_check             = true : error
 csharp_style_throw_expression                                     = true : silent
-csharp_style_var_elsewhere                                        = false : suggestion
-csharp_style_var_for_built_in_types                               = false : suggestion
-csharp_style_var_when_type_is_apparent                            = true : suggestion
+csharp_style_var_elsewhere                                        = false 
+csharp_style_var_for_built_in_types                               = false 
+csharp_style_var_when_type_is_apparent                            = true 
 
 
 
@@ -137,7 +144,7 @@ dotnet_diagnostic.CA1001.severity                                 = suggestion
 dotnet_diagnostic.CA1028.severity                                 = suggestion
 
 # CA1062: Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity                                 = silent
+dotnet_diagnostic.CA1062.severity                                 = suggestion
 
 # CA1308: Normalize strings to uppercase
 dotnet_diagnostic.CA1308.severity                                 = silent
@@ -149,7 +156,7 @@ dotnet_diagnostic.VSTHRD200.severity                              = suggestion
 dotnet_diagnostic.CA1812.severity                                 = none
 
 # CA1819: Properties should not return arrays
-dotnet_diagnostic.CA1819.severity                                 = suggestion
+dotnet_diagnostic.CA1819.severity                                 = silent
 
 # CA1040: Avoid empty interfaces
 dotnet_diagnostic.CA1040.severity                                 = suggestion
@@ -171,4 +178,30 @@ dotnet_diagnostic.CS1587.severity                                 = silent
 
 # IDE0090: Use 'new(...)'
 csharp_style_implicit_object_creation_when_type_is_apparent       = true: warning
-csharp_style_namespace_declarations=file_scoped:warning
+csharp_style_namespace_declarations= file_scoped:warning
+csharp_indent_labels = one_less_than_current
+csharp_using_directive_placement = outside_namespace:silent
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_prefer_method_group_conversion = true:silent
+csharp_style_prefer_top_level_statements = true:silent
+csharp_style_prefer_primary_constructors = true:silent
+csharp_style_expression_bodied_lambdas = true:silent
+csharp_style_expression_bodied_local_functions = false:silent
+
+# IDE0008: Use explicit type
+dotnet_diagnostic.IDE0008.severity = silent
+
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = silent
+
+# CA1510: Use ArgumentNullException throw helper
+dotnet_diagnostic.CA1510.severity = warning
+
+# CA2254: Template should be a static expression
+dotnet_diagnostic.CA2254.severity = warning
+
+# IDE0057: Use range operator
+dotnet_diagnostic.IDE0057.severity = silent
+
+# CA2012: Use ValueTasks correctly
+dotnet_diagnostic.CA2012.severity = silent

@@ -68,7 +68,7 @@ public partial class PingPongProcessor : BaseProcessor,
          Nonce = _randomNumberGenerator.GetUint64()
       };
 
-      await SendMessageAsync(ping).ConfigureAwait(false);
+      await SendMessageAsync(ping, cancellationToken).ConfigureAwait(false);
 
       _status.PingSent(_dateTimeProvider.GetTimeMicros(), ping);
       logger.LogDebug("Sent ping request with nonce {PingNonce}", _status.PingRequestNonce);
@@ -92,24 +92,24 @@ public partial class PingPongProcessor : BaseProcessor,
             Nonce = message.Nonce,
             Quote = _quoteService.GetRandomQuote()
          }
-      }).ConfigureAwait(false);
+      }, cancellation).ConfigureAwait(false);
 
       return true;
    }
 
-   ValueTask<bool> INetworkMessageHandler<PongMessage>.ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
+   async ValueTask<bool> INetworkMessageHandler<PongMessage>.ProcessMessageAsync(PongMessage message, CancellationToken cancellation)
    {
       if (_status.PingRequestNonce != 0 && message.PongFancyResponse?.Nonce == _status.PingRequestNonce)
       {
          (ulong Nonce, long RoundTrip) = _status.PongReceived(_dateTimeProvider.GetTimeMicros());
          logger.LogDebug("Received pong with nonce {PingNonce} in {PingRoundTrip} usec. {Quote}", Nonce, RoundTrip, message.PongFancyResponse.Quote);
-         _pingCancellationTokenSource.Cancel();
+         await _pingCancellationTokenSource.CancelAsync().ConfigureAwait(false);
       }
       else
       {
          logger.LogDebug("Received pong with wrong nonce: {PingNonce}", _status.PingRequestNonce);
       }
 
-      return new ValueTask<bool>(true);
+      return true;
    }
 }

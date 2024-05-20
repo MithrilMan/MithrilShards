@@ -7,19 +7,13 @@ using MithrilShards.Diagnostic.StatisticsCollector.Models;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector;
 
-public class ConsoleKeyDumper
+public class ConsoleKeyDumper(
+   IHostApplicationLifetime hostApplicationLifetime,
+   IStatisticFeedsCollector statisticFeedsCollector)
 {
-   readonly IHostApplicationLifetime _hostApplicationLifetime;
-   readonly IStatisticFeedsCollector _statisticFeedsCollector;
    private bool _isRunning;
 
-   public ConsoleKeyDumper(IHostApplicationLifetime hostApplicationLifetime, IStatisticFeedsCollector statisticFeedsCollector)
-   {
-      _hostApplicationLifetime = hostApplicationLifetime;
-      _statisticFeedsCollector = statisticFeedsCollector;
-   }
-
-   public async Task StartListening()
+   public async Task StartListeningAsync()
    {
       if (_isRunning)
       {
@@ -28,17 +22,17 @@ public class ConsoleKeyDumper
 
       _isRunning = true;
 
-      while (!_hostApplicationLifetime.ApplicationStopping.IsCancellationRequested)
+      while (!hostApplicationLifetime.ApplicationStopping.IsCancellationRequested)
       {
          if (DumpKeyPressed())
          {
-            IEnumerable<StatisticFeedDefinition> feeds = _statisticFeedsCollector.GetRegisteredFeedsDefinitions();
+            IEnumerable<StatisticFeedDefinition> feeds = statisticFeedsCollector.GetRegisteredFeedsDefinitions();
 
             Console.Clear();
 
             foreach (var feed in feeds)
             {
-               var feedResult = _statisticFeedsCollector.GetFeedDump(feed.FeedId, true);
+               var feedResult = statisticFeedsCollector.GetFeedDump(feed.FeedId, true);
                if (feedResult is TabularStatisticFeedResult tabularResult)
                {
                   Console.WriteLine(tabularResult.Content);
@@ -46,11 +40,11 @@ public class ConsoleKeyDumper
             }
          }
 
-         await Task.Delay(500, _hostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
+         await Task.Delay(500, hostApplicationLifetime.ApplicationStopping).ConfigureAwait(false);
       }
    }
 
-   private bool DumpKeyPressed()
+   private static bool DumpKeyPressed()
    {
       bool found = false;
       while (Console.KeyAvailable)

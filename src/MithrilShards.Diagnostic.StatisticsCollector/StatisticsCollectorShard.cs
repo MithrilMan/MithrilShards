@@ -5,34 +5,24 @@ using MithrilShards.Core.Shards;
 
 namespace MithrilShards.Diagnostic.StatisticsCollector;
 
-public class StatisticsCollectorShard : IMithrilShard
+public class StatisticsCollectorShard(
+   ILogger<StatisticsCollectorShard> logger,
+   ConsoleKeyDumper? consoleKeyDumper = null)
+   : IMithrilShard
 {
-   readonly ILogger<StatisticsCollectorShard> _logger;
-   readonly ConsoleKeyDumper? _consoleKeyDumper;
+   public Task InitializeAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-   public StatisticsCollectorShard(ILogger<StatisticsCollectorShard> logger, ConsoleKeyDumper? consoleKeyDumper = null)
+   public Task StartAsync(CancellationToken cancellationToken)
    {
-      _logger = logger;
-      _consoleKeyDumper = consoleKeyDumper;
-   }
+      logger.LogDebug("Starting StatisticsCollectorShard");
 
-   public ValueTask InitializeAsync(CancellationToken cancellationToken)
-   {
-      return default;
-   }
-
-   public ValueTask StartAsync(CancellationToken cancellationToken)
-   {
-      if (_consoleKeyDumper != null)
+      if (consoleKeyDumper != null)
       {
-         _ = _consoleKeyDumper.StartListening();
+         _ = consoleKeyDumper.StartListeningAsync();
       }
 
-      return default;
+      return Task.CompletedTask;
    }
 
-   public ValueTask StopAsync(CancellationToken cancellationToken)
-   {
-      return default;
-   }
+   public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

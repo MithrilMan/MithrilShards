@@ -90,8 +90,7 @@ public class NEO_UInt256 : UIntBase, IComparable<NEO_UInt256>, IEquatable<NEO_UI
    /// </summary>
    public static new NEO_UInt256 Parse(string s)
    {
-      if (s == null)
-         throw new ArgumentNullException();
+      ArgumentNullException.ThrowIfNull(s);
       if (s.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
          s = s.Substring(2);
       if (s.Length != LENGTH * 2)

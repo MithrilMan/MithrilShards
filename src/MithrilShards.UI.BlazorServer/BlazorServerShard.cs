@@ -17,31 +17,23 @@ using MithrilShards.Core.Shards;
 
 namespace MithrilShards.UI.BlazorServer;
 
-internal class BlazorServerShard : IMithrilShard
+internal class BlazorServerShard(
+   ILogger<BlazorServerShard> logger,
+   IOptions<BlazorServerSettings> options,
+   IServiceCollection registeredServices,
+   IServiceProvider serviceProvider
+   ) : IMithrilShard
 {
-   readonly ILogger<BlazorServerShard> _logger;
-   readonly IServiceCollection _registeredServices;
-   readonly IServiceProvider _serviceProvider;
-   readonly IHostApplicationLifetime _hostApplicationLifetime;
-   readonly BlazorServerSettings _settings;
+   readonly BlazorServerSettings _settings = options.Value;
    private IWebHost? _webHost;
 
-   public BlazorServerShard(ILogger<BlazorServerShard> logger, IOptions<BlazorServerSettings> options, IServiceCollection registeredServices, IServiceProvider serviceProvider, IHostApplicationLifetime hostApplicationLifetime)
-   {
-      _logger = logger;
-      _registeredServices = registeredServices;
-      _serviceProvider = serviceProvider;
-      _hostApplicationLifetime = hostApplicationLifetime;
-      _settings = options.Value;
-   }
-
-   public ValueTask InitializeAsync(CancellationToken cancellationToken)
+   public Task InitializeAsync(CancellationToken cancellationToken)
    {
       if (!_settings.Enabled)
       {
-         _logger.LogWarning($"{nameof(BlazorServerSettings)} disabled, Dev API will not be available");
+         logger.LogWarning($"{nameof(BlazorServerSettings)} disabled, Dev API will not be available");
 
-         return default;
+         return Task.CompletedTask;
       }
 
       _webHost = new WebHostBuilder()
@@ -75,7 +67,7 @@ internal class BlazorServerShard : IMithrilShard
          {
             // copies all the services registered in the forge, maintaining eventual singleton instances
             // also copies over singleton instances already defined
-            foreach (ServiceDescriptor service in _registeredServices)
+            foreach (ServiceDescriptor service in registeredServices)
             {
                if (service.ServiceType == typeof(IHostedService))
                {
@@ -92,7 +84,7 @@ internal class BlazorServerShard : IMithrilShard
                   services.AddSingleton(service.ServiceType, sp =>
                   {
                      //resolve singletons from the main provider
-                     var instance = _serviceProvider.GetServices(service.ServiceType).First(s => service.ImplementationType == null || s?.GetType() == service.ImplementationType);
+                     var instance = serviceProvider.GetServices(service.ServiceType).First(s => service.ImplementationType == null || s?.GetType() == service.ImplementationType);
                      if (instance == null) ThrowHelper.ThrowNullReferenceException($"Service type {service.ServiceType.Name} not found.");
 
                      return instance;
@@ -112,50 +104,50 @@ internal class BlazorServerShard : IMithrilShard
 
             });
 
-            services.AddBlazorise(options => { options.ChangeTextOnKeyPress = true; })
+            services.AddBlazorise(options => { /*options.ChangeTextOnKeyPress = true;*/ })
                 .AddBootstrapProviders()
                 .AddFontAwesomeIcons();
          }).Build();
 
 
-      return default;
+      return Task.CompletedTask;
    }
 
-   public ValueTask StartAsync(CancellationToken cancellationToken)
+   public Task StartAsync(CancellationToken cancellationToken)
    {
-      if (_webHost != null)
+      if (_webHost == null)
       {
-         _ = Task.Run(async () =>
+         logger.LogWarning("BlazorServer not initialized, skipping start.");
+         return Task.CompletedTask;
+      }
+
+      _ = Task.Run(async () =>
+        {
+           try
            {
-              try
-              {
-                 _logger.LogInformation("BlazorServer started, listening to endpoint {ListenerLocalEndpoint}.", _settings.EndPoint);
-                 await _webHost.StartAsync(cancellationToken).ConfigureAwait(false);
-              }
-              catch (OperationCanceledException)
-              {
-                 // Task canceled, legit, ignoring exception.
-              }
-              catch (Exception ex)
-              {
-                 _logger.LogCritical(ex, "BlazorServer exception, {BlazorServerException}. The node will still run without BlazorServer functionality.", ex.Message);
-                 // if we want to stop the application in case of exception, uncomment line below
-                 // hostApplicationLifetime.StopApplication();
-              }
-           });
-      }
+              logger.LogInformation("BlazorServer started, listening to endpoint {ListenerLocalEndpoint}.", _settings.EndPoint);
+              await _webHost.StartAsync(cancellationToken).ConfigureAwait(false);
+           }
+           catch (OperationCanceledException)
+           {
+              // Task canceled, legit, ignoring exception.
+           }
+           catch (Exception ex)
+           {
+              logger.LogCritical(ex, "BlazorServer exception, {BlazorServerException}. The node will still run without BlazorServer functionality.", ex.Message);
+              // if we want to stop the application in case of exception, uncomment line below
+              // hostApplicationLifetime.StopApplication();
+           }
+        }, cancellationToken);
 
 
-      return default;
+      return Task.CompletedTask;
    }
 
-   public ValueTask StopAsync(CancellationToken cancellationToken)
+   public async Task StopAsync(CancellationToken cancellationToken)
    {
-      if (_webHost != null)
-      {
-         _ = _webHost.StopAsync(cancellationToken);
-      }
+      if (_webHost == null) return;
 
-      return default;
+      await _webHost.StopAsync(cancellationToken).ConfigureAwait(false);
    }
 }

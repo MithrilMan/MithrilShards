@@ -283,11 +283,11 @@ public static class Helper
 
    internal static IEnumerable<TResult> WeightedFilter<T, TResult>(this IList<T> source, double start, double end, Func<T, BigInteger> weightSelector, Func<T, BigInteger, TResult> resultSelector)
    {
-      if (source == null) throw new ArgumentNullException(nameof(source));
+      ArgumentNullException.ThrowIfNull(source);
       if (start < 0 || start > 1) throw new ArgumentOutOfRangeException(nameof(start));
       if (end < start || start + end > 1) throw new ArgumentOutOfRangeException(nameof(end));
-      if (weightSelector == null) throw new ArgumentNullException(nameof(weightSelector));
-      if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
+      ArgumentNullException.ThrowIfNull(weightSelector);
+      ArgumentNullException.ThrowIfNull(resultSelector);
       if (source.Count == 0 || start == end) yield break;
       double amount = (double)source.Select(weightSelector).Sum();
       BigInteger sum = 0;

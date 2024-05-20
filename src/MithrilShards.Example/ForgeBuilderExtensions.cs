@@ -25,7 +25,7 @@ public static class ForgeBuilderExtensions
    /// <returns></returns>
    public static IForgeBuilder UseExample(this IForgeBuilder forgeBuilder, int minimumSupportedVersion, int currentVersion)
    {
-      if (forgeBuilder is null) throw new ArgumentNullException(nameof(forgeBuilder));
+      ArgumentNullException.ThrowIfNull(forgeBuilder);
 
       forgeBuilder.AddShard<ExampleShard, ExampleSettings>(
          (hostBuildContext, services) =>

@@ -5,9 +5,9 @@ namespace MithrilShards.Core.Shards;
 
 public interface IMithrilShard
 {
-   public ValueTask InitializeAsync(CancellationToken cancellationToken);
+   public Task InitializeAsync(CancellationToken cancellationToken);
 
-   public ValueTask StartAsync(CancellationToken cancellationToken);
+   public Task StartAsync(CancellationToken cancellationToken);
 
-   public ValueTask StopAsync(CancellationToken cancellationToken);
+   public Task StopAsync(CancellationToken cancellationToken);
 }

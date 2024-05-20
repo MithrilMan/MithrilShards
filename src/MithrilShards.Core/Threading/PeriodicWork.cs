@@ -38,8 +38,7 @@ public sealed class PeriodicWork : IDisposable, IPeriodicWork
    private volatile string _label = string.Empty;
    public string Label => _label;
 
-   private bool _stopOnException;
-   public bool StopOnException => _stopOnException;
+   public bool StopOnException { get; private set; }
 
    private IPeriodicWorkExceptionHandler? _exceptionHandler = null;
 
@@ -55,7 +54,7 @@ public sealed class PeriodicWork : IDisposable, IPeriodicWork
 
    public void Configure(bool stopOnException = false, IPeriodicWorkExceptionHandler? exceptionHandler = null)
    {
-      _stopOnException = stopOnException;
+      StopOnException = stopOnException;
       _exceptionHandler = exceptionHandler;
    }
 
@@ -93,8 +92,8 @@ public sealed class PeriodicWork : IDisposable, IPeriodicWork
          {
             try
             {
-               await work(token).WithCancellationAsync(token).ConfigureAwait(false);
-               await Task.Delay(interval()).WithCancellationAsync(token).ConfigureAwait(false);
+               await work(token).WaitAsync(token).ConfigureAwait(false);
+               await Task.Delay(interval(), token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -106,7 +105,7 @@ public sealed class PeriodicWork : IDisposable, IPeriodicWork
                _lastException = ex;
                Interlocked.Increment(ref _exceptionsCount);
 
-               var feedback = new IPeriodicWorkExceptionHandler.Feedback(!_stopOnException, false, null);
+               var feedback = new IPeriodicWorkExceptionHandler.Feedback(!StopOnException, false, null);
                _exceptionHandler?.OnPeriodicWorkException(this, ex, ref feedback);
 
                if (!feedback.ContinueExecution)
@@ -139,23 +138,21 @@ public sealed class PeriodicWork : IDisposable, IPeriodicWork
       _periodicWorkTracker.StopTracking(this);
    }
 
-   public Task StopAsync()
+   public async Task StopAsync()
    {
       if (!_isRunning)
       {
          _logger.LogDebug("PeriodicWork {PeriodicWorkId} is not running.", Id);
-         return Task.CompletedTask;
+         return;
       }
 
-      if (!_cancellationTokenSource?.IsCancellationRequested ?? true)
+      if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
       {
          _logger.LogDebug("PeriodicWork {PeriodicWorkId} is stopping.", Id);
-         _cancellationTokenSource?.Cancel();
-         _cancellationTokenSource?.Dispose();
+         await _cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+         _cancellationTokenSource.Dispose();
          _cancellationTokenSource = null;
       }
-
-      return Task.CompletedTask;
    }
 
 
