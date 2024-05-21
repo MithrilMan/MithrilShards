@@ -125,7 +125,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
          name: mithril-shards-nuget-package
-         path: ${{ github.workspace }}\.nupkgs
+         path: ${{ github.workspace }}/.nupkgs
          if-no-files-found: error
 
 
