@@ -78,9 +78,9 @@ jobs:
       run: |
          if [ "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.single-runner == 'true' }}" = "true" ]
          then
-            echo "::set-output name=matrix::{\"os\":[\"ubuntu-latest\"]}"
+            echo "matrix={\"os\":[\"ubuntu-latest\"]}" >> $GITHUB_OUTPUT
          else
-            echo "::set-output name=matrix::{\"os\":[\"ubuntu-latest\",\"windows-latest\",\"macos-latest\"]}"
+            echo "matrix={\"os\":[\"ubuntu-latest\",\"windows-latest\",\"macos-latest\"]}" >> $GITHUB_OUTPUT
          fi
 
     - name: Dump Variables # for debug purpose
@@ -97,12 +97,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
 
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
@@ -122,7 +122,7 @@ jobs:
 
     - name: Upload Artifacts
       if: matrix.os == 'ubuntu-latest' && needs.set_variables.outputs.DO_PACK == 'true'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
          name: mithril-shards-nuget-package
          path: ${{ github.workspace }}\.nupkgs
@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download Artifact
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
          name: mithril-shards-nuget-package
     - name: Push to GitHub Feed
