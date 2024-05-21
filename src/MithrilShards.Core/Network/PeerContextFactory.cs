@@ -28,11 +28,13 @@ public class PeerContextFactory<TPeerContext> : IPeerContextFactory where TPeerC
 
    public virtual IPeerContext CreateIncomingPeerContext(string peerId, EndPoint localEndPoint, EndPoint remoteEndPoint, INetworkMessageWriter messageWriter)
    {
+      _logger.LogTrace("Creating incoming peer context for {PeerId} from {RemoteEndPoint}", peerId, remoteEndPoint);
       return Create(PeerConnectionDirection.Inbound, peerId, localEndPoint, remoteEndPoint, messageWriter);
    }
 
    public virtual IPeerContext CreateOutgoingPeerContext(string peerId, EndPoint localEndPoint, OutgoingConnectionEndPoint outgoingConnectionEndPoint, INetworkMessageWriter messageWriter)
    {
+      _logger.LogTrace("Creating outgoing peer context for {PeerId} to {RemoteEndPoint}", peerId, outgoingConnectionEndPoint.EndPoint);
       IPeerContext peerContext = Create(PeerConnectionDirection.Outbound, peerId, localEndPoint, outgoingConnectionEndPoint.EndPoint, messageWriter);
       peerContext.Features.Set(outgoingConnectionEndPoint);
 

@@ -9,6 +9,7 @@ dotnet_style_null_propagation = true:warning
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning
 dotnet_style_prefer_auto_properties = true:suggestion
 dotnet_style_object_initializer = true:warning
+dotnet_style_collection_initializer = true:suggestion
 
 [*.xml]
 indent_style = space
@@ -144,7 +145,7 @@ dotnet_diagnostic.CA1001.severity                                 = suggestion
 dotnet_diagnostic.CA1028.severity                                 = suggestion
 
 # CA1062: Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity                                 = suggestion
+dotnet_diagnostic.CA1062.severity                                 = silent
 
 # CA1308: Normalize strings to uppercase
 dotnet_diagnostic.CA1308.severity                                 = silent

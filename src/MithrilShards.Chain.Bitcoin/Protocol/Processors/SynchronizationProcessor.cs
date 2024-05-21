@@ -85,6 +85,12 @@ public partial class SynchronizationProcessor : BaseProcessor, IPeriodicWorkExce
 
    public void OnPeriodicWorkException(IPeriodicWork failedWork, Exception ex, ref IPeriodicWorkExceptionHandler.Feedback feedback)
    {
+      ArgumentNullException.ThrowIfNull(failedWork, nameof(failedWork));
+      ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+      ArgumentNullException.ThrowIfNull(feedback, nameof(feedback));
+
+      logger.LogError(ex, "Error in {FailedWork}", failedWork);
+
       string? disconnectionReason = failedWork switch
       {
          IPeriodicWork work when work == _headerSyncLoop => "Peer header syncing loop had failures.",
@@ -116,7 +122,7 @@ public partial class SynchronizationProcessor : BaseProcessor, IPeriodicWorkExce
    /// <returns></returns>
    protected override async ValueTask OnPeerHandshakedAsync()
    {
-      HandshakeProcessor.HandshakeProcessorStatus handshakeStatus = PeerContext.Features.Get<HandshakeProcessor.HandshakeProcessorStatus>();
+      HandshakeProcessor.HandshakeProcessorStatus handshakeStatus = PeerContext.Features.Get<HandshakeProcessor.HandshakeProcessorStatus>()!;
 
       VersionMessage peerVersion = handshakeStatus.PeerVersion!;
 
@@ -195,7 +201,7 @@ public partial class SynchronizationProcessor : BaseProcessor, IPeriodicWorkExce
             HashStop = UInt256.Zero
          };
 
-         await SendMessageAsync(newGetHeaderRequest).ConfigureAwait(false);
+         await SendMessageAsync(newGetHeaderRequest, cancellationToken).ConfigureAwait(false);
       }
 
       CheckSyncStallingLocked(bestBlockHeader);
