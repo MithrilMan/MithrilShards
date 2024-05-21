@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MithrilShards.Core.Shards;
-using MithrilShards.Core.Shards.Validation;
 
 namespace MithrilShards.Core.Forge;
 
@@ -21,21 +20,23 @@ public class ForgeBuilder : IForgeBuilder
    /// <summary>
    /// A temporary console logger that can be used to report to user errors that may happens for example with missing configuration files and we don't have yet proper logger registration.
    /// </summary>
-   private readonly ILogger<ForgeBuilder> _logger;
-   private bool _isForgeSet = false;
-   private bool _createDefaultConfigurationFileNeeded = false;
-   private readonly List<Action<IHostBuilder>> _preBuildActions = [];
-   private readonly HostBuilder _hostBuilder;
+   protected readonly ILogger<ForgeBuilder> _logger;
+   protected bool _isForgeSet = false;
+   protected bool _createDefaultConfigurationFileNeeded = false;
+   protected readonly List<Action<IHostBuilder>> _preBuildActions = [];
+   protected readonly HostBuilder _hostBuilder;
 
    public string ConfigurationFileName { get; private set; } = null!; //set to something meaningful during initialization
 
-   public ForgeBuilder()
+   public ForgeBuilder() : this(null) { }
+
+   public ForgeBuilder(HostBuilder? hostBuilder)
    {
       // create a temporary logger that logs on console to communicate pre-initialization errors that may happens for example with missing configuration files
       ILoggerFactory loggerFactory = LoggerFactory.Create(logging => logging.SetMinimumLevel(LogLevel.Warning).AddConsole());
       _logger = loggerFactory.CreateLogger<ForgeBuilder>();
 
-      _hostBuilder = new HostBuilder();
+      _hostBuilder = hostBuilder ?? new HostBuilder();
 
       // Add a new service provider configuration
       _hostBuilder
@@ -51,8 +52,10 @@ public class ForgeBuilder : IForgeBuilder
    /// Creates the default configuration file if it's missing.
    /// </summary>
    /// <returns></returns>
-   private void CreateDefaultConfigurationFile(FileLoadExceptionContext fileContext)
+   protected void CreateDefaultConfigurationFile(FileLoadExceptionContext fileContext)
    {
+      ArgumentNullException.ThrowIfNull(fileContext);
+
       if (fileContext.Exception is FileNotFoundException)
       {
          _createDefaultConfigurationFileNeeded = true;
@@ -68,7 +71,7 @@ public class ForgeBuilder : IForgeBuilder
       }
    }
 
-   public IForgeBuilder UseForge<TForgeImplementation>(string[] commandLineArgs, string configurationFile = "forge-settings.json") where TForgeImplementation : class, IForge
+   public virtual IForgeBuilder UseForge<TForgeImplementation>(string[] commandLineArgs, string configurationFile = "forge-settings.json") where TForgeImplementation : class, IForge
    {
       if (_isForgeSet)
       {
@@ -106,7 +109,7 @@ public class ForgeBuilder : IForgeBuilder
 
 
    /// <inheritdoc/>
-   public IForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging)
+   public virtual IForgeBuilder ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> configureLogging)
    {
       _hostBuilder.ConfigureLogging(configureLogging);
       return this;
@@ -174,13 +177,15 @@ public class ForgeBuilder : IForgeBuilder
    /// <inheritdoc/>
    public IForgeBuilder ExtendInnerHostBuilder(Action<IHostBuilder> extendHostBuilderAction)
    {
+      ArgumentNullException.ThrowIfNull(extendHostBuilderAction);
+
       extendHostBuilderAction(_hostBuilder);
       return this;
    }
 
 
    /// <inheritdoc/>
-   public Task RunConsoleAsync(CancellationToken cancellationToken = default)
+   public virtual Task RunConsoleAsync(CancellationToken cancellationToken = default)
    {
       EnsureForgeIsSet();
 
@@ -206,7 +211,34 @@ public class ForgeBuilder : IForgeBuilder
       }
    }
 
-   private void EnsureForgeIsSet()
+   /// <inheritdoc/>
+   public virtual Task RunAsync(CancellationToken cancellationToken = default)
+   {
+      EnsureForgeIsSet();
+
+      foreach (var preBuildAction in _preBuildActions)
+      {
+         preBuildAction.Invoke(_hostBuilder);
+      }
+
+      try
+      {
+         return _hostBuilder.Build().RunAsync(cancellationToken);
+      }
+      catch (OptionsValidationException ex)
+      {
+         _logger.LogError("Cannot run the forge because of configuration errors.");
+
+         foreach (var validationFailure in ex.Failures)
+         {
+            _logger.LogError("Configuration problem in '{MithrilShardSettings}': {WrongSetting}", ex.OptionsType.Name, validationFailure);
+         }
+
+         return Task.CompletedTask;
+      }
+   }
+
+   protected void EnsureForgeIsSet()
    {
       if (!_isForgeSet)
       {
@@ -214,7 +246,7 @@ public class ForgeBuilder : IForgeBuilder
       }
    }
 
-   private ForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE)
+   protected virtual ForgeBuilder Configure(string[] commandLineArgs, string configurationFile = CONFIGURATION_FILE)
    {
       ConfigurationFileName = Path.GetFullPath(configurationFile ?? CONFIGURATION_FILE);
       string absoluteDirectoryPath = Path.GetDirectoryName(ConfigurationFileName)!;
@@ -244,7 +276,7 @@ public class ForgeBuilder : IForgeBuilder
    }
 
    /// <inheritdoc/>
-   public IForgeBuilder ConfigureContext(Action<HostBuilderContext> configureContextDelegate)
+   public virtual IForgeBuilder ConfigureContext(Action<HostBuilderContext> configureContextDelegate)
    {
       _hostBuilder.ConfigureAppConfiguration((context, configurationBuilder) => configureContextDelegate(context));
       return this;
