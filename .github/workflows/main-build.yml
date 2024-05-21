@@ -139,9 +139,10 @@ jobs:
       uses: actions/download-artifact@v4
       with:
          name: mithril-shards-nuget-package
+         path: ${{ github.workspace }}/mithril-shards-nuget-package
     - name: Push to GitHub Feed
       # The github token is automatically being pulled from the workflow
-      run: dotnet nuget push './mithril-shards-nuget-package/*.nupkg' --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_TOKEN
+      run: dotnet nuget push '${{ github.workspace }}/mithril-shards-nuget-package/*.nupkg' --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_TOKEN
       #run: dotnet nuget push ./mithril-shards-nuget-package/*.nupkg --no-symbols --skip-duplicate --source "github"
       #dotnet nuget push "bin/Release/OctocatApp.1.0.0.nupkg"  --api-key YOUR_GITHUB_PAT --source "github"
       #run: |
