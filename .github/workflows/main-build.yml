@@ -118,7 +118,7 @@ jobs:
 
     - name: .NET Lib Pack
       if: matrix.os == 'ubuntu-latest' && needs.set_variables.outputs.DO_PACK == 'true'
-      run: dotnet pack --no-build -c Release /p:PackageOutputPath=${{ github.workspace }}\.nupkgs /p:CI=true
+      run: dotnet pack --no-build -c Release /p:PackageOutputPath=${{ github.workspace }}/.nupkgs /p:CI=true
 
     - name: Upload Artifacts
       if: matrix.os == 'ubuntu-latest' && needs.set_variables.outputs.DO_PACK == 'true'
