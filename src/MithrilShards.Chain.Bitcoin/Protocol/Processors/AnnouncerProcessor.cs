@@ -62,9 +62,10 @@ public partial class AnnouncerProcessor : BaseProcessor,
    /// <returns></returns>
    protected override async ValueTask OnPeerHandshakedAsync()
    {
-      HandshakeProcessor.HandshakeProcessorStatus handshakeStatus = PeerContext.Features.Get<HandshakeProcessor.HandshakeProcessorStatus>();
+      HandshakeProcessor.HandshakeProcessorStatus handshakeStatus = PeerContext.Features.Get<HandshakeProcessor.HandshakeProcessorStatus>()!;
 
       VersionMessage peerVersion = handshakeStatus.PeerVersion!;
+      logger.LogDebug("Peer {PeerId} handshake completed. Peer version: {PeerVersion}", PeerContext.PeerId, peerVersion);
 
       await SendMessageAsync(minVersion: KnownVersion.V70012, new SendHeadersMessage()).ConfigureAwait(false);
    }

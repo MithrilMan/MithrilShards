@@ -30,7 +30,7 @@ public class ExamplePeerContextFactory : PeerContextFactory<ExamplePeerContext>
       /// Since this information may be important to us, we decide to have an explicit property in our <see cref="ExamplePeerContext"/> so we can
       /// access that information easily in our code.
       /// Note that we set that information in our <see cref="Client.ExampleRequiredConnection"/> connector.
-      string myExtraInformation = (string)peerContext.Features.Get<OutgoingConnectionEndPoint>().Items[nameof(ExampleEndPoint.MyExtraInformation)];
+      string myExtraInformation = (string)peerContext.Features.Get<OutgoingConnectionEndPoint>()!.Items[nameof(ExampleEndPoint.MyExtraInformation)];
 
       peerContext.MyExtraInformation = myExtraInformation;
 

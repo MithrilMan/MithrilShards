@@ -28,16 +28,18 @@ public class NetworkMessageProcessorFactory : INetworkMessageProcessorFactory
    /// <param name="peerContext">The peer context.</param>
    public async Task StartProcessorsAsync(IPeerContext peerContext)
    {
-      if (peerContext is null)
-      {
-         ThrowHelper.ThrowArgumentNullException(nameof(peerContext));
-      }
+      ArgumentNullException.ThrowIfNull(peerContext, nameof(peerContext));
 
       IEnumerable<INetworkMessageProcessor> processors = _serviceProvider.GetService<IEnumerable<INetworkMessageProcessor>>()!;
       foreach (INetworkMessageProcessor processor in processors)
       {
          // skip processors that aren't enabled
          if (!processor.Enabled) continue;
+
+         if (_logger.IsEnabled(LogLevel.Trace))
+         {
+            _logger.LogTrace("Attaching processor {ProcessorType} to peer {PeerId}", processor.GetType().Name, peerContext.PeerId);
+         }
 
          peerContext.AttachNetworkMessageProcessor(processor);
          await processor.AttachAsync(peerContext).ConfigureAwait(false);
@@ -48,6 +50,12 @@ public class NetworkMessageProcessorFactory : INetworkMessageProcessorFactory
 
    public async ValueTask ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
    {
-      await peerContext.Features.Get<PeerNetworkMessageProcessorContainer>().ProcessMessageAsync(message, cancellation).ConfigureAwait(false);
+      ArgumentNullException.ThrowIfNull(message, nameof(message));
+      ArgumentNullException.ThrowIfNull(peerContext, nameof(peerContext));
+
+      var container = peerContext.Features.Get<PeerNetworkMessageProcessorContainer>()
+         ?? throw new InvalidOperationException("PeerNetworkMessageProcessorContainer not found in peer context.");
+
+      await container.ProcessMessageAsync(message, cancellation).ConfigureAwait(false);
    }
 }
