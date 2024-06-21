@@ -9,14 +9,20 @@
         <meta name="description" content="Mithril Shards Example Projects, MithrilShards.Example">
       
       
-      
         <meta name="author" content="Mithril Man">
       
       
         <link rel="canonical" href="https://mithrilman.github.io/mithrilshards/example-projects/mithril-shards-example/">
       
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../mithril-shards-example-network-bedrock/">
+      
+      
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.7">
     
     
       
@@ -24,30 +30,35 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.a57b2b03.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.046329b4.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.85d0ee34.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
         
-      
-    
-    
-    
-      
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
-        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
-    
     
     
       <link rel="stylesheet" href="../../_mkdocs/extra_css/custom.css">
     
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
-
+    
     
     
   </head>
@@ -63,9 +74,8 @@
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
-    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
-      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -82,18 +92,22 @@
       
     </div>
     
+    
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Mithril Shards" class="md-header__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -112,47 +126,54 @@
       </div>
     </div>
     
-      <form class="md-header__option" data-md-component="palette">
-        
-          
-          
-          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
-          
-            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            </label>
-          
-        
-          
-          
-          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
-          
-            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"/></svg>
-            </label>
-          
-        
-      </form>
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+      </label>
+    
+  
+</form>
+      
     
     
     
       <label class="md-header__button md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
       </label>
-      
-<div class="md-search" data-md-component="search" role="dialog">
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
-        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
       </nav>
       
@@ -163,7 +184,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -172,11 +193,10 @@
     
     
       <div class="md-header__source">
-        
-<a href="https://github.com/mithrilman/mithrilshards/" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/mithrilman/mithrilshards" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
   </div>
   <div class="md-source__repository">
     mithrilshards
@@ -206,23 +226,23 @@
                     
 
 
+
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Mithril Shards" class="md-nav__button md-logo" aria-label="Mithril Shards" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
 
     </a>
     Mithril Shards
   </label>
   
     <div class="md-nav__source">
-      
-<a href="https://github.com/mithrilman/mithrilshards/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/mithrilman/mithrilshards" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
   </div>
   <div class="md-source__repository">
     mithrilshards
@@ -234,14 +254,18 @@
     
       
       
-      
-
   
   
   
     <li class="md-nav__item">
       <a href="../.." class="md-nav__link">
-        Welcome!
+        
+  
+  <span class="md-ellipsis">
+    Welcome!
+  </span>
+  
+
       </a>
     </li>
   
@@ -249,544 +273,676 @@
     
       
       
-      
-
   
   
   
     
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../mithril-shards/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Mithril Shards Core
+  </span>
+  
+
+            </a>
             
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../mithril-shards/">Mithril Shards Core</a>
-          
-            <label for="__nav_2">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Mithril Shards Core" data-md-level="1">
-        <label class="md-nav__title" for="__nav_2">
-          <span class="md-nav__icon md-icon"></span>
-          Mithril Shards Core
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+              <label class="md-nav__link " for="__nav_2">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
             
-            
-          
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Mithril Shards Core
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../mithril-shards/shards/" class="md-nav__link">
-        Understanding Shards
+        
+  
+  <span class="md-ellipsis">
+    Understanding Shards
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../mithril-shards/forge-builder/" class="md-nav__link">
-        ForgeBuilder
+        
+  
+  <span class="md-ellipsis">
+    ForgeBuilder
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../mithril-shards/default-forge/" class="md-nav__link">
-        DefaultForge
+        
+  
+  <span class="md-ellipsis">
+    DefaultForge
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../mithril-shards/event-bus/" class="md-nav__link">
-        Event Bus
+        
+  
+  <span class="md-ellipsis">
+    Event Bus
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
   
   
   
     
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
-      
-      
-      
         
-          
         
-          
         
-          
         
-          
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
-          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Shards
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-      
-      
-        <label class="md-nav__link" for="__nav_3">
-          Shards
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" aria-label="Shards" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
-          <span class="md-nav__icon md-icon"></span>
-          Shards
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Shards
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
   
   
   
     
+    
+      
+        
+          
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../shards/bedrock-network/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    BedrockNetwork
+  </span>
+  
+
+            </a>
             
-          
+          </div>
         
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../shards/bedrock-network/">BedrockNetwork</a>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="BedrockNetwork" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_1">
-          <span class="md-nav__icon md-icon"></span>
-          BedrockNetwork
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            BedrockNetwork
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     
+    
+      
+        
+          
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../shards/serilog/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Serilog
+  </span>
+  
+
+            </a>
             
-          
+          </div>
         
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../shards/serilog/">Serilog</a>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Serilog" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_2">
-          <span class="md-nav__icon md-icon"></span>
-          Serilog
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Serilog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../shards/web-api/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    WebApi
+  </span>
+  
+
+            </a>
             
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../shards/web-api/">WebApi</a>
-          
-            <label for="__nav_3_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="WebApi" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_3">
-          <span class="md-nav__icon md-icon"></span>
-          WebApi
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+              <label class="md-nav__link " for="__nav_3_3">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
             
-            
-          
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            WebApi
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../shards/web-api/using-webapishard/" class="md-nav__link">
-        Using WebApiShard
+        
+  
+  <span class="md-ellipsis">
+    Using WebApiShard
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../shards/web-api/areas/" class="md-nav__link">
-        Web API Areas
+        
+  
+  <span class="md-ellipsis">
+    Web API Areas
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../shards/web-api/creating-a-controller/" class="md-nav__link">
-        Creating a Controller
+        
+  
+  <span class="md-ellipsis">
+    Creating a Controller
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../shards/web-api/swagger-ui/" class="md-nav__link">
-        Using Swagger UI
+        
+  
+  <span class="md-ellipsis">
+    Using Swagger UI
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     
+    
+      
+        
+          
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" type="checkbox" id="__nav_3_4" >
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../shards/dev-controller/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    DevController
+  </span>
+  
+
+            </a>
             
-          
+          </div>
         
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../shards/dev-controller/">DevController</a>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="DevController" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_4">
-          <span class="md-nav__icon md-icon"></span>
-          DevController
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            DevController
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_5" type="checkbox" id="__nav_3_5" >
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../shards/bitcoin/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Bitcoin
+  </span>
+  
+
+            </a>
             
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../shards/bitcoin/">Bitcoin</a>
-          
-            <label for="__nav_3_5">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Bitcoin" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_5">
-          <span class="md-nav__icon md-icon"></span>
-          Bitcoin
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+              <label class="md-nav__link " for="__nav_3_5">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
             
-            
-          
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Bitcoin
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../shards/bitcoin/network/" class="md-nav__link">
-        Network implementation
+        
+  
+  <span class="md-ellipsis">
+    Network implementation
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../../shards/bitcoin/testing_node_communication/" class="md-nav__link">
-        Testing node communication
+        
+  
+  <span class="md-ellipsis">
+    Testing node communication
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
   
   
     
   
   
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
-      
-      
-      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Example Projects
+  </span>
+  
+
+            </a>
             
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../">Example Projects</a>
-          
-            <label for="__nav_4">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Example Projects" data-md-level="1">
-        <label class="md-nav__title" for="__nav_4">
-          <span class="md-nav__icon md-icon"></span>
-          Example Projects
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
+              <label class="md-nav__link " for="__nav_4">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
             
-            
-          
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Example Projects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+            
+              
+                
   
   
     
@@ -794,21 +950,32 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          MithrilShards.Example
+          
+  
+  <span class="md-ellipsis">
+    MithrilShards.Example
+  </span>
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        MithrilShards.Example
+        
+  
+  <span class="md-ellipsis">
+    MithrilShards.Example
+  </span>
+  
+
       </a>
       
         
-
 
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
@@ -1017,80 +1184,109 @@
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../mithril-shards-example-network-bedrock/" class="md-nav__link">
-        MithrilShards.Example.Network.Bedrock
+        
+  
+  <span class="md-ellipsis">
+    MithrilShards.Example.Network.Bedrock
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../mithril-shards-example-dev/" class="md-nav__link">
-        MithrilShards.Example.Dev
+        
+  
+  <span class="md-ellipsis">
+    MithrilShards.Example.Dev
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../mithril-shards-example-node/" class="md-nav__link">
-        MithrilShards.Example.Node
+        
+  
+  <span class="md-ellipsis">
+    MithrilShards.Example.Node
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
   
     <li class="md-nav__item">
       <a href="../running-example/" class="md-nav__link">
-        Running the example
+        
+  
+  <span class="md-ellipsis">
+    Running the example
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
   
   
   
     <li class="md-nav__item">
       <a href="https://github.com/MithrilMan/MithrilShards/issues" class="md-nav__link">
-        Issue Tracker
+        
+  
+  <span class="md-ellipsis">
+    Issue Tracker
+  </span>
+  
+
       </a>
     </li>
   
@@ -1109,7 +1305,6 @@
                   <div class="md-sidebar__inner">
                     
 
-
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -1318,18 +1513,19 @@
               </div>
             
           
-          <div class="md-content" data-md-component="content">
-            <article class="md-content__inner md-typeset">
-              
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
                 
-                  <a href="https://github.com/mithrilman/mithrilshards/edit/master/docs/example-projects/mithril-shards-example.md" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                  <h1>MithrilShards.Example</h1>
-                
-                <p>MithrilShards.Example project represents the core project where most of the fundamental example application classes lies.</p>
+                  
+
+  
+  
+
+
+  <h1>MithrilShards.Example</h1>
+
+<p>MithrilShards.Example project represents the core project where most of the fundamental example application classes lies.</p>
 <p>Most of the custom application code is implemented here:</p>
 <ul>
 <li>network classes like</li>
@@ -1354,25 +1550,24 @@
 <h3 id="examplesettings">ExampleSettings</h3>
 <p>Holds configuration settings for the ExampleShard.<br />
 You can declare everything may be useful to customize the behavior of the shard by configuration, in this simple example we have few properties</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
 <span class="normal">5</span>
 <span class="normal">6</span>
 <span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">class</span> <span class="nc">ExampleSettings</span> <span class="p">:</span> <span class="n">MithrilShardSettingsBase</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">ExampleSettings</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">MithrilShardSettingsBase</span>
 <span class="p">{</span>
-   <span class="k">const</span> <span class="kt">long</span> <span class="n">DEFAULT_MAX_TIME_ADJUSTMENT</span> <span class="p">=</span> <span class="m">70</span> <span class="p">*</span> <span class="m">60</span><span class="p">;</span>
+<span class="w">   </span><span class="k">const</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">DEFAULT_MAX_TIME_ADJUSTMENT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">70</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">60</span><span class="p">;</span>
 
-   <span class="k">public</span> <span class="kt">long</span> <span class="n">MaxTimeAdjustment</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">DEFAULT_MAX_TIME_ADJUSTMENT</span><span class="p">;</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">MaxTimeAdjustment</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_MAX_TIME_ADJUSTMENT</span><span class="p">;</span>
 
-   <span class="k">public</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">ExampleClientPeerBinding</span><span class="p">&gt;</span> <span class="n">Connections</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">ExampleClientPeerBinding</span><span class="p">&gt;();</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">ExampleClientPeerBinding</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Connections</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">ExampleClientPeerBinding</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p><code>Connections</code> parameter is a list of ExampleClientPeerBinding instances that has been added to show how to define and use complex classes within a configuration settings class.</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1401,43 +1596,42 @@ You can declare everything may be useful to customize the behavior of the shard 
 <span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
-<span class="normal">30</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
+<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
 <span class="c1">/// Client Peer endpoint the node would like to be connected to.</span>
 <span class="c1">/// &lt;/summary&gt;</span>
-<span class="k">public</span> <span class="k">class</span> <span class="nc">ExampleClientPeerBinding</span>
+<span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">ExampleClientPeerBinding</span>
 <span class="p">{</span>
-   <span class="c1">/// &lt;summary&gt;IP address and port number of the peer we wants to connect to.&lt;/summary&gt;</span>
-<span class="na">   [IPEndPointValidator]</span>
-<span class="na">   [Required]</span>
-   <span class="k">public</span> <span class="kt">string?</span> <span class="n">EndPoint</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="w">   </span><span class="c1">/// &lt;summary&gt;IP address and port number of the peer we wants to connect to.&lt;/summary&gt;</span>
+<span class="w">   </span><span class="na">[IPEndPointValidator]</span>
+<span class="w">   </span><span class="na">[Required]</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="kt">string?</span><span class="w"> </span><span class="n">EndPoint</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 
-   <span class="k">public</span> <span class="kt">string?</span> <span class="n">AdditionalInformation</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="kt">string?</span><span class="w"> </span><span class="n">AdditionalInformation</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 
-   <span class="k">public</span> <span class="kt">bool</span> <span class="nf">TryGetExampleEndPoint</span><span class="p">([</span><span class="n">MaybeNullWhen</span><span class="p">(</span><span class="k">false</span><span class="p">)]</span> <span class="k">out</span> <span class="n">ExampleEndPoint</span> <span class="n">endPoint</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="n">endPoint</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">TryGetExampleEndPoint</span><span class="p">([</span><span class="n">MaybeNullWhen</span><span class="p">(</span><span class="k">false</span><span class="p">)]</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">ExampleEndPoint</span><span class="w"> </span><span class="n">endPoint</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="n">endPoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">;</span>
 
-      <span class="k">if</span> <span class="p">(!</span><span class="n">IPEndPoint</span><span class="p">.</span><span class="n">TryParse</span><span class="p">(</span><span class="n">EndPoint</span> <span class="p">??</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">,</span> <span class="k">out</span> <span class="n">IPEndPoint</span><span class="p">?</span> <span class="n">ipEndPoint</span><span class="p">))</span>
-      <span class="p">{</span>
-         <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-      <span class="p">}</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">IPEndPoint</span><span class="p">.</span><span class="n">TryParse</span><span class="p">(</span><span class="n">EndPoint</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">IPEndPoint</span><span class="o">?</span><span class="w"> </span><span class="n">ipEndPoint</span><span class="p">))</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+<span class="w">      </span><span class="p">}</span>
 
-      <span class="k">if</span> <span class="p">(</span><span class="n">AdditionalInformation</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>
-      <span class="p">{</span>
-         <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
-      <span class="p">}</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">AdditionalInformation</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+<span class="w">      </span><span class="p">}</span>
 
-      <span class="n">endPoint</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ExampleEndPoint</span><span class="p">(</span><span class="n">ipEndPoint</span><span class="p">.</span><span class="n">Address</span><span class="p">,</span> <span class="n">ipEndPoint</span><span class="p">.</span><span class="n">Port</span><span class="p">,</span> <span class="n">AdditionalInformation</span><span class="p">);</span>
-      <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-   <span class="p">}</span>
+<span class="w">      </span><span class="n">endPoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ExampleEndPoint</span><span class="p">(</span><span class="n">ipEndPoint</span><span class="p">.</span><span class="n">Address</span><span class="p">,</span><span class="w"> </span><span class="n">ipEndPoint</span><span class="p">.</span><span class="n">Port</span><span class="p">,</span><span class="w"> </span><span class="n">AdditionalInformation</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <h4 id="validating-settings">Validating settings</h4>
 <p>ExampleClientPeerBinding class has an EndPoint property that represents the endpoint (IP:Address) of a remote node we'd like to connect to and it's decorated with attributes that are used to validate the configuration during the initialization of the forge.</p>
-<p>Validation of the settings make use of <a href="https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations?view=net-5.0" target="_blank">System.ComponentModel.DataAnnotations</a> and <a href="https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations.requiredattribute?view=net-5.0" target="_blank">RequiredAttribute</a> used in the example is one of those attribute that belongs to standard set.<br />
+<p>Validation of the settings make use of <a href="https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations?view=net-8.0" target="_blank">System.ComponentModel.DataAnnotations</a> and <a href="https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations.requiredattribute?view=net-8.0" target="_blank">RequiredAttribute</a> used in the example is one of those attribute that belongs to standard set.<br />
 A different story is [IPEndPointValidator]:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1458,30 +1652,29 @@ A different story is [IPEndPointValidator]:</p>
 <span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
-<span class="normal">22</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
 <span class="c1">/// Ensure the value is a valid IPEndPoint.</span>
 <span class="c1">/// Null value is considered valid, use &lt;see cref=&quot;RequiredAttribute&quot;/&gt; if you don&#39;t want to allow null values.</span>
 <span class="c1">/// &lt;/summary&gt;</span>
 <span class="c1">/// &lt;seealso cref=&quot;System.ComponentModel.DataAnnotations.ValidationAttribute&quot; /&gt;</span>
 <span class="na">[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]</span>
-<span class="k">public</span> <span class="k">class</span> <span class="nc">IPEndPointValidator</span> <span class="p">:</span> <span class="n">ValidationAttribute</span>
+<span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">IPEndPointValidator</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ValidationAttribute</span>
 <span class="p">{</span>
-   <span class="k">protected</span> <span class="k">override</span> <span class="n">ValidationResult</span><span class="p">?</span> <span class="n">IsValid</span><span class="p">(</span><span class="kt">object?</span> <span class="k">value</span><span class="p">,</span> <span class="n">ValidationContext</span> <span class="n">validationContext</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="k">value</span> <span class="k">is</span> <span class="k">null</span><span class="p">)</span> <span class="k">return</span> <span class="n">ValidationResult</span><span class="p">.</span><span class="n">Success</span><span class="p">;</span>
+<span class="w">   </span><span class="k">protected</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="n">ValidationResult</span><span class="o">?</span><span class="w"> </span><span class="n">IsValid</span><span class="p">(</span><span class="kt">object?</span><span class="w"> </span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="n">ValidationContext</span><span class="w"> </span><span class="n">validationContext</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">ValidationResult</span><span class="p">.</span><span class="n">Success</span><span class="p">;</span>
 
-      <span class="kt">string</span> <span class="n">instance</span> <span class="p">=</span> <span class="k">value</span> <span class="k">as</span> <span class="kt">string</span> <span class="p">??</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+<span class="w">      </span><span class="kt">string</span><span class="w"> </span><span class="n">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">value</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
 
-      <span class="k">if</span> <span class="p">(!</span><span class="n">IPEndPoint</span><span class="p">.</span><span class="n">TryParse</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="k">out</span> <span class="n">IPEndPoint</span><span class="p">?</span> <span class="n">_</span><span class="p">))</span>
-      <span class="p">{</span>
-         <span class="k">return</span> <span class="k">new</span> <span class="nf">ValidationResult</span><span class="p">(</span><span class="s">$&quot;Not a valid EndPoint ({instance})&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="kt">string</span><span class="p">[]</span> <span class="p">{</span> <span class="n">validationContext</span><span class="p">.</span><span class="n">MemberName</span><span class="p">!</span> <span class="p">});</span>
-      <span class="p">}</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">IPEndPoint</span><span class="p">.</span><span class="n">TryParse</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">IPEndPoint</span><span class="o">?</span><span class="w"> </span><span class="n">_</span><span class="p">))</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nf">ValidationResult</span><span class="p">(</span><span class="s">$&quot;Not a valid EndPoint ({instance})&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">string</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">validationContext</span><span class="p">.</span><span class="n">MemberName</span><span class="o">!</span><span class="w"> </span><span class="p">});</span>
+<span class="w">      </span><span class="p">}</span>
 
-      <span class="k">return</span> <span class="n">ValidationResult</span><span class="p">.</span><span class="n">Success</span><span class="p">;</span>
-   <span class="p">}</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">ValidationResult</span><span class="p">.</span><span class="n">Success</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>This is a concrete example about how to perform validation for custom settings when default validation attributes aren't enough.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -1489,7 +1682,7 @@ A different story is [IPEndPointValidator]:</p>
 </div>
 <h4 id="configuration-file">Configuration file</h4>
 <p>To populate ExampleSettings file by using a json configuration file, we have to add <code>Example</code> section in your application configuration file</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
@@ -1497,17 +1690,16 @@ A different story is [IPEndPointValidator]:</p>
 <span class="normal">6</span>
 <span class="normal">7</span>
 <span class="normal">8</span>
-<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="nt">&quot;Example&quot;</span><span class="p">:</span> <span class="p">{</span>
-   <span class="nt">&quot;MaxTimeAdjustment&quot;</span><span class="p">:</span> <span class="mi">4200</span><span class="p">,</span>
-   <span class="nt">&quot;Connections&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-         <span class="nt">&quot;Endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;127.0.0.1:45061&quot;</span><span class="p">,</span>
-         <span class="nt">&quot;AdditionalInformation&quot;</span><span class="p">:</span> <span class="s2">&quot;I&#39;m cool!&quot;</span>
-      <span class="p">}</span>
-   <span class="p">]</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nt">&quot;Example&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;MaxTimeAdjustment&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4200</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;Connections&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;Endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;127.0.0.1:45061&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;AdditionalInformation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;I&#39;m cool!&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">]</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>By inheriting a setting class from [MithrilShardSettingsBase], the section name to specify in the json file is the name of the setting class without the suffix "<em>Settings</em>". ExampleSettings becomes then Example. You can override this behavior by overriding ConfigurationSection property in your settings file.</p>
@@ -1515,19 +1707,18 @@ A different story is [IPEndPointValidator]:</p>
 <h3 id="iquoteservice">IQuoteService</h3>
 <p>This interface (and its QuoteService implementation) is an example of a service used within the example application to provide a random quote to send as a message to our pong reply.</p>
 <p>It's definition is purposely simple:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
 <span class="normal">5</span>
-<span class="normal">6</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">interface</span> <span class="n">IQuoteService</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">public</span><span class="w"> </span><span class="k">interface</span><span class="w"> </span><span class="n">IQuoteService</span>
 <span class="p">{</span>
-   <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">Quotes</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+<span class="w">   </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Quotes</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 
-   <span class="kt">string</span> <span class="nf">GetRandomQuote</span><span class="p">();</span>
+<span class="w">   </span><span class="kt">string</span><span class="w"> </span><span class="nf">GetRandomQuote</span><span class="p">();</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>In a proper application you wouldn't want to expose directly a list of quotes but rather expose methods like GetQuotes, AddQuote, RemoveQuote, anyway this example goal is to showcase Mithril Shards library and not to teach about how properly write your services classes.</p>
@@ -1549,7 +1740,7 @@ Currently the example implements two guards: </p>
 Actually it's not honored because the default IPeerAddressBook implementation (<code>DefaultPeerAddressBook</code>) is a fake implementation that just log messages but does nothing.</dd>
 </dl>
 <p>As a reference, this is the MaxConnectionThresholdGuard implementation:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1569,29 +1760,28 @@ Actually it's not honored because the default IPeerAddressBook implementation (<
 <span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
-<span class="normal">21</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">class</span> <span class="nc">MaxConnectionThresholdGuard</span> <span class="p">:</span> <span class="n">ServerPeerConnectionGuardBase</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">MaxConnectionThresholdGuard</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ServerPeerConnectionGuardBase</span>
 <span class="p">{</span>
-   <span class="k">readonly</span> <span class="n">IConnectivityPeerStats</span> <span class="n">_peerStats</span><span class="p">;</span>
+<span class="w">   </span><span class="k">readonly</span><span class="w"> </span><span class="n">IConnectivityPeerStats</span><span class="w"> </span><span class="n">_peerStats</span><span class="p">;</span>
 
-   <span class="k">public</span> <span class="nf">MaxConnectionThresholdGuard</span><span class="p">(</span><span class="n">ILogger</span><span class="p">&lt;</span><span class="n">MaxConnectionThresholdGuard</span><span class="p">&gt;</span> <span class="n">logger</span><span class="p">,</span>
-                                       <span class="n">IOptions</span><span class="p">&lt;</span><span class="n">ForgeConnectivitySettings</span><span class="p">&gt;</span> <span class="n">settings</span><span class="p">,</span>
-                                       <span class="n">IConnectivityPeerStats</span> <span class="n">serverPeerStats</span><span class="p">)</span> <span class="p">:</span> <span class="k">base</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="n">_peerStats</span> <span class="p">=</span> <span class="n">serverPeerStats</span><span class="p">;</span>
-   <span class="p">}</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="nf">MaxConnectionThresholdGuard</span><span class="p">(</span><span class="n">ILogger</span><span class="o">&lt;</span><span class="n">MaxConnectionThresholdGuard</span><span class="o">&gt;</span><span class="w"> </span><span class="n">logger</span><span class="p">,</span>
+<span class="w">                                       </span><span class="n">IOptions</span><span class="o">&lt;</span><span class="n">ForgeConnectivitySettings</span><span class="o">&gt;</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span>
+<span class="w">                                       </span><span class="n">IConnectivityPeerStats</span><span class="w"> </span><span class="n">serverPeerStats</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">base</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span><span class="w"> </span><span class="n">settings</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="n">_peerStats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">serverPeerStats</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
 
-   <span class="k">internal</span> <span class="k">override</span> <span class="kt">string?</span> <span class="n">TryGetDenyReason</span><span class="p">(</span><span class="n">IPeerContext</span> <span class="n">peerContext</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">_peerStats</span><span class="p">.</span><span class="n">ConnectedInboundPeersCount</span> <span class="p">&gt;=</span> <span class="n">settings</span><span class="p">.</span><span class="n">MaxInboundConnections</span><span class="p">)</span>
-      <span class="p">{</span>
-         <span class="k">return</span> <span class="s">&quot;Inbound connection refused: max connection threshold reached.&quot;</span><span class="p">;</span>
-      <span class="p">}</span>
+<span class="w">   </span><span class="k">internal</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="kt">string?</span><span class="w"> </span><span class="n">TryGetDenyReason</span><span class="p">(</span><span class="n">IPeerContext</span><span class="w"> </span><span class="n">peerContext</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_peerStats</span><span class="p">.</span><span class="n">ConnectedInboundPeersCount</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">settings</span><span class="p">.</span><span class="n">MaxInboundConnections</span><span class="p">)</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;Inbound connection refused: max connection threshold reached.&quot;</span><span class="p">;</span>
+<span class="w">      </span><span class="p">}</span>
 
-      <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
-   <span class="p">}</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">null</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <h3 id="examplerequiredconnection">ExampleRequiredConnection</h3>
 <p>This class implements [IConnector], extending <code>ConnectorBase</code> abstract class.<br />
 A RequiredConnection connector is already implemented and added by default when we build a forge, this example shows how you can override default registered services with a custom implementation: ExampleRequiredConnection is meant to replace RequiredConnection.</p>
@@ -1605,30 +1795,29 @@ A RequiredConnection connector is already implemented and added by default when 
 In this example we implemented four messages: two for the handshake process (borrowed by bitcoin protocol), namely <code>VerackMessage</code> and <code>VersionMessage</code> and two to implement the ping pong logic: <code>PingMessage</code> and <code>PongMessage</code>.</p>
 <p>Let's just examine one of them and lets pick the one that contains a <code>complex type</code> that has to be serialized over the network.</p>
 <h3 id="pongmessage">PongMessage</h3>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
 <span class="normal">5</span>
 <span class="normal">6</span>
 <span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="na">[NetworkMessage(COMMAND)]</span>
-<span class="k">public</span> <span class="k">sealed</span> <span class="k">class</span> <span class="nc">PongMessage</span> <span class="p">:</span> <span class="n">INetworkMessage</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="na">[NetworkMessage(COMMAND)]</span>
+<span class="k">public</span><span class="w"> </span><span class="k">sealed</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">PongMessage</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">INetworkMessage</span>
 <span class="p">{</span>
-   <span class="k">private</span> <span class="k">const</span> <span class="kt">string</span> <span class="n">COMMAND</span> <span class="p">=</span> <span class="s">&quot;pong&quot;</span><span class="p">;</span>
-   <span class="kt">string</span> <span class="n">INetworkMessage</span><span class="p">.</span><span class="n">Command</span> <span class="p">=&gt;</span> <span class="n">COMMAND</span><span class="p">;</span>
+<span class="w">   </span><span class="k">private</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="n">COMMAND</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pong&quot;</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">string</span><span class="w"> </span><span class="n">INetworkMessage</span><span class="p">.</span><span class="n">Command</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">COMMAND</span><span class="p">;</span>
 
-   <span class="k">public</span> <span class="n">PongFancyResponse</span><span class="p">?</span> <span class="n">PongFancyResponse</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="n">PongFancyResponse</span><span class="o">?</span><span class="w"> </span><span class="n">PongFancyResponse</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>A message has to implement [INetworkMessage] interface and be decorated with the [NetworkMessageAttribute] in order to be serialized by the [NetworkMessageSerializerManager].</p>
 <p>Since the message name, exposed by the <code>Command</code> property, is used both as the return value of the property and as the parameter passed to the NetworkMessageAttribute, a private const string is used to prevent manual errors when creating a new message: just edit the message name in one place.</p>
 <p>The PongMessage payload just contains one serialized property, PongFancyResponse, and the PongMessageSerializer will show how to serialize this complex type.</p>
 <h4 id="pongfancyresponse">PongFancyResponse</h4>
 <p>This type represent a complex type that is serialized when we send a PongMessage to a peer. We could have added the property that this type contains, straight into the PongMessage class but since this example project has the goal to showcase Mithril Shards features, having a complex type is useful to describe the process needed to handle such scenarios.</p>
 <p>The class itself is a simple <abbr title="Plain Old CLR Object">POCO</abbr> class (it's <abbr title="Plain Old CLR Object">POCO</abbr> by choice but it's not mandatory to be so, you can use any kind of class, as long as you implement a serializer for that specific type)</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
@@ -1636,28 +1825,27 @@ In this example we implemented four messages: two for the handshake process (bor
 <span class="normal">6</span>
 <span class="normal">7</span>
 <span class="normal">8</span>
-<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">class</span> <span class="nc">PongFancyResponse</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">PongFancyResponse</span>
 <span class="p">{</span>
-   <span class="c1">/// &lt;summary&gt;</span>
-   <span class="c1">/// The nonce received from the ping request.</span>
-   <span class="c1">/// &lt;/summary&gt;</span>
-   <span class="k">public</span> <span class="kt">ulong</span> <span class="n">Nonce</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="w">   </span><span class="c1">/// &lt;summary&gt;</span>
+<span class="w">   </span><span class="c1">/// The nonce received from the ping request.</span>
+<span class="w">   </span><span class="c1">/// &lt;/summary&gt;</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="kt">ulong</span><span class="w"> </span><span class="n">Nonce</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 
-   <span class="k">public</span> <span class="kt">string?</span> <span class="n">Quote</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="kt">string?</span><span class="w"> </span><span class="n">Quote</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">get</span><span class="p">;</span><span class="w"> </span><span class="k">set</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>Nonce is a simple unsigned long value that's used to link a pong response to a ping request, just returning back the ping Nonce value, while Quote is a nullable string that contains the Quote generated by the node sending the PongMessage.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Projects within Mithril Shards solution make use of <a href="https://docs.microsoft.com/en-us/dotnet/csharp/nullable-references" target="_blank">nullable references types</a> and proper <code>.editorconfig</code> configuration to raise warning and exceptions in multiple scenarios and proudly have a 0 warning build (most of the time <img alt="🤓" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f913.svg" title=":nerd_face:" />).</p>
+<p>Projects within Mithril Shards solution make use of <a href="https://docs.microsoft.com/en-us/dotnet/csharp/nullable-references" target="_blank">nullable references types</a> and proper <code>.editorconfig</code> configuration to raise warning and exceptions in multiple scenarios and proudly have a 0 warning build (most of the time <img alt="🤓" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@14.1.2/assets/svg/1f913.svg" title=":nerd_face:" />).</p>
 </div>
 <h2 id="protocol-messages-serializers">Protocol Messages Serializers</h2>
 <p>Like for messages, their serializer has to implement an interface, in this case to follow DRY, a base generic class <code>ExampleNetworkMessageSerializerBase&lt;TMessage&gt;</code> is implemented that acts just as placeholder because it contains no code except an empty method and some comments, that explain how doing so you can expand a serializer by having a custom [IPeerContext] like in this example and some helper methods you may find useful in your implementation.</p>
 <p>Usually you have one message serializer for each message you have, so in this case we have four message serializers: VersionMessageSerializer, VerackMessageSerializer, PingMessageSerializer and PongMessageSerializer.</p>
 <h3 id="pongmessageserializer">PongMessageSerializer</h3>
 <p>Since we have already described the PongMessage in details, makes sense to explain its serializer:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1685,37 +1873,36 @@ In this example we implemented four messages: two for the handshake process (bor
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
+<span class="normal">29</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
 <span class="c1">/// PongMessage serializer, used to serialize and send through the network a &lt;see cref=&quot;PongMessage&quot;/&gt;</span>
 <span class="c1">/// &lt;/summary&gt;</span>
 <span class="c1">/// &lt;seealso cref=&quot;ExampleNetworkMessageSerializerBase{PongMessage}&quot; /&gt;</span>
-<span class="k">public</span> <span class="k">class</span> <span class="nc">PongMessageSerializer</span> <span class="p">:</span> <span class="n">ExampleNetworkMessageSerializerBase</span><span class="p">&lt;</span><span class="n">PongMessage</span><span class="p">&gt;</span>
+<span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">PongMessageSerializer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ExampleNetworkMessageSerializerBase</span><span class="o">&lt;</span><span class="n">PongMessage</span><span class="o">&gt;</span>
 <span class="p">{</span>
-   <span class="k">readonly</span> <span class="n">IProtocolTypeSerializer</span><span class="p">&lt;</span><span class="n">PongFancyResponse</span><span class="p">&gt;</span> <span class="n">_pongFancyResponseSerializator</span><span class="p">;</span>
+<span class="w">   </span><span class="k">readonly</span><span class="w"> </span><span class="n">IProtocolTypeSerializer</span><span class="o">&lt;</span><span class="n">PongFancyResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">_pongFancyResponseSerializator</span><span class="p">;</span>
 
-   <span class="k">public</span> <span class="nf">PongMessageSerializer</span><span class="p">(</span><span class="n">IProtocolTypeSerializer</span><span class="p">&lt;</span><span class="n">PongFancyResponse</span><span class="p">&gt;</span> <span class="n">pongFancyResponseSerializator</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="c1">/// since the pong message has a complex type that can be reused in other payload (well,</span>
-      <span class="c1">/// this is specific to pong but you get the idea) we are implementing a custom</span>
-      <span class="c1">/// type serializer and inject it into this message serializer</span>
-      <span class="n">_pongFancyResponseSerializator</span> <span class="p">=</span> <span class="n">pongFancyResponseSerializator</span><span class="p">;</span>
-   <span class="p">}</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="nf">PongMessageSerializer</span><span class="p">(</span><span class="n">IProtocolTypeSerializer</span><span class="o">&lt;</span><span class="n">PongFancyResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">pongFancyResponseSerializator</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">/// since the pong message has a complex type that can be reused in other payload (well,</span>
+<span class="w">      </span><span class="c1">/// this is specific to pong but you get the idea) we are implementing a custom</span>
+<span class="w">      </span><span class="c1">/// type serializer and inject it into this message serializer</span>
+<span class="w">      </span><span class="n">_pongFancyResponseSerializator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pongFancyResponseSerializator</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
 
-   <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">Serialize</span><span class="p">(</span><span class="n">PongMessage</span> <span class="n">message</span><span class="p">,</span> <span class="kt">int</span> <span class="n">protocolVersion</span><span class="p">,</span> <span class="n">ExamplePeerContext</span> <span class="n">peerContext</span><span class="p">,</span> <span class="n">IBufferWriter</span><span class="p">&lt;</span><span class="kt">byte</span><span class="p">&gt;</span> <span class="n">output</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="n">output</span><span class="p">.</span><span class="n">WriteWithSerializer</span><span class="p">(</span><span class="n">message</span><span class="p">.</span><span class="n">PongFancyResponse</span><span class="p">!,</span> <span class="n">protocolVersion</span><span class="p">,</span> <span class="n">_pongFancyResponseSerializator</span><span class="p">);</span>
-   <span class="p">}</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="nf">Serialize</span><span class="p">(</span><span class="n">PongMessage</span><span class="w"> </span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">protocolVersion</span><span class="p">,</span><span class="w"> </span><span class="n">ExamplePeerContext</span><span class="w"> </span><span class="n">peerContext</span><span class="p">,</span><span class="w"> </span><span class="n">IBufferWriter</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">&gt;</span><span class="w"> </span><span class="n">output</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="n">output</span><span class="p">.</span><span class="n">WriteWithSerializer</span><span class="p">(</span><span class="n">message</span><span class="p">.</span><span class="n">PongFancyResponse</span><span class="o">!</span><span class="p">,</span><span class="w"> </span><span class="n">protocolVersion</span><span class="p">,</span><span class="w"> </span><span class="n">_pongFancyResponseSerializator</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
 
-   <span class="k">public</span> <span class="k">override</span> <span class="n">PongMessage</span> <span class="nf">Deserialize</span><span class="p">(</span><span class="k">ref</span> <span class="n">SequenceReader</span><span class="p">&lt;</span><span class="kt">byte</span><span class="p">&gt;</span> <span class="n">reader</span><span class="p">,</span> <span class="kt">int</span> <span class="n">protocolVersion</span><span class="p">,</span> <span class="n">ExamplePeerContext</span> <span class="n">peerContext</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="k">return</span> <span class="k">new</span> <span class="n">PongMessage</span>
-      <span class="p">{</span>
-         <span class="n">PongFancyResponse</span> <span class="p">=</span> <span class="n">reader</span><span class="p">.</span><span class="n">ReadWithSerializer</span><span class="p">(</span><span class="n">protocolVersion</span><span class="p">,</span> <span class="n">_pongFancyResponseSerializator</span><span class="p">)</span>
-      <span class="p">};</span>
-   <span class="p">}</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="n">PongMessage</span><span class="w"> </span><span class="nf">Deserialize</span><span class="p">(</span><span class="k">ref</span><span class="w"> </span><span class="n">SequenceReader</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">&gt;</span><span class="w"> </span><span class="n">reader</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">protocolVersion</span><span class="p">,</span><span class="w"> </span><span class="n">ExamplePeerContext</span><span class="w"> </span><span class="n">peerContext</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PongMessage</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="n">PongFancyResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">ReadWithSerializer</span><span class="p">(</span><span class="n">protocolVersion</span><span class="p">,</span><span class="w"> </span><span class="n">_pongFancyResponseSerializator</span><span class="p">)</span>
+<span class="w">      </span><span class="p">};</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>What to highlight in this code is: </p>
 <ul class="task-list">
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> PongMessageSerializer declares it's a serializer for the PongMessage by extending <code>ExampleNetworkMessageSerializerBase&lt;PongMessage&gt;</code> (note that the generic type argument is PongMessage)</li>
@@ -1731,7 +1918,7 @@ In this example we implemented four messages: two for the handshake process (bor
 <h3 id="protocol-types-serializers">Protocol Types Serializers</h3>
 <p>When a message contains a complex type like our PongFancyResponse type, we can make use of <code>IProtocolTypeSerializer</code> implementations.</p>
 <p>In our example we have the PongFancryResponseSerializer class that we can study</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1751,29 +1938,28 @@ In this example we implemented four messages: two for the handshake process (bor
 <span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
-<span class="normal">21</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">class</span> <span class="nc">PongFancyResponseSerializer</span> <span class="p">:</span> <span class="n">IProtocolTypeSerializer</span><span class="p">&lt;</span><span class="n">PongFancyResponse</span><span class="p">&gt;</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">PongFancyResponseSerializer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">IProtocolTypeSerializer</span><span class="o">&lt;</span><span class="n">PongFancyResponse</span><span class="o">&gt;</span>
 <span class="p">{</span>
-   <span class="k">public</span> <span class="kt">int</span> <span class="nf">Serialize</span><span class="p">(</span><span class="n">PongFancyResponse</span> <span class="n">typeInstance</span><span class="p">,</span> <span class="kt">int</span> <span class="n">protocolVersion</span><span class="p">,</span> <span class="n">IBufferWriter</span><span class="p">&lt;</span><span class="kt">byte</span><span class="p">&gt;</span> <span class="n">writer</span><span class="p">,</span> <span class="n">ProtocolTypeSerializerOptions</span><span class="p">?</span> <span class="n">options</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span>
-   <span class="p">{</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">Serialize</span><span class="p">(</span><span class="n">PongFancyResponse</span><span class="w"> </span><span class="n">typeInstance</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">protocolVersion</span><span class="p">,</span><span class="w"> </span><span class="n">IBufferWriter</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">&gt;</span><span class="w"> </span><span class="n">writer</span><span class="p">,</span><span class="w"> </span><span class="n">ProtocolTypeSerializerOptions</span><span class="o">?</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
 
-      <span class="kt">int</span> <span class="n">size</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
-      <span class="n">size</span> <span class="p">+=</span> <span class="n">writer</span><span class="p">.</span><span class="n">WriteULong</span><span class="p">(</span><span class="n">typeInstance</span><span class="p">.</span><span class="n">Nonce</span><span class="p">);</span>
-      <span class="n">size</span> <span class="p">+=</span> <span class="n">writer</span><span class="p">.</span><span class="n">WriteVarString</span><span class="p">(</span><span class="n">typeInstance</span><span class="p">.</span><span class="n">Quote</span><span class="p">);</span>
+<span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span>
+<span class="w">      </span><span class="n">size</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">writer</span><span class="p">.</span><span class="n">WriteULong</span><span class="p">(</span><span class="n">typeInstance</span><span class="p">.</span><span class="n">Nonce</span><span class="p">);</span>
+<span class="w">      </span><span class="n">size</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">writer</span><span class="p">.</span><span class="n">WriteVarString</span><span class="p">(</span><span class="n">typeInstance</span><span class="p">.</span><span class="n">Quote</span><span class="p">);</span>
 
-      <span class="k">return</span> <span class="n">size</span><span class="p">;</span>
-   <span class="p">}</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">size</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
 
-   <span class="k">public</span> <span class="n">PongFancyResponse</span> <span class="nf">Deserialize</span><span class="p">(</span><span class="k">ref</span> <span class="n">SequenceReader</span><span class="p">&lt;</span><span class="kt">byte</span><span class="p">&gt;</span> <span class="n">reader</span><span class="p">,</span> <span class="kt">int</span> <span class="n">protocolVersion</span><span class="p">,</span> <span class="n">ProtocolTypeSerializerOptions</span><span class="p">?</span> <span class="n">options</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="k">return</span> <span class="k">new</span> <span class="n">PongFancyResponse</span>
-      <span class="p">{</span>
-         <span class="n">Nonce</span> <span class="p">=</span> <span class="n">reader</span><span class="p">.</span><span class="n">ReadULong</span><span class="p">(),</span>
-         <span class="n">Quote</span> <span class="p">=</span> <span class="n">reader</span><span class="p">.</span><span class="n">ReadVarString</span><span class="p">()</span>
-      <span class="p">};</span>
-   <span class="p">}</span>
+<span class="w">   </span><span class="k">public</span><span class="w"> </span><span class="n">PongFancyResponse</span><span class="w"> </span><span class="nf">Deserialize</span><span class="p">(</span><span class="k">ref</span><span class="w"> </span><span class="n">SequenceReader</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">&gt;</span><span class="w"> </span><span class="n">reader</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">protocolVersion</span><span class="p">,</span><span class="w"> </span><span class="n">ProtocolTypeSerializerOptions</span><span class="o">?</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PongFancyResponse</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="n">Nonce</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">ReadULong</span><span class="p">(),</span>
+<span class="w">         </span><span class="n">Quote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">ReadVarString</span><span class="p">()</span>
+<span class="w">      </span><span class="p">};</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>The logic is similar to message serializer, we have to implement the interface <code>IProtocolTypeSerializer&lt;TComplextype&gt;</code> that requires us to implement the Serialize and Deserialize method.</p>
 <p>In this specific example we can see how an unsigned long and a nullable string are serialized in our protocol implementaiton.</p>
 <div class="admonition tip">
@@ -1791,13 +1977,12 @@ Mithril Shards has a clever way to handle messages: whenever a stream of data ar
 <p>To shed some light on this, let's inspect the PingPongProcessor, whose goal is to process incoming ping requests and reply with pong messages, or generate ping messages after a certain period of time that has elapsed (it's not meant to be an optimized protocol, in such case you'd want to ping only if you don't receive data from the peer for a certain time, but the goal is to keep the example simple in logic but exhaustive as implementation).</p>
 <h4 id="declaration">Declaration</h4>
 <p>This time I'm not including the full class source code but just meaningful snippets, let's start from the declaration:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
-<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">PingPongProcessor</span> <span class="p">:</span> <span class="n">BaseProcessor</span><span class="p">,</span>
-   <span class="n">INetworkMessageHandler</span><span class="p">&lt;</span><span class="n">PingMessage</span><span class="p">&gt;,</span>
-   <span class="n">INetworkMessageHandler</span><span class="p">&lt;</span><span class="n">PongMessage</span><span class="p">&gt;</span>
-</code></pre></div>
-</td></tr></table>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">public</span><span class="w"> </span><span class="k">partial</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">PingPongProcessor</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">BaseProcessor</span><span class="p">,</span>
+<span class="w">   </span><span class="n">INetworkMessageHandler</span><span class="o">&lt;</span><span class="n">PingMessage</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">   </span><span class="n">INetworkMessageHandler</span><span class="o">&lt;</span><span class="n">PongMessage</span><span class="o">&gt;</span>
+</code></pre></div></td></tr></table></div>
 <p>PingPongProcessor inherits from BaseProcessor and is declared as a partial class, because its internal status is declared as an inner class and defined into a nested file PingProcessor.Status.cs.<br />
 This allow us to restrict Status scope while keeping our source more compact.</p>
 <p><img alt="image-20210408173551787" src="../../img/image-20210408173551787.png" /><br />
@@ -1806,7 +1991,7 @@ This allow us to restrict Status scope while keeping our source more compact.</p
 Implementing INetworkMessageHandler generic interface is a way to instruct the Mithril Shards framework that this processor is interested in handling incoming PingMessage and PongMessage.</p>
 <p>Declarative syntax like this allow us to maintain better our code when we have several processors and allow us to have a better control over which process elaborates which messages without much effort.</p>
 <h4 id="constructor">Constructor</h4>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1819,27 +2004,26 @@ Implementing INetworkMessageHandler generic interface is a way to instruct the M
 <span class="normal">11</span>
 <span class="normal">12</span>
 <span class="normal">13</span>
-<span class="normal">14</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="nf">PingPongProcessor</span><span class="p">(</span><span class="n">ILogger</span><span class="p">&lt;</span><span class="n">PingPongProcessor</span><span class="p">&gt;</span> <span class="n">logger</span><span class="p">,</span>
-                           <span class="n">IEventBus</span> <span class="n">eventBus</span><span class="p">,</span>
-                           <span class="n">IPeerBehaviorManager</span> <span class="n">peerBehaviorManager</span><span class="p">,</span>
-                           <span class="n">IRandomNumberGenerator</span> <span class="n">randomNumberGenerator</span><span class="p">,</span>
-                           <span class="n">IDateTimeProvider</span> <span class="n">dateTimeProvider</span><span class="p">,</span>
-                           <span class="n">IPeriodicWork</span> <span class="n">periodicPing</span><span class="p">,</span>
-                           <span class="n">IQuoteService</span> <span class="n">quoteService</span><span class="p">)</span>
-   <span class="p">:</span> <span class="k">base</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">eventBus</span><span class="p">,</span> <span class="n">peerBehaviorManager</span><span class="p">,</span> <span class="n">isHandshakeAware</span><span class="p">:</span> <span class="k">true</span><span class="p">,</span> <span class="n">receiveMessagesOnlyIfHandshaked</span><span class="p">:</span> <span class="k">true</span><span class="p">)</span>
+<span class="normal">14</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">public</span><span class="w"> </span><span class="nf">PingPongProcessor</span><span class="p">(</span><span class="n">ILogger</span><span class="o">&lt;</span><span class="n">PingPongProcessor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">logger</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">IEventBus</span><span class="w"> </span><span class="n">eventBus</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">IPeerBehaviorManager</span><span class="w"> </span><span class="n">peerBehaviorManager</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">IRandomNumberGenerator</span><span class="w"> </span><span class="n">randomNumberGenerator</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">IDateTimeProvider</span><span class="w"> </span><span class="n">dateTimeProvider</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">IPeriodicWork</span><span class="w"> </span><span class="n">periodicPing</span><span class="p">,</span>
+<span class="w">                           </span><span class="n">IQuoteService</span><span class="w"> </span><span class="n">quoteService</span><span class="p">)</span>
+<span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">base</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span><span class="w"> </span><span class="n">eventBus</span><span class="p">,</span><span class="w"> </span><span class="n">peerBehaviorManager</span><span class="p">,</span><span class="w"> </span><span class="n">isHandshakeAware</span><span class="p">:</span><span class="w"> </span><span class="k">true</span><span class="p">,</span><span class="w"> </span><span class="n">receiveMessagesOnlyIfHandshaked</span><span class="p">:</span><span class="w"> </span><span class="k">true</span><span class="p">)</span>
 <span class="p">{</span>
-   <span class="n">_randomNumberGenerator</span> <span class="p">=</span> <span class="n">randomNumberGenerator</span><span class="p">;</span>
-   <span class="n">_dateTimeProvider</span> <span class="p">=</span> <span class="n">dateTimeProvider</span><span class="p">;</span>
-   <span class="n">_periodicPing</span> <span class="p">=</span> <span class="n">periodicPing</span><span class="p">;</span>
-   <span class="n">_quoteService</span> <span class="p">=</span> <span class="n">quoteService</span><span class="p">;</span>
+<span class="w">   </span><span class="n">_randomNumberGenerator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randomNumberGenerator</span><span class="p">;</span>
+<span class="w">   </span><span class="n">_dateTimeProvider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dateTimeProvider</span><span class="p">;</span>
+<span class="w">   </span><span class="n">_periodicPing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">periodicPing</span><span class="p">;</span>
+<span class="w">   </span><span class="n">_quoteService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quoteService</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>The constructor declares which services we need and calls the base constructor passing its needed services.
 I'd emphasize the last 2 base constructor parameter that I've specified by using named arguments to better show their meaning: <code>isHandshakeAware: true, receiveMessagesOnlyIfHandshaked: true</code></p>
 <p>Specifying true to isHandshakeAware means that the processor is handshake aware and when our peer handshake correctly with a remote peer, <code>OnPeerHandshakedAsync</code> method is invoked.<br />
 In our example we uses this information to start a periodic task that ensures that we send a ping request every PING_INTERVAL amount of time</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1869,39 +2053,38 @@ In our example we uses this information to start a periodic task that ensures th
 <span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
-<span class="normal">31</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">protected</span> <span class="k">override</span> <span class="n">ValueTask</span> <span class="nf">OnPeerHandshakedAsync</span><span class="p">()</span>
+<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">protected</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="n">ValueTask</span><span class="w"> </span><span class="nf">OnPeerHandshakedAsync</span><span class="p">()</span>
 <span class="p">{</span>
-   <span class="n">_</span> <span class="p">=</span> <span class="n">_periodicPing</span><span class="p">.</span><span class="n">StartAsync</span><span class="p">(</span>
-         <span class="n">label</span><span class="p">:</span> <span class="s">$&quot;{nameof(_periodicPing)}-{PeerContext.PeerId}&quot;</span><span class="p">,</span>
-         <span class="n">work</span><span class="p">:</span> <span class="n">PingAsync</span><span class="p">,</span>
-         <span class="n">interval</span><span class="p">:</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="n">PING_INTERVAL</span><span class="p">),</span>
-         <span class="n">cancellation</span><span class="p">:</span> <span class="n">PeerContext</span><span class="p">.</span><span class="n">ConnectionCancellationTokenSource</span><span class="p">.</span><span class="n">Token</span>
-      <span class="p">);</span>
+<span class="w">   </span><span class="n">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_periodicPing</span><span class="p">.</span><span class="n">StartAsync</span><span class="p">(</span>
+<span class="w">         </span><span class="n">label</span><span class="p">:</span><span class="w"> </span><span class="s">$&quot;{nameof(_periodicPing)}-{PeerContext.PeerId}&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="n">work</span><span class="p">:</span><span class="w"> </span><span class="n">PingAsync</span><span class="p">,</span>
+<span class="w">         </span><span class="n">interval</span><span class="p">:</span><span class="w"> </span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="n">PING_INTERVAL</span><span class="p">),</span>
+<span class="w">         </span><span class="n">cancellation</span><span class="p">:</span><span class="w"> </span><span class="n">PeerContext</span><span class="p">.</span><span class="n">ConnectionCancellationTokenSource</span><span class="p">.</span><span class="n">Token</span>
+<span class="w">      </span><span class="p">);</span>
 
-   <span class="k">return</span> <span class="k">default</span><span class="p">;</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="k">default</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="k">private</span> <span class="k">async</span> <span class="n">Task</span> <span class="nf">PingAsync</span><span class="p">(</span><span class="n">CancellationToken</span> <span class="n">cancellationToken</span><span class="p">)</span>
+<span class="k">private</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">PingAsync</span><span class="p">(</span><span class="n">CancellationToken</span><span class="w"> </span><span class="n">cancellationToken</span><span class="p">)</span>
 <span class="p">{</span>
-   <span class="kt">var</span> <span class="n">ping</span> <span class="p">=</span> <span class="k">new</span> <span class="n">PingMessage</span><span class="p">();</span>
-   <span class="n">ping</span><span class="p">.</span><span class="n">Nonce</span> <span class="p">=</span> <span class="n">_randomNumberGenerator</span><span class="p">.</span><span class="n">GetUint64</span><span class="p">();</span>
+<span class="w">   </span><span class="kt">var</span><span class="w"> </span><span class="n">ping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PingMessage</span><span class="p">();</span>
+<span class="w">   </span><span class="n">ping</span><span class="p">.</span><span class="n">Nonce</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_randomNumberGenerator</span><span class="p">.</span><span class="n">GetUint64</span><span class="p">();</span>
 
-   <span class="k">await</span> <span class="nf">SendMessageAsync</span><span class="p">(</span><span class="n">ping</span><span class="p">).</span><span class="n">ConfigureAwait</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+<span class="w">   </span><span class="k">await</span><span class="w"> </span><span class="nf">SendMessageAsync</span><span class="p">(</span><span class="n">ping</span><span class="p">).</span><span class="n">ConfigureAwait</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
 
-   <span class="n">_status</span><span class="p">.</span><span class="n">PingSent</span><span class="p">(</span><span class="n">_dateTimeProvider</span><span class="p">.</span><span class="n">GetTimeMicros</span><span class="p">(),</span> <span class="n">ping</span><span class="p">);</span>
-   <span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Sent ping request with nonce {PingNonce}&quot;</span><span class="p">,</span> <span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="p">);</span>
+<span class="w">   </span><span class="n">_status</span><span class="p">.</span><span class="n">PingSent</span><span class="p">(</span><span class="n">_dateTimeProvider</span><span class="p">.</span><span class="n">GetTimeMicros</span><span class="p">(),</span><span class="w"> </span><span class="n">ping</span><span class="p">);</span>
+<span class="w">   </span><span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Sent ping request with nonce {PingNonce}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="p">);</span>
 
-   <span class="c1">//in case of memory leak, investigate this.</span>
-   <span class="n">_pingCancellationTokenSource</span> <span class="p">=</span> <span class="n">CancellationTokenSource</span><span class="p">.</span><span class="n">CreateLinkedTokenSource</span><span class="p">(</span><span class="n">cancellationToken</span><span class="p">);</span>
+<span class="w">   </span><span class="c1">//in case of memory leak, investigate this.</span>
+<span class="w">   </span><span class="n">_pingCancellationTokenSource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CancellationTokenSource</span><span class="p">.</span><span class="n">CreateLinkedTokenSource</span><span class="p">(</span><span class="n">cancellationToken</span><span class="p">);</span>
 
-   <span class="c1">// ensures the handshake is performed timely</span>
-   <span class="k">await</span> <span class="nf">DisconnectIfAsync</span><span class="p">(()</span> <span class="p">=&gt;</span>
-   <span class="p">{</span>
-      <span class="k">return</span> <span class="k">new</span> <span class="n">ValueTask</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;(</span><span class="n">_status</span><span class="p">.</span><span class="n">PingResponseTime</span> <span class="p">==</span> <span class="m">0</span><span class="p">);</span>
-   <span class="p">},</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="n">TIMEOUT_INTERVAL</span><span class="p">),</span> <span class="s">&quot;Pong not received in time&quot;</span><span class="p">,</span> <span class="n">_pingCancellationTokenSource</span><span class="p">.</span><span class="n">Token</span><span class="p">).</span><span class="n">ConfigureAwait</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+<span class="w">   </span><span class="c1">// ensures the handshake is performed timely</span>
+<span class="w">   </span><span class="k">await</span><span class="w"> </span><span class="nf">DisconnectIfAsync</span><span class="p">(()</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ValueTask</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_status</span><span class="p">.</span><span class="n">PingResponseTime</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">);</span>
+<span class="w">   </span><span class="p">},</span><span class="w"> </span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="n">TIMEOUT_INTERVAL</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Pong not received in time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_pingCancellationTokenSource</span><span class="p">.</span><span class="n">Token</span><span class="p">).</span><span class="n">ConfigureAwait</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>The call to <code>DisconnectIfAsync</code> within PingAsync method, ensures that if the other peers doesn't reply to us with a proper pong messages, we disconnect from the remote peer.<br />
 The action passed to DisconnectIfAsync gets evaluated when the time specified by <code>TimeSpan.FromSeconds(TIMEOUT_INTERVAL)</code> elapses.<br />
 Current status of our processor is held in the inner Status class, when we call its PingSent we are resetting the PingResponseTime to 0.<br />
@@ -1912,7 +2095,7 @@ When we receive a pong message PingResponseTime  is set to a value and thus when
 </div>
 <h4 id="handling-the-pingmessage">Handling the PingMessage</h4>
 <p>As we saw earlier, we declared that the class was implementing INetworkMessageHandler<PingMessage>, this mean that we have to implement its ProcessMessageAsync where we can put our logic to handle the ping message:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1924,21 +2107,20 @@ When we receive a pong message PingResponseTime  is set to a value and thus when
 <span class="normal">10</span>
 <span class="normal">11</span>
 <span class="normal">12</span>
-<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="n">ValueTask</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">INetworkMessageHandler</span><span class="p">&lt;</span><span class="n">PingMessage</span><span class="p">&gt;.</span><span class="n">ProcessMessageAsync</span><span class="p">(</span><span class="n">PingMessage</span> <span class="n">message</span><span class="p">,</span> <span class="n">CancellationToken</span> <span class="n">cancellation</span><span class="p">)</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="n">ValueTask</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">INetworkMessageHandler</span><span class="o">&lt;</span><span class="n">PingMessage</span><span class="o">&gt;</span><span class="p">.</span><span class="n">ProcessMessageAsync</span><span class="p">(</span><span class="n">PingMessage</span><span class="w"> </span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">CancellationToken</span><span class="w"> </span><span class="n">cancellation</span><span class="p">)</span>
 <span class="p">{</span>
-   <span class="k">await</span> <span class="nf">SendMessageAsync</span><span class="p">(</span><span class="k">new</span> <span class="n">PongMessage</span>
-   <span class="p">{</span>
-      <span class="n">PongFancyResponse</span> <span class="p">=</span> <span class="k">new</span> <span class="n">PongFancyResponse</span>
-      <span class="p">{</span>
-         <span class="n">Nonce</span> <span class="p">=</span> <span class="n">message</span><span class="p">.</span><span class="n">Nonce</span><span class="p">,</span>
-         <span class="n">Quote</span> <span class="p">=</span> <span class="n">_quoteService</span><span class="p">.</span><span class="n">GetRandomQuote</span><span class="p">()</span>
-      <span class="p">}</span>
-   <span class="p">}).</span><span class="n">ConfigureAwait</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+<span class="w">   </span><span class="k">await</span><span class="w"> </span><span class="nf">SendMessageAsync</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">PongMessage</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="n">PongFancyResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PongFancyResponse</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="n">Nonce</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">message</span><span class="p">.</span><span class="n">Nonce</span><span class="p">,</span>
+<span class="w">         </span><span class="n">Quote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_quoteService</span><span class="p">.</span><span class="n">GetRandomQuote</span><span class="p">()</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}).</span><span class="n">ConfigureAwait</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
 
-   <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="k">true</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>This method is pretty simple, it just sends an async PongMessage, returning the original ping Nonce and a random quote picked from the IQuoteService implementation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1946,7 +2128,7 @@ When we receive a pong message PingResponseTime  is set to a value and thus when
 </div>
 <h4 id="handling-the-pongmessage">Handling the PongMessage</h4>
 <p>Similarly to the PingMessage handler, we implements PongMessage:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -1960,27 +2142,26 @@ When we receive a pong message PingResponseTime  is set to a value and thus when
 <span class="normal">12</span>
 <span class="normal">13</span>
 <span class="normal">14</span>
-<span class="normal">15</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="n">ValueTask</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">INetworkMessageHandler</span><span class="p">&lt;</span><span class="n">PongMessage</span><span class="p">&gt;.</span><span class="n">ProcessMessageAsync</span><span class="p">(</span><span class="n">PongMessage</span> <span class="n">message</span><span class="p">,</span> <span class="n">CancellationToken</span> <span class="n">cancellation</span><span class="p">)</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">ValueTask</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">INetworkMessageHandler</span><span class="o">&lt;</span><span class="n">PongMessage</span><span class="o">&gt;</span><span class="p">.</span><span class="n">ProcessMessageAsync</span><span class="p">(</span><span class="n">PongMessage</span><span class="w"> </span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="n">CancellationToken</span><span class="w"> </span><span class="n">cancellation</span><span class="p">)</span>
 <span class="p">{</span>
-   <span class="k">if</span> <span class="p">(</span><span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span> <span class="p">!=</span> <span class="m">0</span> <span class="p">&amp;&amp;</span> <span class="n">message</span><span class="p">.</span><span class="n">PongFancyResponse</span><span class="p">?.</span><span class="n">Nonce</span> <span class="p">==</span> <span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="p">)</span>
-   <span class="p">{</span>
-      <span class="p">(</span><span class="kt">ulong</span> <span class="n">Nonce</span><span class="p">,</span> <span class="kt">long</span> <span class="n">RoundTrip</span><span class="p">)</span> <span class="p">=</span> <span class="n">_status</span><span class="p">.</span><span class="n">PongReceived</span><span class="p">(</span><span class="n">_dateTimeProvider</span><span class="p">.</span><span class="n">GetTimeMicros</span><span class="p">());</span>
-      <span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Received pong with nonce {PingNonce} in {PingRoundTrip} usec. {Quote}&quot;</span><span class="p">,</span> <span class="n">Nonce</span><span class="p">,</span> <span class="n">RoundTrip</span><span class="p">,</span> <span class="n">message</span><span class="p">.</span><span class="n">PongFancyResponse</span><span class="p">.</span><span class="n">Quote</span><span class="p">);</span>
-      <span class="n">_pingCancellationTokenSource</span><span class="p">.</span><span class="n">Cancel</span><span class="p">();</span>
-   <span class="p">}</span>
-   <span class="k">else</span>
-   <span class="p">{</span>
-      <span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Received pong with wrong nonce: {PingNonce}&quot;</span><span class="p">,</span> <span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="p">);</span>
-   <span class="p">}</span>
+<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">.</span><span class="n">PongFancyResponse</span><span class="o">?.</span><span class="n">Nonce</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="p">)</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="p">(</span><span class="kt">ulong</span><span class="w"> </span><span class="n">Nonce</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">RoundTrip</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_status</span><span class="p">.</span><span class="n">PongReceived</span><span class="p">(</span><span class="n">_dateTimeProvider</span><span class="p">.</span><span class="n">GetTimeMicros</span><span class="p">());</span>
+<span class="w">      </span><span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Received pong with nonce {PingNonce} in {PingRoundTrip} usec. {Quote}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Nonce</span><span class="p">,</span><span class="w"> </span><span class="n">RoundTrip</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="p">.</span><span class="n">PongFancyResponse</span><span class="p">.</span><span class="n">Quote</span><span class="p">);</span>
+<span class="w">      </span><span class="n">_pingCancellationTokenSource</span><span class="p">.</span><span class="n">Cancel</span><span class="p">();</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="w">   </span><span class="k">else</span>
+<span class="w">   </span><span class="p">{</span>
+<span class="w">      </span><span class="n">logger</span><span class="p">.</span><span class="n">LogDebug</span><span class="p">(</span><span class="s">&quot;Received pong with wrong nonce: {PingNonce}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_status</span><span class="p">.</span><span class="n">PingRequestNonce</span><span class="p">);</span>
+<span class="w">   </span><span class="p">}</span>
 
-   <span class="k">return</span> <span class="k">new</span> <span class="n">ValueTask</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;(</span><span class="k">true</span><span class="p">);</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ValueTask</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>In this method we check that the returned Nonce is the same of our last ping request, if so we update our internal status to signal that we received the pong message.</p>
 <h2 id="add-the-shard-into-the-forge">Add the shard into the forge</h2>
 <p>To add the shard to the forge, the [IForgeBuilder] extension <code>UseExample</code> in ForgeBuilderExtensions class has to be used, here what it does:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -2006,35 +2187,34 @@ When we receive a pong message PingResponseTime  is set to a value and thus when
 <span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
-<span class="normal">27</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
+<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">/// &lt;summary&gt;</span>
 <span class="c1">/// Inject the Example shard.</span>
 <span class="c1">/// &lt;/summary&gt;</span>
 <span class="c1">/// &lt;param name=&quot;forgeBuilder&quot;&gt;The forge builder.&lt;/param&gt;</span>
 <span class="c1">/// &lt;param name=&quot;minimumSupportedVersion&quot;&gt;The minimum version local nodes requires in order to connect to other peers.&lt;/param&gt;</span>
 <span class="c1">/// &lt;param name=&quot;currentVersion&quot;&gt;The current version local peer aim to use with connected peers.&lt;/param&gt;</span>
 <span class="c1">/// &lt;returns&gt;&lt;/returns&gt;</span>
-<span class="k">public</span> <span class="k">static</span> <span class="n">IForgeBuilder</span> <span class="nf">UseExample</span><span class="p">(</span><span class="k">this</span> <span class="n">IForgeBuilder</span> <span class="n">forgeBuilder</span><span class="p">,</span> <span class="kt">int</span> <span class="n">minimumSupportedVersion</span><span class="p">,</span> <span class="kt">int</span> <span class="n">currentVersion</span><span class="p">)</span>
+<span class="k">public</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">IForgeBuilder</span><span class="w"> </span><span class="nf">UseExample</span><span class="p">(</span><span class="k">this</span><span class="w"> </span><span class="n">IForgeBuilder</span><span class="w"> </span><span class="n">forgeBuilder</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">minimumSupportedVersion</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">currentVersion</span><span class="p">)</span>
 <span class="p">{</span>
-   <span class="k">if</span> <span class="p">(</span><span class="n">forgeBuilder</span> <span class="k">is</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="n">ArgumentNullException</span><span class="p">(</span><span class="n">nameof</span><span class="p">(</span><span class="n">forgeBuilder</span><span class="p">));</span>
+<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">forgeBuilder</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArgumentNullException</span><span class="p">(</span><span class="n">nameof</span><span class="p">(</span><span class="n">forgeBuilder</span><span class="p">));</span>
 
-   <span class="n">forgeBuilder</span><span class="p">.</span><span class="n">AddShard</span><span class="p">&lt;</span><span class="n">ExampleShard</span><span class="p">,</span> <span class="n">ExampleSettings</span><span class="p">&gt;(</span>
-      <span class="p">(</span><span class="n">hostBuildContext</span><span class="p">,</span> <span class="n">services</span><span class="p">)</span> <span class="p">=&gt;</span>
-      <span class="p">{</span>
-         <span class="n">services</span>
-            <span class="p">.</span><span class="n">AddSingleton</span><span class="p">(</span><span class="k">new</span> <span class="n">NodeImplementation</span><span class="p">(</span><span class="n">minimumSupportedVersion</span><span class="p">,</span> <span class="n">currentVersion</span><span class="p">))</span>
-            <span class="p">.</span><span class="n">AddSingleton</span><span class="p">&lt;</span><span class="n">IDateTimeProvider</span><span class="p">,</span> <span class="n">DateTimeProvider</span><span class="p">&gt;()</span>
-            <span class="p">.</span><span class="n">AddSingleton</span><span class="p">&lt;</span><span class="n">IQuoteService</span><span class="p">,</span> <span class="n">QuoteService</span><span class="p">&gt;()</span>
-            <span class="p">.</span><span class="n">AddPeerGuards</span><span class="p">()</span>
-            <span class="p">.</span><span class="n">AddMessageSerializers</span><span class="p">()</span>
-            <span class="p">.</span><span class="n">AddProtocolTypeSerializers</span><span class="p">()</span>
-            <span class="p">.</span><span class="n">AddMessageProcessors</span><span class="p">()</span>
-            <span class="p">.</span><span class="n">ReplaceServices</span><span class="p">();</span>
-      <span class="p">});</span>
+<span class="w">   </span><span class="n">forgeBuilder</span><span class="p">.</span><span class="n">AddShard</span><span class="o">&lt;</span><span class="n">ExampleShard</span><span class="p">,</span><span class="w"> </span><span class="n">ExampleSettings</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">      </span><span class="p">(</span><span class="n">hostBuildContext</span><span class="p">,</span><span class="w"> </span><span class="n">services</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">         </span><span class="n">services</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddSingleton</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">NodeImplementation</span><span class="p">(</span><span class="n">minimumSupportedVersion</span><span class="p">,</span><span class="w"> </span><span class="n">currentVersion</span><span class="p">))</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddSingleton</span><span class="o">&lt;</span><span class="n">IDateTimeProvider</span><span class="p">,</span><span class="w"> </span><span class="n">DateTimeProvider</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddSingleton</span><span class="o">&lt;</span><span class="n">IQuoteService</span><span class="p">,</span><span class="w"> </span><span class="n">QuoteService</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddPeerGuards</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddMessageSerializers</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddProtocolTypeSerializers</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddMessageProcessors</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">ReplaceServices</span><span class="p">();</span>
+<span class="w">      </span><span class="p">});</span>
 
-   <span class="k">return</span> <span class="n">forgeBuilder</span><span class="p">;</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="n">forgeBuilder</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
+</code></pre></div></td></tr></table></div>
 <p>As you can see it makes use of AddShard method to register the <a href="#exampleshard">ExampleShard</a> and specify its settings (<a href="#examplesettings">ExampleSettings</a>).</p>
 <p>AddShards exposes an action where you can leverage to register custom services, like in this case IDateTimeProvider, IQuoteService and a lot more.<br />
 This is a very important aspect because allows you</p>
@@ -2044,34 +2224,33 @@ This is a very important aspect because allows you</p>
 </div>
 <p>You can check the ForgeBuilderExtensions.cs file in MithrilShards.Example project to see all services registered, for example AddPeerGuards is a method in the same file that adds some [IServerPeerConnectionGuard]).<br />
 AddMessageSerializers and AddProtocolTypeSerializers are two interesting methods that use reflection to automatically register all [INetworkMessageSerializer] and [IProtocolTypeSerializer] defined in this class without having to manually register each one.</p>
-                
-                  
-                    
 
-<hr>
-<div class="md-source-date">
+  <hr>
+<div class="md-source-file">
   <small>
     
-      Last update: 2021-04-08
+      Last update:
+      2024-06-21
     
   </small>
 </div>
-                  
-                
-              
-              
-                
 
 
-              
-            </article>
-          </div>
+
+
+
+                
+              </article>
+            </div>
+          
+          
         </div>
         
-          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
             Back to top
-          </a>
+          </button>
         
       </main>
       
@@ -2088,7 +2267,7 @@ AddMessageSerializers and AddProtocolTypeSerializers are two interesting methods
    <!-- Link to previous and/or next page -->
    
    <nav class="md-footer__inner md-grid"
-        aria-label="Footer">
+        aria-label="footer.title">
 
       <!-- Link to previous page -->
       
@@ -2096,7 +2275,7 @@ AddMessageSerializers and AddProtocolTypeSerializers are two interesting methods
          class="md-footer__link md-footer__link--prev"
          rel="prev">
          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
          </div>
          <div class="md-footer__title">
             <div class="md-ellipsis">
@@ -2123,7 +2302,7 @@ AddMessageSerializers and AddProtocolTypeSerializers are two interesting methods
             </div>
          </div>
          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
          </div>
       </a>
       
@@ -2145,20 +2324,20 @@ AddMessageSerializers and AddProtocolTypeSerializers are two interesting methods
          </div>
 
          <!-- Social links -->
-         
-  <div class="md-footer-social">
+         <div class="md-social">
+  
+    
+    
+    
     
       
       
-        
-        
-      
-      <a href="https://github.com/MithrilMan/MithrilShards" target="_blank" rel="noopener" title="github.com" class="md-footer-social__link">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
-      </a>
     
-  </div>
-
+    <a href="https://github.com/MithrilMan/MithrilShards" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+</div>
       </div>
    </div>
 </footer>
@@ -2167,10 +2346,11 @@ AddMessageSerializers and AddProtocolTypeSerializers are two interesting methods
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.fcfe8b6d.min.js", "version": null}</script>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.top"], "search": "../../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.b1047164.min.js"></script>
+      <script src="../../assets/javascripts/bundle.dff1b7c8.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@8.8.3/dist/mermaid.min.js"></script>
       
