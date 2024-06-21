@@ -36,7 +36,7 @@ public class ExampleController : MithrilControllerBase
 
 ### Define the area
 
-Line 1 describes, using [AreaAttribute](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.areaattribute?view=aspnetcore-5.0){:target="_blank"}, the area we want this controller to be included.
+Line 1 describes, using [AreaAttribute](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.areaattribute?view=aspnetcore-8.0){:target="_blank"}, the area we want this controller to be included.
 
 WebApiArea is an helper class that just contains a bounch of constant string of known areas: "api" and "dev".
 
@@ -92,7 +92,7 @@ Lines 13-18 declare and implement an action.
 In this case, the action is declared as `HttpGet`, this mean that it will only respond to GET requests. If you try to access that action with others HTTP verbs, it will return a status error `405 Method Not Allowed`
 
 `[ProducesResponseType(StatusCodes.Status200OK)]` declare known action status that can be returned by the action.
-It's just an helpful attribute useful to produce a better documentation on swagger interface and document definition but the action itself may even generate different statuses. This documentation however don't cover canonical Web API implementation, so [refer to .Net documentation](https://docs.microsoft.com/it-it/aspnet/core/web-api/advanced/conventions?view=aspnetcore-5.0){:target="_blank"}. to read more about it.
+It's just an helpful attribute useful to produce a better documentation on swagger interface and document definition but the action itself may even generate different statuses. This documentation however don't cover canonical Web API implementation, so [refer to .Net documentation](https://learn.microsoft.com/en-us/aspnet/core/web-api/advanced/conventions?view=aspnetcore-8.0){:target="_blank"}. to read more about it.
 
 To return an action result, the method `Ok` is invoked, passing the payload (that will be serialized in JSON) as a response.
 
@@ -132,12 +132,12 @@ public IActionResult Connect(PeerManagementConnectRequest request)
 In this example, this action will return 404 (not found) if the member variables _requiredConnection isn't set, or 400 (bad request) if the input peer isn't formatted properly as a valid endpoint. If everything goes fine it will instead return 200 (ok).
 
 !!! tip
-	In case of action problems, instead of calling BadRequest or Problem method extensions, use `ValidationProblem`, it uses a ValidationProblemDetails response that's consistent with automatic validation error responses, [as stated here](https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-5.0#default-badrequest-response){:target="_blank"}.
+	In case of action problems, instead of calling BadRequest or Problem method extensions, use `ValidationProblem`, it uses a ValidationProblemDetails response that's consistent with automatic validation error responses, [as stated here](https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-8.0#default-badrequest-response){:target="_blank"}.
 	In the example above, NotFound could be replaced with ValidationProblem too for a consistent behavior.
 
 ### Producing documentation for Swagger UI
 
-In order to produce proper documentation to be shown on Swagger UI, [XML comments within C#](https://docs.microsoft.com/it-it/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-5.0&tabs=visual-studio#xml-comments){:target="_blank"} source can be used but the build process has to generate a documentation file.
+In order to produce proper documentation to be shown on Swagger UI, [XML comments within C#](https://docs.microsoft.com/it-it/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-8.0&tabs=visual-studio#xml-comments){:target="_blank"} source can be used but the build process has to generate a documentation file.
 
 The easier way is to edit your project file adding this snippet:
 

@@ -12,7 +12,7 @@ Pretending to be into a Tolkien universe, I thought of defining features as *sha
 
 To find analogies with .net naming conventions:
 
-- **Forge** (to be more precise, **ForgeBuilder**) is a [HostBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.hostbuilder?view=dotnet-plat-ext-5.0){:target="_blank"} on steroids (actually it encapsulate a HostBuilder instance).
+- **Forge** (to be more precise, **ForgeBuilder**) is a [HostBuilder](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.hostbuilder?view=net-8.0){:target="_blank"} on steroids (actually it encapsulate a HostBuilder instance).
 - **Shard** is an application part that gets merged into the hostbuilder, using dependency injection, extending its functionality 
 - **Artifact** is just an allegoric view of the result of `forgeBuilderInstance.RunConsoleAsync()`.
 
