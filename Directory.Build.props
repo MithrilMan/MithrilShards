@@ -2,7 +2,7 @@
    <PropertyGroup>
       <Copyright>2024 Mithril Man.</Copyright>
 
-		<VersionPrefix>0.3.0</VersionPrefix>
+		<VersionPrefix>0.4.0</VersionPrefix>
 		
       <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>

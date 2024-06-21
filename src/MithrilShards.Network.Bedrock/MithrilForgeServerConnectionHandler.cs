@@ -17,43 +17,30 @@ using MithrilShards.Core.Network.Server.Guards;
 
 namespace MithrilShards.Network.Bedrock;
 
-public class MithrilForgeServerConnectionHandler : ConnectionHandler
+public class MithrilForgeServerConnectionHandler(
+   ILogger<MithrilForgeServerConnectionHandler> logger,
+   IServiceProvider serviceProvider,
+   IEventBus eventBus,
+   IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
+   INetworkMessageProcessorFactory networkMessageProcessorFactory,
+   IPeerContextFactory peerContextFactory) : ConnectionHandler
 {
-   private readonly ILogger _logger;
-   private readonly IServiceProvider _serviceProvider;
-   private readonly IEventBus _eventBus;
-   private readonly IEnumerable<IServerPeerConnectionGuard> _serverPeerConnectionGuards;
-   private readonly INetworkMessageProcessorFactory _networkMessageProcessorFactory;
-   private readonly IPeerContextFactory _peerContextFactory;
-
-   public MithrilForgeServerConnectionHandler(ILogger<MithrilForgeServerConnectionHandler> logger,
-                                              IServiceProvider serviceProvider,
-                                              IEventBus eventBus,
-                                              IEnumerable<IServerPeerConnectionGuard> serverPeerConnectionGuards,
-                                              INetworkMessageProcessorFactory networkMessageProcessorFactory,
-                                              IPeerContextFactory peerContextFactory)
-   {
-      _logger = logger;
-      _serviceProvider = serviceProvider;
-      _eventBus = eventBus;
-      _serverPeerConnectionGuards = serverPeerConnectionGuards;
-      _networkMessageProcessorFactory = networkMessageProcessorFactory;
-      _peerContextFactory = peerContextFactory;
-   }
 
    public override async Task OnConnectedAsync(ConnectionContext connection)
    {
       ArgumentNullException.ThrowIfNull(connection);
 
-      using var _ = _logger.BeginScope("Peer {PeerId} connected to server {ServerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
+      using var serviceProviderScope = serviceProvider.CreateScope();
+      using var _ = logger.BeginScope("Peer {PeerId} connected to server {ServerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
 
       ProtocolReader reader = connection.CreateReader();
-      INetworkProtocolMessageSerializer protocol = _serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
+      var protocolSerializer = serviceProviderScope.ServiceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
-      IPeerContext peerContext = _peerContextFactory.CreateIncomingPeerContext(connection.ConnectionId,
-                                                                                         connection.LocalEndPoint!.AsIPEndPoint().EnsureIPv6(),
-                                                                                         connection.RemoteEndPoint!.AsIPEndPoint().EnsureIPv6(),
-                                                                                         new NetworkMessageWriter(protocol, connection.CreateWriter()));
+      IPeerContext peerContext = peerContextFactory.CreateIncomingPeerContext(
+         connection.ConnectionId,
+         connection.LocalEndPoint!.AsIPEndPoint().EnsureIPv6(),
+         connection.RemoteEndPoint!.AsIPEndPoint().EnsureIPv6(),
+         new NetworkMessageWriter(protocolSerializer, connection.CreateWriter()));
 
       // will dispose peerContext when out of scope, see https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync#using-async-disposable
       await using var asyncDisposablePeerContext = peerContext.ConfigureAwait(false);
@@ -64,20 +51,20 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
       });
 
       connection.Features.Set(peerContext);
-      protocol.SetPeerContext(peerContext);
+      protocolSerializer.SetPeerContext(peerContext);
 
       if (await EnsurePeerCanConnectAsync(connection, peerContext).ConfigureAwait(false))
       {
 
-         await _eventBus.PublishAsync(new PeerConnected(peerContext)).ConfigureAwait(false);
+         await eventBus.PublishAsync(new PeerConnected(peerContext)).ConfigureAwait(false);
 
-         await _networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
+         await networkMessageProcessorFactory.StartProcessorsAsync(peerContext).ConfigureAwait(false);
 
          while (true)
          {
             try
             {
-               ProtocolReadResult<INetworkMessage> result = await reader.ReadAsync(protocol).ConfigureAwait(false);
+               ProtocolReadResult<INetworkMessage> result = await reader.ReadAsync(protocolSerializer).ConfigureAwait(false);
 
                if (result.IsCompleted)
                {
@@ -88,7 +75,7 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
             }
             catch (Exception ex)
             {
-               _logger.LogDebug(ex, "Unexpected connection terminated because of {DisconnectionReason}.", ex.Message);
+               logger.LogDebug(ex, "Unexpected connection terminated because of {DisconnectionReason}.", ex.Message);
                break;
             }
             finally
@@ -107,10 +94,10 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
    /// <returns>When criteria is met returns <c>true</c>, to allow connection.</returns>
    private async ValueTask<bool> EnsurePeerCanConnectAsync(ConnectionContext connection, IPeerContext peerContext)
    {
-      if (_serverPeerConnectionGuards == null) return false;
+      if (serverPeerConnectionGuards == null) return false;
 
       ServerPeerConnectionGuardResult? result = (
-         from guard in _serverPeerConnectionGuards
+         from guard in serverPeerConnectionGuards
          let guardResult = guard.Check(peerContext)
          where guardResult.IsDenied
          select guardResult
@@ -122,9 +109,9 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
 
       if (result.IsDenied)
       {
-         _logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected because of {ClientDisconnectedReason} and will be closed.", connection.RemoteEndPoint, result.DenyReason);
+         logger.LogDebug("Connection from client '{ConnectingPeerEndPoint}' was rejected because of {ClientDisconnectedReason} and will be closed.", connection.RemoteEndPoint, result.DenyReason);
          connection.Abort(new ConnectionAbortedException(result.DenyReason));
-         await _eventBus.PublishAsync(new PeerConnectionRejected(peerContext, result.DenyReason)).ConfigureAwait(false);
+         await eventBus.PublishAsync(new PeerConnectionRejected(peerContext, result.DenyReason)).ConfigureAwait(false);
          return false;
       }
 
@@ -133,12 +120,12 @@ public class MithrilForgeServerConnectionHandler : ConnectionHandler
 
    private async Task ProcessMessageAsync(INetworkMessage message, IPeerContext peerContext, CancellationToken cancellation)
    {
-      using var _ = _logger.BeginScope("Processing message '{Command}'", message.Command);
+      using var _ = logger.BeginScope("Processing message '{Command}'", message.Command);
 
       if (message is not UnknownMessage)
       {
-         await _networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
-         await _eventBus.PublishAsync(new PeerMessageReceived(peerContext, message), cancellation).ConfigureAwait(false);
+         await networkMessageProcessorFactory.ProcessMessageAsync(message, peerContext, cancellation).ConfigureAwait(false);
+         await eventBus.PublishAsync(new PeerMessageReceived(peerContext, message), cancellation).ConfigureAwait(false);
       }
    }
 }
