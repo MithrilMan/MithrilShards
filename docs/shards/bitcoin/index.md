@@ -30,7 +30,7 @@ Also if you have question or want to discuss about technical details, you can us
 ## Project Overview
 
 **Bitcoin Mithril Shard** has been built on top of **Mithril Shards** framework.
-Mithril Shards goal is to be a framework and toolkit to build *<u>modular and distributed/P2P applications using .Net 6</u>* stack, focusing both on good design, good practices and performance.
+Mithril Shards goal is to be a framework and toolkit to build *<u>modular and distributed/P2P applications using .Net 8</u>* stack, focusing both on good design, good practices and performance.
 
 Core functionalities can be glued togheter to compose the needed application, ranging from a P2P network layer, Web Api layer, Diagnostic tools, cross platform UI based on blazor, distributed eventing using SignalR, MQ brokers like RabbitMq or any kind of other useful libraries.
 

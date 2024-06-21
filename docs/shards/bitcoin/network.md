@@ -23,7 +23,7 @@ Before being able to handshake, whenever a connection has been established betwe
 
 ## Peer Context
 
-Default Mithril Shards implementation uses `PeerContext` class to store, among other things, information like peer unique identification, direction (inbound/outbound) remote and local endpoints, user agent identification, negotiated protocol version and other attachable properties leveraging the .Net [IFeatureCollection](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.features.ifeaturecollection?view=aspnetcore-5.0){:target="_blank"} interface.
+Default Mithril Shards implementation uses `PeerContext` class to store, among other things, information like peer unique identification, direction (inbound/outbound) remote and local endpoints, user agent identification, negotiated protocol version and other attachable properties leveraging the .Net [IFeatureCollection](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.features.ifeaturecollection?view=aspnetcore-8.0){:target="_blank"} interface.
 
 Bitcoin needs some additional information and some of the properties that are ubiquitous needed among all optional Bitcoin features (shards) like wallet, APIs, indexer, etc... have been defined directly into `BitcoinPeerContext` that extends the default `PeerContext`. Some of the additional properties are Permissions (that may change the FN behavior based on its set) and TimeOffset, that's an important aspect for the consensus logic.
 

@@ -87,7 +87,7 @@ public class ExampleClientPeerBinding
 
 ExampleClientPeerBinding class has an EndPoint property that represents the endpoint (IP:Address) of a remote node we'd like to connect to and it's decorated with attributes that are used to validate the configuration during the initialization of the forge.
 
-Validation of the settings make use of [System.ComponentModel.DataAnnotations](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations?view=net-5.0){:target="_blank"} and [RequiredAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations.requiredattribute?view=net-5.0){:target="_blank"} used in the example is one of those attribute that belongs to standard set.  
+Validation of the settings make use of [System.ComponentModel.DataAnnotations](https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations?view=net-8.0){:target="_blank"} and [RequiredAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations.requiredattribute?view=net-8.0){:target="_blank"} used in the example is one of those attribute that belongs to standard set.  
 A different story is [IPEndPointValidator]:
 
 ```c#

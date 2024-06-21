@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MithrilShards.Core.EventBus;
-using MithrilShards.Core.Extensions;
 using MithrilShards.Core.Network;
 using MithrilShards.Core.Network.Client;
 using MithrilShards.Core.Network.Events;
@@ -34,7 +33,7 @@ public class MithrilForgeClientConnectionHandler(
       using var _ = logger.BeginScope("Peer {PeerId} connected to outbound {PeerEndpoint}", connection.ConnectionId, connection.LocalEndPoint);
 
       ProtocolReader reader = connection.CreateReader();
-      INetworkProtocolMessageSerializer protocol = serviceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
+      INetworkProtocolMessageSerializer protocol = serviceProviderScope.ServiceProvider.GetRequiredService<INetworkProtocolMessageSerializer>();
 
       IPeerContext peerContext = peerContextFactory.CreateOutgoingPeerContext(connection.ConnectionId,
                                                                                          connection.LocalEndPoint!,

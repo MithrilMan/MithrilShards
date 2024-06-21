@@ -6,7 +6,7 @@ description: Mithril Shards home page
 
 ## Goal
 
-Mithril Shards goal is to implement a .NET 6 extensible P2P network & distributed services library from scratch with focus on architecture and performance.
+Mithril Shards goal is to implement a .NET 8 extensible P2P network & distributed services library from scratch with focus on architecture and performance.
 
 Allows you to define custom network serialization protocol, easily handle payload messages and interact with the software leveraging any available features (named Shards) like Web API endpoints, cross platform Blazor UI,  and a lot of other exciting stuffs that community can implement and release to the public too!
 
@@ -18,7 +18,7 @@ The project is very ambitious and it's currently developed just by me as a pet p
 
 A random list of available tech used within Mithril Shards.
 
-- [.Net 6](https://dotnet.microsoft.com/download/dotnet/6.0){:target="_blank"} - ... for everything.
+- [.Net 8](https://dotnet.microsoft.com/download/dotnet/8.0){:target="_blank"} - ... for everything.
 - [Bedrock Framework](https://github.com/davidfowl/BedrockFramework/){:target="_blank"} - TCP/IP default connectivity implementation.
 - [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore){:target="_blank"} - to handle Web API in a configurable, multi-area environment and have a playground to test APIs with swagger.
 - [Serilog](https://github.com/serilog/serilog-aspnetcore){:target="_blank"} - default logging implementation.

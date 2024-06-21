@@ -19,7 +19,7 @@ public static IForgeBuilder UseApi(this IForgeBuilder forgeBuilder, Action<WebAp
 
 WebApiOptions class allows to customize the discovery process that's responsible to find and register Web API controllers end include them into a specific [ApiServiceDefinition](#apiservicedefinition).
 
-The discovery process happens during WebApiShard initialization: it generates an [ApplicationPart](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.applicationparts.applicationpart?view=aspnetcore-5.0){:target="blank"} for each registered shard that will include all discovered `MithrilControllerBase`(ControllerBase) types defined in the shard assembly.
+The discovery process happens during WebApiShard initialization: it generates an [ApplicationPart](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.applicationparts.applicationpart?view=aspnetcore-8.0){:target="blank"} for each registered shard that will include all discovered `MithrilControllerBase`(ControllerBase) types defined in the shard assembly.
 
 ### ControllersSeeker
 
