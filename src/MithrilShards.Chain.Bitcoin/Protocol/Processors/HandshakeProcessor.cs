@@ -16,7 +16,9 @@ namespace MithrilShards.Chain.Bitcoin.Protocol.Processors;
 
 public partial class HandshakeProcessor : BaseProcessor,
    INetworkMessageHandler<VersionMessage>,
-   INetworkMessageHandler<VerackMessage>
+   INetworkMessageHandler<VerackMessage>,
+   INetworkMessageHandler<SendAddrv2Message>, // Task 1.2: Added SendAddrv2Message handler
+   INetworkMessageHandler<WtxidRelayMessage> // Task 1.3: Added WtxidRelayMessage handler
 {
    const int HANDSHAKE_TIMEOUT_SECONDS = 5;
    private readonly HandshakeProcessorStatus _status;
@@ -73,6 +75,14 @@ public partial class HandshakeProcessor : BaseProcessor,
          logger.LogDebug("Commencing handshake with local Version.");
          await SendMessageAsync(CreateVersionMessage()).ConfigureAwait(false);
          _status.VersionSent();
+
+         // Task 1.2: Send SendAddrv2Message after our version message
+         logger.LogDebug("Sending SendAddrv2Message to indicate addrv2 support.");
+         await SendMessageAsync(new SendAddrv2Message()).ConfigureAwait(false);
+
+         // Task 1.3: Send WtxidRelayMessage after SendAddrv2Message
+         logger.LogDebug("Sending WtxidRelayMessage to indicate wtxid relay support.");
+         await SendMessageAsync(new WtxidRelayMessage()).ConfigureAwait(false);
       }
    }
 
@@ -118,28 +128,98 @@ public partial class HandshakeProcessor : BaseProcessor,
          logger.LogDebug("Responding to handshake with local Version.");
          await SendMessageAsync(CreateVersionMessage()).ConfigureAwait(false);
          _status.VersionSent();
+
+         // Task 1.2: Send SendAddrv2Message after our version message
+         logger.LogDebug("Sending SendAddrv2Message to indicate addrv2 support.");
+         await SendMessageAsync(new SendAddrv2Message()).ConfigureAwait(false);
+
+         // Task 1.3: Send WtxidRelayMessage after SendAddrv2Message
+         logger.LogDebug("Sending WtxidRelayMessage to indicate wtxid relay support.");
+         await SendMessageAsync(new WtxidRelayMessage()).ConfigureAwait(false);
       }
 
       await SendMessageAsync(new VerackMessage()).ConfigureAwait(false);
 
-      PeerContext.TimeOffset = _dateTimeProvider.GetTimeOffset() - version.Timestamp;
-
-      if (!peerServiceSupports(NodeServices.Network))
+      if (PeerContext is BitcoinPeerContext bitcoinPeerContextOnVersion)
       {
-         if (!peerServiceSupports(NodeServices.NetworkLimited))
-         {
-            PeerContext.IsClient = true;
-         }
-         else
-         {
-            PeerContext.IsLimitedNode = true;
-         }
+         bitcoinPeerContextOnVersion.TimeOffset = _dateTimeProvider.GetTimeOffset() - version.Timestamp;
       }
-
-      PeerContext.CanServeWitness = peerServiceSupports(NodeServices.Witness);
+      else
+      {
+         logger.LogWarning("PeerContext is not BitcoinPeerContext, cannot set TimeOffset.");
+      }
+      if (PeerContext is BitcoinPeerContext bitcoinPeerContextForServices)
+      {
+         if (!peerServiceSupports(NodeServices.Network))
+         {
+            if (!peerServiceSupports(NodeServices.NetworkLimited))
+            {
+               bitcoinPeerContextForServices.IsClient = true;
+            }
+            else
+            {
+               bitcoinPeerContextForServices.IsLimitedNode = true;
+            }
+         }
+         bitcoinPeerContextForServices.CanServeWitness = peerServiceSupports(NodeServices.Witness);
+      }
+      else
+      {
+         logger.LogWarning("PeerContext is not BitcoinPeerContext, cannot set service flags.");
+      }
 
       // will prevent to handle version messages to other Processors
       return false;
+   }
+
+   // Task 1.2: Handler for SendAddrv2Message
+   async ValueTask<bool> INetworkMessageHandler<SendAddrv2Message>.ProcessMessageAsync(SendAddrv2Message message, CancellationToken cancellation)
+   {
+      if (PeerContext is BitcoinPeerContext bitcoinPeerContext)
+      {
+         if (bitcoinPeerContext.SupportsAddrv2)
+         {
+            logger.LogDebug("Received SendAddrv2Message from a peer that already indicated support. Ignoring.");
+         }
+         else
+         {
+            logger.LogDebug("Received SendAddrv2Message, peer supports addrv2.");
+            bitcoinPeerContext.SupportsAddrv2 = true;
+         }
+      }
+      else
+      {
+         logger.LogWarning("Received SendAddrv2Message, but PeerContext is not BitcoinPeerContext. Cannot set SupportsAddrv2 flag.");
+      }
+
+      // According to BIP155, sendaddrv2 is an empty message.
+      // It doesn't strictly need to be passed to other processors, but returning true allows flexibility if needed.
+      // For now, let's say it's handled and doesn't need further processing.
+      return false; // Message is handled, stop further processing.
+   }
+
+   // Task 1.3: Handler for WtxidRelayMessage
+   async ValueTask<bool> INetworkMessageHandler<WtxidRelayMessage>.ProcessMessageAsync(WtxidRelayMessage message, CancellationToken cancellation)
+   {
+      if (PeerContext is BitcoinPeerContext bitcoinPeerContext)
+      {
+         if (bitcoinPeerContext.SupportsWtxidRelay)
+         {
+            logger.LogDebug("Received WtxidRelayMessage from a peer that already indicated support. Ignoring.");
+         }
+         else
+         {
+            logger.LogDebug("Received WtxidRelayMessage, peer supports wtxid relay.");
+            bitcoinPeerContext.SupportsWtxidRelay = true;
+         }
+      }
+      else
+      {
+         logger.LogWarning("Received WtxidRelayMessage, but PeerContext is not BitcoinPeerContext. Cannot set SupportsWtxidRelay flag.");
+      }
+
+      // WtxidRelayMessage is an empty message and typically doesn't need further processing by other handlers.
+      return false; // Message is handled, stop further processing.
    }
 
    /// <summary>

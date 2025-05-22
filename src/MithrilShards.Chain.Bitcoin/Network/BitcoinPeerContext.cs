@@ -39,6 +39,19 @@ public class BitcoinPeerContext : PeerContext
    /// </summary>
    public BitcoinPeerPermissions Permissions { get; set; } = new BitcoinPeerPermissions();
 
+   /// <summary>
+   /// Gets or sets a value indicating whether the remote peer supports addrv2 (BIP155).
+   /// This is typically set when a 'sendaddrv2' message is received from the peer.
+   /// </summary>
+   public bool SupportsAddrv2 { get; set; } = false;
+
+   /// <summary>
+   /// Gets or sets a value indicating whether the remote peer prefers wtxid-based transaction relay (BIP339).
+   /// This is set when a 'wtxidrelay' message is received from the peer.
+   /// Our node also sends 'wtxidrelay' to indicate its own support.
+   /// </summary>
+   public bool SupportsWtxidRelay { get; set; } = false;
+
    public BitcoinPeerContext(ILogger logger,
                              IEventBus eventBus,
                              PeerConnectionDirection direction,

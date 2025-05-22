@@ -129,6 +129,14 @@ public sealed class KnownVersion
    /// </summary>
    public const int V70015 = 70015;
 
+   /// <summary>
+   /// Protocol version 70016.
+   /// Used by Bitcoin Knots and other nodes. Signifies general capability for post-SegWit features
+   /// and is a safe step for broader compatibility beyond 70015.
+   /// No specific BIPs are tied exclusively to 70016 as a network-wide upgrade,
+   /// but it's used to signal a more up-to-date node.
+   /// </summary>
+   public const int V70016 = 70016;
 
-   public static int CurrentVersion => V70015;
+   public static int CurrentVersion => V70016;
 }

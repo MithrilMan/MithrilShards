@@ -17,24 +17,30 @@ public class BlockSerializer : IProtocolTypeSerializer<Block>
 
    public Block Deserialize(ref SequenceReader<byte> reader, int protocolVersion, ProtocolTypeSerializerOptions? options = null)
    {
-      options = (options ?? new ProtocolTypeSerializerOptions())
-         .Set(SerializerOptions.HEADER_IN_BLOCK, false);
+      // Ensure options is not null and set necessary flags for transactions within a block
+      var txOptions = (options ?? new ProtocolTypeSerializerOptions())
+         .Set(SerializerOptions.HEADER_IN_BLOCK, false) // This option seems specific to header serialization context, not tx
+         .Set(SerializerOptions.SERIALIZE_WITNESS, true); // CRITICAL: Enable witness parsing for transactions in a block
 
       return new Block
       {
-         Header = reader.ReadWithSerializer(protocolVersion, _blockHeaderSerializer, options),
-         Transactions = reader.ReadArray(protocolVersion, _transactionSerializer, options)
+         // Header options should not forcibly include SERIALIZE_WITNESS if it's not relevant for header itself
+         Header = reader.ReadWithSerializer(protocolVersion, _blockHeaderSerializer, options ?? new ProtocolTypeSerializerOptions()),
+         Transactions = reader.ReadArray(protocolVersion, _transactionSerializer, txOptions)
       };
    }
 
    public int Serialize(Block typeInstance, int protocolVersion, IBufferWriter<byte> writer, ProtocolTypeSerializerOptions? options = null)
    {
-      options = (options ?? new ProtocolTypeSerializerOptions())
-         .Set(SerializerOptions.HEADER_IN_BLOCK, false);
+      // Ensure options is not null and set necessary flags for transactions within a block
+      var txOptions = (options ?? new ProtocolTypeSerializerOptions())
+         .Set(SerializerOptions.HEADER_IN_BLOCK, false) // This option seems specific to header serialization context, not tx
+         .Set(SerializerOptions.SERIALIZE_WITNESS, true); // CRITICAL: Enable witness serialization for transactions in a block
 
       int size = 0;
-      size += writer.WriteWithSerializer(typeInstance.Header!, protocolVersion, _blockHeaderSerializer, options);
-      size += writer.WriteArray(typeInstance.Transactions!, protocolVersion, _transactionSerializer, options);
+      // Header options should not forcibly include SERIALIZE_WITNESS if it's not relevant for header itself
+      size += writer.WriteWithSerializer(typeInstance.Header!, protocolVersion, _blockHeaderSerializer, options ?? new ProtocolTypeSerializerOptions());
+      size += writer.WriteArray(typeInstance.Transactions!, protocolVersion, _transactionSerializer, txOptions);
 
       return size;
    }

@@ -57,7 +57,7 @@ public static class ForgeBuilderExtensions
                .AddSingleton(typeof(IChainDefinition), chainDefinitionType)
                .AddSingleton<IConsensusParameters>(serviceProvider => serviceProvider.GetRequiredService<IChainDefinition>().Consensus)
                .AddSingleton<INetworkDefinition>(serviceProvider => serviceProvider.GetRequiredService<IChainDefinition>().NetworkDefinition)
-               .AddSingleton(new NodeImplementation(minimumSupportedVersion, currentVersion))
+               .AddSingleton(new NodeImplementation(KnownVersion.V70012, KnownVersion.CurrentVersion)) // Task 1.1: Use V70012 min and new CurrentVersion
                .AddSingleton<IHeadersTree, HeadersTree>()
                .AddSingleton<IDateTimeProvider, DateTimeProvider>()
                .AddSingleton<IChainState, ChainState>()

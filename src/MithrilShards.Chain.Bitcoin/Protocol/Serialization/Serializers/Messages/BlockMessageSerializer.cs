@@ -25,7 +25,11 @@ public class BlockMessageSerializer : BitcoinNetworkMessageSerializerBase<BlockM
 
    public override BlockMessage Deserialize(ref SequenceReader<byte> reader, int protocolVersion, BitcoinPeerContext peerContext)
    {
-      var options = new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, peerContext.CanServeWitness));
+      // For deserializing a block, we must allow for witness data if it's present in the block,
+      // regardless of what the peer signaled with NODE_WITNESS.
+      // The TransactionSerializer (as of Task 1.6 Step 1) will correctly detect if a tx is SegWit or not.
+      // The BlockSerializer (as of Task 1.6 Step 2) will correctly pass this option to TransactionSerializer.
+      var options = new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, true));
 
       return new BlockMessage { Block = reader.ReadWithSerializer(protocolVersion, _blockSerializer, options) };
    }
