@@ -55,11 +55,34 @@ public class CheckTransactions : IBlockValidationRule
          return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-vout-empty");
       }
 
-      // Size limits (this doesn't take the witness into account, as that hasn't been checked for malleability)
-      int size = _transactionSerializer.Serialize(transaction, KnownVersion.CurrentVersion, new ArrayBufferWriter<byte>(), new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
-      if (size * _consensusParameters.WitnessScaleFactor > _consensusParameters.MaxBlockWeight)
+      // Calculate transaction weight
+      long transactionWeight;
       {
-         return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-oversize");
+         var baseSizeBuffer = new ArrayBufferWriter<byte>();
+         _transactionSerializer.Serialize(transaction, KnownVersion.CurrentVersion, baseSizeBuffer, new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, false)));
+         int baseSize = baseSizeBuffer.WrittenCount;
+
+         if (!transaction.HasWitness())
+         {
+            transactionWeight = (long)baseSize * _consensusParameters.WitnessScaleFactor;
+         }
+         else
+         {
+            var totalSizeBuffer = new ArrayBufferWriter<byte>();
+            _transactionSerializer.Serialize(transaction, KnownVersion.CurrentVersion, totalSizeBuffer, new ProtocolTypeSerializerOptions((SerializerOptions.SERIALIZE_WITNESS, true)));
+            int totalSize = totalSizeBuffer.WrittenCount;
+            // Weight = BaseSize * (WitnessScaleFactor - 1) + TotalSize
+            transactionWeight = (long)baseSize * (_consensusParameters.WitnessScaleFactor - 1) + totalSize;
+         }
+      }
+
+      // Each transaction's weight must not by itself exceed the maximum block weight.
+      // Bitcoin Core also has MAX_STANDARD_TX_WEIGHT (400k) for relay and mempool,
+      // but consensus rules only limit by total block weight.
+      // A single transaction could theoretically be up to MaxBlockWeight.
+      if (transactionWeight > _consensusParameters.MaxBlockWeight)
+      {
+         return state.Invalid(TransactionValidationStateResults.Consensus, "bad-txns-oversize", $"Transaction weight {transactionWeight} exceeds block weight limit {_consensusParameters.MaxBlockWeight}");
       }
 
       // Check for negative or overflow output values (see CVE-2010-5139)

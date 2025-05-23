@@ -116,6 +116,8 @@ public static class ForgeBuilderExtensions
          .AddSingleton<IBlockValidationRule, CheckMerkleRoot>()
          .AddSingleton<IBlockValidationRule, CheckSize>()
          .AddSingleton<IBlockValidationRule, CheckCoinbase>()
+         .AddSingleton<IBlockValidationRule, CheckTransactions>() // Already present but good to ensure it's before witness commitment if it does tx-level segwit checks
+         .AddSingleton<IBlockValidationRule, CheckWitnessCommitment>() // Task 2.1: Added CheckWitnessCommitment rule
          ;
 
       return services;
