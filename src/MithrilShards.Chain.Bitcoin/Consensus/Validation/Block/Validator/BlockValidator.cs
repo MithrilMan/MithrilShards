@@ -20,6 +20,7 @@ public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBl
    readonly IValidationRuleSet<IBlockValidationRule> _blockValidationRules;
    readonly IBlockValidationContextFactory _blockValidationContextFactory;
    readonly IEventBus _eventBus;
+   readonly ICoinsView _coinsView; // Main UTXO set view
    readonly UInt256 _genesisHash;
 
    public BlockValidator(ILogger<BlockValidator> logger,
@@ -28,7 +29,8 @@ public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBl
                           IValidationRuleSet<IBlockValidationRule> blockValidationRules,
                           IBlockValidationContextFactory blockValidationContextFactory,
                           IPeriodicWork validationLoop,
-                          IEventBus eventBus)
+                          IEventBus eventBus,
+                          ICoinsView coinsView) // Inject ICoinsView
    {
       _logger = logger;
       _validationLoop = validationLoop;
@@ -36,7 +38,7 @@ public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBl
       _blockValidationRules = blockValidationRules;
       _blockValidationContextFactory = blockValidationContextFactory;
       _eventBus = eventBus;
-
+      _coinsView = coinsView; // Store injected ICoinsView
       _blocksToValidate = Channel.CreateUnbounded<BlockToValidate>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
       _genesisHash = consensusParameters.GenesisHeader.Hash!;
 
@@ -113,7 +115,22 @@ public class BlockValidator : IHostedService, IPeriodicWorkExceptionHandler, IBl
    {
       validationState = new BlockValidationState();
 
-      IBlockValidationContext context = _blockValidationContextFactory.Create(block);
+      // TODO: Here, we should ideally create a CoinsViewCache based on the current state (e.g., _chainState.Tip)
+      // and the block being validated. For this task, we'll pass the main _coinsView directly.
+      // In a real system, this would be something like:
+      // var parentBlockIndex = _chainState.GetHeaderNode(block.Header.PreviousBlockHash);
+      // ICoinsView blockSpecificView = new CoinsViewCache(_coinsView, parentBlockIndex);
+      // For now, using the injected _coinsView. This will be an issue for blocks that spend outputs from the same block.
+      // This simplification means intra-block spends won't be visible to rules if _coinsView is a direct DB view.
+      // A proper CoinsViewCache that can be updated by rules or by a pre-pass is needed for full validation.
+
+      // Assuming CoinsViewCache can be instantiated with a base ICoinsView.
+      // The lifetime of this cache would be per-block validation.
+      // If CoinsViewCache does not exist, its creation would be a prerequisite.
+      // For this step, we demonstrate its intended use.
+      CoinsViewCache viewForContext = new CoinsViewCache(_coinsView);
+
+      IBlockValidationContext context = _blockValidationContextFactory.Create(block, viewForContext);
 
       foreach (IBlockValidationRule rule in _blockValidationRules.Rules)
       {

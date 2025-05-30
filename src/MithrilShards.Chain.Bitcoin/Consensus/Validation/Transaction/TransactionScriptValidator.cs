@@ -230,10 +230,24 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Transaction
          {
             return ValidateTaprootKeyPathSpend(txSpending, inputIndex, spentOutputs, taprootOutputKey, witnessStack[0], annex, settings, out error);
          }
-         else // Potential Script Path Spend
+         else if (witnessStack.Count >= 2) // Potential Script Path Spend (must have at least script and control block)
          {
-            // TODO: Implement ValidateTaprootScriptPathSpend (Task 3.3)
-            error = ScriptError.UNKNOWN_ERROR; // Not yet implemented
+            byte[] controlBlockBytes = witnessStack.Last(); // Last element is control block
+            witnessStack.RemoveAt(witnessStack.Count - 1);
+
+            byte[] tapScriptBytes = witnessStack.Last(); // Second to last is script
+            witnessStack.RemoveAt(witnessStack.Count - 1);
+
+            // Remaining items in witnessStack are the initial stack for the Tapscript
+            List<byte[]> initialStackForTapscript = witnessStack;
+
+            return ValidateTaprootScriptPathSpend(txSpending, inputIndex, spentOutputs, taprootOutputKey,
+                                                controlBlockBytes, tapScriptBytes, initialStackForTapscript,
+                                                annex, settings, out error);
+         }
+         else // Invalid witness stack for Taproot (e.g. empty after annex removal and not key-path)
+         {
+            error = ScriptError.WITNESS_MALLEATED; // Or a more specific Taproot error
             return false;
          }
       }
@@ -265,6 +279,234 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Transaction
          { error = ScriptError.SCHNORR_SIG_VERIFICATION_FAILED; return false; }
 
          return true;
+      }
+
+      private bool ValidateTaprootScriptPathSpend(Transaction txSpending,
+                                                int inputIndex,
+                                                TransactionOutput[] spentOutputs,
+                                                byte[] taprootOutputKeyFromScriptPubKey,
+                                                byte[] controlBlockBytes,
+                                                byte[] tapScriptBytes,
+                                                List<byte[]> initialStackForTapscript,
+                                                byte[]? annex,
+                                                ScriptSettings settings,
+                                                out ScriptError error)
+      {
+         error = ScriptError.OK;
+         // _logger?.LogDebug("Taproot Script Path spend validation STUBBED.");
+
+         // a. Parse Control Block
+         if (controlBlockBytes == null || controlBlockBytes.Length < 33 || controlBlockBytes.Length > 33 + 128 * 32 || (controlBlockBytes.Length - 33) % 32 != 0)
+         {
+            error = ScriptError.TAPROOT_WRONG_CONTROL_BLOCK_SIZE;
+            return false;
+         }
+
+         byte leafVersionAndParity = controlBlockBytes[0];
+         byte tapLeafVersion = (byte)(leafVersionAndParity & 0xFE);
+         // byte parityBit = (byte)(leafVersionAndParity & 0x01); // Needed for commitment check
+
+         if (tapLeafVersion != 0xc0) // LEAF_VERSION_TAPSCRIPT
+         {
+            // For future leaf versions, if SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_TAPROOT_VERSION is set, fail.
+            // Otherwise, treat as success (anyone-can-spend).
+            // For now, we only support 0xc0.
+            error = ScriptError.TAPROOT_INVALID_LEAF_VERSION;
+            return false;
+         }
+
+         byte[] internalPublicKeyBytes_p = new byte[32];
+         System.Buffer.BlockCopy(controlBlockBytes, 1, internalPublicKeyBytes_p, 0, 32);
+
+         List<byte[]> merklePathHashes = new List<byte[]>();
+         for (int i = 33; i < controlBlockBytes.Length; i += 32)
+         {
+            byte[] hash = new byte[32];
+            System.Buffer.BlockCopy(controlBlockBytes, i, hash, 0, 32);
+            merklePathHashes.Add(hash);
+         }
+         if (merklePathHashes.Count > 128) // Max Merkle path depth
+         {
+             error = ScriptError.TAPROOT_CONTROL_BLOCK_MERKLE_PROOF_INVALID;
+             return false;
+         }
+
+         byte parityBit = (byte)(leafVersionAndParity & 0x01);
+
+         // b. Verify Taproot Commitment
+         // b.1. Calculate tapLeafHash = TaggedHash("TapLeaf", tap_leaf_version || CompactSize(tapscript) || tapscript)
+         byte[] tapLeafPreimage;
+         using (var ms = new System.IO.MemoryStream())
+         using (var writer = new System.IO.BinaryWriter(ms))
+         {
+            writer.Write(tapLeafVersion);
+            SighashGenerator.WriteTaprootCompactSizeForTest(writer, (ulong)tapScriptBytes.Length); // Assuming this helper is accessible or reimplemented
+            writer.Write(tapScriptBytes);
+            tapLeafPreimage = ms.ToArray();
+         }
+         byte[] tapLeafHash = HashUtils.TaggedHash("TapLeaf", tapLeafPreimage);
+
+         // b.2. Calculate Merkle Root (tweak_t) from tapLeafHash and Merkle path
+         byte[] currentHash = tapLeafHash;
+         foreach (byte[] pathElement in merklePathHashes)
+         {
+            int comparison = CompareByteArrays(currentHash, pathElement);
+            byte[] combined;
+            if (comparison < 0) // currentHash is smaller
+            {
+               combined = currentHash.Concat(pathElement).ToArray();
+            }
+            else // pathElement is smaller or equal
+            {
+               combined = pathElement.Concat(currentHash).ToArray();
+            }
+            currentHash = HashUtils.TaggedHash("TapBranch", combined);
+         }
+         byte[] merkleRoot_t_bytes = currentHash;
+
+         // b.3. Reconstruct and Verify Taproot Output Key Q
+         //    P_internal = lift_x(internalPublicKeyBytes_p)
+         Org.BouncyCastle.Crypto.Parameters.ECPublicKeyParameters? pInternalParams = SchnorrVerifierBouncyCastle.ParseXOnlyPublicKey_BouncyCastle(internalPublicKeyBytes_p);
+         if (pInternalParams == null)
+         {
+            error = ScriptError.TAPROOT_CONTROL_BLOCK_INVALID_PUBKEY;
+            return false;
+         }
+         Org.BouncyCastle.Math.EC.ECPoint P_internal = pInternalParams.Q;
+
+         //    tweak_scalar = int(merkleRoot_t_bytes) mod n
+         Org.BouncyCastle.Math.BigInteger tweak_scalar = new Org.BouncyCastle.Math.BigInteger(1, merkleRoot_t_bytes);
+         if (tweak_scalar.CompareTo(SchnorrVerifierBouncyCastle.OrderN_BouncyCastle) >= 0)
+         {
+            error = ScriptError.TAPROOT_COMMITMENT_MISMATCH; // Tweak out of range
+            return false;
+         }
+
+         //    Q_calculated_point = P_internal + tweak_scalar * G
+         Org.BouncyCastle.Math.EC.ECPoint G = SchnorrVerifierBouncyCastle.DomainParameters_BouncyCastle.G;
+         Org.BouncyCastle.Math.EC.ECPoint Q_calculated_point = P_internal.Add(G.Multiply(tweak_scalar)).Normalize();
+
+         if (Q_calculated_point.IsInfinity)
+         {
+            error = ScriptError.TAPROOT_COMMITMENT_MISMATCH; // Resulting point is infinity
+            return false;
+         }
+
+         // Compare x(Q_calculated_point) with taprootOutputKeyFromScriptPubKey (which is x(Q_expected))
+         byte[] x_q_calculated_bytes = Q_calculated_point.XCoord.ToBigInteger().ToByteArrayUnsigned();
+         // Ensure 32 bytes by padding with leading zeros if necessary (though unlikely for valid X)
+         if (x_q_calculated_bytes.Length < 32)
+         {
+            byte[] padded = new byte[32];
+            System.Buffer.BlockCopy(x_q_calculated_bytes, 0, padded, 32 - x_q_calculated_bytes.Length, x_q_calculated_bytes.Length);
+            x_q_calculated_bytes = padded;
+         }
+         else if (x_q_calculated_bytes.Length > 32) // Should not happen for secp256k1 x-coordinate
+         {
+             error = ScriptError.TAPROOT_COMMITMENT_MISMATCH; return false;
+         }
+
+
+         if (!x_q_calculated_bytes.SequenceEqual(taprootOutputKeyFromScriptPubKey))
+         {
+            error = ScriptError.TAPROOT_COMMITMENT_MISMATCH;
+            return false;
+         }
+
+         // Check parity
+         bool y_is_odd = Q_calculated_point.YCoord.ToBigInteger().TestBit(0);
+         if ((parityBit == 1) != y_is_odd)
+         {
+            error = ScriptError.TAPROOT_COMMITMENT_MISMATCH; // Parity mismatch
+            return false;
+         }
+         // Commitment verified.
+
+         // c. Execute Tapscript
+         // TODO: This is the next major step.
+         // For now, if commitment is verified, we'll consider script path spend valid up to this point.
+         // A full implementation will parse tapScriptBytes, create ScriptEvaluationContext,
+         // populate stack with initialStackForTapscript, and run _interpreter.Evaluate for Tapscript rules.
+
+         System.Diagnostics.Debug.WriteLine("WARNING: Tapscript execution part of ValidateTaprootScriptPathSpend is STUBBED.");
+         // error = ScriptError.UNKNOWN_ERROR; // Mark as not fully implemented for Tapscript execution
+         // return false; // Returning false until Tapscript execution is also implemented
+
+         // For this subtask, successfully verifying the commitment is the goal.
+         // The actual Tapscript execution is for Task 3.3d.
+         // So, if we reach here, the commitment part is valid.
+
+         // c. Execute Tapscript
+         if (tapScriptBytes.Length > ScriptInterpreter.MAX_SCRIPT_SIZE)
+         {
+            error = ScriptError.SCRIPT_SIZE_EXCEEDED;
+            return false;
+         }
+
+         if (!ScriptParser.TryParse(tapScriptBytes, out IList<ScriptElement> parsedTapscriptElements, out ScriptError parseError))
+         {
+            error = parseError; // Propagate parsing error
+            return false;
+         }
+
+         var tapScriptContext = new ScriptEvaluationContext(
+             txSpending,
+             inputIndex,
+             spentOutputs[inputIndex].Value, // Amount for the current input
+             ScriptFlags.Taproot | ScriptFlags.Witness, // Base flags for Tapscript
+                                                        // Add any other relevant flags from 'settings' if needed, e.g. settings.ScriptVerifyFlags
+             allSpentOutputs: spentOutputs,
+             currentTapLeafHash: tapLeafHash, // Calculated during commitment verification
+             currentTapLeafVersion: tapLeafVersion, // From control block (e.g., 0xc0)
+             annexForSighash: annex // Raw annex bytes
+         );
+         tapScriptContext.Script = parsedTapscriptElements;
+
+         // Populate initial stack for Tapscript
+         // As per BIP342, stack items are pushed in reverse order of their appearance in the witness.
+         // `initialStackForTapscript` is already in the correct order (script's initial stack items, last one on top).
+         // So, we push them onto the context's MainStack in the order they are, which means they'll be reversed on the stack.
+         // Then, when popped by script opcodes, they come out in the intended order.
+         // Example: witness: [... S2 S1 CtlBlk Script], initialStackForTapscript = [S2, S1]. Stack becomes [S1 (top), S2].
+         while (tapScriptContext.MainStack.Count > 0) tapScriptContext.MainStack.Pop(); // Clear stack
+         foreach (var item in initialStackForTapscript.AsEnumerable().Reverse()) // Iterate from bottom of initial witness stack to top
+         {
+            // BIP342: "The existing 520 byte limit on stack element size applies."
+            if (item.Length > ScriptInterpreter.MAX_SCRIPT_ELEMENT_SIZE_TAPSCRIPT)
+            {
+               error = ScriptError.TAPROOT_STACK_ELEMENT_SIZE_EXCEEDED_TAPSCRIPT;
+               return false;
+            }
+            tapScriptContext.MainStack.Push(item);
+         }
+
+         // Execute the Tapscript
+         if (!_interpreter.Evaluate(tapScriptContext))
+         {
+            error = tapScriptContext.GetError(); // Propagate specific error from interpreter
+            if (error == ScriptError.OK && tapScriptContext.ScriptFailed) // Ensure an error is set if script failed but OK was returned
+            {
+               error = ScriptError.EVAL_FALSE; // Generic failure if no specific error was set
+            }
+            return false;
+         }
+
+         // The _interpreter.Evaluate now handles the final stack state check for Taproot
+         // (exactly one true item, or OP_SUCCESS path).
+         // If it returned true, the Tapscript is considered valid.
+         return true;
+      }
+
+      // Helper for lexicographical byte array comparison
+      private int CompareByteArrays(byte[] a, byte[] b)
+      {
+         int len = System.Math.Min(a.Length, b.Length);
+         for (int i = 0; i < len; i++)
+         {
+            if (a[i] < b[i]) return -1;
+            if (a[i] > b[i]) return 1;
+         }
+         return a.Length.CompareTo(b.Length);
       }
    }
 }

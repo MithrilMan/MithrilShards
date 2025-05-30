@@ -5,5 +5,11 @@
 /// </summary>
 public interface IBlockValidationContextFactory
 {
-   IBlockValidationContext Create(Protocol.Types.Block block);
+   /// <summary>
+   /// Creates a new block validation context.
+   /// </summary>
+   /// <param name="block">The block to be validated.</param>
+   /// <param name="coinsView">The UTXO view to be used for this validation session.</param>
+   /// <returns>A new block validation context.</returns>
+   IBlockValidationContext Create(Protocol.Types.Block block, ICoinsView coinsView);
 }

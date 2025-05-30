@@ -74,30 +74,91 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Script
       /// Used in signature checking operations to determine the scriptCode.
       /// Initialized to 0, meaning the entire script from the beginning.
       /// </summary>
-      public int CodeSeparatorPosition { get; set; } = 0;
+      public int CodeSeparatorPosition { get; set; } = 0; // For legacy sighash
+
+      // --- Taproot Specific Fields (BIP341/BIP342) ---
+      /// <summary>
+      /// For Tapscript execution, this is the hash of the Tapscript being executed.
+      /// Used by OP_CHECKSIGADD for sighash calculation (ext_flag = 1).
+      /// </summary>
+      public byte[]? CurrentTapLeafHash { get; }
+
+      /// <summary>
+      /// For Tapscript execution, this is the leaf version of the script being executed (e.g., 0xc0 for Tapscript).
+      /// Used by OP_CHECKSIGADD (ext_flag = 1).
+      /// </summary>
+      public byte CurrentTapLeafVersion { get; } // LEAF_VERSION_TAPSCRIPT = 0xc0
+
+      /// <summary>
+      /// Counts signature operations (OP_CHECKSIG, OP_CHECKSIGVERIFY, OP_CHECKMULTISIG, OP_CHECKMULTISIGVERIFY, OP_CHECKSIGADD).
+      /// In Tapscript, this is limited to 50.
+      /// </summary>
+      public int SignatureOperationCount { get; set; } = 0;
+
+      /// <summary>
+      /// All UTXOs being spent by the current transaction. Required for Taproot sighash calculation.
+      /// </summary>
+      public TransactionOutput[]? AllSpentOutputs { get; }
+
+      /// <summary>
+      /// The annex data if present in a Taproot spend. Used for sighash calculation if ext_flag indicates annex.
+      /// This is the raw annex data, not its hash.
+      /// </summary>
+      public byte[]? AnnexForSighash { get; }
+
+      /// <summary>
+      /// Indicates if a successful script execution requires the stack to be clean
+      /// (i.e., contain exactly one true item). OP_SUCCESSx opcodes can set this to false.
+      /// </summary>
+      // public bool ScriptSuccessRequiresCleanStack { get; set; } = true; // Replaced by EvaluationResultIfHalted
+
+      /// <summary>
+      /// If HaltExecution is true, this field indicates the success/failure result.
+      /// True for OP_SUCCESSx, false for OP_RETURN or other immediate failures.
+      /// </summary>
+      public bool EvaluationResultIfHalted { get; set; } = false;
 
 
-      public ScriptEvaluationContext(Transaction? transaction, int inputIndex, long amount, ScriptFlags flags = ScriptFlags.None)
+      public ScriptEvaluationContext(Transaction? transaction,
+                                   int inputIndex,
+                                   long amount, // Amount of the current input's UTXO
+                                   ScriptFlags flags = ScriptFlags.None,
+                                   TransactionOutput[]? allSpentOutputs = null, // For Taproot
+                                   byte[]? currentTapLeafHash = null,         // For Tapscript
+                                   byte currentTapLeafVersion = 0,           // For Tapscript (e.g., 0xc0)
+                                   byte[]? annexForSighash = null             // For Tapscript sighash with annex
+                                   )
       {
          Transaction = transaction;
          InputIndex = inputIndex;
          Amount = amount;
          Flags = flags;
+         AllSpentOutputs = allSpentOutputs;
+         CurrentTapLeafHash = currentTapLeafHash;
+         CurrentTapLeafVersion = currentTapLeafVersion;
+         AnnexForSighash = annexForSighash;
       }
 
+      // Simplified constructor for non-Taproot or when Taproot specifics are set later
       public ScriptEvaluationContext(ScriptFlags flags = ScriptFlags.None)
-      : this(null, -1, 0, flags) { }
+         : this(null, -1, 0, flags, null, null, 0, null) { }
 
 
+      private ScriptError _error = ScriptError.OK;
       /// <summary>
       /// Marks the script as failed and sets HaltExecution to true.
       /// </summary>
-      public void SetError(ScriptError error = ScriptError.UNKNOWN_ERROR) // TODO: Define ScriptError enum
+      public void SetError(ScriptError error)
       {
-         // In a real system, 'error' would be recorded.
+         if (_error == ScriptError.OK) // Only set the first error encountered
+         {
+            _error = error;
+         }
          ScriptFailed = true;
          HaltExecution = true;
       }
+
+      public ScriptError GetError() => _error;
 
       /// <summary>
       /// Gets the current conditional state (i.e. if the current branch of an IF/ELSE should execute).
@@ -195,14 +256,31 @@ namespace MithrilShards.Chain.Bitcoin.Consensus.Validation.Script
 
       // Taproot specific errors (BIP341/342)
       TAPROOT_WRONG_CONTROL_BLOCK_SIZE,
-      TAPROOT_INVALID_LEAF_VERSION,
-      TAPROOT_CHECKSIGADD_FAIL, // From OP_CHECKSIGADD
-      SCHNORR_SIG_VERIFICATION_FAILED, // Generic Schnorr failure if not covered by more specific ones
+      TAPROOT_INVALID_LEAF_VERSION,       // Leaf version in control block is invalid
+      TAPROOT_LEAF_VERSION_MISMATCH,    // Leaf version in control block doesn't match script execution context (e.g. 0xc0 for Tapscript)
+      TAPROOT_CHECKSIGADD_FAIL,           // From OP_CHECKSIGADD internal logic
+      SCHNORR_SIG_VERIFICATION_FAILED,    // Generic Schnorr failure if not covered by more specific ones
       SCHNORR_SIG_INVALID_LENGTH,
       SCHNORR_SIG_INVALID_PUBKEY_X_ONLY,
-      SCHNORR_SIG_R_COMPONENT_INVALID, // R >= N or R not on curve (BIP340 implies R is an x-coord, so always on curve if valid x)
-      SCHNORR_SIG_S_COMPONENT_INVALID, // S >= N
-      TAPROOT_KEY_PATH_NO_SIGNATURE, // Key path spend with no signature
-      TAPROOT_KEY_PATH_SIGNATURE_INVALID_LENGTH, // Key path spend with signature of wrong length (not 64 or 65)
+      SCHNORR_SIG_R_COMPONENT_INVALID,    // R >= N or R not on curve (BIP340 implies R is an x-coord, so always on curve if valid x)
+      SCHNORR_SIG_S_COMPONENT_INVALID,    // S >= N
+      TAPROOT_KEY_PATH_NO_SIGNATURE,
+      TAPROOT_KEY_PATH_SIGNATURE_INVALID_LENGTH,
+      TAPROOT_SCRIPT_PATH_NO_CONTROL_BLOCK,
+      TAPROOT_SCRIPT_PATH_NO_SCRIPT,
+      TAPROOT_SCRIPT_PATH_STACK_EMPTY_AFTER_SCRIPT, // After tapscript execution, stack must not be empty
+      TAPROOT_SCRIPT_PATH_STACK_TOP_NOT_TRUE,      // After tapscript execution, top stack item must be true
+      TAPROOT_CONTROL_BLOCK_INVALID_PUBKEY,        // Internal pubkey in control block is invalid
+      TAPROOT_CONTROL_BLOCK_MERKLE_PROOF_INVALID,  // Merkle proof in control block is invalid or too long
+      TAPROOT_COMMITMENT_MISMATCH,                 // Calculated Taproot output key doesn't match provided one
+      TAPROOT_CODESEPARATOR_INVALID_POSITION,      // OP_CODESEPARATOR used in Tapscript
+      TAPROOT_OP_SUCCESS_ERROR,                    // OP_SUCCESSx used incorrectly or with invalid data
+      TAPROOT_STACK_ELEMENT_SIZE_EXCEEDED_TAPSCRIPT, // Stack element size exceeds 520 bytes in Tapscript
+      TAPROOT_SIGNATURE_COUNT_EXCEEDED,            // More than 50 signature operations in Tapscript (SIGOP_LIMIT_TAPROOT)
+      TAPROOT_DISABLED_OPCODE_TAPSCRIPT,           // Use of a disabled opcode within Tapscript (DISABLED_OPCODE_TAPROOT)
+
+      // Specific errors for OP_CHECKSIGADD format/type checks
+      TAPROOT_PUBKEY_FORMAT_ERROR,                // Public key format error in Tapscript (PUBKEYTYPE_TAPROOT)
+      TAPROOT_SIGNATURE_FORMAT_ERROR,             // Signature format error in Tapscript (SIG_FORMAT_TAPROOT)
    }
 }

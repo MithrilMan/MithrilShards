@@ -18,4 +18,11 @@ public interface IBlockValidationContext : IValidationContext
    /// The known block that has been already validated previously.
    /// </value>
    Protocol.Types.Block? KnownBlock { get; }
+
+   /// <summary>
+   /// Provides access to the UTXO set relevant for the current block validation.
+   /// This view should allow lookups for inputs of transactions in the current block,
+   /// potentially including outputs of earlier transactions in the same block.
+   /// </summary>
+   ICoinsView CoinsView { get; }
 }

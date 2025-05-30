@@ -59,4 +59,15 @@ public enum BlockValidationStateResults
    /// the block failed to meet one of our checkpoints
    /// </summary>
    Checkpoint,
+
+   /// <summary>
+   /// An input is missing.
+   /// </summary>
+   MissingInputs,
+
+   /// <summary>
+   /// A mandatory script verification flag failed (e.g. P2SH, WITNESS, DERSIG, NULLDUMMY, CLTV, CSV, Taproot).
+   /// This does not include SCRIPT_ERR_EVAL_FALSE or SCRIPT_ERR_VERIFY type failures.
+   /// </summary>
+   MandatoryScriptVerifyFlagFailed
 }
